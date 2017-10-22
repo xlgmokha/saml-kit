@@ -8,11 +8,11 @@ class AuthenticationRequest
   end
 
   def id
-    raise NotImplementedError.new
+    @hash['AuthnRequest']['ID']
   end
 
   def acs_url
-    raise NotImplementedError.new
+    @hash['AuthnRequest']['AssertionConsumerServiceURL']
   end
 
   def issuer
