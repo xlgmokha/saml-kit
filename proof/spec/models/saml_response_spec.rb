@@ -4,7 +4,7 @@ describe SamlResponse do
   describe ".for" do
     subject { described_class }
     let(:user) { double(:user, uuid: SecureRandom.uuid) }
-    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url) }
+    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:issuer) { FFaker::Movie.title }
 
@@ -79,6 +79,10 @@ describe SamlResponse do
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['NotOnOrAfter']).to eql(3.hours.from_now.utc.iso8601)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['Recipient']).to eql(acs_url)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['InResponseTo']).to eql(request.id)
+
+      expect(hash['Response']['Assertion']['Conditions']['NotBefore']).to eql(5.seconds.ago.utc.iso8601)
+      expect(hash['Response']['Assertion']['Conditions']['NotOnOrAfter']).to eql(3.hours.from_now.utc.iso8601)
+      expect(hash['Response']['Assertion']['Conditions']['AudienceRestriction']['Audience']).to eql(request.issuer)
     end
   end
 end

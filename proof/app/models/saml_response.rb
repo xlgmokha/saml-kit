@@ -39,6 +39,11 @@ class SamlResponse
               xml.SubjectConfirmationData "", subject_confirmation_data_options
             end
           end
+          xml.Conditions conditions_options do
+            xml.AudienceRestriction do
+              xml.Audience request.issuer
+            end
+          end
         end
       end
       xml.target!
@@ -79,6 +84,13 @@ class SamlResponse
         InResponseTo: request.id,
         NotOnOrAfter: 3.hours.from_now.utc.iso8601,
         Recipient: request.acs_url,
+      }
+    end
+
+    def conditions_options
+      {
+        NotBefore: 5.seconds.ago.utc.iso8601,
+        NotOnOrAfter: 3.hours.from_now.utc.iso8601,
       }
     end
 
