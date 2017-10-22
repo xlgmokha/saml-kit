@@ -7,7 +7,7 @@ describe AuthenticationRequest do
 
   describe "#valid?" do
     let(:raw_xml) do
-      builder = AuthenticationRequestBuilder.new
+      builder = AuthenticationRequest::Builder.new
       builder.id = SecureRandom.uuid
       builder.issued_at = Time.now.utc
       builder.issuer = "my-issuer"

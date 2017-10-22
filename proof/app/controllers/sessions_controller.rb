@@ -33,6 +33,7 @@ class SessionsController < ApplicationController
 
   def post_to_service_provider(user)
     @saml_response = @saml_request.response_for(user)
+    @relay_state = params[:RelayState]
     render template: "sessions/saml_post", layout: nil
   end
 
