@@ -1,0 +1,5 @@
+Rails.application.config.x.acs_url = ENV['ACS_URL']
+Rails.application.config.x.authentication_host = ENV['AUTHENTICATION_HOST']
+Rails.application.config.x.issuer = ENV['ISSUER']
+Rails.configuration.x.api_client_id = ENV['API_CLIENT_ID']
+Rails.configuration.x.api_client_secret = ENV['API_CLIENT_SECRET']
