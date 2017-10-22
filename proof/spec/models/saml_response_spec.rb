@@ -3,7 +3,7 @@ require 'rails_helper'
 describe SamlResponse do
   describe ".for" do
     subject { described_class }
-    let(:user) { double(:user) }
+    let(:user) { double(:user, uuid: SecureRandom.uuid) }
     let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:issuer) { FFaker::Movie.title }
@@ -21,10 +21,15 @@ describe SamlResponse do
   <samlp:Status>
     <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
   </samlp:Status>
-  <saml:Assertion xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" ID="_d71a3a8e9fcc45c9e9d248ef7049393fc8f04e5f75" Version="2.0" IssueInstant="2014-07-17T01:01:48Z">
+  <saml:Assertion
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    ID="_d71a3a8e9fcc45c9e9d248ef7049393fc8f04e5f75"
+    Version="2.0"
+    IssueInstant="2014-07-17T01:01:48Z">
     <saml:Issuer>http://idp.example.com/metadata.php</saml:Issuer>
     <saml:Subject>
-      <saml:NameID SPNameQualifier="http://sp.example.com/demo1/metadata.php" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient">_ce3d2948b4cf20146dee0a0b3dd6f69b6cf86f62d7</saml:NameID>
+      <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient">_ce3d2948b4cf20146dee0a0b3dd6f69b6cf86f62d7</saml:NameID>
       <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
         <saml:SubjectConfirmationData NotOnOrAfter="2024-01-18T06:21:48Z" Recipient="http://sp.example.com/demo1/index.php?acs" InResponseTo="ONELOGIN_4fee3b046395c4e751011e97f8900b5273d56685"/>
       </saml:SubjectConfirmation>
@@ -46,10 +51,6 @@ describe SamlResponse do
       <saml:Attribute Name="mail" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
         <saml:AttributeValue xsi:type="xs:string">test@example.com</saml:AttributeValue>
       </saml:Attribute>
-      <saml:Attribute Name="eduPersonAffiliation" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
-        <saml:AttributeValue xsi:type="xs:string">users</saml:AttributeValue>
-        <saml:AttributeValue xsi:type="xs:string">examplerole1</saml:AttributeValue>
-      </saml:Attribute>
     </saml:AttributeStatement>
   </saml:Assertion>
 </samlp:Response>
@@ -67,6 +68,17 @@ describe SamlResponse do
       expect(hash['Response']['InResponseTo']).to eql(request.id)
       expect(hash['Response']['Issuer']).to eql(issuer)
       expect(hash['Response']['Status']['StatusCode']['Value']).to eql("urn:oasis:names:tc:SAML:2.0:status:Success")
+
+      expect(hash['Response']['Assertion']['ID']).to be_present
+      expect(hash['Response']['Assertion']['IssueInstant']).to eql(Time.now.utc.iso8601)
+      expect(hash['Response']['Assertion']['Version']).to eql("2.0")
+      expect(hash['Response']['Assertion']['Issuer']).to eql(issuer)
+
+      expect(hash['Response']['Assertion']['Subject']['NameID']).to eql(user.uuid)
+      expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['Method']).to eql("urn:oasis:names:tc:SAML:2.0:cm:bearer")
+      expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['NotOnOrAfter']).to eql(3.hours.from_now.utc.iso8601)
+      expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['Recipient']).to eql(acs_url)
+      expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['InResponseTo']).to eql(request.id)
     end
   end
 end
