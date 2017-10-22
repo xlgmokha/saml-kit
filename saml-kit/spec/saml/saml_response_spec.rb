@@ -1,11 +1,11 @@
-require 'rails_helper'
+require 'spec_helper'
 
-describe SamlResponse do
+RSpec.describe Saml::Kit::SamlResponse do
   describe "#acs_url" do
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes: { }) }
     let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title) }
-    subject { SamlResponse::Builder.new(user, request).build }
+    subject { described_class::Builder.new(user, request).build }
 
     it 'returns the acs_url' do
       expect(subject.acs_url).to eql(acs_url)
@@ -13,7 +13,7 @@ describe SamlResponse do
   end
 
   describe "#to_xml" do
-    subject { SamlResponse::Builder.new(user, request) }
+    subject { described_class::Builder.new(user, request) }
     let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes: { email: email, created_at: Time.now.utc.iso8601 }) }
     let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
@@ -69,7 +69,7 @@ describe SamlResponse do
     XML
     it 'returns a proper response for the user' do
       travel_to 1.second.from_now
-      allow(Rails.configuration.x).to receive(:issuer).and_return(issuer)
+      allow(Saml::Kit.configuration).to receive(:issuer).and_return(issuer)
       result = subject.to_xml
       hash = Hash.from_xml(result)
 

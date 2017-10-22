@@ -1,13 +1,13 @@
-require 'rails_helper'
+require 'spec_helper'
 
-describe AuthenticationRequest do
+RSpec.describe Saml::Kit::AuthenticationRequest do
   subject { described_class.new(raw_xml, registry) }
   let(:registry) { double }
   let(:id) { SecureRandom.uuid }
   let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
   let(:issuer) { FFaker::Movie.title }
   let(:raw_xml) do
-    builder = AuthenticationRequest::Builder.new
+    builder = described_class::Builder.new
     builder.id = id
     builder.issued_at = Time.now.utc
     builder.issuer = issuer
