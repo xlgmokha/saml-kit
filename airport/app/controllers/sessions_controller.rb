@@ -9,9 +9,8 @@ class SessionsController < ApplicationController
 
   def create
     saml_response = SamlResponse.parse(params[:SAMLResponse])
-    session[:email] = saml_response.email
-    session[:user_id] = saml_response[:user_id]
-    session[:access_token] = ApiClient.new(session).access_token
+    session[:user_id] = saml_response.name_id
+    session[:email] = saml_response[:email]
     redirect_to dashboard_path
   end
 

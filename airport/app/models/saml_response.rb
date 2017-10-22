@@ -4,7 +4,7 @@ class SamlResponse
     @hash = Hash.from_xml(xml)
   end
 
-  def email
+  def name_id
     @hash['Response']['Assertion']['Subject']['NameID']
   end
 
