@@ -4,7 +4,7 @@ describe SamlResponse do
   describe ".for" do
     subject { described_class }
     let(:user) { double(:user) }
-    let(:authentication_request) { double(acs_url: acs_url) }
+    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
 
     <<-XML
@@ -55,13 +55,14 @@ describe SamlResponse do
     XML
     it 'returns a proper response for the user' do
       travel_to 1.second.from_now
-      result = subject.for(user, authentication_request).to_xml
+      result = subject.for(user, request).to_xml
       hash = Hash.from_xml(result)
 
       expect(hash['Response']['ID']).to be_present
       expect(hash['Response']['Version']).to eql('2.0')
       expect(hash['Response']['IssueInstant']).to eql(Time.now.utc.iso8601)
       expect(hash['Response']['Destination']).to eql(acs_url)
+      expect(hash['Response']['InResponseTo']).to eql(request.id)
     end
   end
 end

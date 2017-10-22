@@ -7,6 +7,14 @@ class AuthenticationRequest
     @hash = Hash.from_xml(@xml)
   end
 
+  def id
+    raise NotImplementedError.new
+  end
+
+  def acs_url
+    raise NotImplementedError.new
+  end
+
   def issuer
     @hash['AuthnRequest']['Issuer']
   end

@@ -32,6 +32,7 @@ class SamlResponse
         Version: "2.0",
         IssueInstant: Time.now.utc.iso8601,
         Destination: request.acs_url,
+        InResponseTo: request.id,
       }
       xml.tag! "samlp:Response", options do |response|
       end
