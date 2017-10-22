@@ -50,6 +50,13 @@ class SamlResponse
               xml.AuthnContextClassRef Namespaces::AuthnContext::ClassRef::PASSWORD
             end
           end
+          xml.AttributeStatement do
+            user.assertion_attributes.each do |key, value|
+              xml.Attribute Name: key, NameFormat: Namespaces::Formats::Attr::URI, FriendlyName: key do
+                xml.AttributeValue value.to_s
+              end
+            end
+          end
         end
       end
       xml.target!
