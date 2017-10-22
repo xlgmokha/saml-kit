@@ -6,16 +6,18 @@ class SessionsController < ApplicationController
 
   def create
     if user_params[:email].blank? || user_params[:password].blank?
-      return redirect_to new_session_path(saml_params), error: "Invalid Credentials"
+      return render_invalid_credentials
     end
 
-    user = User.find_by(email: user_params[:email])
-    if user.try(:authenticate, user_params[:password])
+    user = User.find_by!(email: user_params[:email])
+    if user.authenticate(user_params[:password])
       create_user_session(user)
       post_to_service_provider(user)
     else
-      redirect_to new_session_path(saml_params), error: "Invalid Credentials"
+      render_invalid_credentials
     end
+  rescue ActiveRecord::RecordNotFound
+    render_invalid_credentials
   end
 
   private
@@ -30,8 +32,8 @@ class SessionsController < ApplicationController
   end
 
   def post_to_service_provider(user)
-    @saml_response = encode_response(user)
-    render template: "amp_authentication/sessions/saml_post", layout: nil
+    @saml_response = @saml_request.response_for(user)
+    render template: "sessions/saml_post", layout: nil
   end
 
   def saml_params(storage = params)
@@ -42,12 +44,15 @@ class SessionsController < ApplicationController
   end
 
   def validate_saml_request(raw_saml_request = params[:SAMLRequest])
-    #decode_request(raw_saml_request)
-    saml_request = SamlRequest.decode(raw_saml_request)
-    render_http_status(:forbidden) unless saml_request.valid?
+    @saml_request = SamlRequest.decode(raw_saml_request)
+    render_http_status(:forbidden) unless @saml_request.valid?
   end
 
   def render_http_status(status = :forbidden)
     head :status
+  end
+
+  def render_invalid_credentials
+    redirect_to new_session_path(saml_params), error: "Invalid Credentials"
   end
 end
