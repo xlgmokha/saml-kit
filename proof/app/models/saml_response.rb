@@ -5,6 +5,10 @@ class SamlResponse
     @xml = xml
   end
 
+  def acs_url
+    Hash.from_xml(@xml)['Response']['Destination']
+  end
+
   def to_xml
     @xml
   end

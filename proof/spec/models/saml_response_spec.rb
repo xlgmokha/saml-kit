@@ -1,7 +1,18 @@
 require 'rails_helper'
 
 describe SamlResponse do
-  describe "#build" do
+  describe "#acs_url" do
+    let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
+    let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes: { }) }
+    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title) }
+    subject { SamlResponse::Builder.new(user, request).build }
+
+    it 'returns the acs_url' do
+      expect(subject.acs_url).to eql(acs_url)
+    end
+  end
+
+  describe "#to_xml" do
     subject { SamlResponse::Builder.new(user, request) }
     let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes: { email: email, created_at: Time.now.utc.iso8601 }) }
     let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title) }
