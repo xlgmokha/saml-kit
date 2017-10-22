@@ -13,6 +13,10 @@ class SamlResponse
     @xml
   end
 
+  def encode
+    Base64.strict_encode64(to_xml)
+  end
+
   class Builder
     attr_reader :user, :request, :id, :reference_id, :now
 
