@@ -66,6 +66,7 @@ describe SamlResponse do
       expect(hash['Response']['Destination']).to eql(acs_url)
       expect(hash['Response']['InResponseTo']).to eql(request.id)
       expect(hash['Response']['Issuer']).to eql(issuer)
+      expect(hash['Response']['Status']['StatusCode']['Value']).to eql("urn:oasis:names:tc:SAML:2.0:status:Success")
     end
   end
 end

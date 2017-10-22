@@ -36,6 +36,9 @@ class SamlResponse
       }
       xml.tag!("samlp:Response", options) do
         xml.tag!('saml:Issuer', configuration.issuer)
+        xml.tag!("samlp:Status") do
+          xml.tag!('samlp:StatusCode', Value: "urn:oasis:names:tc:SAML:2.0:status:Success")
+        end
       end
       xml.target!
     end
