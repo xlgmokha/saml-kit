@@ -6,6 +6,7 @@ describe SamlResponse do
     let(:user) { double(:user) }
     let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
+    let(:issuer) { FFaker::Movie.title }
 
     <<-XML
 <samlp:Response 
@@ -55,6 +56,7 @@ describe SamlResponse do
     XML
     it 'returns a proper response for the user' do
       travel_to 1.second.from_now
+      allow(Rails.configuration.x).to receive(:issuer).and_return(issuer)
       result = subject.for(user, request).to_xml
       hash = Hash.from_xml(result)
 
@@ -63,6 +65,7 @@ describe SamlResponse do
       expect(hash['Response']['IssueInstant']).to eql(Time.now.utc.iso8601)
       expect(hash['Response']['Destination']).to eql(acs_url)
       expect(hash['Response']['InResponseTo']).to eql(request.id)
+      expect(hash['Response']['Issuer']).to eql(issuer)
     end
   end
 end

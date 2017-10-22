@@ -34,13 +34,20 @@ class SamlResponse
         Destination: request.acs_url,
         InResponseTo: request.id,
       }
-      xml.tag! "samlp:Response", options do |response|
+      xml.tag!("samlp:Response", options) do
+        xml.tag!('saml:Issuer', configuration.issuer)
       end
       xml.target!
     end
 
     def build
       SamlResponse.new(to_xml)
+    end
+
+    private
+
+    def configuration
+      Rails.configuration.x
     end
   end
 end
