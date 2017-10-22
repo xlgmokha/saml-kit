@@ -45,7 +45,7 @@ class SessionsController < ApplicationController
   end
 
   def validate_saml_request(raw_saml_request = params[:SAMLRequest])
-    @saml_request = SamlRequest.decode(raw_saml_request)
+    @saml_request = Saml::Kit::SamlRequest.decode(raw_saml_request)
     render_http_status(:forbidden) unless @saml_request.valid?
   end
 

@@ -1,3 +1,10 @@
+PATH
+  remote: ../saml-kit
+  specs:
+    saml-kit (0.1.0)
+      activesupport (~> 5.1)
+      builder (~> 3.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -226,6 +233,7 @@ DEPENDENCIES
   rails (~> 5.1.4)
   rails-controller-testing
   rspec-rails (~> 3.6)
+  saml-kit!
   sass-rails (~> 5.0)
   selenium-webdriver
   spring
