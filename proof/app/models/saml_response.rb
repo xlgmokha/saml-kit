@@ -15,13 +15,14 @@ class SamlResponse
   end
 
   class Builder
-    attr_reader :user, :request, :id, :reference_id
+    attr_reader :user, :request, :id, :reference_id, :now
 
     def initialize(user, request)
       @user = user
       @request = request
       @id = SecureRandom.uuid
       @reference_id = SecureRandom.uuid
+      @now = Time.now.utc
     end
 
     def to_xml
@@ -44,6 +45,11 @@ class SamlResponse
               xml.Audience request.issuer
             end
           end
+          xml.AuthnStatement authn_statement_options do
+            xml.AuthnContext do
+              xml.AuthnContextClassRef Namespaces::AuthnContext::ClassRef::PASSWORD
+            end
+          end
         end
       end
       xml.target!
@@ -63,7 +69,7 @@ class SamlResponse
       {
         ID: "_#{id}",
         Version: "2.0",
-        IssueInstant: Time.now.utc.iso8601,
+        IssueInstant: now.iso8601,
         Destination: request.acs_url,
         Consent: Namespaces::Consents::UNSPECIFIED,
         InResponseTo: request.id,
@@ -74,7 +80,7 @@ class SamlResponse
     def assertion_options
       {
         ID: "_#{reference_id}",
-        IssueInstant: Time.now.utc.iso8601,
+        IssueInstant: now.iso8601,
         Version: "2.0",
       }
     end
@@ -91,6 +97,14 @@ class SamlResponse
       {
         NotBefore: 5.seconds.ago.utc.iso8601,
         NotOnOrAfter: 3.hours.from_now.utc.iso8601,
+      }
+    end
+
+    def authn_statement_options
+      {
+        AuthnInstant: now.iso8601,
+        SessionIndex: assertion_options[:ID],
+        SessionNotOnOrAfter: 3.hours.from_now.utc.iso8601,
       }
     end
 
