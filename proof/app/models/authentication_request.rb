@@ -28,7 +28,7 @@ class AuthenticationRequest
   end
 
   def response_for(user)
-    SamlResponse.for(user, self)
+    SamlResponse::Builder.new(user, self).build
   end
 
   class Builder
@@ -47,6 +47,10 @@ class AuthenticationRequest
         xml.tag!('samlp:NameIDPolicy', Format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
       end
       xml.target!
+    end
+
+    def build
+      AuthenticationRequest.new(to_xml)
     end
   end
 end

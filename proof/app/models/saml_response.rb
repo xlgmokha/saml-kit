@@ -9,11 +9,6 @@ class SamlResponse
     @xml
   end
 
-  def self.for(user, authentication_request)
-    builder = Builder.new(user, authentication_request)
-    builder.build
-  end
-
   class Builder
     attr_reader :user, :request, :id, :reference_id, :now
 

@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 describe SamlResponse do
-  describe ".for" do
-    subject { described_class }
+  describe "#build" do
+    subject { SamlResponse::Builder.new(user, request) }
     let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes: { email: email, created_at: Time.now.utc.iso8601 }) }
     let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
@@ -10,13 +10,13 @@ describe SamlResponse do
     let(:email) { FFaker::Internet.email }
 
     <<-XML
-<samlp:Response 
-  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
-  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" 
-  ID="_8e8dc5f69a98cc4c1ff3427e5ce34606fd672f91e6" 
-  Version="2.0" 
-  IssueInstant="2014-07-17T01:01:48Z" 
-  Destination="http://sp.example.com/demo1/index.php?acs" 
+<samlp:Response
+  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+  ID="_8e8dc5f69a98cc4c1ff3427e5ce34606fd672f91e6"
+  Version="2.0"
+  IssueInstant="2014-07-17T01:01:48Z"
+  Destination="http://sp.example.com/demo1/index.php?acs"
   InResponseTo="ONELOGIN_4fee3b046395c4e751011e97f8900b5273d56685">
   <saml:Issuer>http://idp.example.com/metadata.php</saml:Issuer>
   <samlp:Status>
@@ -59,7 +59,7 @@ describe SamlResponse do
     it 'returns a proper response for the user' do
       travel_to 1.second.from_now
       allow(Rails.configuration.x).to receive(:issuer).and_return(issuer)
-      result = subject.for(user, request).to_xml
+      result = subject.to_xml
       hash = Hash.from_xml(result)
 
       expect(hash['Response']['ID']).to be_present
