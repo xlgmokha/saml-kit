@@ -1,6 +1,6 @@
 module Saml
   module Kit
-    class SamlRequest
+    class Request
       def self.encode(document)
         Base64.encode64(compress(document.to_xml))
       end

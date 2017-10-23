@@ -8,7 +8,7 @@ describe SessionsController do
 
     it 'generates a saml request and redirects to the auth host' do
       travel_to 1.seconds.from_now
-      allow(Saml::Kit::SamlRequest).to receive(:encode).and_return(saml_request)
+      allow(Saml::Kit::Request).to receive(:encode).and_return(saml_request)
       allow(Rails.configuration.x).to receive(:authentication_host).and_return(auth_host)
 
       get :new
@@ -27,7 +27,7 @@ describe SessionsController do
 
   describe "#create" do
     let(:saml_response) do
-      Saml::Kit::SamlResponse::Builder.new(user, auth_request).build.encode
+      Saml::Kit::Response::Builder.new(user, auth_request).build.encode
     end
     let(:auth_request) { double(id: '1', issuer: 'issuer', acs_url: '')  }
     let(:user) { double(uuid: user_id, assertion_attributes: { email: email, blah: 'blah' }) }

@@ -9,7 +9,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    saml_response = Saml::Kit::SamlResponse.parse(params[:SAMLResponse])
+    saml_response = Saml::Kit::Response.parse(params[:SAMLResponse])
     session[:user] = { id: saml_response.name_id }.merge(saml_response.attributes)
     redirect_to dashboard_path
   end
@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
 
   def query_params
     {
-      'SAMLRequest' => Saml::Kit::SamlRequest.encode(authentication_request),
+      'SAMLRequest' => Saml::Kit::Request.encode(authentication_request),
       'RelayState' => JSON.generate(inbound_path: '/'),
     }.map do |(x, y)|
       "#{x}=#{CGI.escape(y)}"
