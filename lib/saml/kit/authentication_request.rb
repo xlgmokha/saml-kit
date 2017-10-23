@@ -34,6 +34,13 @@ module Saml
       class Builder
         attr_accessor :id, :issued_at, :issuer, :acs_url
 
+        def initialize(configuration = Saml::Kit.configuration)
+          @id = SecureRandom.uuid
+          @issued_at = Time.now.utc
+          @acs_url = configuration.acs_url
+          @issuer = configuration.issuer
+        end
+
         def to_xml(xml = ::Builder::XmlMarkup.new)
           xml.tag!('samlp:AuthnRequest',
                    "xmlns:samlp" => "urn:oasis:names:tc:SAML:2.0:protocol",
