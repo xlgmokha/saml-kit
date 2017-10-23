@@ -37,8 +37,7 @@ describe SessionsController do
     it 'logs the correct user in' do
       post :create, params: { SAMLResponse: saml_response }
 
-      expect(session[:email]).to eql(email)
-      expect(session[:user_id]).to eql(user_id)
+      expect(session[:user]).to eql(id: user_id, 'email' => email, 'blah' => 'blah')
       expect(response).to redirect_to(dashboard_path)
     end
   end

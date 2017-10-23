@@ -10,8 +10,7 @@ class SessionsController < ApplicationController
 
   def create
     saml_response = Saml::Kit::SamlResponse.parse(params[:SAMLResponse])
-    session[:user_id] = saml_response.name_id
-    session[:email] = saml_response[:email]
+    session[:user] = { id: saml_response.name_id }.merge(saml_response.attributes)
     redirect_to dashboard_path
   end
 

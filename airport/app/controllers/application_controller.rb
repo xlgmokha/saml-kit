@@ -4,8 +4,8 @@ class ApplicationController < ActionController::Base
   before_action :authenticate!
 
   def current_user
-    return nil unless session[:user_id].present?
-    @current_user ||= User.new(id: session[:user_id], email: session[:email])
+    return nil unless session[:user].present?
+    @current_user ||= User.new(session[:user].with_indifferent_access)
   end
 
   def current_user?
