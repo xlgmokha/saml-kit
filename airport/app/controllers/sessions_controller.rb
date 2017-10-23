@@ -18,14 +18,10 @@ class SessionsController < ApplicationController
 
   def query_params
     {
-      'SAMLRequest' => Saml::Kit::Request.encode(authentication_request),
+      'SAMLRequest' => Saml::Kit::Request.authentication,
       'RelayState' => JSON.generate(inbound_path: '/'),
     }.map do |(x, y)|
       "#{x}=#{CGI.escape(y)}"
     end.join('&')
-  end
-
-  def authentication_request
-    Saml::Kit::AuthenticationRequest::Builder.new
   end
 end
