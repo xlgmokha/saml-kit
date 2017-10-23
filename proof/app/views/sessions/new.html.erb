@@ -1,8 +1,17 @@
-<%= debug flash %>
-<%= form_for :user, url: session_path, method: :post do |form| %>
-  <%= hidden_field_tag :SAMLRequest, params[:SAMLRequest] %>
-  <%= hidden_field_tag :RelayState, params[:RelayState] %>
-  <%= form.email_field :email, autofocus: true, required: :required %>
-  <%= form.password_field :password, required: :required %>
-  <%= form.button t('log_in'), type: 'submit', data: { disable_with: t('loading') } %>
-<% end %>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <%= form_for :user, url: session_path, method: :post do |form| %>
+        <div class="form-group">
+          <%= form.email_field :email, class: 'form-control', placeholder: User.human_attribute_name(:email), autofocus: true, required: :required %>
+        </div>
+        <div class="form-group">
+          <%= form.password_field :password, class: 'form-control', placeholder: User.human_attribute_name(:password), required: :required %>
+        </div>
+        <%= hidden_field_tag :SAMLRequest, params[:SAMLRequest] %>
+        <%= hidden_field_tag :RelayState, params[:RelayState] %>
+        <%= form.button t('log_in'), type: 'submit', class: 'btn btn-primary', data: { disable_with: t('loading') } %>
+      <% end %>
+    </div>
+  </div>
+</div>

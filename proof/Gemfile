@@ -58,3 +58,4 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'dotenv-rails'
 gem 'saml-kit', path: '../saml-kit'
+gem 'rails-assets-bootstrap', source: 'https://rails-assets.org'
