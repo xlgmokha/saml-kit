@@ -3,22 +3,25 @@ module Saml
     class SamlResponse
       def initialize(xml)
         @xml = xml
-        @hash = Hash.from_xml(xml)
+        @xml_hash = Hash.from_xml(xml)
       end
 
       def name_id
-        @hash['Response']['Assertion']['Subject']['NameID']
+        @xml_hash['Response']['Assertion']['Subject']['NameID']
       end
 
       def [](key)
-        item = @hash['Response']['Assertion']['AttributeStatement']['Attribute'].find do |x|
-          x['Name'] == key.to_s
-        end
-        item['AttributeValue']
+        attributes[key]
+      end
+
+      def attributes
+        @attributes ||= Hash[@xml_hash['Response']['Assertion']['AttributeStatement']['Attribute'].map do |item|
+          [item['Name'].to_sym, item['AttributeValue']]
+        end].with_indifferent_access
       end
 
       def acs_url
-        @hash['Response']['Destination']
+        @xml_hash['Response']['Destination']
       end
 
       def to_xml
