@@ -1,6 +1,6 @@
 module Saml
   module Kit
-    class SamlResponse
+    class Response
       def initialize(xml)
         @xml = xml
         @xml_hash = Hash.from_xml(xml)
@@ -85,7 +85,7 @@ module Saml
         end
 
         def build
-          SamlResponse.new(to_xml)
+          Response.new(to_xml)
         end
 
         private

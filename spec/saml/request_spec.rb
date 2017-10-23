@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Saml::Kit::SamlRequest do
+RSpec.describe Saml::Kit::Request do
   describe ".encode" do
     subject { described_class }
 
