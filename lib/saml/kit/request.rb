@@ -5,6 +5,10 @@ module Saml
         Base64.encode64(compress(document.to_xml))
       end
 
+      def self.authentication
+        encode(AuthenticationRequest::Builder.new)
+      end
+
       def self.compress(content)
         content
         #Zlib::Deflate.deflate(xml, 9)[2..-5]
