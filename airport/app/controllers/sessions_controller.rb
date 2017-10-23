@@ -1,5 +1,6 @@
 class SessionsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:create]
+  skip_before_action :authenticate!
 
   def new
     uri = URI.parse(Rails.configuration.x.authentication_host)

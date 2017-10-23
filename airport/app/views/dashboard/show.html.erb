@@ -1,1 +1,7 @@
-<h1>Welcome <%= @user_id %>:<%= @email %></h1>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Welcome <%= current_user.id %>:<%= current_user.email %></h1>
+    </div>
+  </div>
+</div>
