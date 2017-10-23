@@ -112,4 +112,29 @@ RSpec.describe Saml::Kit::SamlResponse do
       expect(hash['Response']['Assertion']['AttributeStatement']['Attribute'][1]['AttributeValue']).to be_present
     end
   end
+
+  describe ".parse" do
+    subject { described_class }
+    let(:raw_response) { IO.read('spec/fixtures/encoded_response.txt') }
+
+    it 'decodes the response to the raw xml' do
+      xml = subject.parse(raw_response).to_xml
+      result = Hash.from_xml(xml)
+      expect(result['Response']['ID']).to eql('_75358cd9-f357-4b2d-999f-f53382ba8263')
+      expect(result['Response']['Version']).to eql('2.0')
+      expect(result['Response']['IssueInstant']).to eql("2017-10-22T23:36:44Z")
+      expect(result['Response']['Destination']).to eql('http://localhost:4000/session')
+      expect(result['Response']['Issuer']).to eql('proof.dev')
+      expect(result['Response']['Status']['StatusCode']['Value']).to eql('urn:oasis:names:tc:SAML:2.0:status:Success')
+      expect(result['Response']['Assertion']['ID']).to eql("_78cacf76-243e-4509-9ace-d1985353b3fe")
+      expect(result['Response']['Assertion']['IssueInstant']).to eql("2017-10-22T23:36:44Z")
+      expect(result['Response']['Assertion']['Issuer']).to eql("proof.dev")
+      expect(result['Response']['Assertion']['Subject']['NameID']).to eql("ea64c235-e18d-4b9a-8672-06ef84dabdec")
+      expect(result['Response']['Assertion']['Conditions']['NotBefore']).to eql("2017-10-22T23:36:39Z")
+      expect(result['Response']['Assertion']['Conditions']['NotOnOrAfter']).to eql("2017-10-23T02:36:44Z")
+      expect(result['Response']['Assertion']['Conditions']['AudienceRestriction']['Audience']).to eql('airport.dev')
+      expect(result['Response']['Assertion']['AttributeStatement']['Attribute'][0]['Name']).to eql('id')
+      expect(result['Response']['Assertion']['AttributeStatement']['Attribute'][0]['AttributeValue']).to eql("ea64c235-e18d-4b9a-8672-06ef84dabdec")
+    end
+  end
 end
