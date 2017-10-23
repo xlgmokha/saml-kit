@@ -6,7 +6,7 @@ class SessionsController < ApplicationController
 
   def create
     if user = User.login(user_params[:email], user_params[:password])
-      create_user_session(user)
+      create_session_for(user)
       post_to_service_provider(user)
     else
       redirect_to new_session_path(saml_params), error: "Invalid Credentials"
@@ -19,7 +19,7 @@ class SessionsController < ApplicationController
     params.require(:user).permit(:email, :password)
   end
 
-  def create_user_session(user)
+  def create_session_for(user)
     reset_session
     session[:user_id] = user.id
   end
