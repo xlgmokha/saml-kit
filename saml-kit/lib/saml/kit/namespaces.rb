@@ -6,6 +6,11 @@ module Saml
       SIGNATURE = "http://www.w3.org/2000/09/xmldsig#"
       PROTOCOL = "urn:oasis:names:tc:SAML:2.0:protocol"
 
+      module Bindings
+        POST = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+        HTTP_REDIRECT = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+      end
+
       module Statuses
         SUCCESS = "urn:oasis:names:tc:SAML:2.0:status:Success"
       end

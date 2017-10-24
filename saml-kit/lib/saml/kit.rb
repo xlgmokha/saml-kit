@@ -11,6 +11,7 @@ require "saml/kit/namespaces"
 require "saml/kit/request"
 require "saml/kit/response"
 require "saml/kit/service_provider_registry"
+require "saml/kit/identity_provider_metadata"
 
 module Saml
   module Kit
