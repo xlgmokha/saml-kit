@@ -34,6 +34,7 @@ module Saml
         module Attr
           URI = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
           BASIC = "urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+          SPLAT = "urn:oasis:names:tc:SAML:2.0:attrname-format:*"
         end
 
         module NameId
