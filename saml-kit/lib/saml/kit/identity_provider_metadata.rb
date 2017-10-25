@@ -1,12 +1,85 @@
 module Saml
   module Kit
     class IdentityProviderMetadata
+      NAMESPACES = {
+        "NameFormat": Namespaces::Formats::Attr::SPLAT,
+        "ds": Namespaces::SIGNATURE,
+        "md": Namespaces::METADATA,
+        "saml": Namespaces::ASSERTION,
+      }.freeze
+
       def initialize(xml)
         @xml = xml
       end
 
+      def entity_id
+        find_by("/md:EntityDescriptor/@entityID").value
+      end
+
+      def name_id_format
+        find_by("/md:EntityDescriptor/md:IDPSSODescriptor/md:NameIDFormat").try(:text)
+      end
+
+      def single_sign_on_services
+        xpath = "/md:EntityDescriptor/md:IDPSSODescriptor/md:SingleSignOnService"
+        find_all(xpath).map do |item|
+          { binding: item.attribute("Binding").value, location: item.attribute("Location").value }
+        end
+      end
+
+      def single_logout_services
+        xpath = "/md:EntityDescriptor/md:IDPSSODescriptor/md:SingleLogoutService"
+        find_all(xpath).map do |item|
+          { binding: item.attribute("Binding").value, location: item.attribute("Location").value }
+        end
+      end
+
+      def certificates
+        xpath = "/md:EntityDescriptor/md:IDPSSODescriptor/md:KeyDescriptor"
+        find_all(xpath).map do |item|
+          cert = Base64.decode64(item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", NAMESPACES).text)
+          {
+            fingerprint: fingerprint_for(cert),
+            use: item.attribute('use').value,
+            value: cert,
+          }
+        end
+      end
+
+      def attributes
+        find_all("/md:EntityDescriptor/md:IDPSSODescriptor/saml:Attribute").map do |item|
+          {
+            format: item.attribute("NameFormat").value,
+            friendly_name: item.attribute("FriendlyName").value,
+            name: item.attribute("Name").value,
+          }
+        end
+      end
+
+      def validate
+      end
+
       def to_xml
         @xml
+      end
+
+      private
+
+      def fingerprint_for(value)
+        x509 = OpenSSL::X509::Certificate.new(value)
+        OpenSSL::Digest::SHA256.new.hexdigest(x509.to_der).upcase.scan(/../).join(":")
+      end
+
+      def document
+        @document ||= Nokogiri::XML(@xml)
+      end
+
+      def find_by(xpath)
+        document.at_xpath(xpath, NAMESPACES)
+      end
+
+      def find_all(xpath)
+        document.search(xpath, NAMESPACES)
       end
 
       class Builder

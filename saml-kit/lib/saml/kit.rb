@@ -1,6 +1,7 @@
 require "saml/kit/version"
 
 require "builder"
+require "nokogiri"
 require "securerandom"
 require "active_support/duration"
 require "active_support/core_ext/numeric/time"
