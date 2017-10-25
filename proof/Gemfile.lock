@@ -4,6 +4,7 @@ PATH
     saml-kit (0.1.0)
       activesupport (~> 5.1)
       builder (~> 3.2)
+      nokogiri (~> 1.8)
 
 GEM
   remote: https://rubygems.org/
