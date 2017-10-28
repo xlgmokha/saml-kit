@@ -57,6 +57,7 @@ module Saml
       end
 
       def validate
+        yield error_message(:invalid_idp_metadata) unless idp_metadata?
       end
 
       def to_xml
@@ -64,6 +65,15 @@ module Saml
       end
 
       private
+
+      def error_message(key)
+        message = I18n.translate(key, scope: 'saml/kit.errors')
+        OpenStruct.new(message: message)
+      end
+
+      def idp_metadata?
+        find_by('/md:EntityDescriptor/md:IDPSSODescriptor').present?
+      end
 
       def fingerprint_for(value)
         x509 = OpenSSL::X509::Certificate.new(value)
