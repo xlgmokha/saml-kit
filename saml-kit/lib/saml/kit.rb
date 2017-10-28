@@ -1,12 +1,14 @@
 require "saml/kit/version"
 
+require "active_model"
+require "active_support/core_ext/hash/conversions"
+require "active_support/core_ext/numeric/time"
+require "active_support/duration"
 require "builder"
 require "nokogiri"
 require "securerandom"
-require "active_model"
-require "active_support/duration"
-require "active_support/core_ext/numeric/time"
-require "active_support/core_ext/hash/conversions"
+require "xmldsig"
+
 require "saml/kit/authentication_request"
 require "saml/kit/configuration"
 require "saml/kit/namespaces"
@@ -15,6 +17,7 @@ require "saml/kit/response"
 require "saml/kit/service_provider_registry"
 require "saml/kit/identity_provider_metadata"
 require "saml/kit/service_provider_metadata"
+require "saml/kit/xml"
 
 I18n.load_path += Dir[File.expand_path("kit/locales/*.yml", File.dirname(__FILE__))]
 

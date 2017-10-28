@@ -13,6 +13,7 @@ module Saml
       validates_presence_of :metadata
       validate :must_contain_idp_descriptor
       validate :must_match_xsd
+      validate :must_have_valid_signature
 
       def initialize(xml)
         @xml = xml
@@ -87,6 +88,15 @@ module Saml
             errors[:metadata] << error.message
           end
         end
+      end
+
+      def must_have_valid_signature
+        return if to_xml.blank?
+        errors[:metadata] << error_message('metadata.invalid_signature') unless valid_signature?
+      end
+
+      def valid_signature?
+        Saml::Kit::Xml.new(to_xml).valid?
       end
 
       def fingerprint_for(value)

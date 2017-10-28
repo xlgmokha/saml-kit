@@ -222,21 +222,15 @@ EOS
         metadata_xml = IO.read("spec/fixtures/metadata/ad_2012.xml").gsub(old_url, new_url)
 
         subject = described_class.new(metadata_xml)
-        subject.validate do |error|
-          errors << error
-        end
-        expect(errors).to be_present
-        expect(errors[0].message).to eql(I18n.translate("activerecord.errors.models.sso_configuration.attributes.metadata.invalid_signature"))
+        expect(subject).to be_invalid
+        expect(subject.errors[:metadata]).to include("invalid signature.")
       end
 
       it 'is valid, when the content has not been tampered with' do
         metadata_xml = IO.read("spec/fixtures/metadata/ad_2012.xml")
 
         subject = described_class.new(metadata_xml)
-        subject.validate do |error|
-          errors << error
-        end
-        expect(errors).to be_empty
+        expect(subject).to be_valid
       end
     end
   end
