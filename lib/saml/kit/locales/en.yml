@@ -6,3 +6,4 @@ en:
         metadata:
           invalid_idp: "must contain identity provider metadata."
           blank: "metadata is required."
+          invalid_signature: "invalid signature."
