@@ -15,6 +15,8 @@ require "saml/kit/service_provider_registry"
 require "saml/kit/identity_provider_metadata"
 require "saml/kit/service_provider_metadata"
 
+I18n.load_path += Dir[File.expand_path("kit/locales/*.yml", File.dirname(__FILE__))]
+
 module Saml
   module Kit
     def self.configuration

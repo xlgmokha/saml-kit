@@ -1,0 +1,5 @@
+---
+en:
+  saml/kit:
+    errors:
+      invalid_idp_metadata: "must contain identity provider metadata."

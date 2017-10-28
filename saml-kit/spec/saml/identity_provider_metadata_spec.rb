@@ -109,7 +109,6 @@ EOS
         { location: "https://win2008r2-ad-sso.qa1.immunet.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
       ])
     end
-    it { expect(subject.certificate_base64).to eql(certificate) }
     it do
       expect(subject.certificates).to match_array([
         { use: 'signing', value: Base64.decode64(signing_certificate), fingerprint: "E6:03:E1:2D:F2:70:9C:D6:CC:8B:3E:4C:5A:37:F5:53:D7:B2:78:B1:2E:95:5B:31:5C:56:E8:7F:16:A1:1B:D2"  },
@@ -197,7 +196,7 @@ EOS
         errors << error
       end
       expect(errors).to be_present
-      expect(errors[0].message).to eql(I18n.translate("activerecord.errors.models.sso_configuration.attributes.metadata.not_service_provider"))
+      expect(errors[0].message).to eql(I18n.translate("saml/kit.errors.invalid_idp_metadata"))
     end
 
     it 'is invalid, when the metadata is nil' do
