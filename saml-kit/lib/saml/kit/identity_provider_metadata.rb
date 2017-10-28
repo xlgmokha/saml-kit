@@ -7,6 +7,12 @@ module Saml
         "md": Namespaces::METADATA,
         "saml": Namespaces::ASSERTION,
       }.freeze
+      METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
+
+      include ActiveModel::Validations
+      validates_presence_of :metadata
+      validate :must_contain_idp_descriptor
+      validate :must_match_xsd
 
       def initialize(xml)
         @xml = xml
@@ -56,10 +62,6 @@ module Saml
         end
       end
 
-      def validate
-        yield error_message(:invalid_idp_metadata) unless idp_metadata?
-      end
-
       def to_xml
         @xml
       end
@@ -67,12 +69,24 @@ module Saml
       private
 
       def error_message(key)
-        message = I18n.translate(key, scope: 'saml/kit.errors')
-        OpenStruct.new(message: message)
+        I18n.translate(key, scope: 'saml/kit.errors.identity_provider_metadata')
       end
 
-      def idp_metadata?
+      def metadata
         find_by('/md:EntityDescriptor/md:IDPSSODescriptor').present?
+      end
+
+      def must_contain_idp_descriptor
+        errors[:metadata] << error_message('metadata.invalid_idp') unless metadata
+      end
+
+      def must_match_xsd
+        Dir.chdir(File.dirname(METADATA_XSD)) do
+          xsd = Nokogiri::XML::Schema(IO.read(METADATA_XSD))
+          xsd.validate(document).each do |error|
+            errors[:metadata] << error.message
+          end
+        end
       end
 
       def fingerprint_for(value)

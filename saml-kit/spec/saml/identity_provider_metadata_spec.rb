@@ -192,30 +192,27 @@ EOS
 
     it 'is invalid, when given service provider metadata' do
       subject = described_class.new(service_provider_metadata)
-      subject.validate do |error|
-        errors << error
-      end
-      expect(errors).to be_present
-      expect(errors[0].message).to eql(I18n.translate("saml/kit.errors.invalid_idp_metadata"))
+      expect(subject).to_not be_valid
+      expect(subject.errors[:metadata]).to include(I18n.translate("saml/kit.errors.identity_provider_metadata.metadata.invalid_idp"))
     end
 
     it 'is invalid, when the metadata is nil' do
       subject = described_class.new(nil)
-      subject.validate do |error|
-        errors << error
-      end
-      expect(errors).to be_present
-      expect(errors[0].message).to eql(I18n.translate("activerecord.errors.models.sso_configuration.attributes.metadata.blank"))
+      expect(subject).to_not be_valid
+      expect(subject.errors[:metadata]).to include("can't be blank")
     end
 
     it 'is invalid, when the metadata does not validate against the xsd schema' do
-      xml = IO.read("spec/fixtures/utf8_policy.xml").force_encoding(Encoding::ASCII_8BIT)
-      subject = described_class.new(xml)
-      subject.validate do |error|
-        errors << error
+      xml = ::Builder::XmlMarkup.new
+      xml.instruct!
+      xml.EntityDescriptor 'xmlns': Saml::Kit::Namespaces::METADATA do
+        xml.IDPSSODescriptor do
+          xml.Fake foo: :bar
+        end
       end
-      expect(errors).to be_present
-      expect(errors[0].message).to eql(I18n.translate("activerecord.errors.models.sso_configuration.attributes.metadata.not_service_provider"))
+      subject = described_class.new(xml.target!)
+      expect(subject).to_not be_valid
+      expect(subject.errors[:metadata][0]).to include("1:0: ERROR: Element '{urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor'")
     end
 
     context "signature validation" do
