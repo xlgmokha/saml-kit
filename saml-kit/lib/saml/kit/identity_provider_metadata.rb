@@ -23,8 +23,8 @@ module Saml
         find_by("/md:EntityDescriptor/@entityID").value
       end
 
-      def name_id_format
-        find_by("/md:EntityDescriptor/md:IDPSSODescriptor/md:NameIDFormat").try(:text)
+      def name_id_formats
+        find_all("/md:EntityDescriptor/md:IDPSSODescriptor/md:NameIDFormat").map(&:text)
       end
 
       def single_sign_on_services
