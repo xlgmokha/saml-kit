@@ -227,6 +227,7 @@ EOS
       end
 
       it 'is valid, when the content has not been tampered with' do
+        travel_to DateTime.parse('2017-10-21')
         metadata_xml = IO.read("spec/fixtures/metadata/ad_2012.xml")
 
         subject = described_class.new(metadata_xml)

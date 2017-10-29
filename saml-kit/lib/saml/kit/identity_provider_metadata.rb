@@ -96,7 +96,12 @@ module Saml
       end
 
       def valid_signature?
-        Saml::Kit::Xml.new(to_xml).valid?
+        xml = Saml::Kit::Xml.new(to_xml)
+        result = xml.valid?
+        xml.errors.each do |error|
+          errors[:metadata] << error
+        end
+        result
       end
 
       def fingerprint_for(value)
