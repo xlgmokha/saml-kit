@@ -48,7 +48,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
 
     it { expect(subject.entity_id).to eql("http://www.okta.com/exk8dx3jilpueVzpU0h7") }
-    it { expect(subject.name_id_format).to eql("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress") }
+    it { expect(subject.name_id_formats).to include("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress") }
     it do
       expect(subject.single_sign_on_services).to match_array([
         { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", location: "https://dev-989848.oktapreview.com/app/ciscodev843126_portal_1/exk8dx3jilpueVzpU0h7/sso/saml" },
@@ -96,7 +96,7 @@ EOS
     end
 
     it { expect(subject.entity_id).to eql("https://win2008r2-ad-sso.qa1.immunet.com/adfs/services/trust") }
-    it { expect(subject.name_id_format).to eql("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress") }
+    it { expect(subject.name_id_formats).to include("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress") }
     it do
       expect(subject.single_sign_on_services).to match_array([
         { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", location: "https://win2008r2-ad-sso.qa1.immunet.com/adfs/ls/" },
@@ -152,7 +152,7 @@ EOS
     end
 
     it { expect(subject.entity_id).to eql("http://win2012r2-ad-sso.qa1.immunet.com/adfs/services/trust") }
-    it { expect(subject.name_id_format).to eql("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress") }
+    it { expect(subject.name_id_formats).to include("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress") }
     it do
       expect(subject.single_sign_on_services).to match_array([
         { location: "https://win2012r2-ad-sso.qa1.immunet.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
