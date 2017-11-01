@@ -15,6 +15,14 @@ module Saml
         @xml = xml
       end
 
+      def entity_id
+        find_by("/md:EntityDescriptor/@entityID").value
+      end
+
+      def name_id_formats
+        find_all("/md:EntityDescriptor/md:#{descriptor_name}/md:NameIDFormat").map(&:text)
+      end
+
       def certificates
         xpath = "/md:EntityDescriptor/md:#{descriptor_name}/md:KeyDescriptor"
         find_all(xpath).map do |item|
