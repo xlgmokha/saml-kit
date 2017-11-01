@@ -37,20 +37,12 @@ module Saml
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
           @issued_at = Time.now.utc
-          @acs_url = configuration.acs_url
           @issuer = configuration.issuer
         end
 
         def to_xml(xml = ::Builder::XmlMarkup.new)
           signature = Signature.new(id)
-          xml.tag!('samlp:AuthnRequest',
-                   "xmlns:samlp" => "urn:oasis:names:tc:SAML:2.0:protocol",
-                   "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion",
-                   ID: id,
-                   Version: "2.0",
-                   IssueInstant: issued_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                   AssertionConsumerServiceURL: acs_url,
-                  ) do
+          xml.tag!('samlp:AuthnRequest', request_options) do
             signature.template(xml)
             xml.tag!('saml:Issuer', issuer)
             xml.tag!('samlp:NameIDPolicy', Format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
@@ -60,6 +52,20 @@ module Saml
 
         def build
           AuthenticationRequest.new(to_xml)
+        end
+
+        private
+
+        def request_options
+          options = {
+            "xmlns:samlp" => Namespaces::PROTOCOL,
+            "xmlns:saml" => Namespaces::ASSERTION,
+            ID: id,
+            Version: "2.0",
+            IssueInstant: issued_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+          }
+          options[:AssertionConsumerServiceURL] = acs_url if acs_url
+          options
         end
       end
     end

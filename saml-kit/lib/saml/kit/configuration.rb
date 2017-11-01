@@ -4,7 +4,7 @@ module Saml
       BEGIN_CERT=/-----BEGIN CERTIFICATE-----/
       END_CERT=/-----END CERTIFICATE-----/
 
-      attr_accessor :issuer, :acs_url
+      attr_accessor :issuer
       attr_accessor :signature_method, :digest_method
       attr_accessor :signing_certificate_pem, :signing_private_key_pem, :signing_private_key_password
 
