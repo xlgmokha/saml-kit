@@ -45,8 +45,7 @@ RSpec.describe Saml::Kit::Signature do
     result = Hash.from_xml(subject.finalize(xml))
 
     signature = result["AuthnRequest"]["Signature"]
-    expect(signature['xmlns:ds']).to eql("http://www.w3.org/2000/09/xmldsig#")
-    expect(signature['SignedInfo']['xmlns:ds']).to eql("http://www.w3.org/2000/09/xmldsig#")
+    expect(signature['xmlns']).to eql("http://www.w3.org/2000/09/xmldsig#")
     expect(signature['SignedInfo']['CanonicalizationMethod']['Algorithm']).to eql('http://www.w3.org/2001/10/xml-exc-c14n#')
     expect(signature['SignedInfo']['SignatureMethod']['Algorithm']).to eql("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256")
 

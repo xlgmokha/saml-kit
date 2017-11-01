@@ -39,29 +39,24 @@ module Saml
           signature = Signature.new(id)
           xml = ::Builder::XmlMarkup.new
           xml.instruct!
-          xml.tag! 'md:EntityDescriptor', entity_descriptor_options do
+          xml.EntityDescriptor entity_descriptor_options do
             signature.template(xml)
-            xml.tag! "md:SPSSODescriptor", descriptor_options do
-              name_id_formats.each do |format|
-                xml.tag! "md:NameIDFormat", format
-              end
-              acs_urls.each_with_index do |item, index|
-                xml.tag! "md:AssertionConsumerService", {
-                  Binding: item[:binding],
-                  Location: item[:location],
-                  index: index,
-                  isDefault: index == 0 ? true : false,
-                }
-              end
-              logout_urls.each do |item|
-                xml.tag! "md:SingleLogoutService", Binding: item[:binding], Location: item[:location]
-              end
-              xml.tag! "md:KeyDescriptor", use: "signing" do
-                xml.tag! "ds:KeyInfo", "xmlns:ds": Saml::Kit::Signature::XMLDSIG do
-                  xml.tag! "ds:X509Data" do
-                    xml.tag! "ds:X509Certificate", @configuration.stripped_signing_certificate
+            xml.SPSSODescriptor descriptor_options do
+              xml.KeyDescriptor use: "signing" do
+                xml.KeyInfo "xmlns": Saml::Kit::Signature::XMLDSIG do
+                  xml.X509Data do
+                    xml.X509Certificate @configuration.stripped_signing_certificate
                   end
                 end
+              end
+              logout_urls.each do |item|
+                xml.SingleLogoutService Binding: item[:binding], Location: item[:location]
+              end
+              name_id_formats.each do |format|
+                xml.NameIDFormat format
+              end
+              acs_urls.each_with_index do |item, index|
+                xml.AssertionConsumerService Binding: item[:binding], Location: item[:location], index: index, isDefault: index == 0 ? true : false
               end
             end
           end
@@ -76,7 +71,7 @@ module Saml
 
         def entity_descriptor_options
           {
-            'xmlns:md': Namespaces::METADATA,
+            'xmlns': Namespaces::METADATA,
             ID: "_#{id}",
             entityID: entity_id,
           }
