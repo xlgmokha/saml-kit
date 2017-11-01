@@ -4,9 +4,9 @@ RSpec.describe Saml::Kit::Signature do
   subject { described_class.new(reference_id, configuration) }
   let(:configuration) do
     config = Saml::Kit::Configuration.new
-    config.certificate_pem = certificate
-    config.private_key_pem = private_key
-    config.private_key_password = password
+    config.signing_certificate_pem = certificate
+    config.signing_private_key_pem = private_key
+    config.signing_private_key_password = password
     config
   end
 
