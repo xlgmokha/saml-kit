@@ -22,6 +22,7 @@ module Saml
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
           @configuration = configuration
+          @entity_id = configuration.issuer
           @acs_urls = []
           @logout_urls = []
           @name_id_formats = [Namespaces::Formats::NameId::PERSISTENT]
