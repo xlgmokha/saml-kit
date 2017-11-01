@@ -48,8 +48,10 @@ module Saml
         end
 
         def to_xml
+          signature = Signature.new(id)
           xml = ::Builder::XmlMarkup.new
           xml.tag!("samlp:Response", response_options) do
+            signature.template(xml)
             xml.Issuer(configuration.issuer, xmlns: Namespaces::ASSERTION)
             xml.tag!("samlp:Status") do
               xml.tag!('samlp:StatusCode', Value: Namespaces::Statuses::SUCCESS)
@@ -81,7 +83,7 @@ module Saml
               end
             end
           end
-          xml.target!
+          signature.finalize(xml)
         end
 
         def build
@@ -96,7 +98,7 @@ module Saml
 
         def response_options
           {
-            ID: "_#{id}",
+            ID: id,
             Version: "2.0",
             IssueInstant: now.iso8601,
             Destination: request.acs_url,
