@@ -27,13 +27,14 @@ module Saml
       private
 
       class Builder
-        attr_accessor :id, :entity_id, :acs_urls, :logout_urls
+        attr_accessor :id, :entity_id, :acs_urls, :logout_urls, :name_id_formats
 
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
           @configuration = configuration
           @acs_urls = []
           @logout_urls = []
+          @name_id_formats = [Namespaces::Formats::NameId::PERSISTENT]
         end
 
         def add_assertion_consumer_service(url, binding: :post)
@@ -51,7 +52,9 @@ module Saml
           xml.tag! 'md:EntityDescriptor', entity_descriptor_options do
             signature.template(xml)
             xml.tag! "md:SPSSODescriptor", descriptor_options do
-              xml.tag! "md:NameIDFormat", Namespaces::Formats::NameId::PERSISTENT
+              name_id_formats.each do |format|
+                xml.tag! "md:NameIDFormat", format
+              end
               acs_urls.each_with_index do |item, index|
                 xml.tag! "md:AssertionConsumerService", {
                   Binding: item[:binding],
