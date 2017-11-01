@@ -5,8 +5,11 @@ module Saml
         Base64.encode64(compress(document.to_xml))
       end
 
-      def self.authentication
-        encode(AuthenticationRequest::Builder.new)
+      def self.authentication(assertion_consumer_service:, entity_id: nil)
+        builder = AuthenticationRequest::Builder.new
+        builder.acs_url = assertion_consumer_service
+        builder.entity_id = entity_id unless entity_id.blank?
+        encode(builder)
       end
 
       def self.compress(content)
