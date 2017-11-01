@@ -1,14 +1,6 @@
 module Saml
   module Kit
     class IdentityProviderMetadata < Metadata
-      METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
-
-      include ActiveModel::Validations
-      validates_presence_of :metadata
-      validate :must_contain_idp_descriptor
-      validate :must_match_xsd
-      validate :must_have_valid_signature
-
       def initialize(xml)
         super("IDPSSODescriptor", xml)
       end
@@ -31,41 +23,6 @@ module Saml
       end
 
       private
-
-      def error_message(key)
-        I18n.translate(key, scope: 'saml/kit.errors.identity_provider_metadata')
-      end
-
-      def metadata
-        find_by('/md:EntityDescriptor/md:IDPSSODescriptor').present?
-      end
-
-      def must_contain_idp_descriptor
-        errors[:metadata] << error_message('metadata.invalid_idp') unless metadata
-      end
-
-      def must_match_xsd
-        Dir.chdir(File.dirname(METADATA_XSD)) do
-          xsd = Nokogiri::XML::Schema(IO.read(METADATA_XSD))
-          xsd.validate(document).each do |error|
-            errors[:metadata] << error.message
-          end
-        end
-      end
-
-      def must_have_valid_signature
-        return if to_xml.blank?
-        errors[:metadata] << error_message('metadata.invalid_signature') unless valid_signature?
-      end
-
-      def valid_signature?
-        xml = Saml::Kit::Xml.new(to_xml)
-        result = xml.valid?
-        xml.errors.each do |error|
-          errors[:metadata] << error
-        end
-        result
-      end
 
       class Builder
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :single_sign_on_location, :single_logout_location, :attributes
@@ -112,7 +69,7 @@ module Saml
             'xmlns': Namespaces::METADATA,
             'xmlns:ds': Namespaces::SIGNATURE,
             'xmlns:saml': Namespaces::ASSERTION,
-            ID: id,
+            ID: "_#{id}",
             entityID: entity_id,
           }
         end

@@ -60,7 +60,7 @@ module Saml
           options = {
             "xmlns:samlp" => Namespaces::PROTOCOL,
             "xmlns:saml" => Namespaces::ASSERTION,
-            ID: id,
+            ID: "_#{id}",
             Version: "2.0",
             IssueInstant: issued_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
           }

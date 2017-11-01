@@ -36,7 +36,7 @@ RSpec.describe Saml::Kit::Signature do
     options = {
       "xmlns:samlp" => "urn:oasis:names:tc:SAML:2.0:protocol",
       "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion",
-      ID: "#{reference_id}",
+      ID: "_#{reference_id}",
     }
     xml.tag!('samlp:AuthnRequest', options) do
       subject.template(xml)
@@ -50,7 +50,7 @@ RSpec.describe Saml::Kit::Signature do
     expect(signature['SignedInfo']['CanonicalizationMethod']['Algorithm']).to eql('http://www.w3.org/2001/10/xml-exc-c14n#')
     expect(signature['SignedInfo']['SignatureMethod']['Algorithm']).to eql("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256")
 
-    expect(signature['SignedInfo']['Reference']['URI']).to eql("##{reference_id}")
+    expect(signature['SignedInfo']['Reference']['URI']).to eql("#_#{reference_id}")
     expect(signature['SignedInfo']['Reference']['Transforms']['Transform']).to match_array([
       { "Algorithm" => "http://www.w3.org/2000/09/xmldsig#enveloped-signature" },
       { "Algorithm" => "http://www.w3.org/2001/10/xml-exc-c14n#" }

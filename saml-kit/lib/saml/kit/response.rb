@@ -98,7 +98,7 @@ module Saml
 
         def response_options
           {
-            ID: id,
+            ID: "_#{id}",
             Version: "2.0",
             IssueInstant: now.iso8601,
             Destination: request.acs_url,

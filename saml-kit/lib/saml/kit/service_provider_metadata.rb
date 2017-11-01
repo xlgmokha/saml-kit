@@ -77,7 +77,7 @@ module Saml
         def entity_descriptor_options
           {
             'xmlns:md': Namespaces::METADATA,
-            ID: id,
+            ID: "_#{id}",
             entityID: entity_id,
           }
         end

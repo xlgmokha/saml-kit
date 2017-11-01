@@ -16,7 +16,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   end
 
   it { expect(subject.issuer).to eql(issuer) }
-  it { expect(subject.id).to eql(id) }
+  it { expect(subject.id).to eql("_#{id}") }
   it { expect(subject.acs_url).to eql(acs_url) }
 
   describe "#valid?" do

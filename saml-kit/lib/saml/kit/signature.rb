@@ -29,7 +29,7 @@ module Saml
           xml.tag! "ds:SignedInfo", "xmlns:ds" => XMLDSIG do
             xml.tag! "ds:CanonicalizationMethod", Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
             xml.tag! "ds:SignatureMethod", Algorithm: SIGNATURE_METHODS[configuration.signature_method]
-            xml.tag! "ds:Reference", URI: "##{reference_id}" do
+            xml.tag! "ds:Reference", URI: "#_#{reference_id}" do
               xml.tag! "ds:Transforms" do
                 xml.tag! "ds:Transform", Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
                 xml.tag! "ds:Transform", Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"

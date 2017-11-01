@@ -1,12 +1,20 @@
 module Saml
   module Kit
     class Metadata
+      include ActiveModel::Validations
+
+      METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
       NAMESPACES = {
         "NameFormat": Namespaces::Formats::Attr::SPLAT,
         "ds": Namespaces::SIGNATURE,
         "md": Namespaces::METADATA,
         "saml": Namespaces::ASSERTION,
       }.freeze
+
+      validates_presence_of :metadata
+      validate :must_contain_descriptor
+      validate :must_match_xsd
+      validate :must_have_valid_signature
 
       attr_reader :xml, :descriptor_name
 
@@ -78,6 +86,46 @@ module Saml
 
       def pretty_fingerprint(fingerprint)
         fingerprint.upcase.scan(/../).join(":")
+      end
+
+      def metadata
+        find_by("/md:EntityDescriptor/md:#{descriptor_name}").present?
+      end
+
+      def must_contain_descriptor
+        unless metadata
+          errors[:metadata] << error_message('invalid')
+        end
+      end
+
+      def must_match_xsd
+        Dir.chdir(File.dirname(METADATA_XSD)) do
+          xsd = Nokogiri::XML::Schema(IO.read(METADATA_XSD))
+          xsd.validate(document).each do |error|
+            errors[:metadata] << error.message
+          end
+        end
+      end
+
+      def must_have_valid_signature
+        return if to_xml.blank?
+
+        unless valid_signature?
+          errors[:metadata] << error_message('invalid_signature') 
+        end
+      end
+
+      def valid_signature?
+        xml = Saml::Kit::Xml.new(to_xml)
+        result = xml.valid?
+        xml.errors.each do |error|
+          errors[:metadata] << error
+        end
+        result
+      end
+
+      def error_message(key)
+        I18n.translate(key, scope: "saml/kit.errors.#{descriptor_name}")
       end
     end
   end

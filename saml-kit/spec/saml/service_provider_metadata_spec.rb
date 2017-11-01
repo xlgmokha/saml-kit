@@ -1,8 +1,13 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::ServiceProviderMetadata do
+  let(:entity_id) { FFaker::Movie.title }
+  let(:acs_post_url) { "https://#{FFaker::Internet.domain_name}/post" }
+  let(:acs_redirect_url) { "https://#{FFaker::Internet.domain_name}/redirect" }
+  let(:logout_post_url) { "https://#{FFaker::Internet.domain_name}/post" }
+  let(:logout_redirect_url) { "https://#{FFaker::Internet.domain_name}/redirect" }
+
   describe described_class::Builder do
-    let(:entity_id) { FFaker::Movie.title }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
 
     <<-XML
@@ -42,11 +47,6 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
   end
 
   describe described_class do
-    let(:entity_id) { FFaker::Movie.title }
-    let(:acs_post_url) { "https://#{FFaker::Internet.domain_name}/post" }
-    let(:acs_redirect_url) { "https://#{FFaker::Internet.domain_name}/redirect" }
-    let(:logout_post_url) { "https://#{FFaker::Internet.domain_name}/post" }
-    let(:logout_redirect_url) { "https://#{FFaker::Internet.domain_name}/redirect" }
     let(:builder) { described_class::Builder.new }
     subject do
       builder.entity_id = entity_id
@@ -90,6 +90,66 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
     it 'returns the entity id' do
       expect(subject.entity_id).to eql(entity_id)
+    end
+  end
+
+  describe "#validate" do
+    let(:errors) { [] }
+    let(:service_provider_metadata) do
+      builder = described_class::Builder.new
+      builder.entity_id = entity_id
+      builder.add_assertion_consumer_service(acs_post_url, binding: :post)
+      builder.add_assertion_consumer_service(acs_redirect_url, binding: :http_redirect)
+      builder.add_single_logout_service(logout_post_url, binding: :post)
+      builder.add_single_logout_service(logout_redirect_url, binding: :http_redirect)
+      builder.to_xml
+    end
+
+    let(:identity_provider_metadata) { IO.read("spec/fixtures/metadata/okta.xml") }
+
+    it 'valid when given valid service provider metadata' do
+      subject = described_class.new(service_provider_metadata)
+      expect(subject).to be_valid
+    end
+
+    it 'is invalid, when given identity provider metadata' do
+      subject = described_class.new(identity_provider_metadata)
+      expect(subject).to_not be_valid
+      expect(subject.errors[:metadata]).to include(I18n.translate("saml/kit.errors.SPSSODescriptor.invalid"))
+    end
+
+    it 'is invalid, when the metadata is nil' do
+      subject = described_class.new(nil)
+      expect(subject).to_not be_valid
+      expect(subject.errors[:metadata]).to include("can't be blank")
+    end
+
+    it 'is invalid, when the metadata does not validate against the xsd schema' do
+      xml = ::Builder::XmlMarkup.new
+      xml.instruct!
+      xml.EntityDescriptor 'xmlns': Saml::Kit::Namespaces::METADATA do
+        xml.SPSSODescriptor do
+          xml.Fake foo: :bar
+        end
+      end
+      subject = described_class.new(xml.target!)
+      expect(subject).to_not be_valid
+      expect(subject.errors[:metadata][0]).to include("1:0: ERROR: Element '{urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor'")
+    end
+
+    context "signature validation" do
+      it 'is invalid, when the signature is invalid' do
+        new_url = 'https://myserver.com/hacked'
+        metadata_xml = service_provider_metadata.gsub(acs_post_url, new_url)
+        subject = described_class.new(metadata_xml)
+        expect(subject).to be_invalid
+        expect(subject.errors[:metadata]).to include("invalid signature.")
+      end
+
+      it 'is valid, when the content has not been tampered with' do
+        subject = described_class.new(service_provider_metadata)
+        expect(subject).to be_valid
+      end
     end
   end
 end
