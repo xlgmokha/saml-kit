@@ -17,6 +17,7 @@ require "saml/kit/response"
 require "saml/kit/service_provider_registry"
 require "saml/kit/identity_provider_metadata"
 require "saml/kit/service_provider_metadata"
+require "saml/kit/signature"
 require "saml/kit/xml"
 
 I18n.load_path += Dir[File.expand_path("kit/locales/*.yml", File.dirname(__FILE__))]
