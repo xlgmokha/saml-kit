@@ -44,12 +44,18 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 </samlp:AuthnRequest>
 EXAMPLE
   describe "#to_xml" do
-    subject { described_class::Builder.new(double(issuer: issuer, acs_url: acs_url)) }
+    subject { described_class::Builder.new(configuration) }
+    let(:configuration) do
+      config = Saml::Kit::Configuration.new
+      config.issuer = issuer
+      config
+    end
     let(:issuer) { FFaker::Movie.title }
     let(:acs_url) { "https://airport.dev/session/acs" }
 
     it 'returns a valid authentication request' do
       travel_to DateTime.new(2014, 7, 16, 23, 52, 45)
+      subject.acs_url = acs_url
       result = Hash.from_xml(subject.to_xml)
 
       expect(result['AuthnRequest']['ID']).to be_present

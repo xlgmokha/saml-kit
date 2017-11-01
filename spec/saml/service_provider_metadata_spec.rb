@@ -40,4 +40,12 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       expect(result['EntityDescriptor']['SPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']).to eql(Saml::Kit.configuration.stripped_signing_certificate)
     end
   end
+
+  describe described_class do
+    let(:builder) { described_class::Builder.new }
+
+    it 'returns each of the certificates' do
+      
+    end
+  end
 end
