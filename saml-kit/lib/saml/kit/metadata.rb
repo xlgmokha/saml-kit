@@ -20,8 +20,8 @@ module Saml
         find_all(xpath).map do |item|
           cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", NAMESPACES).text
           {
-            fingerprint: fingerprint_for(cert, OpenSSL::Digest::SHA256),
             text: cert,
+            fingerprint: fingerprint_for(cert, OpenSSL::Digest::SHA256),
             use: item.attribute('use').value,
           }
         end

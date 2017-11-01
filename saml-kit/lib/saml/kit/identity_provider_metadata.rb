@@ -1,12 +1,6 @@
 module Saml
   module Kit
-    class IdentityProviderMetadata
-      NAMESPACES = {
-        "NameFormat": Namespaces::Formats::Attr::SPLAT,
-        "ds": Namespaces::SIGNATURE,
-        "md": Namespaces::METADATA,
-        "saml": Namespaces::ASSERTION,
-      }.freeze
+    class IdentityProviderMetadata < Metadata
       METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
 
       include ActiveModel::Validations
@@ -16,7 +10,7 @@ module Saml
       validate :must_have_valid_signature
 
       def initialize(xml)
-        @xml = xml
+        super("IDPSSODescriptor", xml)
       end
 
       def entity_id
@@ -41,18 +35,6 @@ module Saml
         end
       end
 
-      def certificates
-        xpath = "/md:EntityDescriptor/md:IDPSSODescriptor/md:KeyDescriptor"
-        find_all(xpath).map do |item|
-          cert = Base64.decode64(item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", NAMESPACES).text)
-          {
-            fingerprint: fingerprint_for(cert),
-            use: item.attribute('use').value,
-            value: cert,
-          }
-        end
-      end
-
       def attributes
         find_all("/md:EntityDescriptor/md:IDPSSODescriptor/saml:Attribute").map do |item|
           {
@@ -61,10 +43,6 @@ module Saml
             name: item.attribute("Name").value,
           }
         end
-      end
-
-      def to_xml
-        @xml
       end
 
       private
@@ -102,23 +80,6 @@ module Saml
           errors[:metadata] << error
         end
         result
-      end
-
-      def fingerprint_for(value)
-        x509 = OpenSSL::X509::Certificate.new(value)
-        OpenSSL::Digest::SHA256.new.hexdigest(x509.to_der).upcase.scan(/../).join(":")
-      end
-
-      def document
-        @document ||= Nokogiri::XML(@xml)
-      end
-
-      def find_by(xpath)
-        document.at_xpath(xpath, NAMESPACES)
-      end
-
-      def find_all(xpath)
-        document.search(xpath, NAMESPACES)
       end
 
       class Builder
