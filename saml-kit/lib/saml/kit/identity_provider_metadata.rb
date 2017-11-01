@@ -27,8 +27,9 @@ module Saml
       class Builder
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :single_sign_on_location, :single_logout_location, :attributes
 
-        def initialize
+        def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
+          @entity_id = configuration.issuer
           @attributes = []
         end
 
