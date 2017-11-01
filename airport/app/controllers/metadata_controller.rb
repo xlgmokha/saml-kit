@@ -7,8 +7,7 @@ class MetadataController < ApplicationController
 
   def to_xml
     builder = Saml::Kit::ServiceProviderMetadata::Builder.new
-    builder.entity_id = "airport.dev"
-    builder.acs_url = "http://localhost:4000/session"
+    builder.add_assertion_consumer_service(session_url, binding: :post)
     builder.to_xml
   end
 end

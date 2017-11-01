@@ -2,9 +2,11 @@ PATH
   remote: ../saml-kit
   specs:
     saml-kit (0.1.0)
+      activemodel (~> 5.1)
       activesupport (~> 5.1)
       builder (~> 3.2)
       nokogiri (~> 1.8)
+      xmldsig (~> 0.6)
 
 GEM
   remote: https://rubygems.org/
@@ -223,6 +225,8 @@ GEM
     websocket-driver (0.6.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
+    xmldsig (0.6.4)
+      nokogiri (>= 1.6.8, < 2.0.0)
     xpath (2.1.0)
       nokogiri (~> 1.3)
 
