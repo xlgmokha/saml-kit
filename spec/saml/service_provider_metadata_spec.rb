@@ -43,11 +43,13 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
   describe described_class do
     let(:entity_id) { FFaker::Movie.title }
-    let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
+    let(:acs_post_url) { "https://#{FFaker::Internet.domain_name}/post" }
+    let(:acs_redirect_url) { "https://#{FFaker::Internet.domain_name}/redirect" }
     let(:builder) { described_class::Builder.new }
     subject do
       builder.entity_id = entity_id
-      builder.add_acs_url(acs_url)
+      builder.add_acs_url(acs_post_url, binding: :post)
+      builder.add_acs_url(acs_redirect_url, binding: :http_redirect)
       builder.build
     end
 
@@ -59,6 +61,13 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
           use: "signing",
           text: Saml::Kit.configuration.stripped_signing_certificate
         }
+      ])
+    end
+
+    it 'returns each acs url and binding' do
+      expect(subject.assertion_consumer_services).to match_array([
+        { location: acs_post_url, binding: Saml::Kit::Namespaces::Bindings::POST },
+        { location: acs_redirect_url, binding: Saml::Kit::Namespaces::Bindings::HTTP_REDIRECT },
       ])
     end
   end
