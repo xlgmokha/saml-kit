@@ -29,7 +29,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       subject.add_assertion_consumer_service(acs_url, binding: :post)
       result = Hash.from_xml(subject.build.to_xml)
 
-      expect(result['EntityDescriptor']['xmlns:md']).to eql("urn:oasis:names:tc:SAML:2.0:metadata")
+      expect(result['EntityDescriptor']['xmlns']).to eql("urn:oasis:names:tc:SAML:2.0:metadata")
       expect(result['EntityDescriptor']['ID']).to be_present
       expect(result['EntityDescriptor']['entityID']).to eql(entity_id)
       expect(result['EntityDescriptor']['SPSSODescriptor']['AuthnRequestsSigned']).to eql('true')
@@ -94,7 +94,6 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
   end
 
   describe "#validate" do
-    let(:errors) { [] }
     let(:service_provider_metadata) do
       builder = described_class::Builder.new
       builder.entity_id = entity_id
@@ -105,22 +104,19 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       builder.to_xml
     end
 
-    let(:identity_provider_metadata) { IO.read("spec/fixtures/metadata/okta.xml") }
-
     it 'valid when given valid service provider metadata' do
-      subject = described_class.new(service_provider_metadata)
-      expect(subject).to be_valid
+      expect(described_class.new(service_provider_metadata)).to be_valid
     end
 
     it 'is invalid, when given identity provider metadata' do
-      subject = described_class.new(identity_provider_metadata)
-      expect(subject).to_not be_valid
+      subject = described_class.new(IO.read("spec/fixtures/metadata/okta.xml"))
+      expect(subject).to be_invalid
       expect(subject.errors[:metadata]).to include(I18n.translate("saml/kit.errors.SPSSODescriptor.invalid"))
     end
 
     it 'is invalid, when the metadata is nil' do
       subject = described_class.new(nil)
-      expect(subject).to_not be_valid
+      expect(subject).to be_invalid
       expect(subject.errors[:metadata]).to include("can't be blank")
     end
 
@@ -137,19 +133,12 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       expect(subject.errors[:metadata][0]).to include("1:0: ERROR: Element '{urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor'")
     end
 
-    context "signature validation" do
-      it 'is invalid, when the signature is invalid' do
-        new_url = 'https://myserver.com/hacked'
-        metadata_xml = service_provider_metadata.gsub(acs_post_url, new_url)
-        subject = described_class.new(metadata_xml)
-        expect(subject).to be_invalid
-        expect(subject.errors[:metadata]).to include("invalid signature.")
-      end
-
-      it 'is valid, when the content has not been tampered with' do
-        subject = described_class.new(service_provider_metadata)
-        expect(subject).to be_valid
-      end
+    it 'is invalid, when the signature is invalid' do
+      new_url = 'https://myserver.com/hacked'
+      metadata_xml = service_provider_metadata.gsub(acs_post_url, new_url)
+      subject = described_class.new(metadata_xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:metadata]).to include("invalid signature.")
     end
   end
 end

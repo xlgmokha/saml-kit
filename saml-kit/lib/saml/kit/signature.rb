@@ -25,23 +25,23 @@ module Saml
       end
 
       def template(xml = ::Builder::XmlMarkup.new)
-        xml.tag! "ds:Signature", "xmlns:ds" => XMLDSIG do
-          xml.tag! "ds:SignedInfo", "xmlns:ds" => XMLDSIG do
-            xml.tag! "ds:CanonicalizationMethod", Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
-            xml.tag! "ds:SignatureMethod", Algorithm: SIGNATURE_METHODS[configuration.signature_method]
-            xml.tag! "ds:Reference", URI: "#_#{reference_id}" do
-              xml.tag! "ds:Transforms" do
-                xml.tag! "ds:Transform", Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
-                xml.tag! "ds:Transform", Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
+        xml.Signature "xmlns" => XMLDSIG do
+          xml.SignedInfo do
+            xml.CanonicalizationMethod Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
+            xml.SignatureMethod Algorithm: SIGNATURE_METHODS[configuration.signature_method]
+            xml.Reference URI: "#_#{reference_id}" do
+              xml.Transforms do
+                xml.Transform Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
+                xml.Transform Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
               end
-              xml.tag! "ds:DigestMethod", Algorithm: DIGEST_METHODS[configuration.digest_method]
-              xml.tag! "ds:DigestValue", ""
+              xml.DigestMethod Algorithm: DIGEST_METHODS[configuration.digest_method]
+              xml.DigestValue ""
             end
           end
-          xml.tag! "ds:SignatureValue", ""
-          xml.tag! "ds:KeyInfo" do
-            xml.tag! "ds:X509Data" do
-              xml.tag! "ds:X509Certificate", configuration.stripped_signing_certificate
+          xml.SignatureValue ""
+          xml.KeyInfo do
+            xml.X509Data do
+              xml.X509Certificate configuration.stripped_signing_certificate
             end
           end
         end

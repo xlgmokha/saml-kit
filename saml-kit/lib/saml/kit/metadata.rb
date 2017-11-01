@@ -93,9 +93,7 @@ module Saml
       end
 
       def must_contain_descriptor
-        unless metadata
-          errors[:metadata] << error_message('invalid')
-        end
+        errors[:metadata] << error_message(:invalid) unless metadata
       end
 
       def must_match_xsd
@@ -111,7 +109,7 @@ module Saml
         return if to_xml.blank?
 
         unless valid_signature?
-          errors[:metadata] << error_message('invalid_signature') 
+          errors[:metadata] << error_message(:invalid_signature)
         end
       end
 
