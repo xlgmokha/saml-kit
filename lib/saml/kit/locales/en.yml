@@ -2,8 +2,9 @@
 en:
   saml/kit:
     errors:
-      identity_provider_metadata:
-        metadata:
-          invalid_idp: "must contain identity provider metadata."
-          blank: "metadata is required."
-          invalid_signature: "invalid signature."
+      SPSSODescriptor:
+        invalid: "must contain service provider metadata."
+        invalid_signature: "invalid signature."
+      IDPSSODescriptor:
+        invalid: "must contain identity provider metadata."
+        invalid_signature: "invalid signature."

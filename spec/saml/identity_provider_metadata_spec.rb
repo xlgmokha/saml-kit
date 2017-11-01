@@ -175,16 +175,13 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
 
     it 'valid when given valid identity provider metadata' do
       subject = described_class.new(identity_provider_metadata)
-      subject.validate do |error|
-        errors << error
-      end
-      expect(errors).to be_empty
+      expect(subject).to be_valid
     end
 
     it 'is invalid, when given service provider metadata' do
       subject = described_class.new(service_provider_metadata)
       expect(subject).to_not be_valid
-      expect(subject.errors[:metadata]).to include(I18n.translate("saml/kit.errors.identity_provider_metadata.metadata.invalid_idp"))
+      expect(subject.errors[:metadata]).to include(I18n.translate("saml/kit.errors.IDPSSODescriptor.invalid"))
     end
 
     it 'is invalid, when the metadata is nil' do
