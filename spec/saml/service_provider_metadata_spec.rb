@@ -81,5 +81,11 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
         { location: logout_redirect_url, binding: Saml::Kit::Namespaces::Bindings::HTTP_REDIRECT },
       ])
     end
+
+    it 'returns each of the nameid formats' do
+      expect(subject.name_id_formats).to match_array([
+        Saml::Kit::Namespaces::Formats::NameId::PERSISTENT
+      ])
+    end
   end
 end
