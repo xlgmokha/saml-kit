@@ -21,7 +21,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     XML
     it 'builds the service provider metadata' do
       subject.entity_id = entity_id
-      subject.add_acs_url(acs_url, binding: :post)
+      subject.add_assertion_consumer_service(acs_url, binding: :post)
       result = Hash.from_xml(subject.build.to_xml)
 
       expect(result['EntityDescriptor']['xmlns:md']).to eql("urn:oasis:names:tc:SAML:2.0:metadata")
@@ -45,11 +45,15 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     let(:entity_id) { FFaker::Movie.title }
     let(:acs_post_url) { "https://#{FFaker::Internet.domain_name}/post" }
     let(:acs_redirect_url) { "https://#{FFaker::Internet.domain_name}/redirect" }
+    let(:logout_post_url) { "https://#{FFaker::Internet.domain_name}/post" }
+    let(:logout_redirect_url) { "https://#{FFaker::Internet.domain_name}/redirect" }
     let(:builder) { described_class::Builder.new }
     subject do
       builder.entity_id = entity_id
-      builder.add_acs_url(acs_post_url, binding: :post)
-      builder.add_acs_url(acs_redirect_url, binding: :http_redirect)
+      builder.add_assertion_consumer_service(acs_post_url, binding: :post)
+      builder.add_assertion_consumer_service(acs_redirect_url, binding: :http_redirect)
+      builder.add_single_logout_service(logout_post_url, binding: :post)
+      builder.add_single_logout_service(logout_redirect_url, binding: :http_redirect)
       builder.build
     end
 
@@ -68,6 +72,13 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       expect(subject.assertion_consumer_services).to match_array([
         { location: acs_post_url, binding: Saml::Kit::Namespaces::Bindings::POST },
         { location: acs_redirect_url, binding: Saml::Kit::Namespaces::Bindings::HTTP_REDIRECT },
+      ])
+    end
+
+    it 'returns each logout url and binding' do
+      expect(subject.single_logout_services).to match_array([
+        { location: logout_post_url, binding: Saml::Kit::Namespaces::Bindings::POST },
+        { location: logout_redirect_url, binding: Saml::Kit::Namespaces::Bindings::HTTP_REDIRECT },
       ])
     end
   end
