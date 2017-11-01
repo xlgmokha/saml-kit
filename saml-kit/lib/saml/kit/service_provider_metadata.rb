@@ -5,6 +5,10 @@ module Saml
         super("SPSSODescriptor", xml)
       end
 
+      def entity_id
+        find_by("/md:EntityDescriptor/@entityID").value
+      end
+
       def name_id_formats
         find_all("/md:EntityDescriptor/md:SPSSODescriptor/md:NameIDFormat").map do |item|
           item.text

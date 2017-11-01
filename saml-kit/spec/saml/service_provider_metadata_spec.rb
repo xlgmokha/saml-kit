@@ -87,5 +87,9 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
         Saml::Kit::Namespaces::Formats::NameId::PERSISTENT
       ])
     end
+
+    it 'returns the entity id' do
+      expect(subject.entity_id).to eql(entity_id)
+    end
   end
 end
