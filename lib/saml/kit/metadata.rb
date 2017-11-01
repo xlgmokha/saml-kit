@@ -35,6 +35,16 @@ module Saml
         certificates.find_all { |x| x[:use] == "signing" }
       end
 
+      def single_logout_services
+        xpath = "/md:EntityDescriptor/md:#{descriptor_name}/md:SingleLogoutService"
+        find_all(xpath).map do |item|
+          {
+            binding: item.attribute("Binding").value,
+            location: item.attribute("Location").value,
+          }
+        end
+      end
+
       def to_xml
         @xml
       end

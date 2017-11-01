@@ -28,13 +28,6 @@ module Saml
         end
       end
 
-      def single_logout_services
-        xpath = "/md:EntityDescriptor/md:IDPSSODescriptor/md:SingleLogoutService"
-        find_all(xpath).map do |item|
-          { binding: item.attribute("Binding").value, location: item.attribute("Location").value }
-        end
-      end
-
       def attributes
         find_all("/md:EntityDescriptor/md:IDPSSODescriptor/saml:Attribute").map do |item|
           {

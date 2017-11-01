@@ -18,16 +18,21 @@ module Saml
       private
 
       class Builder
-        attr_accessor :id, :entity_id, :acs_urls
+        attr_accessor :id, :entity_id, :acs_urls, :logout_urls
 
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
           @configuration = configuration
           @acs_urls = []
+          @logout_urls = []
         end
 
-        def add_acs_url(url, binding: :post)
+        def add_assertion_consumer_service(url, binding: :post)
           @acs_urls.push(location: url, binding: binding_namespace_for(binding))
+        end
+
+        def add_single_logout_service(url, binding: :post)
+          @logout_urls.push(location: url, binding: binding_namespace_for(binding))
         end
 
         def to_xml
@@ -45,6 +50,9 @@ module Saml
                   index: index,
                   isDefault: index == 0 ? true : false,
                 }
+              end
+              logout_urls.each do |item|
+                xml.tag! "md:SingleLogoutService", Binding: item[:binding], Location: item[:location]
               end
               xml.tag! "md:KeyDescriptor", use: "signing" do
                 xml.tag! "ds:KeyInfo", "xmlns:ds": Saml::Kit::Signature::XMLDSIG do
