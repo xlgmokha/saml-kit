@@ -37,7 +37,7 @@ module Saml
       end
 
       class Builder
-        attr_reader :user, :request, :id, :reference_id, :now
+        attr_reader :user, :request, :id, :reference_id, :now, :name_id_format
 
         def initialize(user, request)
           @user = user
@@ -45,6 +45,7 @@ module Saml
           @id = SecureRandom.uuid
           @reference_id = SecureRandom.uuid
           @now = Time.now.utc
+          @name_id_format = Namespaces::Formats::NameId::PERSISTENT
         end
 
         def to_xml
@@ -137,10 +138,6 @@ module Saml
             SessionIndex: assertion_options[:ID],
             SessionNotOnOrAfter: 3.hours.from_now.utc.iso8601,
           }
-        end
-
-        def name_id_format
-          "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
         end
       end
     end
