@@ -6,20 +6,20 @@ module Saml
 
       attr_accessor :issuer, :acs_url
       attr_accessor :signature_method, :digest_method
-      attr_accessor :certificate_pem, :private_key_pem, :private_key_password
+      attr_accessor :signing_certificate_pem, :signing_private_key_pem, :signing_private_key_password
 
       def initialize
         @signature_method = :SHA256
         @digest_method = :SHA256
-        @certificate_pem, @private_key_pem, @private_key_password = create_self_signed_certificate
+        @signing_certificate_pem, @signing_private_key_pem, @signing_private_key_password = create_self_signed_certificate
       end
 
-      def stripped_certificate
-        certificate_pem.to_s.gsub(BEGIN_CERT, '').gsub(END_CERT, '').gsub(/\n/, '')
+      def stripped_signing_certificate
+        signing_certificate_pem.to_s.gsub(BEGIN_CERT, '').gsub(END_CERT, '').gsub(/\n/, '')
       end
 
-      def private_key
-        OpenSSL::PKey::RSA.new(private_key_pem, private_key_password)
+      def signing_private_key
+        OpenSSL::PKey::RSA.new(signing_private_key_pem, signing_private_key_password)
       end
 
       private

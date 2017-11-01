@@ -29,7 +29,7 @@ module Saml
               xml.tag! "md:KeyDescriptor", use: "signing" do
                 xml.tag! "ds:KeyInfo", "xmlns:ds": Saml::Kit::Signature::XMLDSIG do
                   xml.tag! "ds:X509Data" do
-                    xml.tag! "ds:X509Certificate", @configuration.stripped_certificate
+                    xml.tag! "ds:X509Certificate", @configuration.stripped_signing_certificate
                   end
                 end
               end

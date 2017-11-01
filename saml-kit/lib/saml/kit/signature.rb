@@ -41,7 +41,7 @@ module Saml
           xml.tag! "ds:SignatureValue", ""
           xml.tag! "ds:KeyInfo" do
             xml.tag! "ds:X509Data" do
-              xml.tag! "ds:X509Certificate", configuration.stripped_certificate
+              xml.tag! "ds:X509Certificate", configuration.stripped_signing_certificate
             end
           end
         end
@@ -49,7 +49,7 @@ module Saml
 
       def finalize(xml)
         document = Xmldsig::SignedDocument.new(xml.target!)
-        document.sign(configuration.private_key)
+        document.sign(configuration.signing_private_key)
       end
     end
   end
