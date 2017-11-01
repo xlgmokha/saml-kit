@@ -130,9 +130,11 @@ module Saml
         end
 
         def to_xml
+          signature = Signature.new(id)
           xml = ::Builder::XmlMarkup.new
           xml.instruct!
           xml.EntityDescriptor entity_descriptor_options do
+            signature.template(xml)
             xml.IDPSSODescriptor protocolSupportEnumeration: Namespaces::PROTOCOL do
               xml.NameIDFormat Namespaces::Formats::NameId::PERSISTENT
               xml.SingleLogoutService Binding: Namespaces::Bindings::POST, Location: single_logout_location
@@ -150,7 +152,7 @@ module Saml
               xml.Company "mailto:#{contact_email}"
             end
           end
-          xml.target!
+          signature.finalize(xml)
         end
 
         def build
@@ -164,7 +166,7 @@ module Saml
             'xmlns': Namespaces::METADATA,
             'xmlns:ds': Namespaces::SIGNATURE,
             'xmlns:saml': Namespaces::ASSERTION,
-            ID: "_#{id}",
+            ID: id,
             entityID: entity_id,
           }
         end
