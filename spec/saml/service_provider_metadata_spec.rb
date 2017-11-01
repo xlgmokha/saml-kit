@@ -21,7 +21,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     XML
     it 'builds the service provider metadata' do
       subject.entity_id = entity_id
-      subject.acs_url = acs_url
+      subject.add_acs_url(acs_url, binding: :post)
       result = Hash.from_xml(subject.build.to_xml)
 
       expect(result['EntityDescriptor']['xmlns:md']).to eql("urn:oasis:names:tc:SAML:2.0:metadata")

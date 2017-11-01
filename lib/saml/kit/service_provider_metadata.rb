@@ -10,11 +10,16 @@ module Saml
       end
 
       class Builder
-        attr_accessor :id, :entity_id, :acs_url
+        attr_accessor :id, :entity_id, :acs_urls
 
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
           @configuration = configuration
+          @acs_urls = []
+        end
+
+        def add_acs_url(url, binding: :post)
+          @acs_urls.push(location: url, binding: binding_namespace_for(binding))
         end
 
         def to_xml
@@ -25,7 +30,14 @@ module Saml
             signature.template(xml)
             xml.tag! "md:SPSSODescriptor", descriptor_options do
               xml.tag! "md:NameIDFormat", Namespaces::Formats::NameId::PERSISTENT
-              xml.tag! "md:AssertionConsumerService", Binding: Namespaces::Bindings::POST, Location: acs_url, index: "0", isDefault: "true"
+              acs_urls.each_with_index do |item, index|
+                xml.tag! "md:AssertionConsumerService", {
+                  Binding: item[:binding],
+                  Location: item[:location],
+                  index: index,
+                  isDefault: index == 0 ? true : false,
+                }
+              end
               xml.tag! "md:KeyDescriptor", use: "signing" do
                 xml.tag! "ds:KeyInfo", "xmlns:ds": Saml::Kit::Signature::XMLDSIG do
                   xml.tag! "ds:X509Data" do
@@ -58,6 +70,14 @@ module Saml
             WantAssertionsSigned: "true",
             protocolSupportEnumeration: Namespaces::PROTOCOL,
           }
+        end
+
+        def binding_namespace_for(binding)
+          if :post == binding
+            Namespaces::Bindings::POST
+          else
+            Namespaces::Bindings::HTTP_REDIRECT
+          end
         end
       end
     end
