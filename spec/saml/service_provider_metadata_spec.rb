@@ -42,10 +42,24 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
   end
 
   describe described_class do
+    let(:entity_id) { FFaker::Movie.title }
+    let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:builder) { described_class::Builder.new }
+    subject do
+      builder.entity_id = entity_id
+      builder.add_acs_url(acs_url)
+      builder.build
+    end
 
     it 'returns each of the certificates' do
-      
+      expected_sha256 = OpenSSL::Digest::SHA256.new.hexdigest(Saml::Kit.configuration.signing_x509.to_der)
+      expect(subject.certificates).to match_array([
+        {
+          fingerprint: expected_sha256.upcase.scan(/../).join(":"),
+          use: "signing",
+          text: Saml::Kit.configuration.stripped_signing_certificate
+        }
+      ])
     end
   end
 end

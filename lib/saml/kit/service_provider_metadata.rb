@@ -1,13 +1,11 @@
 module Saml
   module Kit
-    class ServiceProviderMetadata
+    class ServiceProviderMetadata < Metadata
       def initialize(xml)
-        @xml = xml
+        super("SPSSODescriptor", xml)
       end
 
-      def to_xml
-        @xml
-      end
+      private
 
       class Builder
         attr_accessor :id, :entity_id, :acs_urls
