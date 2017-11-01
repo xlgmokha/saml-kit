@@ -27,6 +27,14 @@ module Saml
         end
       end
 
+      def encryption_certificates
+        certificates.find_all { |x| x[:use] == "encryption" }
+      end
+
+      def signing_certificates
+        certificates.find_all { |x| x[:use] == "signing" }
+      end
+
       def to_xml
         @xml
       end

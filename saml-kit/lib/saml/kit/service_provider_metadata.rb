@@ -5,6 +5,16 @@ module Saml
         super("SPSSODescriptor", xml)
       end
 
+      def assertion_consumer_services
+        xpath = "/md:EntityDescriptor/md:SPSSODescriptor/md:AssertionConsumerService"
+        find_all(xpath).map do |item|
+          {
+            binding: item.attribute("Binding").value,
+            location: item.attribute("Location").value,
+          }
+        end
+      end
+
       private
 
       class Builder
