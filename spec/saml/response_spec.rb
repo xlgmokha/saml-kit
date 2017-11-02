@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Saml::Kit::Response do
   describe "#acs_url" do
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
-    let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes: { }) }
+    let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes_for: { }) }
     let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title) }
     subject { described_class::Builder.new(user, request).build }
 
@@ -14,7 +14,7 @@ RSpec.describe Saml::Kit::Response do
 
   describe "#to_xml" do
     subject { described_class::Builder.new(user, request) }
-    let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes: { email: email, created_at: Time.now.utc.iso8601 }) }
+    let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
     let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:issuer) { FFaker::Movie.title }
