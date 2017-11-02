@@ -26,6 +26,10 @@ module Saml
         Response::Builder.new(user, self).build
       end
 
+      def valid?
+        true
+      end
+
       class Builder
         attr_accessor :id, :issued_at, :issuer, :acs_url
 
