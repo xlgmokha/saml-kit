@@ -38,11 +38,11 @@ module Saml
         end
 
         def add_single_sign_on_service(url, binding: :post)
-          @single_sign_on_urls.push(location: url, binding: binding_namespace_for(binding))
+          @single_sign_on_urls.push(location: url, binding: Namespaces.binding_for(binding))
         end
 
         def add_single_logout_service(url, binding: :post)
-          @logout_urls.push(location: url, binding: binding_namespace_for(binding))
+          @logout_urls.push(location: url, binding: Namespaces.binding_for(binding))
         end
 
         def to_xml
@@ -91,14 +91,6 @@ module Saml
             ID: "_#{id}",
             entityID: entity_id,
           }
-        end
-
-        def binding_namespace_for(binding)
-          if :post == binding
-            Namespaces::POST
-          else
-            Namespaces::HTTP_REDIRECT
-          end
         end
       end
     end
