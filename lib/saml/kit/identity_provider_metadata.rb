@@ -25,12 +25,23 @@ module Saml
       private
 
       class Builder
-        attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :single_sign_on_location, :single_logout_location, :attributes
+        attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes
+        attr_reader :logout_urls, :single_sign_on_urls
 
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
           @entity_id = configuration.issuer
           @attributes = []
+          @single_sign_on_urls = []
+          @logout_urls = []
+        end
+
+        def add_single_sign_on_service(url, binding: :post)
+          @single_sign_on_urls.push(location: url, binding: binding_namespace_for(binding))
+        end
+
+        def add_single_logout_service(url, binding: :post)
+          @logout_urls.push(location: url, binding: binding_namespace_for(binding))
         end
 
         def to_xml
@@ -41,8 +52,12 @@ module Saml
             signature.template(xml)
             xml.IDPSSODescriptor protocolSupportEnumeration: Namespaces::PROTOCOL do
               xml.NameIDFormat Namespaces::Formats::NameId::PERSISTENT
-              xml.SingleLogoutService Binding: Namespaces::Bindings::POST, Location: single_logout_location
-              xml.SingleSignOnService Binding: Namespaces::Bindings::HTTP_REDIRECT, Location: single_sign_on_location
+              logout_urls.each do |item|
+                xml.SingleLogoutService Binding: item[:binding], Location: item[:location]
+              end
+              single_sign_on_urls.each do |item|
+                xml.SingleSignOnService Binding: item[:binding], Location: item[:location]
+              end
               attributes.each do |attribute|
                 xml.tag! 'saml:Attribute', NameFormat: Namespaces::Formats::Attr::URI, Name: attribute, FriendlyName: attribute
               end
@@ -73,6 +88,14 @@ module Saml
             ID: "_#{id}",
             entityID: entity_id,
           }
+        end
+
+        def binding_namespace_for(binding)
+          if :post == binding
+            Namespaces::Bindings::POST
+          else
+            Namespaces::Bindings::HTTP_REDIRECT
+          end
         end
       end
     end

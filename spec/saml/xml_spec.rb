@@ -40,17 +40,5 @@ RSpec.describe Saml::Kit::Xml do
       expect(subject).to_not be_valid
       expect(subject.errors[:signature]).to be_present
     end
-
-    [
-      'ad_2012.xml',
-      'ad_with_logout.xml',
-      'okta.xml',
-    ].each do |xml_file|
-      it "validates #{xml_file}" do
-        travel_to DateTime.new(2017, 10, 6)
-        xml = IO.read("spec/fixtures/metadata/#{xml_file}")
-        expect(described_class.new(xml)).to be_valid
-      end
-    end
   end
 end
