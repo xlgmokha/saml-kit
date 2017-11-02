@@ -1,7 +1,7 @@
-# proof.dev (aka auth)
+# airport.dev
 
 * localhost:3000
 
-# airport.dev
+# proof.dev (aka auth)
 
 * localhost:4000
