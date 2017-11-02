@@ -6,7 +6,7 @@ module Saml
       attr_reader :raw_xml, :document
 
       validate :validate_signature
-      validate :validate_certificate, if: :signature_element
+      validate :validate_certificate
 
       def initialize(raw_xml)
         @raw_xml = raw_xml
@@ -15,41 +15,41 @@ module Saml
         end
       end
 
-      def signature_element
-        document.at_xpath('//ds:Signature', Xmldsig::NAMESPACES)
-      end
-
-      def certificate
-        xpath = '//ds:KeyInfo/ds:X509Data/ds:X509Certificate'
-        raw_signature = signature_element.xpath(xpath, Xmldsig::NAMESPACES).text
-        OpenSSL::X509::Certificate.new(Base64.decode64(raw_signature))
+      def x509_certificates
+        xpath = "//ds:KeyInfo/ds:X509Data/ds:X509Certificate"
+        document.search(xpath, Xmldsig::NAMESPACES).map do |item|
+          OpenSSL::X509::Certificate.new(Base64.decode64(item.text))
+        end
       end
 
       private
 
       def validate_signature
         invalid_signatures.flat_map(&:errors).uniq.each do |error|
-          errors.add(error, "is invalid") if error != :signature
+          errors.add(error, "is invalid")
         end
       end
 
-      def signed_document
-        Xmldsig::SignedDocument.new(document, id_attr: 'ID=$uri or @Id')
-      end
-
       def invalid_signatures
+        signed_document = Xmldsig::SignedDocument.new(document, id_attr: 'ID=$uri or @Id')
         signed_document.signatures.find_all do |signature|
-          !signature.valid?(certificate)
+          x509_certificates.all? do |certificate|
+            !signature.valid?(certificate)
+          end
         end
       end
 
       def validate_certificate(now = Time.current)
-        if now < certificate.not_before
-          errors.add(:certificate, "Not valid before #{certificate.not_before}")
-        end
+        return unless document.at_xpath('//ds:Signature', Xmldsig::NAMESPACES).present?
 
-        if now > certificate.not_after
-          errors.add(:certificate, "Not valid after #{certificate.not_after}")
+        x509_certificates.each do |certificate|
+          if now < certificate.not_before
+            errors.add(:certificate, "Not valid before #{certificate.not_before}")
+          end
+
+          if now > certificate.not_after
+            errors.add(:certificate, "Not valid after #{certificate.not_after}")
+          end
         end
       end
     end
