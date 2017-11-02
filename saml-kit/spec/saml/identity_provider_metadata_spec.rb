@@ -13,6 +13,11 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       subject.entity_id = entity_id
       subject.organization_name = org_name
       subject.organization_url = url
+      subject.name_id_formats = [
+        Saml::Kit::Namespaces::Formats::NameId::PERSISTENT,
+        Saml::Kit::Namespaces::Formats::NameId::TRANSIENT,
+        Saml::Kit::Namespaces::Formats::NameId::EMAIL_ADDRESS,
+      ]
       subject.add_single_sign_on_service("https://www.example.com/login", binding: :http_redirect)
       subject.add_single_logout_service("https://www.example.com/logout", binding: :post)
       subject.attributes << "id"
@@ -22,7 +27,11 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(result['EntityDescriptor']['ID']).to be_present
       expect(result['EntityDescriptor']['entityID']).to eql(entity_id)
       expect(result['EntityDescriptor']['IDPSSODescriptor']['protocolSupportEnumeration']).to eql('urn:oasis:names:tc:SAML:2.0:protocol')
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['NameIDFormat']).to eql('urn:oasis:names:tc:SAML:2.0:nameid-format:persistent')
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['NameIDFormat']).to match_array([
+        Saml::Kit::Namespaces::Formats::NameId::PERSISTENT,
+        Saml::Kit::Namespaces::Formats::NameId::TRANSIENT,
+        Saml::Kit::Namespaces::Formats::NameId::EMAIL_ADDRESS,
+      ])
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Binding']).to eql('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect')
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Location']).to eql("https://www.example.com/login")
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Binding']).to eql('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST')
