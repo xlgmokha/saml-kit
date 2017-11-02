@@ -54,13 +54,13 @@ module Saml
             signature.template(xml)
             xml.Issuer(configuration.issuer, xmlns: Namespaces::ASSERTION)
             xml.tag!("samlp:Status") do
-              xml.tag!('samlp:StatusCode', Value: Namespaces::Statuses::SUCCESS)
+              xml.tag!('samlp:StatusCode', Value: Namespaces::SUCCESS)
             end
             xml.Assertion(assertion_options) do
               xml.Issuer configuration.issuer
               xml.Subject do
                 xml.NameID user.uuid, Format: name_id_format
-                xml.SubjectConfirmation Method: Namespaces::Methods::BEARER do
+                xml.SubjectConfirmation Method: Namespaces::BEARER do
                   xml.SubjectConfirmationData "", subject_confirmation_data_options
                 end
               end
@@ -71,12 +71,12 @@ module Saml
               end
               xml.AuthnStatement authn_statement_options do
                 xml.AuthnContext do
-                  xml.AuthnContextClassRef Namespaces::AuthnContext::ClassRef::PASSWORD
+                  xml.AuthnContextClassRef Namespaces::PASSWORD
                 end
               end
               xml.AttributeStatement do
                 user.assertion_attributes.each do |key, value|
-                  xml.Attribute Name: key, NameFormat: Namespaces::Formats::Attr::URI, FriendlyName: key do
+                  xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
                     xml.AttributeValue value.to_s
                   end
                 end
@@ -102,7 +102,7 @@ module Saml
             Version: "2.0",
             IssueInstant: now.iso8601,
             Destination: request.acs_url,
-            Consent: Namespaces::Consents::UNSPECIFIED,
+            Consent: Namespaces::UNSPECIFIED,
             InResponseTo: request.id,
             "xmlns:samlp" => Namespaces::PROTOCOL,
           }

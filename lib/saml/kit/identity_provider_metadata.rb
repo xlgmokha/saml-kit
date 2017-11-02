@@ -32,7 +32,7 @@ module Saml
           @id = SecureRandom.uuid
           @entity_id = configuration.issuer
           @attributes = []
-          @name_id_formats = [Namespaces::Formats::NameId::PERSISTENT]
+          @name_id_formats = [Namespaces::PERSISTENT]
           @single_sign_on_urls = []
           @logout_urls = []
         end
@@ -62,7 +62,7 @@ module Saml
                 xml.SingleSignOnService Binding: item[:binding], Location: item[:location]
               end
               attributes.each do |attribute|
-                xml.tag! 'saml:Attribute', NameFormat: Namespaces::Formats::Attr::URI, Name: attribute, FriendlyName: attribute
+                xml.tag! 'saml:Attribute', NameFormat: Namespaces::URI, Name: attribute, FriendlyName: attribute
               end
             end
             xml.Organization do
@@ -95,9 +95,9 @@ module Saml
 
         def binding_namespace_for(binding)
           if :post == binding
-            Namespaces::Bindings::POST
+            Namespaces::POST
           else
-            Namespaces::Bindings::HTTP_REDIRECT
+            Namespaces::HTTP_REDIRECT
           end
         end
       end

@@ -25,7 +25,7 @@ module Saml
           @entity_id = configuration.issuer
           @acs_urls = []
           @logout_urls = []
-          @name_id_formats = [Namespaces::Formats::NameId::PERSISTENT]
+          @name_id_formats = [Namespaces::PERSISTENT]
         end
 
         def add_assertion_consumer_service(url, binding: :post)
@@ -44,7 +44,7 @@ module Saml
             signature.template(xml)
             xml.SPSSODescriptor descriptor_options do
               xml.KeyDescriptor use: "signing" do
-                xml.KeyInfo "xmlns": Saml::Kit::Signature::XMLDSIG do
+                xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
                   xml.X509Data do
                     xml.X509Certificate @configuration.stripped_signing_certificate
                   end
@@ -88,9 +88,9 @@ module Saml
 
         def binding_namespace_for(binding)
           if :post == binding
-            Namespaces::Bindings::POST
+            Namespaces::POST
           else
-            Namespaces::Bindings::HTTP_REDIRECT
+            Namespaces::HTTP_REDIRECT
           end
         end
       end
