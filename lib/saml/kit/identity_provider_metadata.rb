@@ -25,8 +25,8 @@ module Saml
       private
 
       class Builder
-        attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes
-        attr_reader :logout_urls, :single_sign_on_urls, :name_id_formats
+        attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats
+        attr_reader :logout_urls, :single_sign_on_urls
 
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid

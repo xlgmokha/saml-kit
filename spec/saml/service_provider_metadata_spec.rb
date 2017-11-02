@@ -27,6 +27,11 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     it 'builds the service provider metadata' do
       subject.entity_id = entity_id
       subject.add_assertion_consumer_service(acs_url, binding: :post)
+      subject.name_id_formats = [
+        Saml::Kit::Namespaces::Formats::NameId::PERSISTENT,
+        Saml::Kit::Namespaces::Formats::NameId::TRANSIENT,
+        Saml::Kit::Namespaces::Formats::NameId::EMAIL_ADDRESS,
+      ]
       result = Hash.from_xml(subject.build.to_xml)
 
       expect(result['EntityDescriptor']['xmlns']).to eql("urn:oasis:names:tc:SAML:2.0:metadata")
@@ -35,7 +40,11 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       expect(result['EntityDescriptor']['SPSSODescriptor']['AuthnRequestsSigned']).to eql('true')
       expect(result['EntityDescriptor']['SPSSODescriptor']['WantAssertionsSigned']).to eql('true')
       expect(result['EntityDescriptor']['SPSSODescriptor']['protocolSupportEnumeration']).to eql('urn:oasis:names:tc:SAML:2.0:protocol')
-      expect(result['EntityDescriptor']['SPSSODescriptor']['NameIDFormat']).to eql("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
+      expect(result['EntityDescriptor']['SPSSODescriptor']['NameIDFormat']).to match_array([
+        Saml::Kit::Namespaces::Formats::NameId::PERSISTENT,
+        Saml::Kit::Namespaces::Formats::NameId::TRANSIENT,
+        Saml::Kit::Namespaces::Formats::NameId::EMAIL_ADDRESS,
+      ])
       expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['Binding']).to eql("urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST")
       expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['Location']).to eql(acs_url)
       expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['isDefault']).to eql('true')
