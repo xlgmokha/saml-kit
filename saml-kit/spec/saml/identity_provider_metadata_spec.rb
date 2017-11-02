@@ -13,8 +13,8 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       subject.entity_id = entity_id
       subject.organization_name = org_name
       subject.organization_url = url
-      subject.single_sign_on_location = "https://www.example.com/login"
-      subject.single_logout_location = "https://www.example.com/logout"
+      subject.add_single_sign_on_service("https://www.example.com/login", binding: :http_redirect)
+      subject.add_single_logout_service("https://www.example.com/logout", binding: :post)
       subject.attributes << "id"
 
       result = Hash.from_xml(subject.build.to_xml)
