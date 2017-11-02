@@ -28,9 +28,9 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       subject.entity_id = entity_id
       subject.add_assertion_consumer_service(acs_url, binding: :post)
       subject.name_id_formats = [
-        Saml::Kit::Namespaces::Formats::NameId::PERSISTENT,
-        Saml::Kit::Namespaces::Formats::NameId::TRANSIENT,
-        Saml::Kit::Namespaces::Formats::NameId::EMAIL_ADDRESS,
+        Saml::Kit::Namespaces::PERSISTENT,
+        Saml::Kit::Namespaces::TRANSIENT,
+        Saml::Kit::Namespaces::EMAIL_ADDRESS,
       ]
       result = Hash.from_xml(subject.build.to_xml)
 
@@ -41,9 +41,9 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       expect(result['EntityDescriptor']['SPSSODescriptor']['WantAssertionsSigned']).to eql('true')
       expect(result['EntityDescriptor']['SPSSODescriptor']['protocolSupportEnumeration']).to eql('urn:oasis:names:tc:SAML:2.0:protocol')
       expect(result['EntityDescriptor']['SPSSODescriptor']['NameIDFormat']).to match_array([
-        Saml::Kit::Namespaces::Formats::NameId::PERSISTENT,
-        Saml::Kit::Namespaces::Formats::NameId::TRANSIENT,
-        Saml::Kit::Namespaces::Formats::NameId::EMAIL_ADDRESS,
+        Saml::Kit::Namespaces::PERSISTENT,
+        Saml::Kit::Namespaces::TRANSIENT,
+        Saml::Kit::Namespaces::EMAIL_ADDRESS,
       ])
       expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['Binding']).to eql("urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST")
       expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['Location']).to eql(acs_url)
@@ -79,21 +79,21 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
     it 'returns each acs url and binding' do
       expect(subject.assertion_consumer_services).to match_array([
-        { location: acs_post_url, binding: Saml::Kit::Namespaces::Bindings::POST },
-        { location: acs_redirect_url, binding: Saml::Kit::Namespaces::Bindings::HTTP_REDIRECT },
+        { location: acs_post_url, binding: Saml::Kit::Namespaces::POST },
+        { location: acs_redirect_url, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
       ])
     end
 
     it 'returns each logout url and binding' do
       expect(subject.single_logout_services).to match_array([
-        { location: logout_post_url, binding: Saml::Kit::Namespaces::Bindings::POST },
-        { location: logout_redirect_url, binding: Saml::Kit::Namespaces::Bindings::HTTP_REDIRECT },
+        { location: logout_post_url, binding: Saml::Kit::Namespaces::POST },
+        { location: logout_redirect_url, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
       ])
     end
 
     it 'returns each of the nameid formats' do
       expect(subject.name_id_formats).to match_array([
-        Saml::Kit::Namespaces::Formats::NameId::PERSISTENT
+        Saml::Kit::Namespaces::PERSISTENT
       ])
     end
 

@@ -1,7 +1,6 @@
 module Saml
   module Kit
     class Signature
-      XMLDSIG="http://www.w3.org/2000/09/xmldsig#"
       SIGNATURE_METHODS = {
         SHA1: "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
         SHA224: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224",
@@ -25,7 +24,7 @@ module Saml
       end
 
       def template(xml = ::Builder::XmlMarkup.new)
-        xml.Signature "xmlns" => XMLDSIG do
+        xml.Signature "xmlns" => Namespaces::XMLDSIG do
           xml.SignedInfo do
             xml.CanonicalizationMethod Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
             xml.SignatureMethod Algorithm: SIGNATURE_METHODS[configuration.signature_method]
