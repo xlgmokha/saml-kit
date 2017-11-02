@@ -19,6 +19,14 @@ module Saml
       UNSPECIFIED = "urn:oasis:names:tc:SAML:2.0:consent:unspecified"
       URI = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
       XMLDSIG = "http://www.w3.org/2000/09/xmldsig#"
+
+      def self.binding_for(binding)
+        if :post == binding
+          Namespaces::POST
+        else
+          Namespaces::HTTP_REDIRECT
+        end
+      end
     end
   end
 end
