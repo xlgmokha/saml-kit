@@ -26,12 +26,13 @@ module Saml
 
       class Builder
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes
-        attr_reader :logout_urls, :single_sign_on_urls
+        attr_reader :logout_urls, :single_sign_on_urls, :name_id_formats
 
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
           @entity_id = configuration.issuer
           @attributes = []
+          @name_id_formats = [Namespaces::Formats::NameId::PERSISTENT]
           @single_sign_on_urls = []
           @logout_urls = []
         end
@@ -51,7 +52,9 @@ module Saml
           xml.EntityDescriptor entity_descriptor_options do
             signature.template(xml)
             xml.IDPSSODescriptor protocolSupportEnumeration: Namespaces::PROTOCOL do
-              xml.NameIDFormat Namespaces::Formats::NameId::PERSISTENT
+              name_id_formats.each do |format|
+                xml.NameIDFormat format
+              end
               logout_urls.each do |item|
                 xml.SingleLogoutService Binding: item[:binding], Location: item[:location]
               end
