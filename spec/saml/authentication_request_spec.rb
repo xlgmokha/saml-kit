@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::AuthenticationRequest do
-  subject { described_class.new(raw_xml, registry) }
-  let(:registry) { double }
+  subject { described_class.new(raw_xml) }
   let(:id) { SecureRandom.uuid }
   let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
   let(:issuer) { FFaker::Movie.title }
@@ -18,18 +17,6 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   it { expect(subject.issuer).to eql(issuer) }
   it { expect(subject.id).to eql("_#{id}") }
   it { expect(subject.acs_url).to eql(acs_url) }
-
-  describe "#valid?" do
-    it 'returns false when the service provider is not known' do
-      allow(registry).to receive(:registered?).with(issuer).and_return(false)
-      expect(subject).to_not be_valid
-    end
-
-    it 'returns true when the service provider is registered' do
-      allow(registry).to receive(:registered?).with(issuer).and_return(true)
-      expect(subject).to be_valid
-    end
-  end
 
 <<-EXAMPLE
 <samlp:AuthnRequest
