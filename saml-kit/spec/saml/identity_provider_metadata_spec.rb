@@ -83,7 +83,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       xml_hash['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor'].find { |x| x['use'] == 'encryption' }['KeyInfo']['X509Data']['X509Certificate']
     end
 
-    it { expect(subject.entity_id).to eql("https://win2008r2-ad-sso.qa1.immunet.com/adfs/services/trust") }
+    it { expect(subject.entity_id).to eql("https://www.example.com/adfs/services/trust") }
     it do
       expect(subject.name_id_formats).to match_array([
         "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
@@ -93,14 +93,14 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
     it do
       expect(subject.single_sign_on_services).to match_array([
-        { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", location: "https://win2008r2-ad-sso.qa1.immunet.com/adfs/ls/" },
-        { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", location: "https://win2008r2-ad-sso.qa1.immunet.com/adfs/ls/" },
+        { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", location: "https://www.example.com/adfs/ls/" },
+        { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", location: "https://www.example.com/adfs/ls/" },
       ])
     end
     it do
       expect(subject.single_logout_services).to match_array([
-        { location: "https://win2008r2-ad-sso.qa1.immunet.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
-        { location: "https://win2008r2-ad-sso.qa1.immunet.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
+        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
+        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
       ])
     end
     it do
@@ -136,7 +136,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       xml_hash['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor'].find { |x| x['use'] == 'encryption' }['KeyInfo']['X509Data']['X509Certificate']
     end
 
-    it { expect(subject.entity_id).to eql("http://win2012r2-ad-sso.qa1.immunet.com/adfs/services/trust") }
+    it { expect(subject.entity_id).to eql("http://www.example.com/adfs/services/trust") }
     it do
       expect(subject.name_id_formats).to match_array([
         "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
@@ -146,14 +146,14 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
     it do
       expect(subject.single_sign_on_services).to match_array([
-        { location: "https://win2012r2-ad-sso.qa1.immunet.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
-        { location: "https://win2012r2-ad-sso.qa1.immunet.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
+        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
+        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
       ])
     end
     it do
       expect(subject.single_logout_services).to match_array([
-        { location: "https://win2012r2-ad-sso.qa1.immunet.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
-        { location: "https://win2012r2-ad-sso.qa1.immunet.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
+        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
+        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
       ])
     end
     it do
@@ -203,24 +203,14 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(subject.errors[:metadata][0]).to include("1:0: ERROR: Element '{urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor'")
     end
 
-    context "signature validation" do
-      it 'is invalid, when the signature is invalid' do
-        old_url = 'https://win2012r2-ad-sso.qa1.immunet.com/adfs/ls/'
-        new_url = 'https://myserver.com/hacked'
-        metadata_xml = IO.read("spec/fixtures/metadata/ad_2012.xml").gsub(old_url, new_url)
+    it 'is invalid, when the signature is invalid' do
+      old_url = 'https://www.example.com/adfs/ls/'
+      new_url = 'https://myserver.com/hacked'
+      metadata_xml = IO.read("spec/fixtures/metadata/ad_2012.xml").gsub(old_url, new_url)
 
-        subject = described_class.new(metadata_xml)
-        expect(subject).to be_invalid
-        expect(subject.errors[:metadata]).to include("invalid signature.")
-      end
-
-      it 'is valid, when the content has not been tampered with' do
-        travel_to DateTime.parse('2017-10-21')
-        metadata_xml = IO.read("spec/fixtures/metadata/ad_2012.xml")
-
-        subject = described_class.new(metadata_xml)
-        expect(subject).to be_valid
-      end
+      subject = described_class.new(metadata_xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:metadata]).to include("invalid signature.")
     end
   end
 end
