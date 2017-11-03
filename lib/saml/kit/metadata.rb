@@ -37,7 +37,7 @@ module Saml
           cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", NAMESPACES).text
           {
             text: cert,
-            fingerprint: fingerprint_for(cert, OpenSSL::Digest::SHA256),
+            fingerprint: Fingerprint.new(cert).algorithm(OpenSSL::Digest::SHA256),
             use: item.attribute('use').value,
           }
         end
@@ -77,15 +77,6 @@ module Saml
 
       def find_all(xpath)
         document.search(xpath, NAMESPACES)
-      end
-
-      def fingerprint_for(value, algorithm)
-        x509 = OpenSSL::X509::Certificate.new(Base64.decode64(value))
-        pretty_fingerprint(algorithm.new.hexdigest(x509.to_der))
-      end
-
-      def pretty_fingerprint(fingerprint)
-        fingerprint.upcase.scan(/../).join(":")
       end
 
       def metadata

@@ -43,6 +43,8 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   end
 
   describe "#valid?" do
+    let(:registry) { double }
+
     it 'is valid when left untampered' do
       expect(described_class.new(raw_xml)).to be_valid
     end
@@ -59,6 +61,17 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
     it 'is invalid when not an AuthnRequest' do
       xml = Saml::Kit::IdentityProviderMetadata::Builder.new.to_xml
+      expect(described_class.new(xml)).to be_invalid
+    end
+
+    it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do
+      builder = described_class::Builder.new
+      builder.issuer = issuer
+      xml = builder.to_xml
+
+      allow(Saml::Kit.configuration).to receive(:service_provider_registry).and_return(registry)
+      fingerprint = Saml::Kit::Fingerprint.new(Hash.from_xml(xml)['AuthnRequest']['Signature']['KeyInfo']['X509Data']['X509Certificate'])
+      allow(registry).to receive(:registered?).with(issuer, fingerprint).and_return(false)
       expect(described_class.new(xml)).to be_invalid
     end
   end

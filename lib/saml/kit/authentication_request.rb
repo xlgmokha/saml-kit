@@ -5,6 +5,7 @@ module Saml
       validates_presence_of :content
       validate :must_be_request
       validate :must_have_valid_signature
+      validate :must_be_registered_service_provider
 
       attr_reader :content, :name
 
@@ -26,6 +27,14 @@ module Saml
         @hash[name]['Issuer']
       end
 
+      def certificate
+        @hash[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
+      end
+
+      def fingerprint
+        Fingerprint.new(certificate)
+      end
+
       def to_xml
         @content
       end
@@ -35,6 +44,13 @@ module Saml
       end
 
       private
+
+      def must_be_registered_service_provider
+        return unless login_request?
+        return if Saml::Kit.configuration.service_provider_registry.registered?(issuer, fingerprint)
+
+        errors[:base] << error_message(:invalid)
+      end
 
       def must_have_valid_signature
         return if to_xml.blank?
@@ -49,9 +65,12 @@ module Saml
       def must_be_request
         return if @hash.nil?
 
-        if @hash[name].blank?
-          errors[:base] << error_message(:invalid)
-        end
+        errors[:base] << error_message(:invalid) unless login_request?
+      end
+
+      def login_request?
+        return false if to_xml.blank?
+        @hash[name].present?
       end
 
       def error_message(key)
