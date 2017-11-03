@@ -12,7 +12,7 @@ require "xmldsig"
 
 require "saml/kit/authentication_request"
 require "saml/kit/configuration"
-require "saml/kit/default_service_provider_registry"
+require "saml/kit/default_registry"
 require "saml/kit/fingerprint"
 require "saml/kit/namespaces"
 require "saml/kit/metadata"
