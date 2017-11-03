@@ -3,25 +3,27 @@ module Saml
     class AuthenticationRequest
       include ActiveModel::Validations
       validates_presence_of :content
+      validate :must_be_request
       validate :must_have_valid_signature
 
-      attr_reader :content
+      attr_reader :content, :name
 
       def initialize(xml)
         @content = xml
+        @name = "AuthnRequest"
         @hash = Hash.from_xml(@content)
       end
 
       def id
-        @hash['AuthnRequest']['ID']
+        @hash[name]['ID']
       end
 
       def acs_url
-        @hash['AuthnRequest']['AssertionConsumerServiceURL']
+        @hash[name]['AssertionConsumerServiceURL']
       end
 
       def issuer
-        @hash['AuthnRequest']['Issuer']
+        @hash[name]['Issuer']
       end
 
       def to_xml
@@ -40,12 +42,20 @@ module Saml
         xml = Saml::Kit::Xml.new(to_xml)
         xml.valid?
         xml.errors.each do |error|
-          errors[:metadata] << error
+          errors[:base] << error
+        end
+      end
+
+      def must_be_request
+        return if @hash.nil?
+
+        if @hash[name].blank?
+          errors[:base] << error_message(:invalid)
         end
       end
 
       def error_message(key)
-        I18n.translate(key, scope: "saml/kit.errors.#{descriptor_name}")
+        I18n.translate(key, scope: "saml/kit.errors.#{name}")
       end
 
       class Builder

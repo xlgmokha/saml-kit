@@ -51,11 +51,15 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       raw_xml.gsub!(issuer, 'corrupt')
       subject = described_class.new(raw_xml)
       expect(subject).to_not be_valid
-      puts subject.errors.full_messages.inspect
     end
 
     it 'is invalid when blank' do
       expect(described_class.new('')).to be_invalid
+    end
+
+    it 'is invalid when not an AuthnRequest' do
+      xml = Saml::Kit::IdentityProviderMetadata::Builder.new.to_xml
+      expect(described_class.new(xml)).to be_invalid
     end
   end
 end
