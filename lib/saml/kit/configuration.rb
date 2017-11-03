@@ -7,15 +7,14 @@ module Saml
       attr_accessor :issuer
       attr_accessor :signature_method, :digest_method
       attr_accessor :signing_certificate_pem, :signing_private_key_pem, :signing_private_key_password
-      attr_accessor :service_provider_registry
+      attr_accessor :registry
 
       def initialize
-        #@issuer = SecureRandom.uuid
         @signature_method = :SHA256
         @digest_method = :SHA256
         @signing_private_key_password = SecureRandom.uuid
         @signing_certificate_pem, @signing_private_key_pem = SelfSignedCertificate.new(@signing_private_key_password).create
-        @service_provider_registry = DefaultServiceProviderRegistry.new
+        @registry = DefaultRegistry.new
       end
 
       def stripped_signing_certificate
