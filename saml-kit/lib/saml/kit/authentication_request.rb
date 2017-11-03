@@ -1,9 +1,15 @@
 module Saml
   module Kit
     class AuthenticationRequest
+      include ActiveModel::Validations
+      validates_presence_of :content
+      validate :must_have_valid_signature
+
+      attr_reader :content
+
       def initialize(xml)
-        @xml = xml
-        @hash = Hash.from_xml(@xml)
+        @content = xml
+        @hash = Hash.from_xml(@content)
       end
 
       def id
@@ -19,15 +25,27 @@ module Saml
       end
 
       def to_xml
-        @xml
+        @content
       end
 
       def response_for(user)
         Response::Builder.new(user, self).build
       end
 
-      def valid?
-        true
+      private
+
+      def must_have_valid_signature
+        return if to_xml.blank?
+
+        xml = Saml::Kit::Xml.new(to_xml)
+        xml.valid?
+        xml.errors.each do |error|
+          errors[:metadata] << error
+        end
+      end
+
+      def error_message(key)
+        I18n.translate(key, scope: "saml/kit.errors.#{descriptor_name}")
       end
 
       class Builder
