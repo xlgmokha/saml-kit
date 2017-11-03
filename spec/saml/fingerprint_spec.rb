@@ -18,4 +18,12 @@ RSpec.describe Saml::Kit::Fingerprint do
       expect(described_class.new(certificate).algorithm(OpenSSL::Digest::SHA1)).to eql(sha1)
     end
   end
+
+  it 'produces correct hash keys' do
+    certificate, _ = Saml::Kit::SelfSignedCertificate.new("password").create
+    items = { }
+    items[described_class.new(certificate)] = "HI"
+    items[described_class.new(certificate)] = "BYE"
+    expect(items.keys.count).to eql(1)
+  end
 end
