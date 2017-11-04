@@ -2,6 +2,7 @@ module Saml
   module Kit
     class AuthenticationRequest
       PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
+      include XsdValidatable
 
       include ActiveModel::Validations
       validates_presence_of :content
@@ -86,22 +87,12 @@ module Saml
       end
 
       def must_match_xsd
-        Dir.chdir(File.dirname(PROTOCOL_XSD)) do
-          xsd = Nokogiri::XML::Schema(IO.read(PROTOCOL_XSD))
-          document = Nokogiri::XML(to_xml)
-          xsd.validate(document).each do |error|
-            errors[:base] << error.message
-          end
-        end
+        matches_xsd?(PROTOCOL_XSD)
       end
 
       def login_request?
         return false if to_xml.blank?
         @hash[name].present?
-      end
-
-      def error_message(key)
-        I18n.translate(key, scope: "saml/kit.errors.#{name}")
       end
 
       class Builder

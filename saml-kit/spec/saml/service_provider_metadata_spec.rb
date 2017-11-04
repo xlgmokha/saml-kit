@@ -120,7 +120,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     it 'is invalid, when given identity provider metadata' do
       subject = described_class.new(IO.read("spec/fixtures/metadata/okta.xml"))
       expect(subject).to be_invalid
-      expect(subject.errors[:metadata]).to include(I18n.translate("saml/kit.errors.SPSSODescriptor.invalid"))
+      expect(subject.errors[:base]).to include(I18n.translate("saml/kit.errors.SPSSODescriptor.invalid"))
     end
 
     it 'is invalid, when the metadata is nil' do
@@ -139,7 +139,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       end
       subject = described_class.new(xml.target!)
       expect(subject).to_not be_valid
-      expect(subject.errors[:metadata][0]).to include("1:0: ERROR: Element '{urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor'")
+      expect(subject.errors[:base][0]).to include("1:0: ERROR: Element '{urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor'")
     end
 
     it 'is invalid, when the signature is invalid' do
@@ -147,7 +147,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       metadata_xml = service_provider_metadata.gsub(acs_post_url, new_url)
       subject = described_class.new(metadata_xml)
       expect(subject).to be_invalid
-      expect(subject.errors[:metadata]).to include("invalid signature.")
+      expect(subject.errors[:base]).to include("invalid signature.")
     end
   end
 
