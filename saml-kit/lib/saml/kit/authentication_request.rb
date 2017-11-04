@@ -45,9 +45,13 @@ module Saml
 
       private
 
+      def registry
+        Saml::Kit.configuration.registry
+      end
+
       def must_be_registered_service_provider
         return unless login_request?
-        return if Saml::Kit.configuration.registry.registered?(issuer, fingerprint)
+        return if registry.registered?(issuer, fingerprint)
 
         errors[:base] << error_message(:invalid)
       end
