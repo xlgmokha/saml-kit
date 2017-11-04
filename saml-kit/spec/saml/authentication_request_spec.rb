@@ -43,7 +43,14 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   end
 
   describe "#valid?" do
-    let(:registry) { double }
+    let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
+    let(:service_provider_metadata) { instance_double(Saml::Kit::ServiceProviderMetadata) }
+
+    before :each do
+      allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
+      allow(registry).to receive(:service_provider_metadata_for).and_return(service_provider_metadata)
+      allow(service_provider_metadata).to receive(:matches?).and_return(true)
+    end
 
     it 'is valid when left untampered' do
       expect(described_class.new(raw_xml)).to be_valid
@@ -67,12 +74,66 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do
       builder = described_class::Builder.new
       builder.issuer = issuer
+      builder.acs_url = acs_url
       xml = builder.to_xml
 
-      allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
       fingerprint = Saml::Kit::Fingerprint.new(Hash.from_xml(xml)['AuthnRequest']['Signature']['KeyInfo']['X509Data']['X509Certificate'])
-      allow(registry).to receive(:registered?).with(issuer, fingerprint).and_return(false)
+      allow(service_provider_metadata).to receive(:matches?).with(issuer, fingerprint).and_return(false)
       expect(described_class.new(xml)).to be_invalid
+    end
+
+    it 'is invalid when an assertion consumer service url is not provided' do
+      allow(service_provider_metadata).to receive(:matches?).and_return(true)
+      allow(service_provider_metadata).to receive(:assertion_consumer_services).and_return([])
+
+      builder = described_class::Builder.new
+      builder.acs_url = nil
+      xml = builder.to_xml
+
+      expect(described_class.new(xml)).to be_invalid
+    end
+
+    it 'is valid when an the ACS is available via the registry' do
+      allow(registry).to receive(:service_provider_metadata_for).with(issuer)
+        .and_return(service_provider_metadata)
+      allow(service_provider_metadata).to receive(:matches?).and_return(true)
+      allow(service_provider_metadata).to receive(:assertion_consumer_services).and_return([
+        { location: acs_url, binding: Saml::Kit::Namespaces::POST }
+      ])
+
+      builder = described_class::Builder.new
+      builder.issuer = issuer
+      builder.acs_url = nil
+      xml = builder.to_xml
+
+      expect(described_class.new(xml)).to be_valid
+    end
+  end
+
+  describe "#acs_url" do
+    let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
+    let(:service_provider_metadata) { instance_double(Saml::Kit::ServiceProviderMetadata) }
+
+    it 'returns the ACS in the request' do
+      builder = described_class::Builder.new
+      builder.acs_url = acs_url
+      subject = builder.build
+      expect(subject.acs_url).to eql(acs_url)
+    end
+
+    it 'returns the registered ACS url' do
+      builder = described_class::Builder.new
+      builder.issuer = issuer
+      builder.acs_url = nil
+      subject = builder.build
+
+      allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
+      allow(registry).to receive(:service_provider_metadata_for).and_return(service_provider_metadata)
+      allow(registry).to receive(:service_provider_metadata_for).with(issuer).and_return(service_provider_metadata)
+      allow(service_provider_metadata).to receive(:assertion_consumer_services).and_return([
+        { location: acs_url, binding: Saml::Kit::Namespaces::POST }
+      ])
+      expect(subject.acs_url).to eql(acs_url)
     end
   end
 end
