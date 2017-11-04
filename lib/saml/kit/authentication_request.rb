@@ -61,7 +61,7 @@ module Saml
 
       def must_be_registered_service_provider
         return unless login_request?
-        return if service_provider.matches?(fingerprint)
+        return if service_provider.matches?(fingerprint, use: "signing")
 
         errors[:base] << error_message(:invalid)
       end
