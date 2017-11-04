@@ -201,5 +201,12 @@ RSpec.describe Saml::Kit::Response do
       builder.version = "1.1"
       expect(described_class.new(builder.to_xml)).to be_invalid
     end
+
+    it 'validates the id' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+      builder.id = nil
+      expect(described_class.new(builder.to_xml)).to_not be_valid
+    end
   end
 end

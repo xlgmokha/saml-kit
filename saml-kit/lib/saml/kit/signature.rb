@@ -24,6 +24,8 @@ module Saml
       end
 
       def template(xml = ::Builder::XmlMarkup.new)
+        return if reference_id.blank?
+
         xml.Signature "xmlns" => Namespaces::XMLDSIG do
           xml.SignedInfo do
             xml.CanonicalizationMethod Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
@@ -47,8 +49,12 @@ module Saml
       end
 
       def finalize(xml)
-        document = Xmldsig::SignedDocument.new(xml.target!)
-        document.sign(configuration.signing_private_key)
+        if reference_id.present?
+          document = Xmldsig::SignedDocument.new(xml.target!)
+          document.sign(configuration.signing_private_key)
+        else
+          xml.target!
+        end
       end
     end
   end

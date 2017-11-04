@@ -7,6 +7,7 @@ module Saml
 
       attr_reader :content, :name
       validates_presence_of :content
+      validates_presence_of :id
       validate :must_have_valid_signature
       validate :must_be_response
       validate :must_be_registered
@@ -15,16 +16,20 @@ module Saml
 
       def initialize(xml)
         @content = xml
-        @xml_hash = Hash.from_xml(xml)
+        @xml_hash = Hash.from_xml(xml) || {}
         @name = 'Response'
       end
 
+      def id
+        @xml_hash.dig(name, 'ID')
+      end
+
       def name_id
-        @xml_hash[name]['Assertion']['Subject']['NameID']
+        @xml_hash.dig(name, 'Assertion', 'Subject', 'NameID')
       end
 
       def issuer
-        @xml_hash[name]['Issuer']
+        @xml_hash.dig(name, 'Issuer')
       end
 
       def [](key)
@@ -32,17 +37,17 @@ module Saml
       end
 
       def attributes
-        @attributes ||= Hash[@xml_hash[name]['Assertion']['AttributeStatement']['Attribute'].map do |item|
+        @attributes ||= Hash[@xml_hash.dig(name, 'Assertion', 'AttributeStatement', 'Attribute').map do |item|
           [item['Name'].to_sym, item['AttributeValue']]
         end].with_indifferent_access
       end
 
       def acs_url
-        @xml_hash[name]['Destination']
+        @xml_hash.dig(name, 'Destination')
       end
 
       def version
-        @xml_hash[name]['Version']
+        @xml_hash.dig(name, 'Version')
       end
 
       def to_xml
@@ -54,10 +59,11 @@ module Saml
       end
 
       def certificate
-        @xml_hash[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
+        @xml_hash.dig(name, 'Signature', 'KeyInfo', 'X509Data', 'X509Certificate')
       end
 
       def fingerprint
+        return if certificate.blank?
         Fingerprint.new(certificate)
       end
 
@@ -179,7 +185,7 @@ module Saml
 
         def response_options
           {
-            ID: "_#{id}",
+            ID: id.present? ? "_#{id}" : nil,
             Version: version,
             IssueInstant: now.iso8601,
             Destination: request.acs_url,
