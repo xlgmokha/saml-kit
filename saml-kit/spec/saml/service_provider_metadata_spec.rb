@@ -150,4 +150,20 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       expect(subject.errors[:metadata]).to include("invalid signature.")
     end
   end
+
+  describe "#matches?" do
+    subject { described_class::Builder.new.build }
+
+    it 'returns true when the fingerprint matches one of the signing certificates' do
+      certificate = Hash.from_xml(subject.to_xml)['EntityDescriptor']['Signature']['KeyInfo']['X509Data']['X509Certificate']
+      fingerprint = Saml::Kit::Fingerprint.new(certificate)
+      expect(subject.matches?(fingerprint)).to be_truthy
+    end
+
+    it 'returns false when the fingerprint does not match one of the signing certificates' do
+      certificate, _ = Saml::Kit::SelfSignedCertificate.new('password').create
+      fingerprint = Saml::Kit::Fingerprint.new(certificate)
+      expect(subject.matches?(fingerprint)).to be_falsey
+    end
+  end
 end
