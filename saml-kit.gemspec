@@ -6,7 +6,7 @@ require "saml/kit/version"
 Gem::Specification.new do |spec|
   spec.name          = "saml-kit"
   spec.version       = Saml::Kit::VERSION
-  spec.authors       = ["mo"]
+  spec.authors       = ["mo khan"]
   spec.email         = ["mo@mokhan.ca"]
 
   spec.summary       = %q{A simple toolkit for working with SAML.}
