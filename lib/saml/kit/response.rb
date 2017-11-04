@@ -13,6 +13,7 @@ module Saml
       validate :must_be_registered
       validate :must_match_xsd
       validate :must_be_valid_version
+      validate :must_be_successful
 
       def initialize(xml)
         @content = xml
@@ -30,6 +31,10 @@ module Saml
 
       def issuer
         @xml_hash.dig(name, 'Issuer')
+      end
+
+      def status_code
+        @xml_hash.dig(name, 'Status', 'StatusCode', 'Value')
       end
 
       def [](key)
@@ -114,6 +119,11 @@ module Saml
         errors[:base] << error_message(:invalid)
       end
 
+      def must_be_successful
+        return if Namespaces::SUCCESS == status_code
+        errors[:base] << error_message(:invalid)
+      end
+
       def login_response?
         return false if to_xml.blank?
         @xml_hash[name].present?
@@ -122,7 +132,7 @@ module Saml
       class Builder
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now, :name_id_format
-        attr_accessor :version
+        attr_accessor :version, :status_code
 
         def initialize(user, request)
           @user = user
@@ -132,6 +142,7 @@ module Saml
           @now = Time.now.utc
           @name_id_format = Namespaces::PERSISTENT
           @version = "2.0"
+          @status_code = Namespaces::SUCCESS
         end
 
         def to_xml
@@ -141,7 +152,7 @@ module Saml
             xml.Issuer(configuration.issuer, xmlns: Namespaces::ASSERTION)
             signature.template(xml)
             xml.Status do
-              xml.StatusCode Value: Namespaces::SUCCESS
+              xml.StatusCode Value: status_code
             end
             xml.Assertion(assertion_options) do
               xml.Issuer configuration.issuer
