@@ -25,12 +25,24 @@ module Saml
       private
 
       class Builder
-        attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :single_sign_on_location, :single_logout_location, :attributes
+        attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats
+        attr_reader :logout_urls, :single_sign_on_urls
 
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
           @entity_id = configuration.issuer
           @attributes = []
+          @name_id_formats = [Namespaces::PERSISTENT]
+          @single_sign_on_urls = []
+          @logout_urls = []
+        end
+
+        def add_single_sign_on_service(url, binding: :post)
+          @single_sign_on_urls.push(location: url, binding: Namespaces.binding_for(binding))
+        end
+
+        def add_single_logout_service(url, binding: :post)
+          @logout_urls.push(location: url, binding: Namespaces.binding_for(binding))
         end
 
         def to_xml
@@ -40,11 +52,17 @@ module Saml
           xml.EntityDescriptor entity_descriptor_options do
             signature.template(xml)
             xml.IDPSSODescriptor protocolSupportEnumeration: Namespaces::PROTOCOL do
-              xml.NameIDFormat Namespaces::Formats::NameId::PERSISTENT
-              xml.SingleLogoutService Binding: Namespaces::Bindings::POST, Location: single_logout_location
-              xml.SingleSignOnService Binding: Namespaces::Bindings::HTTP_REDIRECT, Location: single_sign_on_location
+              name_id_formats.each do |format|
+                xml.NameIDFormat format
+              end
+              logout_urls.each do |item|
+                xml.SingleLogoutService Binding: item[:binding], Location: item[:location]
+              end
+              single_sign_on_urls.each do |item|
+                xml.SingleSignOnService Binding: item[:binding], Location: item[:location]
+              end
               attributes.each do |attribute|
-                xml.tag! 'saml:Attribute', NameFormat: Namespaces::Formats::Attr::URI, Name: attribute, FriendlyName: attribute
+                xml.tag! 'saml:Attribute', NameFormat: Namespaces::URI, Name: attribute, FriendlyName: attribute
               end
             end
             xml.Organization do

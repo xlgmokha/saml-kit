@@ -1,9 +1,8 @@
 module Saml
   module Kit
     class AuthenticationRequest
-      def initialize(xml, registry = ServiceProviderRegistry.new)
+      def initialize(xml)
         @xml = xml
-        @registry = registry
         @hash = Hash.from_xml(@xml)
       end
 
@@ -19,16 +18,16 @@ module Saml
         @hash['AuthnRequest']['Issuer']
       end
 
-      def valid?
-        @registry.registered?(issuer)
-      end
-
       def to_xml
         @xml
       end
 
       def response_for(user)
         Response::Builder.new(user, self).build
+      end
+
+      def valid?
+        true
       end
 
       class Builder
