@@ -5,8 +5,8 @@ module Saml
 
       attr_reader :raw_xml, :document
 
-      validate :validate_signature
-      validate :validate_certificate
+      validate :validate_signatures
+      validate :validate_certificates
 
       def initialize(raw_xml)
         @raw_xml = raw_xml
@@ -24,7 +24,7 @@ module Saml
 
       private
 
-      def validate_signature
+      def validate_signatures
         invalid_signatures.flat_map(&:errors).uniq.each do |error|
           errors.add(error, "is invalid")
         end
@@ -39,7 +39,7 @@ module Saml
         end
       end
 
-      def validate_certificate(now = Time.current)
+      def validate_certificates(now = Time.current)
         return unless document.at_xpath('//ds:Signature', Xmldsig::NAMESPACES).present?
 
         x509_certificates.each do |certificate|
