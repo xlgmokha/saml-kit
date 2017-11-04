@@ -48,7 +48,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
     before :each do
       allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
-      allow(registry).to receive(:service_provider_metadata_for).and_return(service_provider_metadata)
+      allow(registry).to receive(:metadata_for).and_return(service_provider_metadata)
       allow(service_provider_metadata).to receive(:matches?).and_return(true)
     end
 
@@ -93,7 +93,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
 
     it 'is valid when an the ACS is available via the registry' do
-      allow(registry).to receive(:service_provider_metadata_for).with(issuer)
+      allow(registry).to receive(:metadata_for).with(issuer)
         .and_return(service_provider_metadata)
       allow(service_provider_metadata).to receive(:matches?).and_return(true)
       allow(service_provider_metadata).to receive(:assertion_consumer_services).and_return([
@@ -127,8 +127,8 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       subject = builder.build
 
       allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
-      allow(registry).to receive(:service_provider_metadata_for).and_return(service_provider_metadata)
-      allow(registry).to receive(:service_provider_metadata_for).with(issuer).and_return(service_provider_metadata)
+      allow(registry).to receive(:metadata_for).and_return(service_provider_metadata)
+      allow(registry).to receive(:metadata_for).with(issuer).and_return(service_provider_metadata)
       allow(service_provider_metadata).to receive(:assertion_consumer_services).and_return([
         { location: acs_url, binding: Saml::Kit::Namespaces::POST }
       ])

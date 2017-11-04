@@ -6,14 +6,14 @@ module Saml
       end
 
       def single_sign_on_services
-        xpath = "/md:EntityDescriptor/md:IDPSSODescriptor/md:SingleSignOnService"
+        xpath = "/md:EntityDescriptor/md:#{name}/md:SingleSignOnService"
         find_all(xpath).map do |item|
           { binding: item.attribute("Binding").value, location: item.attribute("Location").value }
         end
       end
 
       def attributes
-        find_all("/md:EntityDescriptor/md:IDPSSODescriptor/saml:Attribute").map do |item|
+        find_all("/md:EntityDescriptor/md:#{name}/saml:Attribute").map do |item|
           {
             format: item.attribute("NameFormat").value,
             friendly_name: item.attribute("FriendlyName").value,
@@ -86,7 +86,7 @@ module Saml
         def entity_descriptor_options
           {
             'xmlns': Namespaces::METADATA,
-            'xmlns:ds': Namespaces::SIGNATURE,
+            'xmlns:ds': Namespaces::XMLDSIG,
             'xmlns:saml': Namespaces::ASSERTION,
             ID: "_#{id}",
             entityID: entity_id,

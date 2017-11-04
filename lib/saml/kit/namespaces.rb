@@ -13,7 +13,6 @@ module Saml
       PERSISTENT = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
       POST = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
       PROTOCOL = "urn:oasis:names:tc:SAML:2.0:protocol"
-      SIGNATURE = "http://www.w3.org/2000/09/xmldsig#"
       SUCCESS = "urn:oasis:names:tc:SAML:2.0:status:Success"
       TRANSIENT = "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
       UNSPECIFIED = "urn:oasis:names:tc:SAML:2.0:consent:unspecified"

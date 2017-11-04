@@ -52,7 +52,7 @@ module Saml
       end
 
       def service_provider
-        registry.service_provider_metadata_for(issuer)
+        registry.metadata_for(issuer)
       end
 
       def registry
