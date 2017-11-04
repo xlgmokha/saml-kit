@@ -44,4 +44,6 @@ RSpec.describe Saml::Kit::DefaultRegistry do
       expect(result).to be_instance_of(Saml::Kit::IdentityProviderMetadata)
     end
   end
+
+  xit 'registers metadata that serves as both an IDP and SP'
 end

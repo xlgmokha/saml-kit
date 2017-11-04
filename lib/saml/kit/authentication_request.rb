@@ -1,12 +1,15 @@
 module Saml
   module Kit
     class AuthenticationRequest
+      PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
+
       include ActiveModel::Validations
       validates_presence_of :content
       validates_presence_of :acs_url, if: :login_request?
       validate :must_be_request
       validate :must_have_valid_signature
       validate :must_be_registered_service_provider
+      validate :must_match_xsd
 
       attr_reader :content, :name
 
@@ -82,6 +85,16 @@ module Saml
         errors[:base] << error_message(:invalid) unless login_request?
       end
 
+      def must_match_xsd
+        Dir.chdir(File.dirname(PROTOCOL_XSD)) do
+          xsd = Nokogiri::XML::Schema(IO.read(PROTOCOL_XSD))
+          document = Nokogiri::XML(to_xml)
+          xsd.validate(document).each do |error|
+            errors[:base] << error.message
+          end
+        end
+      end
+
       def login_request?
         return false if to_xml.blank?
         @hash[name].present?
@@ -103,8 +116,8 @@ module Saml
         def to_xml(xml = ::Builder::XmlMarkup.new)
           signature = Signature.new(id)
           xml.tag!('samlp:AuthnRequest', request_options) do
-            signature.template(xml)
             xml.tag!('saml:Issuer', issuer)
+            signature.template(xml)
             xml.tag!('samlp:NameIDPolicy', Format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
           end
           signature.finalize(xml)

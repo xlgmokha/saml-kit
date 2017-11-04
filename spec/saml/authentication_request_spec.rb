@@ -53,7 +53,8 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
 
     it 'is valid when left untampered' do
-      expect(described_class.new(raw_xml)).to be_valid
+      subject = described_class.new(raw_xml)
+      expect(subject).to be_valid
     end
 
     it 'is invalid if the document has been tampered with' do
@@ -106,6 +107,24 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       xml = builder.to_xml
 
       expect(described_class.new(xml)).to be_valid
+    end
+
+    it 'validates the schema of the request' do
+      xml = ::Builder::XmlMarkup.new
+      id = SecureRandom.uuid
+      options = {
+        "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL,
+        AssertionConsumerServiceURL: acs_url,
+        ID: "_#{id}",
+      }
+      signature = Saml::Kit::Signature.new(id)
+      xml.tag!('samlp:AuthnRequest', options) do
+        signature.template(xml)
+        xml.Fake do
+          xml.NotAllowed "Huh?"
+        end
+      end
+      expect(described_class.new(signature.finalize(xml))).to be_invalid
     end
   end
 
