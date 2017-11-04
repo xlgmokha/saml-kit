@@ -1,13 +1,29 @@
 module Saml
   module Kit
     class Response
+      PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
+      include ActiveModel::Validations
+      include XsdValidatable
+
+      attr_reader :content, :name
+      validates_presence_of :content
+      validate :must_have_valid_signature
+      validate :must_be_response
+      validate :must_be_registered
+      validate :must_match_xsd
+
       def initialize(xml)
-        @xml = xml
+        @content = xml
         @xml_hash = Hash.from_xml(xml)
+        @name = 'Response'
       end
 
       def name_id
-        @xml_hash['Response']['Assertion']['Subject']['NameID']
+        @xml_hash[name]['Assertion']['Subject']['NameID']
+      end
+
+      def issuer
+        @xml_hash[name]['Issuer']
       end
 
       def [](key)
@@ -15,29 +31,80 @@ module Saml
       end
 
       def attributes
-        @attributes ||= Hash[@xml_hash['Response']['Assertion']['AttributeStatement']['Attribute'].map do |item|
+        @attributes ||= Hash[@xml_hash[name]['Assertion']['AttributeStatement']['Attribute'].map do |item|
           [item['Name'].to_sym, item['AttributeValue']]
         end].with_indifferent_access
       end
 
       def acs_url
-        @xml_hash['Response']['Destination']
+        @xml_hash[name]['Destination']
       end
 
       def to_xml
-        @xml
+        content
       end
 
       def encode
         Base64.strict_encode64(to_xml)
       end
 
+      def certificate
+        @xml_hash[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
+      end
+
+      def fingerprint
+        Fingerprint.new(certificate)
+      end
+
       def self.parse(saml_response)
         new(Base64.decode64(saml_response))
       end
 
+      private
+
+      def provider
+        registry.metadata_for(issuer)
+      end
+
+      def registry
+        Saml::Kit.configuration.registry
+      end
+
+      def must_have_valid_signature
+        return if to_xml.blank?
+
+        xml = Saml::Kit::Xml.new(to_xml)
+        xml.valid?
+        xml.errors.each do |error|
+          errors[:base] << error
+        end
+      end
+
+      def must_be_response
+        return if to_xml.blank?
+
+        errors[:base] << error_message(:invalid) unless login_response?
+      end
+
+      def must_be_registered
+        return unless login_response?
+        return if provider.present? && provider.matches?(fingerprint, use: "signing")
+
+        errors[:base] << error_message(:invalid)
+      end
+
+      def must_match_xsd
+        matches_xsd?(PROTOCOL_XSD)
+      end
+
+      def login_response?
+        return false if to_xml.blank?
+        @xml_hash[name].present?
+      end
+
       class Builder
-        attr_reader :user, :request, :id, :reference_id, :now, :name_id_format
+        attr_reader :user, :request
+        attr_accessor :id, :reference_id, :now, :name_id_format
 
         def initialize(user, request)
           @user = user
@@ -51,11 +118,11 @@ module Saml
         def to_xml
           signature = Signature.new(id)
           xml = ::Builder::XmlMarkup.new
-          xml.tag!("samlp:Response", response_options) do
-            signature.template(xml)
+          xml.Response response_options do
             xml.Issuer(configuration.issuer, xmlns: Namespaces::ASSERTION)
-            xml.tag!("samlp:Status") do
-              xml.tag!('samlp:StatusCode', Value: Namespaces::SUCCESS)
+            signature.template(xml)
+            xml.Status do
+              xml.StatusCode Value: Namespaces::SUCCESS
             end
             xml.Assertion(assertion_options) do
               xml.Issuer configuration.issuer
@@ -105,7 +172,7 @@ module Saml
             Destination: request.acs_url,
             Consent: Namespaces::UNSPECIFIED,
             InResponseTo: request.id,
-            "xmlns:samlp" => Namespaces::PROTOCOL,
+            xmlns: Namespaces::PROTOCOL,
           }
         end
 
@@ -114,6 +181,7 @@ module Saml
             ID: "_#{reference_id}",
             IssueInstant: now.iso8601,
             Version: "2.0",
+            xmlns: Namespaces::ASSERTION,
           }
         end
 
