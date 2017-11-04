@@ -1,8 +1,7 @@
 module Saml
   module Kit
     class DefaultRegistry
-      def registered?(issuer, fingerprint)
-        issuer.present? && fingerprint.algorithm(OpenSSL::Digest::SHA256).present?
+      def service_provider_metadata_for(issuer)
       end
     end
   end

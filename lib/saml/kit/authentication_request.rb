@@ -3,6 +3,7 @@ module Saml
     class AuthenticationRequest
       include ActiveModel::Validations
       validates_presence_of :content
+      validates_presence_of :acs_url, if: :login_request?
       validate :must_be_request
       validate :must_have_valid_signature
       validate :must_be_registered_service_provider
@@ -20,7 +21,7 @@ module Saml
       end
 
       def acs_url
-        @hash[name]['AssertionConsumerServiceURL']
+        @hash[name]['AssertionConsumerServiceURL'] || registered_acs_url
       end
 
       def issuer
@@ -45,13 +46,22 @@ module Saml
 
       private
 
+      def registered_acs_url
+        acs_urls = service_provider.assertion_consumer_services
+        return acs_urls.first[:location] if acs_urls.any?
+      end
+
+      def service_provider
+        registry.service_provider_metadata_for(issuer)
+      end
+
       def registry
         Saml::Kit.configuration.registry
       end
 
       def must_be_registered_service_provider
         return unless login_request?
-        return if registry.registered?(issuer, fingerprint)
+        return if service_provider.matches?(issuer, fingerprint)
 
         errors[:base] << error_message(:invalid)
       end
@@ -114,7 +124,7 @@ module Saml
             Version: "2.0",
             IssueInstant: issued_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
           }
-          options[:AssertionConsumerServiceURL] = acs_url if acs_url
+          options[:AssertionConsumerServiceURL] = acs_url if acs_url.present?
           options
         end
       end
