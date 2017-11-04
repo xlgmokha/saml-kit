@@ -11,6 +11,7 @@ module Saml
       validate :must_be_response
       validate :must_be_registered
       validate :must_match_xsd
+      validate :must_be_valid_version
 
       def initialize(xml)
         @content = xml
@@ -38,6 +39,10 @@ module Saml
 
       def acs_url
         @xml_hash[name]['Destination']
+      end
+
+      def version
+        @xml_hash[name]['Version']
       end
 
       def to_xml
@@ -97,6 +102,12 @@ module Saml
         matches_xsd?(PROTOCOL_XSD)
       end
 
+      def must_be_valid_version
+        return unless login_response?
+        return if "2.0" == version
+        errors[:base] << error_message(:invalid)
+      end
+
       def login_response?
         return false if to_xml.blank?
         @xml_hash[name].present?
@@ -105,6 +116,7 @@ module Saml
       class Builder
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now, :name_id_format
+        attr_accessor :version
 
         def initialize(user, request)
           @user = user
@@ -113,6 +125,7 @@ module Saml
           @reference_id = SecureRandom.uuid
           @now = Time.now.utc
           @name_id_format = Namespaces::PERSISTENT
+          @version = "2.0"
         end
 
         def to_xml
@@ -167,7 +180,7 @@ module Saml
         def response_options
           {
             ID: "_#{id}",
-            Version: "2.0",
+            Version: version,
             IssueInstant: now.iso8601,
             Destination: request.acs_url,
             Consent: Namespaces::UNSPECIFIED,

@@ -194,5 +194,12 @@ RSpec.describe Saml::Kit::Response do
       end
       expect(described_class.new(signature.finalize(xml))).to be_invalid
     end
+
+    it 'validates the version' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+      builder.version = "1.1"
+      expect(described_class.new(builder.to_xml)).to be_invalid
+    end
   end
 end
