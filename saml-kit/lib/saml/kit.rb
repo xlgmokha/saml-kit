@@ -1,11 +1,12 @@
 require "saml/kit/version"
 
 require "active_model"
+require "active_support/core_ext/date/calculations"
 require "active_support/core_ext/hash/conversions"
 require "active_support/core_ext/numeric/time"
 require "active_support/duration"
-require "active_support/core_ext/date/calculations"
 require "builder"
+require "net/http"
 require "nokogiri"
 require "securerandom"
 require "xmldsig"

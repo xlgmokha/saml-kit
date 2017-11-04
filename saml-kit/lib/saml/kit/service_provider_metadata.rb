@@ -6,7 +6,7 @@ module Saml
       end
 
       def assertion_consumer_services
-        find_all("/md:EntityDescriptor/md:SPSSODescriptor/md:AssertionConsumerService").map do |item|
+        find_all("/md:EntityDescriptor/md:#{name}/md:AssertionConsumerService").map do |item|
           {
             binding: item.attribute("Binding").value,
             location: item.attribute("Location").value,

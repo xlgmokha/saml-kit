@@ -1,7 +1,8 @@
 require "bundler/setup"
 require "saml/kit"
-require "ffaker"
 require "active_support/testing/time_helpers"
+require "ffaker"
+require "webmock/rspec"
 
 RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
