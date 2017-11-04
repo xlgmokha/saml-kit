@@ -208,5 +208,12 @@ RSpec.describe Saml::Kit::Response do
       builder.id = nil
       expect(described_class.new(builder.to_xml)).to_not be_valid
     end
+
+    it 'validates the status code' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+      builder.status_code = Saml::Kit::Namespaces::REQUESTER_ERROR
+      expect(described_class.new(builder.to_xml)).to_not be_valid
+    end
   end
 end
