@@ -14,10 +14,9 @@ module Saml
         end
       end
 
-      def matches?(issuer, fingerprint)
-        #issuer.present? && fingerprint.algorithm(OpenSSL::Digest::SHA256).present?
+      def matches?(fingerprint)
+        #fingerprint.algorithm(OpenSSL::Digest::SHA256).present?
       end
-
 
       private
 
