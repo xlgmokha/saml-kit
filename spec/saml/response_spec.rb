@@ -137,4 +137,62 @@ RSpec.describe Saml::Kit::Response do
       expect(result['Response']['Assertion']['AttributeStatement']['Attribute'][0]['AttributeValue']).to eql("ea64c235-e18d-4b9a-8672-06ef84dabdec")
     end
   end
+
+  describe "#valid?" do
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url) }
+    let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
+    let(:builder) { described_class::Builder.new(user, request) }
+    let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
+    let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
+
+    before :each do
+      allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
+    end
+
+    it 'is valid' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+      expect(builder.build).to be_valid
+    end
+
+    it 'is invalid when blank' do
+      expect(described_class.new("")).to be_invalid
+    end
+
+    it 'is invalid if the document has been tampered with' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+      name_id_format = Saml::Kit::Namespaces::PERSISTENT
+      builder.name_id_format = name_id_format
+      subject = described_class.new(builder.to_xml.gsub(name_id_format, Saml::Kit::Namespaces::EMAIL_ADDRESS))
+      expect(subject).to_not be_valid
+    end
+
+    it 'is invalid when not a Response' do
+      xml = Saml::Kit::IdentityProviderMetadata::Builder.new.to_xml
+      expect(described_class.new(xml)).to be_invalid
+    end
+
+    it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(false)
+      expect(described_class.new(builder.to_xml)).to be_invalid
+    end
+
+    it 'validates the schema of the response' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+      xml = ::Builder::XmlMarkup.new
+      id = SecureRandom.uuid
+      options = { "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, ID: "_#{id}", }
+      signature = Saml::Kit::Signature.new(id)
+      xml.tag!("samlp:Response", options) do
+        signature.template(xml)
+        xml.Fake do
+          xml.NotAllowed "Huh?"
+        end
+      end
+      expect(described_class.new(signature.finalize(xml))).to be_invalid
+    end
+  end
 end

@@ -14,15 +14,6 @@ module Saml
         end
       end
 
-      def matches?(fingerprint, use: :signing)
-        if :signing == use
-          sha256 = fingerprint.algorithm(OpenSSL::Digest::SHA256)
-          signing_certificates.find do |signing_certificate|
-            sha256 == signing_certificate[:fingerprint]
-          end
-        end
-      end
-
       private
 
       class Builder

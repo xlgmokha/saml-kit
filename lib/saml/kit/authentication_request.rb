@@ -3,13 +3,13 @@ module Saml
     class AuthenticationRequest
       PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
       include XsdValidatable
-
       include ActiveModel::Validations
+
       validates_presence_of :content
       validates_presence_of :acs_url, if: :login_request?
       validate :must_be_request
       validate :must_have_valid_signature
-      validate :must_be_registered_service_provider
+      validate :must_be_registered
       validate :must_match_xsd
 
       attr_reader :content, :name
@@ -51,11 +51,11 @@ module Saml
       private
 
       def registered_acs_url
-        acs_urls = service_provider.assertion_consumer_services
+        acs_urls = provider.assertion_consumer_services
         return acs_urls.first[:location] if acs_urls.any?
       end
 
-      def service_provider
+      def provider
         registry.metadata_for(issuer)
       end
 
@@ -63,9 +63,9 @@ module Saml
         Saml::Kit.configuration.registry
       end
 
-      def must_be_registered_service_provider
+      def must_be_registered
         return unless login_request?
-        return if service_provider.matches?(fingerprint, use: "signing")
+        return if provider.matches?(fingerprint, use: "signing")
 
         errors[:base] << error_message(:invalid)
       end
