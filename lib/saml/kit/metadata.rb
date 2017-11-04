@@ -2,6 +2,7 @@ module Saml
   module Kit
     class Metadata
       include ActiveModel::Validations
+      include XsdValidatable
 
       METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
       NAMESPACES = {
@@ -94,23 +95,18 @@ module Saml
       end
 
       def must_contain_descriptor
-        errors[:metadata] << error_message(:invalid) unless metadata
+        errors[:base] << error_message(:invalid) unless metadata
       end
 
       def must_match_xsd
-        Dir.chdir(File.dirname(METADATA_XSD)) do
-          xsd = Nokogiri::XML::Schema(IO.read(METADATA_XSD))
-          xsd.validate(document).each do |error|
-            errors[:metadata] << error.message
-          end
-        end
+        matches_xsd?(METADATA_XSD)
       end
 
       def must_have_valid_signature
         return if to_xml.blank?
 
         unless valid_signature?
-          errors[:metadata] << error_message(:invalid_signature)
+          errors[:base] << error_message(:invalid_signature)
         end
       end
 
@@ -118,13 +114,9 @@ module Saml
         xml = Saml::Kit::Xml.new(to_xml)
         result = xml.valid?
         xml.errors.each do |error|
-          errors[:metadata] << error
+          errors[:base] << error
         end
         result
-      end
-
-      def error_message(key)
-        I18n.translate(key, scope: "saml/kit.errors.#{name}")
       end
     end
   end
