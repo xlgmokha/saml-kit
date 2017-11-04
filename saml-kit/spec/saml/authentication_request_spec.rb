@@ -18,18 +18,6 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   it { expect(subject.id).to eql("_#{id}") }
   it { expect(subject.acs_url).to eql(acs_url) }
 
-<<-EXAMPLE
-<samlp:AuthnRequest
-  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-  ID="ONELOGIN_809707f0030a5d00620c9d9df97f627afe9dcc24"
-  Version="2.0"
-  IssueInstant="2014-07-16T23:52:45Z"
-  AssertionConsumerServiceURL="http://sp.example.com/demo1/index.php?acs">
-  <saml:Issuer>http://sp.example.com/demo1/metadata.php</saml:Issuer>
-  <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
-</samlp:AuthnRequest>
-EXAMPLE
   describe "#to_xml" do
     subject { described_class::Builder.new(configuration) }
     let(:configuration) do
@@ -51,6 +39,40 @@ EXAMPLE
       expect(result['AuthnRequest']['AssertionConsumerServiceURL']).to eql(acs_url)
       expect(result['AuthnRequest']['Issuer']).to eql(issuer)
       expect(result['AuthnRequest']['NameIDPolicy']['Format']).to eql("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
+    end
+  end
+
+  describe "#valid?" do
+    let(:registry) { double }
+
+    it 'is valid when left untampered' do
+      expect(described_class.new(raw_xml)).to be_valid
+    end
+
+    it 'is invalid if the document has been tampered with' do
+      raw_xml.gsub!(issuer, 'corrupt')
+      subject = described_class.new(raw_xml)
+      expect(subject).to_not be_valid
+    end
+
+    it 'is invalid when blank' do
+      expect(described_class.new('')).to be_invalid
+    end
+
+    it 'is invalid when not an AuthnRequest' do
+      xml = Saml::Kit::IdentityProviderMetadata::Builder.new.to_xml
+      expect(described_class.new(xml)).to be_invalid
+    end
+
+    it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do
+      builder = described_class::Builder.new
+      builder.issuer = issuer
+      xml = builder.to_xml
+
+      allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
+      fingerprint = Saml::Kit::Fingerprint.new(Hash.from_xml(xml)['AuthnRequest']['Signature']['KeyInfo']['X509Data']['X509Certificate'])
+      allow(registry).to receive(:registered?).with(issuer, fingerprint).and_return(false)
+      expect(described_class.new(xml)).to be_invalid
     end
   end
 end

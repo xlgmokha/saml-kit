@@ -1,33 +1,80 @@
 module Saml
   module Kit
     class AuthenticationRequest
+      include ActiveModel::Validations
+      validates_presence_of :content
+      validate :must_be_request
+      validate :must_have_valid_signature
+      validate :must_be_registered_service_provider
+
+      attr_reader :content, :name
+
       def initialize(xml)
-        @xml = xml
-        @hash = Hash.from_xml(@xml)
+        @content = xml
+        @name = "AuthnRequest"
+        @hash = Hash.from_xml(@content)
       end
 
       def id
-        @hash['AuthnRequest']['ID']
+        @hash[name]['ID']
       end
 
       def acs_url
-        @hash['AuthnRequest']['AssertionConsumerServiceURL']
+        @hash[name]['AssertionConsumerServiceURL']
       end
 
       def issuer
-        @hash['AuthnRequest']['Issuer']
+        @hash[name]['Issuer']
+      end
+
+      def certificate
+        @hash[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
+      end
+
+      def fingerprint
+        Fingerprint.new(certificate)
       end
 
       def to_xml
-        @xml
+        @content
       end
 
       def response_for(user)
         Response::Builder.new(user, self).build
       end
 
-      def valid?
-        true
+      private
+
+      def must_be_registered_service_provider
+        return unless login_request?
+        return if Saml::Kit.configuration.registry.registered?(issuer, fingerprint)
+
+        errors[:base] << error_message(:invalid)
+      end
+
+      def must_have_valid_signature
+        return if to_xml.blank?
+
+        xml = Saml::Kit::Xml.new(to_xml)
+        xml.valid?
+        xml.errors.each do |error|
+          errors[:base] << error
+        end
+      end
+
+      def must_be_request
+        return if @hash.nil?
+
+        errors[:base] << error_message(:invalid) unless login_request?
+      end
+
+      def login_request?
+        return false if to_xml.blank?
+        @hash[name].present?
+      end
+
+      def error_message(key)
+        I18n.translate(key, scope: "saml/kit.errors.#{name}")
       end
 
       class Builder

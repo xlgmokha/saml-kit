@@ -76,7 +76,7 @@ module Saml
                 end
               end
               xml.AttributeStatement do
-                user.assertion_attributes.each do |key, value|
+                user.assertion_attributes_for(request).each do |key, value|
                   xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
                     xml.AttributeValue value.to_s
                   end

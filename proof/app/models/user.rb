@@ -4,7 +4,7 @@ class User < ApplicationRecord
     self.uuid = SecureRandom.uuid unless self.uuid
   end
 
-  def assertion_attributes
+  def assertion_attributes_for(request)
     {
       id: uuid,
       email: email,
