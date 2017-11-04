@@ -45,7 +45,7 @@ module Saml
           @id = SecureRandom.uuid
           @reference_id = SecureRandom.uuid
           @now = Time.now.utc
-          @name_id_format = Namespaces::Formats::NameId::PERSISTENT
+          @name_id_format = Namespaces::PERSISTENT
         end
 
         def to_xml
