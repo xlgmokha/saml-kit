@@ -78,7 +78,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       xml = builder.to_xml
 
       fingerprint = Saml::Kit::Fingerprint.new(Hash.from_xml(xml)['AuthnRequest']['Signature']['KeyInfo']['X509Data']['X509Certificate'])
-      allow(service_provider_metadata).to receive(:matches?).with(issuer, fingerprint).and_return(false)
+      allow(service_provider_metadata).to receive(:matches?).with(fingerprint).and_return(false)
       expect(described_class.new(xml)).to be_invalid
     end
 
