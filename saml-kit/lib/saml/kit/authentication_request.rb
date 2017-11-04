@@ -105,12 +105,13 @@ module Saml
       end
 
       class Builder
-        attr_accessor :id, :issued_at, :issuer, :acs_url
+        attr_accessor :id, :issued_at, :issuer, :acs_url, :name_id_format
 
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
           @issued_at = Time.now.utc
           @issuer = configuration.issuer
+          @name_id_format = Namespaces::EMAIL_ADDRESS
         end
 
         def to_xml(xml = ::Builder::XmlMarkup.new)
@@ -118,7 +119,7 @@ module Saml
           xml.tag!('samlp:AuthnRequest', request_options) do
             xml.tag!('saml:Issuer', issuer)
             signature.template(xml)
-            xml.tag!('samlp:NameIDPolicy', Format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
+            xml.tag!('samlp:NameIDPolicy', Format: name_id_format)
           end
           signature.finalize(xml)
         end
