@@ -221,5 +221,23 @@ RSpec.describe Saml::Kit::Response do
       allow(metadata).to receive(:matches?).and_return(true)
       expect(described_class.new(builder.to_xml, request_id: SecureRandom.uuid)).to_not be_valid
     end
+
+    it 'is invalid after a valid session window' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+
+      subject = described_class.new(builder.to_xml)
+      travel_to Saml::Kit.configuration.session_timeout.from_now + 5.seconds
+      expect(subject).to_not be_valid
+    end
+
+    it 'is invalid before the valid session window' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+
+      subject = described_class.new(builder.to_xml)
+      travel_to 5.seconds.ago
+      expect(subject).to_not be_valid
+    end
   end
 end
