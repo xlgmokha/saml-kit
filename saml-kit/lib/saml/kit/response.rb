@@ -16,6 +16,7 @@ module Saml
       validate :must_be_successful
       validate :must_match_request_id
       validate :must_be_active_session
+      validate :must_match_issuer
 
       def initialize(xml, request_id: nil)
         @content = xml
@@ -158,6 +159,20 @@ module Saml
       def must_be_active_session
         return unless login_response?
         errors[:base] << error_message(:expired) unless active?
+      end
+
+      def must_match_issuer
+        return unless login_response?
+
+        unless audiences.include?(Saml::Kit.configuration.issuer)
+          errors[:base] << error_message(:expired)
+        end
+      end
+
+      def audiences
+        Array(@xml_hash[name]['Assertion']['Conditions']['AudienceRestriction']['Audience'])
+      rescue
+        []
       end
 
       def login_response?

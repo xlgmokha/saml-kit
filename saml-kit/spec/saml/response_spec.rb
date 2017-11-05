@@ -147,6 +147,7 @@ RSpec.describe Saml::Kit::Response do
 
     before :each do
       allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
+      allow(Saml::Kit.configuration).to receive(:issuer).and_return(request.issuer)
     end
 
     it 'is valid' do
@@ -237,6 +238,16 @@ RSpec.describe Saml::Kit::Response do
 
       subject = described_class.new(builder.to_xml)
       travel_to 5.seconds.ago
+      expect(subject).to_not be_valid
+    end
+
+    it 'is invalid when the audience does not match the expected issuer' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+
+      allow(Saml::Kit.configuration).to receive(:issuer).and_return(FFaker::Internet.http_url)
+      allow(request).to receive(:issuer).and_return(FFaker::Internet.http_url)
+      subject = described_class.new(builder.to_xml)
       expect(subject).to_not be_valid
     end
   end
