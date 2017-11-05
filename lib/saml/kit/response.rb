@@ -5,7 +5,7 @@ module Saml
       include ActiveModel::Validations
       include XsdValidatable
 
-      attr_reader :content, :name
+      attr_reader :content, :name, :request_id
       validates_presence_of :content
       validates_presence_of :id
       validate :must_have_valid_signature
@@ -14,15 +14,21 @@ module Saml
       validate :must_match_xsd
       validate :must_be_valid_version
       validate :must_be_successful
+      validate :must_match_request_id
 
-      def initialize(xml)
+      def initialize(xml, request_id: nil)
         @content = xml
         @xml_hash = Hash.from_xml(xml) || {}
         @name = 'Response'
+        @request_id = request_id
       end
 
       def id
         @xml_hash.dig(name, 'ID')
+      end
+
+      def in_response_to
+        @xml_hash.dig(name, 'InResponseTo')
       end
 
       def name_id
@@ -122,6 +128,14 @@ module Saml
       def must_be_successful
         return if Namespaces::SUCCESS == status_code
         errors[:base] << error_message(:invalid)
+      end
+
+      def must_match_request_id
+        return if request_id.nil?
+
+        if in_response_to != request_id
+          errors[:base] << error_message(:invalid)
+        end
       end
 
       def login_response?

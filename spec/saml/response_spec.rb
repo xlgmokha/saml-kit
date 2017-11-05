@@ -215,5 +215,11 @@ RSpec.describe Saml::Kit::Response do
       builder.status_code = Saml::Kit::Namespaces::REQUESTER_ERROR
       expect(described_class.new(builder.to_xml)).to_not be_valid
     end
+
+    it 'validates the InResponseTo' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+      expect(described_class.new(builder.to_xml, request_id: SecureRandom.uuid)).to_not be_valid
+    end
   end
 end
