@@ -232,15 +232,15 @@ module Saml
         def subject_confirmation_data_options
           {
             InResponseTo: request.id,
-            NotOnOrAfter: 3.hours.from_now.utc.iso8601,
+            NotOnOrAfter: 3.hours.since(now).utc.iso8601,
             Recipient: request.acs_url,
           }
         end
 
         def conditions_options
           {
-            NotBefore: 5.seconds.ago.utc.iso8601,
-            NotOnOrAfter: 3.hours.from_now.utc.iso8601,
+            NotBefore: now.utc.iso8601,
+            NotOnOrAfter: Saml::Kit.configuration.session_timeout.from_now.utc.iso8601,
           }
         end
 

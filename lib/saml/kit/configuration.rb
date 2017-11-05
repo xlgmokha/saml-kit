@@ -7,7 +7,7 @@ module Saml
       attr_accessor :issuer
       attr_accessor :signature_method, :digest_method
       attr_accessor :signing_certificate_pem, :signing_private_key_pem, :signing_private_key_password
-      attr_accessor :registry
+      attr_accessor :registry, :session_timeout
 
       def initialize
         @signature_method = :SHA256
@@ -15,6 +15,7 @@ module Saml
         @signing_private_key_password = SecureRandom.uuid
         @signing_certificate_pem, @signing_private_key_pem = SelfSignedCertificate.new(@signing_private_key_password).create
         @registry = DefaultRegistry.new
+        @session_timeout = 3.hours
       end
 
       def stripped_signing_certificate
