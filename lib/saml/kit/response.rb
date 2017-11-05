@@ -15,6 +15,7 @@ module Saml
       validate :must_be_valid_version
       validate :must_be_successful
       validate :must_match_request_id
+      validate :must_be_active_session
 
       def initialize(xml, request_id: nil)
         @content = xml
@@ -78,6 +79,22 @@ module Saml
         Fingerprint.new(certificate)
       end
 
+      def started_at
+        parse_date(@xml_hash.dig(name, 'Assertion', 'Conditions', 'NotBefore'))
+      end
+
+      def expired_at
+        parse_date(@xml_hash.dig(name, 'Assertion', 'Conditions', 'NotOnOrAfter'))
+      end
+
+      def expired?
+        Time.current > expired_at
+      end
+
+      def active?
+        Time.current > started_at && !expired?
+      end
+
       def self.parse(saml_response)
         new(Base64.decode64(saml_response))
       end
@@ -138,9 +155,20 @@ module Saml
         end
       end
 
+      def must_be_active_session
+        return unless login_response?
+        errors[:base] << error_message(:expired) unless active?
+      end
+
       def login_response?
         return false if to_xml.blank?
         @xml_hash[name].present?
+      end
+
+      def parse_date(value)
+        DateTime.parse(value)
+      rescue
+        Time.at(0).to_datetime
       end
 
       class Builder
