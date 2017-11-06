@@ -55,6 +55,7 @@ module Saml
       private
 
       def registered_acs_url
+        return if provider.nil?
         acs_urls = provider.assertion_consumer_services
         return acs_urls.first[:location] if acs_urls.any?
       end
@@ -69,6 +70,7 @@ module Saml
 
       def must_be_registered
         return unless login_request?
+        return if provider.nil?
         return if provider.matches?(fingerprint, use: "signing")
 
         errors[:base] << error_message(:invalid)
