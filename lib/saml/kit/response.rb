@@ -291,7 +291,7 @@ module Saml
           {
             AuthnInstant: now.iso8601,
             SessionIndex: assertion_options[:ID],
-            SessionNotOnOrAfter: 3.hours.from_now.utc.iso8601,
+            SessionNotOnOrAfter: 3.hours.since(now).utc.iso8601,
           }
         end
       end
