@@ -1,4 +1,6 @@
 class MetadataController < ApplicationController
+  skip_before_action :authenticate!
+
   def show
     render xml: to_xml
   end
