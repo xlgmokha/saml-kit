@@ -4,6 +4,14 @@ class User < ApplicationRecord
     self.uuid = SecureRandom.uuid unless self.uuid
   end
 
+  def name_id_for(request)
+    if Saml::Kit::Namespaces::PERSISTENT == request.name_id_format
+      uuid
+    else
+      email
+    end
+  end
+
   def assertion_attributes_for(request)
     {
       id: uuid,
