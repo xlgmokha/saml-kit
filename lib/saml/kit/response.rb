@@ -188,7 +188,7 @@ module Saml
 
       class Builder
         attr_reader :user, :request
-        attr_accessor :id, :reference_id, :now, :name_id_format
+        attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code
 
         def initialize(user, request)
@@ -197,7 +197,6 @@ module Saml
           @id = SecureRandom.uuid
           @reference_id = SecureRandom.uuid
           @now = Time.now.utc
-          @name_id_format = Namespaces::PERSISTENT
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
         end
@@ -214,7 +213,7 @@ module Saml
             xml.Assertion(assertion_options) do
               xml.Issuer configuration.issuer
               xml.Subject do
-                xml.NameID user.uuid, Format: name_id_format
+                xml.NameID user.uuid, Format: request.name_id_format
                 xml.SubjectConfirmation Method: Namespaces::BEARER do
                   xml.SubjectConfirmationData "", subject_confirmation_data_options
                 end
