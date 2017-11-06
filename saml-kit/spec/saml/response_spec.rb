@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Saml::Kit::Response do
   describe "#acs_url" do
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
-    let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes_for: { }) }
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { }) }
     let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS) }
     subject { described_class::Builder.new(user, request).build }
 
@@ -14,64 +14,16 @@ RSpec.describe Saml::Kit::Response do
 
   describe "#to_xml" do
     subject { described_class::Builder.new(user, request) }
-    let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
     let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:issuer) { FFaker::Movie.title }
     let(:email) { FFaker::Internet.email }
 
-    <<-XML
-<samlp:Response
-  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-  ID="_8e8dc5f69a98cc4c1ff3427e5ce34606fd672f91e6"
-  Version="2.0"
-  IssueInstant="2014-07-17T01:01:48Z"
-  Destination="http://sp.example.com/demo1/index.php?acs"
-  InResponseTo="ONELOGIN_4fee3b046395c4e751011e97f8900b5273d56685">
-  <saml:Issuer>http://idp.example.com/metadata.php</saml:Issuer>
-  <samlp:Status>
-    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
-  </samlp:Status>
-  <saml:Assertion
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    ID="_d71a3a8e9fcc45c9e9d248ef7049393fc8f04e5f75"
-    Version="2.0"
-    IssueInstant="2014-07-17T01:01:48Z">
-    <saml:Issuer>http://idp.example.com/metadata.php</saml:Issuer>
-    <saml:Subject>
-      <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient">_ce3d2948b4cf20146dee0a0b3dd6f69b6cf86f62d7</saml:NameID>
-      <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
-        <saml:SubjectConfirmationData NotOnOrAfter="2024-01-18T06:21:48Z" Recipient="http://sp.example.com/demo1/index.php?acs" InResponseTo="ONELOGIN_4fee3b046395c4e751011e97f8900b5273d56685"/>
-      </saml:SubjectConfirmation>
-    </saml:Subject>
-    <saml:Conditions NotBefore="2014-07-17T01:01:18Z" NotOnOrAfter="2024-01-18T06:21:48Z">
-      <saml:AudienceRestriction>
-        <saml:Audience>http://sp.example.com/demo1/metadata.php</saml:Audience>
-      </saml:AudienceRestriction>
-    </saml:Conditions>
-    <saml:AuthnStatement AuthnInstant="2014-07-17T01:01:48Z" SessionNotOnOrAfter="2024-07-17T09:01:48Z" SessionIndex="_be9967abd904ddcae3c0eb4189adbe3f71e327cf93">
-      <saml:AuthnContext>
-        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</saml:AuthnContextClassRef>
-      </saml:AuthnContext>
-    </saml:AuthnStatement>
-    <saml:AttributeStatement>
-      <saml:Attribute Name="uid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
-        <saml:AttributeValue xsi:type="xs:string">test</saml:AttributeValue>
-      </saml:Attribute>
-      <saml:Attribute Name="mail" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
-        <saml:AttributeValue xsi:type="xs:string">test@example.com</saml:AttributeValue>
-      </saml:Attribute>
-    </saml:AttributeStatement>
-  </saml:Assertion>
-</samlp:Response>
-    XML
     it 'returns a proper response for the user' do
       travel_to 1.second.from_now
       allow(Saml::Kit.configuration).to receive(:issuer).and_return(issuer)
-      result = subject.to_xml
-      hash = Hash.from_xml(result)
+      hash = Hash.from_xml(subject.to_xml)
 
       expect(hash['Response']['ID']).to be_present
       expect(hash['Response']['Version']).to eql('2.0')
@@ -86,7 +38,7 @@ RSpec.describe Saml::Kit::Response do
       expect(hash['Response']['Assertion']['Version']).to eql("2.0")
       expect(hash['Response']['Assertion']['Issuer']).to eql(issuer)
 
-      expect(hash['Response']['Assertion']['Subject']['NameID']).to eql(user.uuid)
+      expect(hash['Response']['Assertion']['Subject']['NameID']).to eql(user.name_id_for)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['Method']).to eql("urn:oasis:names:tc:SAML:2.0:cm:bearer")
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['NotOnOrAfter']).to eql(3.hours.from_now.utc.iso8601)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['Recipient']).to eql(acs_url)
@@ -118,8 +70,7 @@ RSpec.describe Saml::Kit::Response do
     let(:raw_response) { IO.read('spec/fixtures/encoded_response.txt') }
 
     it 'decodes the response to the raw xml' do
-      xml = subject.parse(raw_response).to_xml
-      result = Hash.from_xml(xml)
+      result = Hash.from_xml(subject.parse(raw_response).to_xml)
       expect(result['Response']['ID']).to eql('_75358cd9-f357-4b2d-999f-f53382ba8263')
       expect(result['Response']['Version']).to eql('2.0')
       expect(result['Response']['IssueInstant']).to eql("2017-10-22T23:36:44Z")
@@ -140,7 +91,7 @@ RSpec.describe Saml::Kit::Response do
 
   describe "#valid?" do
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT) }
-    let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
     let(:builder) { described_class::Builder.new(user, request) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
