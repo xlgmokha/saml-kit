@@ -4,7 +4,7 @@ RSpec.describe Saml::Kit::Response do
   describe "#acs_url" do
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes_for: { }) }
-    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title) }
+    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS) }
     subject { described_class::Builder.new(user, request).build }
 
     it 'returns the acs_url' do
@@ -15,7 +15,7 @@ RSpec.describe Saml::Kit::Response do
   describe "#to_xml" do
     subject { described_class::Builder.new(user, request) }
     let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
-    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title) }
+    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:issuer) { FFaker::Movie.title }
     let(:email) { FFaker::Internet.email }
@@ -139,7 +139,7 @@ RSpec.describe Saml::Kit::Response do
   end
 
   describe "#valid?" do
-    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url) }
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT) }
     let(:user) { double(:user, uuid: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
     let(:builder) { described_class::Builder.new(user, request) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
@@ -163,9 +163,9 @@ RSpec.describe Saml::Kit::Response do
     it 'is invalid if the document has been tampered with' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      name_id_format = Saml::Kit::Namespaces::PERSISTENT
-      builder.name_id_format = name_id_format
-      subject = described_class.new(builder.to_xml.gsub(name_id_format, Saml::Kit::Namespaces::EMAIL_ADDRESS))
+      status_code = FFaker::Movie.title
+      builder.status_code = status_code
+      subject = described_class.new(builder.to_xml.gsub(status_code, "TAMPERED"))
       expect(subject).to_not be_valid
     end
 
