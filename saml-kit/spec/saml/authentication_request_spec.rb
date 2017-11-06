@@ -85,6 +85,12 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       expect(described_class.new(xml)).to be_invalid
     end
 
+    it 'is invalid when the service provider is not known' do
+      allow(registry).to receive(:metadata_for).and_return(nil)
+      builder = described_class::Builder.new
+      expect(described_class.new(builder.to_xml)).to be_invalid
+    end
+
     it 'is invalid when an assertion consumer service url is not provided' do
       allow(service_provider_metadata).to receive(:matches?).and_return(true)
       allow(service_provider_metadata).to receive(:assertion_consumer_services).and_return([])
