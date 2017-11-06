@@ -32,6 +32,10 @@ module Saml
         @hash[name]['Issuer']
       end
 
+      def name_id_format
+        @hash[name]['NameIDPolicy']['Format']
+      end
+
       def certificate
         @hash[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
       end
@@ -102,7 +106,7 @@ module Saml
           @id = SecureRandom.uuid
           @issued_at = Time.now.utc
           @issuer = configuration.issuer
-          @name_id_format = Namespaces::EMAIL_ADDRESS
+          @name_id_format = Namespaces::PERSISTENT
         end
 
         def to_xml(xml = ::Builder::XmlMarkup.new)
@@ -127,7 +131,7 @@ module Saml
             "xmlns:saml" => Namespaces::ASSERTION,
             ID: "_#{id}",
             Version: "2.0",
-            IssueInstant: issued_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            IssueInstant: issued_at.utc.iso8601,
           }
           options[:AssertionConsumerServiceURL] = acs_url if acs_url.present?
           options
