@@ -1,4 +1,5 @@
 class SessionsController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: [:new]
   before_action :validate_saml_request, only: [:new, :create]
 
   def new

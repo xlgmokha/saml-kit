@@ -1,8 +1,11 @@
 <div class="container">
   <div class="row">
     <div class="col">
-      <%= form_tag url: "" do %>
-        <% submit_tag "Log In to IDP" %>
+      <%= link_to "Log in to IDP via redirect", @redirect_uri %>
+      <%= form_tag @uri.to_s, method: :post do %>
+        <%= hidden_field_tag 'SAMLRequest', Saml::Kit::Request.authentication(assertion_consumer_service: session_url) %>
+        <%= hidden_field_tag 'RelayState', JSON.generate(inbound_path: '/') %>
+        <%= submit_tag "Log In to IDP via POST" %>
       <% end %>
     </div>
   </div>

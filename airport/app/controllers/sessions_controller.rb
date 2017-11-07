@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
 
   def new
     @uri = URI.parse(idp_metadata.single_sign_on_service_for(binding: :http_redirect)[:location])
-    redirect_to @uri.to_s + '?' + query_params
+    @redirect_uri = redirect_url_for(@uri)
   end
 
   def create
@@ -15,8 +15,9 @@ class SessionsController < ApplicationController
 
   private
 
-  def query_params
-    {
+  def redirect_url_for(uri)
+    uri.to_s + '?' +
+      {
       'SAMLRequest' => Saml::Kit::Request.authentication(assertion_consumer_service: session_url),
       'RelayState' => JSON.generate(inbound_path: '/'),
     }.map do |(x, y)|
