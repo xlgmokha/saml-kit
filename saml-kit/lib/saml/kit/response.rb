@@ -13,7 +13,8 @@ module Saml
       validate :must_be_registered
       validate :must_match_xsd
       validate :must_be_valid_version
-      validate :must_be_successful
+      validates_inclusion_of :status_code, in: [Namespaces::SUCCESS]
+
       validate :must_match_request_id
       validate :must_be_active_session
       validate :must_match_issuer
@@ -130,7 +131,7 @@ module Saml
         return unless login_response?
         return if provider.present? && provider.matches?(fingerprint, use: "signing")
 
-        errors[:base] << error_message(:invalid)
+        errors[:base] << error_message(:unregistered)
       end
 
       def must_match_xsd
@@ -140,19 +141,14 @@ module Saml
       def must_be_valid_version
         return unless login_response?
         return if "2.0" == version
-        errors[:base] << error_message(:invalid)
-      end
-
-      def must_be_successful
-        return if Namespaces::SUCCESS == status_code
-        errors[:base] << error_message(:invalid)
+        errors[:version] << error_message(:invalid_version)
       end
 
       def must_match_request_id
         return if request_id.nil?
 
         if in_response_to != request_id
-          errors[:base] << error_message(:invalid)
+          errors[:in_response_to] << error_message(:invalid_response_to)
         end
       end
 
@@ -165,7 +161,7 @@ module Saml
         return unless login_response?
 
         unless audiences.include?(Saml::Kit.configuration.issuer)
-          errors[:base] << error_message(:expired)
+          errors[:audience] << error_message(:must_match_issuer)
         end
       end
 

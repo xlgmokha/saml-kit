@@ -8,3 +8,10 @@ en:
       IDPSSODescriptor:
         invalid: "must contain identity provider metadata."
         invalid_signature: "invalid signature."
+      Response:
+        invalid: "must contain response."
+        unregistered: "must originate from registered service provider."
+        expired: "must not be expired."
+        invalid_version: "must be 2.0."
+        invalid_response_to: "must match request id."
+        must_match_issuer: "must match entityId."
