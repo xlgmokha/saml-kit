@@ -1,7 +1,12 @@
 <div class="container">
   <div class="row">
     <div class="col">
-      <h1>Welcome <%= current_user.id %>:<%= current_user.email %></h1>
+      <h1>Welcome <%= current_user.email %></h1>
+      <ul>
+        <% current_user.attributes.each do |attribute| %>
+          <li> <%= attribute %> </li>
+        <% end %>
+      </ul>
     </div>
   </div>
 </div>
