@@ -35,8 +35,7 @@ module Saml
       end
 
       def certificates
-        xpath = "/md:EntityDescriptor/md:#{name}/md:KeyDescriptor"
-        find_all(xpath).map do |item|
+        @certificates ||= find_all("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
           cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", NAMESPACES).text
           {
             text: cert,
@@ -55,8 +54,7 @@ module Saml
       end
 
       def single_logout_services
-        xpath = "/md:EntityDescriptor/md:#{name}/md:SingleLogoutService"
-        find_all(xpath).map do |item|
+        find_all("/md:EntityDescriptor/md:#{name}/md:SingleLogoutService").map do |item|
           {
             binding: item.attribute("Binding").value,
             location: item.attribute("Location").value,

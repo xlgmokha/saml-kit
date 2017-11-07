@@ -1,14 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::ServiceProviderMetadata do
-  let(:entity_id) { FFaker::Movie.title }
-  let(:acs_post_url) { "https://#{FFaker::Internet.domain_name}/post" }
-  let(:acs_redirect_url) { "https://#{FFaker::Internet.domain_name}/redirect" }
-  let(:logout_post_url) { "https://#{FFaker::Internet.domain_name}/post" }
-  let(:logout_redirect_url) { "https://#{FFaker::Internet.domain_name}/redirect" }
+  let(:entity_id) { FFaker::Internet.http_url }
+  let(:acs_post_url) { FFaker::Internet.http_url }
+  let(:acs_redirect_url) { FFaker::Internet.http_url }
+  let(:logout_post_url) { FFaker::Internet.http_url }
+  let(:logout_redirect_url) { FFaker::Internet.http_url }
 
   describe described_class::Builder do
-    let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
+    let(:acs_url) { FFaker::Internet.http_url }
 
     <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
