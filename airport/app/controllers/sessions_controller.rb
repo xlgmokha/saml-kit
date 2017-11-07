@@ -8,8 +8,10 @@ class SessionsController < ApplicationController
   end
 
   def create
-    saml_response = Saml::Kit::Response.parse(params[:SAMLResponse])
-    session[:user] = { id: saml_response.name_id }.merge(saml_response.attributes)
+    @saml_response = Saml::Kit::Response.parse(params[:SAMLResponse])
+    return render :error, status: :forbidden if @saml_response.invalid?
+
+    session[:user] = { id: @saml_response.name_id }.merge(@saml_response.attributes)
     redirect_to dashboard_path
   end
 
