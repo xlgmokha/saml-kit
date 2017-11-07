@@ -42,6 +42,7 @@ module Saml
           @name_id_formats = [Namespaces::PERSISTENT]
           @single_sign_on_urls = []
           @logout_urls = []
+          @configuration = configuration
         end
 
         def add_single_sign_on_service(url, binding: :post)
@@ -59,6 +60,13 @@ module Saml
           xml.EntityDescriptor entity_descriptor_options do
             signature.template(xml)
             xml.IDPSSODescriptor protocolSupportEnumeration: Namespaces::PROTOCOL do
+              xml.KeyDescriptor use: "signing" do
+                xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
+                  xml.X509Data do
+                    xml.X509Certificate @configuration.stripped_signing_certificate
+                  end
+                end
+              end
               name_id_formats.each do |format|
                 xml.NameIDFormat format
               end

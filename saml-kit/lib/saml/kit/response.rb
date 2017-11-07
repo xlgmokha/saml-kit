@@ -129,7 +129,7 @@ module Saml
 
       def must_be_registered
         return unless login_response?
-        return if provider.present? && provider.matches?(fingerprint, use: "signing")
+        return if provider.present? && provider.matches?(fingerprint, use: :signing)
 
         errors[:base] << error_message(:unregistered)
       end

@@ -39,6 +39,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['Name']).to eql("id")
       expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['FriendlyName']).to eql("id")
       expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['NameFormat']).to eql("urn:oasis:names:tc:SAML:2.0:attrname-format:uri")
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']).to eql(Saml::Kit.configuration.stripped_signing_certificate)
 
       expect(result['EntityDescriptor']['Organization']['OrganizationName']).to eql(org_name)
       expect(result['EntityDescriptor']['Organization']['OrganizationDisplayName']).to eql(org_name)
