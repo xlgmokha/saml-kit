@@ -25,8 +25,10 @@ module Saml
       def self.binding_for(binding)
         if :post == binding
           Namespaces::POST
-        else
+        elsif :http_redirect == binding
           Namespaces::HTTP_REDIRECT
+        else
+          nil
         end
       end
     end
