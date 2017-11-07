@@ -3,8 +3,7 @@ class SessionsController < ApplicationController
   skip_before_action :authenticate!
 
   def new
-    metadata = Saml::Kit.configuration.registry.metadata_for(DEFAULT_IDP_ENTITY_ID)
-    @uri = URI.parse(metadata.single_sign_on_service_for(binding: :http_redirect)[:location])
+    @uri = URI.parse(idp_metadata.single_sign_on_service_for(binding: :http_redirect)[:location])
     redirect_to @uri.to_s + '?' + query_params
   end
 
@@ -23,5 +22,9 @@ class SessionsController < ApplicationController
     }.map do |(x, y)|
       "#{x}=#{CGI.escape(y)}"
     end.join('&')
+  end
+
+  def idp_metadata
+    Saml::Kit.configuration.registry.metadata_for(DEFAULT_IDP_ENTITY_ID)
   end
 end
