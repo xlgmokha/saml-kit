@@ -18,10 +18,12 @@ module Saml
       validate :must_have_valid_signature
 
       attr_reader :xml, :name
+      attr_accessor :hash_algorithm
 
       def initialize(name, xml)
         @name = name
         @xml = xml
+        @hash_algorithm = OpenSSL::Digest::SHA256
       end
 
       def entity_id
@@ -38,7 +40,7 @@ module Saml
           cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", NAMESPACES).text
           {
             text: cert,
-            fingerprint: Fingerprint.new(cert).algorithm(OpenSSL::Digest::SHA256),
+            fingerprint: Fingerprint.new(cert).algorithm(hash_algorithm),
             use: item.attribute('use').value,
           }
         end
@@ -63,10 +65,10 @@ module Saml
       end
 
       def matches?(fingerprint, use: :signing)
-        if :signing == use
-          sha256 = fingerprint.algorithm(OpenSSL::Digest::SHA256)
+        if :signing == use.to_sym
+          hash_value = fingerprint.algorithm(hash_algorithm)
           signing_certificates.find do |signing_certificate|
-            sha256 == signing_certificate[:fingerprint]
+            hash_value == signing_certificate[:fingerprint]
           end
         end
       end

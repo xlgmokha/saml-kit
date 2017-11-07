@@ -74,7 +74,7 @@ module Saml
           errors[:service_provider] << error_message(:unregistered)
           return
         end
-        return if provider.matches?(fingerprint, use: "signing")
+        return if provider.matches?(fingerprint, use: :signing)
 
         errors[:fingerprint] << error_message(:invalid_fingerprint)
       end
