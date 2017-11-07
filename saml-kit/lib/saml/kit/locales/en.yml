@@ -2,14 +2,18 @@
 en:
   saml/kit:
     errors:
+      AuthnRequest:
+        invalid: "must contain AuthnRequest."
+        invalid_fingerprint: "does not match."
+        unregistered: "is unregistered."
       SPSSODescriptor:
-        invalid: "must contain service provider metadata."
+        invalid: "must contain SPSSODescriptor."
         invalid_signature: "invalid signature."
       IDPSSODescriptor:
-        invalid: "must contain identity provider metadata."
+        invalid: "must contain IDPSSODescriptor."
         invalid_signature: "invalid signature."
       Response:
-        invalid: "must contain response."
+        invalid: "must contain Response."
         unregistered: "must originate from registered service provider."
         expired: "must not be expired."
         invalid_version: "must be 2.0."

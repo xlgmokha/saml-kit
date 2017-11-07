@@ -63,16 +63,20 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     it 'is invalid if the document has been tampered with' do
       raw_xml.gsub!(issuer, 'corrupt')
       subject = described_class.new(raw_xml)
-      expect(subject).to_not be_valid
+      expect(subject).to be_invalid
     end
 
     it 'is invalid when blank' do
-      expect(described_class.new('')).to be_invalid
+      subject = described_class.new('')
+      expect(subject).to be_invalid
+      expect(subject.errors[:content]).to be_present
     end
 
     it 'is invalid when not an AuthnRequest' do
       xml = Saml::Kit::IdentityProviderMetadata::Builder.new.to_xml
-      expect(described_class.new(xml)).to be_invalid
+      subject = described_class.new(xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:base]).to be_present
     end
 
     it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do
@@ -82,13 +86,17 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       xml = builder.to_xml
 
       allow(service_provider_metadata).to receive(:matches?).and_return(false)
-      expect(described_class.new(xml)).to be_invalid
+      subject = described_class.new(xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:fingerprint]).to be_present
     end
 
     it 'is invalid when the service provider is not known' do
       allow(registry).to receive(:metadata_for).and_return(nil)
       builder = described_class::Builder.new
-      expect(described_class.new(builder.to_xml)).to be_invalid
+      subject = described_class.new(builder.to_xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:service_provider]).to be_present
     end
 
     it 'is invalid when an assertion consumer service url is not provided' do
@@ -99,7 +107,9 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       builder.acs_url = nil
       xml = builder.to_xml
 
-      expect(described_class.new(xml)).to be_invalid
+      subject = described_class.new(xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:acs_url]).to be_present
     end
 
     it 'is valid when an the ACS is available via the registry' do
