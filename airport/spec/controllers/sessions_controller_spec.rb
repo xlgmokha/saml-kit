@@ -9,7 +9,7 @@ describe SessionsController do
     it 'generates a saml request and redirects to the auth host' do
       travel_to 1.seconds.from_now
       allow(Saml::Kit::Request).to receive(:encode).and_return(saml_request)
-      allow(Rails.configuration.x).to receive(:authentication_host).and_return(auth_host)
+      #allow(Rails.configuration.x).to receive(:authentication_host).and_return(auth_host)
 
       get :new
 

@@ -221,4 +221,25 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(subject.errors[:base]).to include("invalid signature.")
     end
   end
+
+  describe "#single_sign_on_service_for" do
+    let(:url) { FFaker::Internet.http_url }
+
+    subject do
+      builder = Saml::Kit::IdentityProviderMetadata::Builder.new
+      builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_redirect)
+      builder.add_single_sign_on_service(url, binding: :post)
+      builder.build
+    end
+
+    it 'returns the binding that matches the requested' do
+      result = subject.single_sign_on_service_for(binding: :post)
+      expect(result[:binding]).to eql(Saml::Kit::Namespaces::POST)
+      expect(result[:location]).to eql(url)
+    end
+
+    it 'returns nil if the binding cannot be found' do
+      expect(subject.single_sign_on_service_for(binding: :soap)).to be_nil
+    end
+  end
 end

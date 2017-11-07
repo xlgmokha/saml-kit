@@ -12,6 +12,13 @@ module Saml
         end
       end
 
+      def single_sign_on_service_for(binding:)
+        binding = Saml::Kit::Namespaces.binding_for(binding)
+        single_sign_on_services.find do |item|
+          item[:binding] == binding
+        end
+      end
+
       def attributes
         find_all("/md:EntityDescriptor/md:#{name}/saml:Attribute").map do |item|
           {

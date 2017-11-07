@@ -3,9 +3,9 @@ class SessionsController < ApplicationController
   skip_before_action :authenticate!
 
   def new
-    uri = URI.parse(Rails.configuration.x.authentication_host)
-    uri.path += "/session/new"
-    redirect_to uri.to_s + '?' + query_params
+    metadata = Saml::Kit.configuration.registry.metadata_for(DEFAULT_IDP_ENTITY_ID)
+    @uri = URI.parse(metadata.single_sign_on_service_for(binding: :http_redirect)[:location])
+    redirect_to @uri.to_s + '?' + query_params
   end
 
   def create

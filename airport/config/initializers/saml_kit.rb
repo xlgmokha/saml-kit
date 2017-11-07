@@ -1,4 +1,5 @@
+DEFAULT_IDP_ENTITY_ID="#{ENV['AUTHENTICATION_HOST']}/metadata"
 Saml::Kit.configure do |configuration|
   configuration.issuer = ENV['ISSUER']
-  configuration.registry.register_url("#{ENV['AUTHENTICATION_HOST']}/metadata")
+  configuration.registry.register_url(DEFAULT_IDP_ENTITY_ID)
 end
