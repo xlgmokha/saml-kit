@@ -14,6 +14,11 @@ class MetadataController < ApplicationController
     builder.add_single_sign_on_service(new_session_url, binding: :post)
     builder.add_single_sign_on_service(new_session_url, binding: :http_redirect)
     builder.add_single_logout_service(session_url, binding: :post)
+    builder.name_id_formats = [
+      Saml::Kit::Namespaces::EMAIL_ADDRESS,
+      Saml::Kit::Namespaces::PERSISTENT,
+      Saml::Kit::Namespaces::TRANSIENT,
+    ]
     builder.attributes << :id
     builder.attributes << :email
     builder.attributes << :created_at
