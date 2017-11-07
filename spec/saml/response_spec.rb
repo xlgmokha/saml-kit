@@ -108,7 +108,9 @@ RSpec.describe Saml::Kit::Response do
     end
 
     it 'is invalid when blank' do
-      expect(described_class.new("")).to be_invalid
+      subject = described_class.new("")
+      expect(subject).to be_invalid
+      expect(subject.errors[:content]).to be_present
     end
 
     it 'is invalid if the document has been tampered with' do
@@ -117,18 +119,22 @@ RSpec.describe Saml::Kit::Response do
       status_code = FFaker::Movie.title
       builder.status_code = status_code
       subject = described_class.new(builder.to_xml.gsub(status_code, "TAMPERED"))
-      expect(subject).to_not be_valid
+      expect(subject).to be_invalid
     end
 
     it 'is invalid when not a Response' do
       xml = Saml::Kit::IdentityProviderMetadata::Builder.new.to_xml
-      expect(described_class.new(xml)).to be_invalid
+      subject = described_class.new(xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:base]).to be_present
     end
 
     it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(false)
-      expect(described_class.new(builder.to_xml)).to be_invalid
+      subject = described_class.new(builder.to_xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:base]).to be_present
     end
 
     it 'validates the schema of the response' do
@@ -144,34 +150,44 @@ RSpec.describe Saml::Kit::Response do
           xml.NotAllowed "Huh?"
         end
       end
-      expect(described_class.new(signature.finalize(xml))).to be_invalid
+      subject = described_class.new(signature.finalize(xml))
+      expect(subject).to be_invalid
+      expect(subject.errors[:base]).to be_present
     end
 
     it 'validates the version' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       builder.version = "1.1"
-      expect(described_class.new(builder.to_xml)).to be_invalid
+      subject = described_class.new(builder.to_xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:version]).to be_present
     end
 
     it 'validates the id' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       builder.id = nil
-      expect(described_class.new(builder.to_xml)).to_not be_valid
+      subject = described_class.new(builder.to_xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:id]).to be_present
     end
 
     it 'validates the status code' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       builder.status_code = Saml::Kit::Namespaces::REQUESTER_ERROR
-      expect(described_class.new(builder.to_xml)).to_not be_valid
+      subject = described_class.new(builder.to_xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:status_code]).to be_present
     end
 
     it 'validates the InResponseTo' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      expect(described_class.new(builder.to_xml, request_id: SecureRandom.uuid)).to_not be_valid
+      subject = described_class.new(builder.to_xml, request_id: SecureRandom.uuid)
+      expect(subject).to be_invalid
+      expect(subject.errors[:in_response_to]).to be_present
     end
 
     it 'is invalid after a valid session window' do
@@ -181,6 +197,7 @@ RSpec.describe Saml::Kit::Response do
       subject = described_class.new(builder.to_xml)
       travel_to Saml::Kit.configuration.session_timeout.from_now + 5.seconds
       expect(subject).to_not be_valid
+      expect(subject.errors[:base]).to be_present
     end
 
     it 'is invalid before the valid session window' do
@@ -189,7 +206,8 @@ RSpec.describe Saml::Kit::Response do
 
       subject = described_class.new(builder.to_xml)
       travel_to 5.seconds.ago
-      expect(subject).to_not be_valid
+      expect(subject).to be_invalid
+      expect(subject.errors[:base]).to be_present
     end
 
     it 'is invalid when the audience does not match the expected issuer' do
@@ -199,7 +217,9 @@ RSpec.describe Saml::Kit::Response do
       allow(Saml::Kit.configuration).to receive(:issuer).and_return(FFaker::Internet.http_url)
       allow(request).to receive(:issuer).and_return(FFaker::Internet.http_url)
       subject = described_class.new(builder.to_xml)
-      expect(subject).to_not be_valid
+
+      expect(subject).to be_invalid
+      expect(subject.errors[:audience]).to be_present
     end
   end
 end
