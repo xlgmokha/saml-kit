@@ -60,3 +60,4 @@ gem 'dotenv-rails'
 gem "factory_girl_rails", "~> 4.0"
 gem "saml-kit", path: "../saml-kit"
 gem "rails-assets-bootstrap", source: "https://rails-assets.org"
+gem "rails-assets-jquery", source: "https://rails-assets.org"
