@@ -17,7 +17,12 @@ class User < ApplicationRecord
       id: uuid,
       email: email,
       created_at: created_at,
+      access_token: access_token,
     }
+  end
+
+  def access_token
+    BearerToken.new.encode(id: uuid)
   end
 
   def self.login(email, password)
