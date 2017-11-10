@@ -113,11 +113,11 @@ module Saml
         end
       end
 
-      private
-
       def provider
         registry.metadata_for(issuer)
       end
+
+      private
 
       def registry
         Saml::Kit.configuration.registry
@@ -211,9 +211,14 @@ module Saml
           @issuer = configuration.issuer
         end
 
-        def to_xml
-          signature = Signature.new(id)
-          xml = ::Builder::XmlMarkup.new
+        def want_assertions_signed
+          request.provider.want_assertions_signed
+        rescue
+          true
+        end
+
+        def to_xml(xml = ::Builder::XmlMarkup.new)
+          signature = Signature.new(id, sign: want_assertions_signed)
           xml.Response response_options do
             xml.Issuer(issuer, xmlns: Namespaces::ASSERTION)
             signature.template(xml)

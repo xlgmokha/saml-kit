@@ -4,7 +4,7 @@ RSpec.describe Saml::Kit::Response do
   describe "#acs_url" do
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { }) }
-    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS) }
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil) }
     subject { described_class::Builder.new(user, request).build }
 
     it 'returns the acs_url' do
@@ -15,7 +15,7 @@ RSpec.describe Saml::Kit::Response do
   describe "#to_xml" do
     subject { described_class::Builder.new(user, request) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
-    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS) }
+    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:issuer) { FFaker::Movie.title }
     let(:email) { FFaker::Internet.email }
@@ -63,6 +63,16 @@ RSpec.describe Saml::Kit::Response do
       expect(hash['Response']['Assertion']['AttributeStatement']['Attribute'][1]['NameFormat']).to eql('urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
       expect(hash['Response']['Assertion']['AttributeStatement']['Attribute'][1]['AttributeValue']).to be_present
     end
+
+    it 'does not add a signature when the SP does not want assertions signed' do
+      builder = Saml::Kit::ServiceProviderMetadata::Builder.new
+      builder.want_assertions_signed = false
+      metadata = builder.build
+      allow(request).to receive(:provider).and_return(metadata)
+
+      hash = Hash.from_xml(subject.to_xml)
+      expect(hash['Response']['Signature']).to be_nil
+    end
   end
 
   describe ".deserialize" do
@@ -90,7 +100,7 @@ RSpec.describe Saml::Kit::Response do
   end
 
   describe "#valid?" do
-    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT) }
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
     let(:builder) { described_class::Builder.new(user, request) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
@@ -225,7 +235,7 @@ RSpec.describe Saml::Kit::Response do
 
   describe "#serialize" do
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { }) }
-    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::PERSISTENT) }
+    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil) }
     let(:acs_url) { FFaker::Internet.http_url }
     let(:issuer) { FFaker::Internet.http_url }
 

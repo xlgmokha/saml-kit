@@ -14,10 +14,16 @@ module Saml
         end
       end
 
+      def want_assertions_signed
+        attribute = find_by("/md:EntityDescriptor/md:#{name}").attribute("WantAssertionsSigned")
+        attribute.text.downcase == "true"
+      end
+
       private
 
       class Builder
         attr_accessor :id, :entity_id, :acs_urls, :logout_urls, :name_id_formats, :sign
+        attr_accessor :want_assertions_signed
 
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
@@ -27,6 +33,7 @@ module Saml
           @logout_urls = []
           @name_id_formats = [Namespaces::PERSISTENT]
           @sign = true
+          @want_assertions_signed = true
         end
 
         def add_assertion_consumer_service(url, binding: :post)
@@ -83,7 +90,7 @@ module Saml
         def descriptor_options
           {
             AuthnRequestsSigned: "true",
-            WantAssertionsSigned: "true",
+            WantAssertionsSigned: want_assertions_signed,
             protocolSupportEnumeration: Namespaces::PROTOCOL,
           }
         end

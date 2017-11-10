@@ -66,16 +66,16 @@ module Saml
         provider.matches?(fingerprint, use: :signing)
       end
 
+      def provider
+        registry.metadata_for(issuer)
+      end
+
       private
 
       def registered_acs_url
         return if provider.nil?
         acs_urls = provider.assertion_consumer_services
         return acs_urls.first[:location] if acs_urls.any?
-      end
-
-      def provider
-        registry.metadata_for(issuer)
       end
 
       def registry
