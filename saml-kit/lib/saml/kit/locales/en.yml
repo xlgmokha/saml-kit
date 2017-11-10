@@ -12,6 +12,8 @@ en:
       IDPSSODescriptor:
         invalid: "must contain IDPSSODescriptor."
         invalid_signature: "invalid signature."
+      InvalidRequest:
+        invalid: "must contain valid SAMLRequest"
       Response:
         invalid: "must contain Response."
         unregistered: "must originate from registered identity provider."
