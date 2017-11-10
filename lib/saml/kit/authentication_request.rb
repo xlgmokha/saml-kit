@@ -60,6 +60,12 @@ module Saml
         Response::Builder.new(user, self).build
       end
 
+      def trusted?
+        return false if provider.nil?
+        return false unless signed?
+        provider.matches?(fingerprint, use: :signing)
+      end
+
       private
 
       def registered_acs_url
@@ -82,8 +88,7 @@ module Saml
           errors[:service_provider] << error_message(:unregistered)
           return
         end
-        return if provider.matches?(fingerprint, use: :signing)
-
+        return if trusted?
         errors[:fingerprint] << error_message(:invalid_fingerprint)
       end
 

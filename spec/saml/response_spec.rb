@@ -222,4 +222,20 @@ RSpec.describe Saml::Kit::Response do
       expect(subject.errors[:audience]).to be_present
     end
   end
+
+  describe "#serialize" do
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { }) }
+    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::PERSISTENT) }
+    let(:acs_url) { FFaker::Internet.http_url }
+    let(:issuer) { FFaker::Internet.http_url }
+
+    it 'returns a compressed and base64 encoded document' do
+      builder = described_class::Builder.new(user, request)
+      xml = builder.to_xml
+      subject = described_class.new(xml)
+
+      expected_value = Base64.encode64(Zlib::Deflate.deflate(xml, 9)).gsub(/\n/, '')
+      expect(subject.serialize).to eql(expected_value)
+    end
+  end
 end
