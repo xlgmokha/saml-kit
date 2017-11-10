@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:new]
-  before_action :validate_saml_request, only: [:new, :create]
+  before_action :load_saml_request, only: [:new, :create]
 
   def new
   end
@@ -38,8 +38,8 @@ class SessionsController < ApplicationController
     }
   end
 
-  def validate_saml_request(raw_saml_request = params[:SAMLRequest])
+  def load_saml_request(raw_saml_request = params[:SAMLRequest])
     @saml_request = Saml::Kit::Request.decode(raw_saml_request)
-    render_http_status(:forbidden, item: @saml_request) if @saml_request.invalid?
+    render_error(:forbidden, item: @saml_request) if @saml_request.invalid?
   end
 end

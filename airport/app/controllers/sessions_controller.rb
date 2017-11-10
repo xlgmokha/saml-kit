@@ -3,8 +3,10 @@ class SessionsController < ApplicationController
   skip_before_action :authenticate!
 
   def new
+    @saml_request = authentication_request
+    @relay_state = JSON.generate(redirect_to: '/')
     @uri = URI.parse(idp_metadata.single_sign_on_service_for(binding: :http_redirect)[:location])
-    @redirect_uri = redirect_url_for(@uri)
+    @redirect_uri = redirect_url_for(@uri, @saml_request, @relay_state)
   end
 
   def create
@@ -17,11 +19,11 @@ class SessionsController < ApplicationController
 
   private
 
-  def redirect_url_for(uri)
+  def redirect_url_for(uri, saml_request, relay_state)
     uri.to_s + '?' +
       {
-      'SAMLRequest' => Saml::Kit::Request.authentication(assertion_consumer_service: session_url),
-      'RelayState' => JSON.generate(inbound_path: '/'),
+      'SAMLRequest' => saml_request,
+      'RelayState' => relay_state,
     }.map do |(x, y)|
       "#{x}=#{CGI.escape(y)}"
     end.join('&')
@@ -29,5 +31,11 @@ class SessionsController < ApplicationController
 
   def idp_metadata
     Saml::Kit.configuration.registry.metadata_for(DEFAULT_IDP_ENTITY_ID)
+  end
+
+  def authentication_request
+    builder = AuthenticationRequest::Builder.new
+    builder.acs_url = assertion_consumer_service
+    Saml::Kit::Request.encode(builder)
   end
 end
