@@ -10,7 +10,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    @saml_response = Saml::Kit::Response.parse(params[:SAMLResponse])
+    @saml_response = Saml::Kit::Response.deserialize(params[:SAMLResponse])
     return render :error, status: :forbidden if @saml_response.invalid?
 
     session[:user] = { id: @saml_response.name_id }.merge(@saml_response.attributes)
