@@ -9,6 +9,7 @@ class MetadataController < ApplicationController
 
   def to_xml
     builder = Saml::Kit::ServiceProviderMetadata::Builder.new
+    builder.sign = false
     builder.add_assertion_consumer_service(session_url, binding: :post)
     builder.to_xml
   end
