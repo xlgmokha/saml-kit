@@ -9,6 +9,4 @@ before_script:
 
 rspec:
   script:
-    - pwd
-    - ls
     - bundle exec rspec
