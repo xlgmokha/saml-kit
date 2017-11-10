@@ -2,12 +2,13 @@
   <div class="row">
     <div class="col">
       <h1>Forbidden</h1>
-      <% if @item %>
+      <% if @model %>
         <ul class="list-unstyled">
-          <% @item.errors.full_messages.each do |message| %>
+          <% @model.errors.full_messages.each do |message| %>
             <li><%= message %></li>
           <% end %>
         </ul>
+        <%= debug @model %>
       <% end %>
     </div>
   </div>
