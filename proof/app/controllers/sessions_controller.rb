@@ -39,7 +39,7 @@ class SessionsController < ApplicationController
   end
 
   def load_saml_request(raw_saml_request = params[:SAMLRequest])
-    @saml_request = Saml::Kit::Request.decode(raw_saml_request)
+    @saml_request = Saml::Kit::Request.deserialize(raw_saml_request)
     render_error(:forbidden, item: @saml_request) if @saml_request.invalid?
   end
 end

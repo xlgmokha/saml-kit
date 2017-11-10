@@ -34,8 +34,8 @@ class SessionsController < ApplicationController
   end
 
   def authentication_request
-    builder = AuthenticationRequest::Builder.new
-    builder.acs_url = assertion_consumer_service
-    Saml::Kit::Request.encode(builder)
+    builder = Saml::Kit::AuthenticationRequest::Builder.new
+    builder.acs_url = session_url
+    Saml::Kit::Request.serialize(builder)
   end
 end

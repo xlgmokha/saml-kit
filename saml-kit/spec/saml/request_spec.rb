@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Request do
-  describe ".encode" do
+  describe ".serialize" do
     subject { described_class }
 
     it 'returns a compressed and base64 encoded document' do
@@ -9,11 +9,11 @@ RSpec.describe Saml::Kit::Request do
       document = double(to_xml: xml)
 
       expected_value = Base64.encode64(Zlib::Deflate.deflate(xml, 9)).gsub(/\n/, '')
-      expect(subject.encode(document)).to eql(expected_value)
+      expect(subject.serialize(document)).to eql(expected_value)
     end
   end
 
-  describe ".decode" do
+  describe ".deserialize" do
     subject { described_class }
     let(:issuer) { FFaker::Internet.http_url }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
@@ -31,15 +31,15 @@ RSpec.describe Saml::Kit::Request do
     it 'decodes the raw_request' do
       builder = Saml::Kit::AuthenticationRequest::Builder.new
       builder.issuer = issuer
-      raw_saml = subject.encode(builder)
+      raw_saml = subject.serialize(builder)
 
-      result = subject.decode(raw_saml)
+      result = subject.deserialize(raw_saml)
       expect(result.issuer).to eql(issuer)
       expect(result).to be_valid
     end
 
     it 'returns an invalid request when the raw request is corrupted' do
-      expect(subject.decode("nonsense")).to be_invalid
+      expect(subject.deserialize("nonsense")).to be_invalid
     end
   end
 end
