@@ -5,10 +5,20 @@ module Saml
         super("IDPSSODescriptor", xml)
       end
 
+      def want_authn_requests_signed
+        xpath = "/md:EntityDescriptor/md:#{name}"
+        attribute = find_by(xpath).attribute("WantAuthnRequestsSigned")
+        return true if attribute.nil?
+        attribute.text.downcase == "true"
+      end
+
       def single_sign_on_services
         xpath = "/md:EntityDescriptor/md:#{name}/md:SingleSignOnService"
         find_all(xpath).map do |item|
-          { binding: item.attribute("Binding").value, location: item.attribute("Location").value }
+          {
+            binding: item.attribute("Binding").value,
+            location: item.attribute("Location").value,
+          }
         end
       end
 
@@ -33,6 +43,7 @@ module Saml
 
       class Builder
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats
+        attr_accessor :want_authn_requests_signed
         attr_reader :logout_urls, :single_sign_on_urls
 
         def initialize(configuration = Saml::Kit.configuration)
@@ -43,6 +54,7 @@ module Saml
           @single_sign_on_urls = []
           @logout_urls = []
           @configuration = configuration
+          @want_authn_requests_signed = true
         end
 
         def add_single_sign_on_service(url, binding: :post)
@@ -59,7 +71,7 @@ module Saml
           xml.instruct!
           xml.EntityDescriptor entity_descriptor_options do
             signature.template(xml)
-            xml.IDPSSODescriptor protocolSupportEnumeration: Namespaces::PROTOCOL do
+            xml.IDPSSODescriptor idp_sso_descriptor_options do
               xml.KeyDescriptor use: "signing" do
                 xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
                   xml.X509Data do
@@ -105,6 +117,13 @@ module Saml
             'xmlns:saml': Namespaces::ASSERTION,
             ID: "_#{id}",
             entityID: entity_id,
+          }
+        end
+
+        def idp_sso_descriptor_options
+          {
+            protocolSupportEnumeration: Namespaces::PROTOCOL,
+            WantAuthnRequestsSigned: want_authn_requests_signed
           }
         end
       end

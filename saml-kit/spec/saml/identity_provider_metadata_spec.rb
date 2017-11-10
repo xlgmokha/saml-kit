@@ -27,6 +27,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(result['EntityDescriptor']['ID']).to be_present
       expect(result['EntityDescriptor']['entityID']).to eql(entity_id)
       expect(result['EntityDescriptor']['IDPSSODescriptor']['protocolSupportEnumeration']).to eql('urn:oasis:names:tc:SAML:2.0:protocol')
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['WantAuthnRequestsSigned']).to eql('true')
       expect(result['EntityDescriptor']['IDPSSODescriptor']['NameIDFormat']).to match_array([
         Saml::Kit::Namespaces::PERSISTENT,
         Saml::Kit::Namespaces::TRANSIENT,
@@ -241,6 +242,29 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
 
     it 'returns nil if the binding cannot be found' do
       expect(subject.single_sign_on_service_for(binding: :soap)).to be_nil
+    end
+  end
+
+  describe "#want_authn_requests_signed" do
+    let(:builder) { Saml::Kit::IdentityProviderMetadata::Builder.new }
+
+    it 'returns true when enabled' do
+      builder.want_authn_requests_signed = true
+      subject = builder.build
+      expect(subject.want_authn_requests_signed).to be(true)
+    end
+
+    it 'returns false when disabled' do
+      builder.want_authn_requests_signed = false
+      subject = builder.build
+      expect(subject.want_authn_requests_signed).to be(false)
+    end
+
+    it 'returns true when the attribute is missing' do
+      builder.want_authn_requests_signed = false
+      xml = builder.to_xml.gsub("WantAuthnRequestsSigned=\"false\"", "")
+      subject = described_class.new(xml)
+      expect(subject.want_authn_requests_signed).to be(true)
     end
   end
 end
