@@ -18,10 +18,6 @@ module Saml
         end
       end
 
-      def url_encode(xml)
-        CGI.escape(Base64.encode64(deflate(xml)))
-      end
-
       def self.decode(value)
         Base64.decode64(value)
       end
