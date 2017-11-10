@@ -34,8 +34,6 @@ class SessionsController < ApplicationController
   end
 
   def authentication_request
-    builder = Saml::Kit::AuthenticationRequest::Builder.new
-    builder.acs_url = session_url
-    Saml::Kit::Request.serialize(builder)
+    idp_metadata.build_authentication_request.serialize
   end
 end

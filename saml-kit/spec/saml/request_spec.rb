@@ -1,18 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Request do
-  describe ".serialize" do
-    subject { described_class }
-
-    it 'returns a compressed and base64 encoded document' do
-      xml = "<xml></xml>"
-      document = double(to_xml: xml)
-
-      expected_value = Base64.encode64(Zlib::Deflate.deflate(xml, 9)).gsub(/\n/, '')
-      expect(subject.serialize(document)).to eql(expected_value)
-    end
-  end
-
   describe ".deserialize" do
     subject { described_class }
     let(:issuer) { FFaker::Internet.http_url }
@@ -31,7 +19,7 @@ RSpec.describe Saml::Kit::Request do
     it 'decodes the raw_request' do
       builder = Saml::Kit::AuthenticationRequest::Builder.new
       builder.issuer = issuer
-      raw_saml = subject.serialize(builder)
+      raw_saml = builder.build.serialize
 
       result = subject.deserialize(raw_saml)
       expect(result.issuer).to eql(issuer)
