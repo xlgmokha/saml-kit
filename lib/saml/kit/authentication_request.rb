@@ -37,10 +37,12 @@ module Saml
       end
 
       def certificate
+        return nil unless signed?
         to_h[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
       end
 
       def fingerprint
+        return nil unless signed?
         Fingerprint.new(certificate)
       end
 
@@ -54,6 +56,10 @@ module Saml
 
       def to_xml
         @content
+      end
+
+      def to_s
+        to_xml
       end
 
       def serialize
