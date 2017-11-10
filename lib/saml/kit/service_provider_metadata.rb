@@ -89,7 +89,7 @@ module Saml
 
         def descriptor_options
           {
-            AuthnRequestsSigned: "true",
+            AuthnRequestsSigned: sign,
             WantAssertionsSigned: want_assertions_signed,
             protocolSupportEnumeration: Namespaces::PROTOCOL,
           }
