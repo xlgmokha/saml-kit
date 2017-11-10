@@ -27,23 +27,23 @@ module Saml
       end
 
       def id
-        @xml_hash.dig(name, 'ID')
+        to_h.dig(name, 'ID')
       end
 
       def in_response_to
-        @xml_hash.dig(name, 'InResponseTo')
+        to_h.dig(name, 'InResponseTo')
       end
 
       def name_id
-        @xml_hash.dig(name, 'Assertion', 'Subject', 'NameID')
+        to_h.dig(name, 'Assertion', 'Subject', 'NameID')
       end
 
       def issuer
-        @xml_hash.dig(name, 'Issuer')
+        to_h.dig(name, 'Issuer')
       end
 
       def status_code
-        @xml_hash.dig(name, 'Status', 'StatusCode', 'Value')
+        to_h.dig(name, 'Status', 'StatusCode', 'Value')
       end
 
       def [](key)
@@ -51,21 +51,25 @@ module Saml
       end
 
       def attributes
-        @attributes ||= Hash[@xml_hash.dig(name, 'Assertion', 'AttributeStatement', 'Attribute').map do |item|
+        @attributes ||= Hash[to_h.dig(name, 'Assertion', 'AttributeStatement', 'Attribute').map do |item|
           [item['Name'].to_sym, item['AttributeValue']]
         end].with_indifferent_access
       end
 
       def acs_url
-        @xml_hash.dig(name, 'Destination')
+        to_h.dig(name, 'Destination')
       end
 
       def version
-        @xml_hash.dig(name, 'Version')
+        to_h.dig(name, 'Version')
       end
 
       def to_xml
         content
+      end
+
+      def to_h
+        @xml_hash
       end
 
       def serialize
@@ -73,7 +77,8 @@ module Saml
       end
 
       def certificate
-        @xml_hash.dig(name, 'Signature', 'KeyInfo', 'X509Data', 'X509Certificate')
+        return unless signed?
+        to_h.dig(name, 'Signature', 'KeyInfo', 'X509Data', 'X509Certificate')
       end
 
       def fingerprint
@@ -82,11 +87,11 @@ module Saml
       end
 
       def started_at
-        parse_date(@xml_hash.dig(name, 'Assertion', 'Conditions', 'NotBefore'))
+        parse_date(to_h.dig(name, 'Assertion', 'Conditions', 'NotBefore'))
       end
 
       def expired_at
-        parse_date(@xml_hash.dig(name, 'Assertion', 'Conditions', 'NotOnOrAfter'))
+        parse_date(to_h.dig(name, 'Assertion', 'Conditions', 'NotOnOrAfter'))
       end
 
       def expired?
@@ -98,7 +103,7 @@ module Saml
       end
 
       def signed?
-        @xml_hash[name]['Signature'].present?
+        to_h[name]['Signature'].present?
       end
 
       def trusted?
@@ -107,14 +112,14 @@ module Saml
         provider.matches?(fingerprint, use: :signing)
       end
 
+      def provider
+        registry.metadata_for(issuer)
+      end
+
       class << self
         def deserialize(saml_response)
           new(Saml::Kit::Content.decode_raw_saml(saml_response))
         end
-      end
-
-      def provider
-        registry.metadata_for(issuer)
       end
 
       private
@@ -178,14 +183,14 @@ module Saml
       end
 
       def audiences
-        Array(@xml_hash[name]['Assertion']['Conditions']['AudienceRestriction']['Audience'])
+        Array(to_h[name]['Assertion']['Conditions']['AudienceRestriction']['Audience'])
       rescue
         []
       end
 
       def login_response?
         return false if to_xml.blank?
-        @xml_hash[name].present?
+        to_h[name].present?
       end
 
       def parse_date(value)

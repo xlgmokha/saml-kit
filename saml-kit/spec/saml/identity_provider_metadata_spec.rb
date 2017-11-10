@@ -73,7 +73,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it do
       expect(subject.certificates).to match_array([
         {
-          use: "signing",
+          use: :signing,
           text: certificate,
           fingerprint: "9F:74:13:3B:BC:5A:7B:8B:2D:4F:8B:EF:1E:88:EB:D1:AE:BC:19:BF:CA:19:C6:2F:0F:4B:31:1D:68:98:B0:1B",
         }
@@ -117,12 +117,12 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
         {
           text: signing_certificate,
           fingerprint: "E6:03:E1:2D:F2:70:9C:D6:CC:8B:3E:4C:5A:37:F5:53:D7:B2:78:B1:2E:95:5B:31:5C:56:E8:7F:16:A1:1B:D2",
-          use: 'signing',
+          use: :signing,
         },
         {
           text: encryption_certificate,
           fingerprint: "E1:0A:68:23:E4:17:32:A3:3A:F8:B7:30:A3:1D:D8:75:F4:C5:76:48:A4:C0:C8:D3:5E:F1:AE:AB:5B:B2:37:22",
-          use: 'encryption',
+          use: :encryption,
         },
       ])
     end
@@ -166,8 +166,8 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
     it do
       expect(subject.certificates).to match_array([
-        { use: "signing", text: signing_certificate, fingerprint: "BE:12:70:84:AD:99:6A:58:28:2A:BC:DA:AB:E8:51:D3:FF:AB:58:30:E0:77:DB:23:57:15:01:B3:86:60:97:80" },
-        { use: "encryption", text: encryption_certificate, fingerprint: "5C:51:0C:8A:6A:02:24:3C:9E:96:96:18:2E:37:65:8F:CC:EA:51:0E:2C:C5:3F:1D:72:47:11:D0:7B:95:26:1F" },
+        { use: :signing, text: signing_certificate, fingerprint: "BE:12:70:84:AD:99:6A:58:28:2A:BC:DA:AB:E8:51:D3:FF:AB:58:30:E0:77:DB:23:57:15:01:B3:86:60:97:80" },
+        { use: :encryption, text: encryption_certificate, fingerprint: "5C:51:0C:8A:6A:02:24:3C:9E:96:96:18:2E:37:65:8F:CC:EA:51:0E:2C:C5:3F:1D:72:47:11:D0:7B:95:26:1F" },
       ])
     end
     it { expect(subject.attributes).to be_present }
