@@ -68,8 +68,8 @@ module Saml
         content
       end
 
-      def encode
-        Base64.strict_encode64(to_xml)
+      def serialize
+        Saml::Kit::Content.encode_raw_saml(to_xml)
       end
 
       def certificate
@@ -97,8 +97,20 @@ module Saml
         Time.current > started_at && !expired?
       end
 
-      def self.deserialize(saml_response)
-        new(Saml::Kit::Content.decode_raw_saml(saml_response))
+      def signed?
+        @xml_hash[name]['Signature'].present?
+      end
+
+      def trusted?
+        return false if provider.nil?
+        return false unless signed?
+        provider.matches?(fingerprint, use: :signing)
+      end
+
+      class << self
+        def deserialize(saml_response)
+          new(Saml::Kit::Content.decode_raw_saml(saml_response))
+        end
       end
 
       private
@@ -129,7 +141,7 @@ module Saml
 
       def must_be_registered
         return unless login_response?
-        return if provider.present? && provider.matches?(fingerprint, use: :signing)
+        return if trusted?
 
         errors[:base] << error_message(:unregistered)
       end
@@ -186,6 +198,7 @@ module Saml
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code
+        attr_accessor :issuer
 
         def initialize(user, request)
           @user = user
@@ -195,19 +208,20 @@ module Saml
           @now = Time.now.utc
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
+          @issuer = configuration.issuer
         end
 
         def to_xml
           signature = Signature.new(id)
           xml = ::Builder::XmlMarkup.new
           xml.Response response_options do
-            xml.Issuer(configuration.issuer, xmlns: Namespaces::ASSERTION)
+            xml.Issuer(issuer, xmlns: Namespaces::ASSERTION)
             signature.template(xml)
             xml.Status do
               xml.StatusCode Value: status_code
             end
             xml.Assertion(assertion_options) do
-              xml.Issuer configuration.issuer
+              xml.Issuer issuer
               xml.Subject do
                 xml.NameID user.name_id_for(request), Format: request.name_id_format
                 xml.SubjectConfirmation Method: Namespaces::BEARER do
@@ -224,10 +238,13 @@ module Saml
                   xml.AuthnContextClassRef Namespaces::PASSWORD
                 end
               end
-              xml.AttributeStatement do
-                user.assertion_attributes_for(request).each do |key, value|
-                  xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
-                    xml.AttributeValue value.to_s
+              assertion_attributes = user.assertion_attributes_for(request)
+              if assertion_attributes.any?
+                xml.AttributeStatement do
+                  assertion_attributes.each do |key, value|
+                    xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
+                      xml.AttributeValue value.to_s
+                    end
                   end
                 end
               end
