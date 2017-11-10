@@ -38,8 +38,6 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Binding']).to eql('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST')
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Location']).to eql("https://www.example.com/logout")
       expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['Name']).to eql("id")
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['FriendlyName']).to eql("id")
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['NameFormat']).to eql("urn:oasis:names:tc:SAML:2.0:attrname-format:uri")
       expect(result['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']).to eql(Saml::Kit.configuration.stripped_signing_certificate)
 
       expect(result['EntityDescriptor']['Organization']['OrganizationName']).to eql(org_name)
@@ -131,7 +129,6 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it do
       expect(subject.attributes).to include({
         format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
-        friendly_name: "E-Mail Address",
         name: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
       })
     end
