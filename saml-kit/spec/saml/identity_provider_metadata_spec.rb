@@ -246,7 +246,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
   end
 
   describe "#want_authn_requests_signed" do
-    let(:builder) { Saml::Kit::IdentityProviderMetadata::Builder.new }
+    let(:builder) { described_class::Builder.new }
 
     it 'returns true when enabled' do
       builder.want_authn_requests_signed = true
@@ -265,6 +265,24 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       xml = builder.to_xml.gsub("WantAuthnRequestsSigned=\"false\"", "")
       subject = described_class.new(xml)
       expect(subject.want_authn_requests_signed).to be(true)
+    end
+  end
+
+  describe "#build_authentication_request" do
+    let(:builder) { described_class::Builder.new }
+
+    it 'it signs the authentication request when the idp metadata demands it' do
+      builder.want_authn_requests_signed = true
+      subject = builder.build
+
+      expect(subject.build_authentication_request).to be_signed
+    end
+
+    it 'does not sign the authentication request when the idp does not require it' do
+      builder.want_authn_requests_signed = false
+      subject = builder.build
+
+      expect(subject.build_authentication_request).to_not be_signed
     end
   end
 end

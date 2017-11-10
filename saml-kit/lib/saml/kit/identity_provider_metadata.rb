@@ -39,7 +39,11 @@ module Saml
         end
       end
 
-      private
+      def build_authentication_request
+        builder = AuthenticationRequest::Builder.new(sign: want_authn_requests_signed)
+        yield builder if block_given?
+        builder.build
+      end
 
       class Builder
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats

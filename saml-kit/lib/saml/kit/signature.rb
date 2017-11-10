@@ -59,8 +59,7 @@ module Saml
         end
       end
 
-      def self.sign(id, sign: true)
-        xml = ::Builder::XmlMarkup.new
+      def self.sign(id, sign: true, xml: ::Builder::XmlMarkup.new)
         signature = new(id, sign: sign)
         yield xml, signature
         signature.finalize(xml)
