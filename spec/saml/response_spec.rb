@@ -65,12 +65,12 @@ RSpec.describe Saml::Kit::Response do
     end
   end
 
-  describe ".parse" do
+  describe ".deserialize" do
     subject { described_class }
     let(:raw_response) { IO.read('spec/fixtures/encoded_response.txt') }
 
     it 'decodes the response to the raw xml' do
-      result = Hash.from_xml(subject.parse(raw_response).to_xml)
+      result = Hash.from_xml(subject.deserialize(raw_response).to_xml)
       expect(result['Response']['ID']).to eql('_75358cd9-f357-4b2d-999f-f53382ba8263')
       expect(result['Response']['Version']).to eql('2.0')
       expect(result['Response']['IssueInstant']).to eql("2017-10-22T23:36:44Z")

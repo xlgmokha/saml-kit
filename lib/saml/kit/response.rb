@@ -97,8 +97,8 @@ module Saml
         Time.current > started_at && !expired?
       end
 
-      def self.parse(saml_response)
-        new(Base64.decode64(saml_response))
+      def self.deserialize(saml_response)
+        new(Saml::Kit::Content.decode_raw_saml(saml_response))
       end
 
       private
