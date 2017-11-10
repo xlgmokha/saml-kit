@@ -32,8 +32,7 @@ module Saml
       def attributes
         find_all("/md:EntityDescriptor/md:#{name}/saml:Attribute").map do |item|
           {
-            format: item.attribute("NameFormat").value,
-            friendly_name: item.attribute("FriendlyName").value,
+            format: item.attribute("NameFormat").try(:value),
             name: item.attribute("Name").value,
           }
         end
@@ -93,7 +92,7 @@ module Saml
                   xml.SingleSignOnService Binding: item[:binding], Location: item[:location]
                 end
                 attributes.each do |attribute|
-                  xml.tag! 'saml:Attribute', NameFormat: Namespaces::URI, Name: attribute, FriendlyName: attribute
+                  xml.tag! 'saml:Attribute', Name: attribute
                 end
               end
               xml.Organization do
