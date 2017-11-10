@@ -21,23 +21,23 @@ module Saml
       end
 
       def id
-        @hash[name]['ID']
+        to_h[name]['ID']
       end
 
       def acs_url
-        @hash[name]['AssertionConsumerServiceURL'] || registered_acs_url
+        to_h[name]['AssertionConsumerServiceURL'] || registered_acs_url
       end
 
       def issuer
-        @hash[name]['Issuer']
+        to_h[name]['Issuer']
       end
 
       def name_id_format
-        @hash[name]['NameIDPolicy']['Format']
+        to_h[name]['NameIDPolicy']['Format']
       end
 
       def certificate
-        @hash[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
+        to_h[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
       end
 
       def fingerprint
@@ -45,7 +45,11 @@ module Saml
       end
 
       def signed?
-        @hash[name]['Signature'].present?
+        to_h[name]['Signature'].present?
+      end
+
+      def to_h
+        @hash
       end
 
       def to_xml
