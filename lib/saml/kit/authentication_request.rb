@@ -44,8 +44,16 @@ module Saml
         Fingerprint.new(certificate)
       end
 
+      def signed?
+        @hash[name]['Signature'].present?
+      end
+
       def to_xml
         @content
+      end
+
+      def serialize
+        Saml::Kit::Content.encode_raw_saml(to_xml)
       end
 
       def response_for(user)
@@ -106,22 +114,24 @@ module Saml
 
       class Builder
         attr_accessor :id, :issued_at, :issuer, :acs_url, :name_id_format
+        attr_reader :sign
 
-        def initialize(configuration = Saml::Kit.configuration)
+        def initialize(configuration = Saml::Kit.configuration, sign: true)
           @id = SecureRandom.uuid
           @issued_at = Time.now.utc
           @issuer = configuration.issuer
           @name_id_format = Namespaces::PERSISTENT
+          @sign = sign
         end
 
-        def to_xml(xml = ::Builder::XmlMarkup.new)
-          signature = Signature.new(id)
-          xml.tag!('samlp:AuthnRequest', request_options) do
-            xml.tag!('saml:Issuer', issuer)
-            signature.template(xml)
-            xml.tag!('samlp:NameIDPolicy', Format: name_id_format)
+        def to_xml
+          Signature.sign(id, sign: sign) do |xml, signature|
+            xml.tag!('samlp:AuthnRequest', request_options) do
+              xml.tag!('saml:Issuer', issuer)
+              signature.template(xml)
+              xml.tag!('samlp:NameIDPolicy', Format: name_id_format)
+            end
           end
-          signature.finalize(xml)
         end
 
         def build
