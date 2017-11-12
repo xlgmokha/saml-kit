@@ -24,9 +24,10 @@ module Saml
 
       def single_sign_on_service_for(binding:)
         binding = Saml::Kit::Namespaces.binding_for(binding)
-        single_sign_on_services.find do |item|
+        result = single_sign_on_services.find do |item|
           item[:binding] == binding
         end
+        return result[:location] if result
       end
 
       def attributes

@@ -5,8 +5,8 @@ class SessionsController < ApplicationController
   def new
     @saml_request = authentication_request
     @relay_state = JSON.generate(redirect_to: '/')
-    @uri = URI.parse(idp_metadata.single_sign_on_service_for(binding: :http_redirect)[:location])
-    @redirect_uri = redirect_url_for(@uri, @saml_request, @relay_state)
+    @post_uri = idp_metadata.single_sign_on_service_for(binding: :post)
+    @redirect_uri = redirect_url_for(@saml_request, @relay_state)
   end
 
   def create
@@ -17,11 +17,16 @@ class SessionsController < ApplicationController
     redirect_to dashboard_path
   end
 
+  def destroy
+    @uri = idp_metadata.single_logout_service_for(:post)
+    @logout_request = idp_metadata.build_logout_request.serialize
+  end
+
   private
 
-  def redirect_url_for(uri, saml_request, relay_state)
-    uri.to_s + '?' +
-      {
+  def redirect_url_for(saml_request, relay_state)
+    uri = idp_metadata.single_sign_on_service_for(binding: :http_redirect)
+    uri.to_s + '?' + {
       'SAMLRequest' => saml_request,
       'RelayState' => relay_state,
     }.map do |(x, y)|
@@ -30,7 +35,7 @@ class SessionsController < ApplicationController
   end
 
   def idp_metadata
-    Saml::Kit.configuration.registry.metadata_for(DEFAULT_IDP_ENTITY_ID)
+    Rails.configuration.x.idp_metadata
   end
 
   def authentication_request
