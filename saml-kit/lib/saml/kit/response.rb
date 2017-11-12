@@ -233,7 +233,7 @@ module Saml
               xml.Assertion(assertion_options) do
                 xml.Issuer issuer
                 xml.Subject do
-                  xml.NameID user.name_id_for(request), Format: request.name_id_format
+                  xml.NameID user.name_id_for(request.name_id_format), Format: request.name_id_format
                   xml.SubjectConfirmation Method: Namespaces::BEARER do
                     xml.SubjectConfirmationData "", subject_confirmation_data_options
                   end
