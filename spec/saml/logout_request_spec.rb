@@ -1,6 +1,34 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::LogoutRequest do
+  subject { builder.build }
+  let(:builder) { described_class::Builder.new(user) }
+  let(:user) { double(:user, name_id_for: name_id) }
+  let(:name_id) { SecureRandom.uuid }
+
+  it 'parses the issuer' do
+    builder.issuer = FFaker::Internet.http_url
+    expect(subject.issuer).to eql(builder.issuer)
+  end
+
+  it 'parses the issue instant' do
+    travel_to 1.second.from_now
+    expect(subject.issue_instant).to eql(Time.now.utc.iso8601)
+  end
+
+  it 'parses the version' do
+    expect(subject.version).to eql("2.0")
+  end
+
+  it 'parses the destination' do
+    builder.destination = FFaker::Internet.http_url
+    expect(subject.destination).to eql(builder.destination)
+  end
+
+  it 'parses the name_id' do
+    expect(subject.name_id).to eql(name_id)
+  end
+
   describe described_class::Builder do
     subject { described_class.new(user) }
     let(:user) { double(:user, name_id_for: name_id) }

@@ -3,6 +3,27 @@ module Saml
     class LogoutRequest
       def initialize(xml)
         @xml = xml
+        @xml_hash = Hash.from_xml(xml)
+      end
+
+      def issuer
+        @xml_hash['LogoutRequest']['Issuer']
+      end
+
+      def issue_instant
+        @xml_hash['LogoutRequest']['IssueInstant']
+      end
+
+      def version
+        @xml_hash['LogoutRequest']['Version']
+      end
+
+      def destination
+        @xml_hash['LogoutRequest']['Destination']
+      end
+
+      def name_id
+        @xml_hash['LogoutRequest']['NameID']
       end
 
       def to_xml
@@ -29,7 +50,7 @@ module Saml
             xml.LogoutRequest logout_request_options do
               xml.Issuer issuer
               signature.template(xml)
-              xml.NameID name_id_options, user.name_id_for(self)
+              xml.NameID name_id_options, user.name_id_for(name_id_format)
             end
           end
         end
