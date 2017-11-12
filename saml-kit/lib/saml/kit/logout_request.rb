@@ -77,6 +77,14 @@ module Saml
         to_h[name]['Signature'].present?
       end
 
+      def to_s
+        to_xml
+      end
+
+      def serialize
+        Saml::Kit::Content.encode_raw_saml(to_xml)
+      end
+
       private
 
       def registry

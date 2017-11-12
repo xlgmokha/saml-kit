@@ -12,6 +12,7 @@ class MetadataController < ApplicationController
       builder = Saml::Kit::ServiceProviderMetadata::Builder.new
       builder.sign = false
       builder.add_assertion_consumer_service(session_url, binding: :post)
+      builder.add_single_logout_service(session_url, binding: :post)
       builder.to_xml
     end
   end

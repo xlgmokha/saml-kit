@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
   skip_before_action :authenticate!
 
   def new
-    @saml_request = idp_metadata.build_authentication_request.serialize
+    @saml_request = idp_metadata.build_request(Saml::Kit::AuthenticationRequest).serialize
     @relay_state = JSON.generate(redirect_to: '/')
     @post_uri = idp_metadata.single_sign_on_service_for(binding: :post)
     @redirect_uri = http_redirect_url_for_login(@saml_request, @relay_state)
@@ -19,7 +19,7 @@ class SessionsController < ApplicationController
 
   def destroy
     @post_uri = idp_metadata.single_logout_service_for(:post)
-    @saml_request = idp_metadata.build_logout_request.serialize
+    @saml_request = idp_metadata.build_request(Saml::Kit::LogoutRequest).serialize
   end
 
   private

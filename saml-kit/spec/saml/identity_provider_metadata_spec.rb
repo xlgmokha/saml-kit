@@ -265,21 +265,21 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
   end
 
-  describe "#build_authentication_request" do
+  describe "#build_request" do
     let(:builder) { described_class::Builder.new }
 
     it 'it signs the authentication request when the idp metadata demands it' do
       builder.want_authn_requests_signed = true
       subject = builder.build
 
-      expect(subject.build_authentication_request).to be_signed
+      expect(subject.build_request(Saml::Kit::AuthenticationRequest)).to be_signed
     end
 
     it 'does not sign the authentication request when the idp does not require it' do
       builder.want_authn_requests_signed = false
       subject = builder.build
 
-      expect(subject.build_authentication_request).to_not be_signed
+      expect(subject.build_request(Saml::Kit::AuthenticationRequest)).to_not be_signed
     end
   end
 end

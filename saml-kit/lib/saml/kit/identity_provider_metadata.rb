@@ -39,8 +39,8 @@ module Saml
         end
       end
 
-      def build_authentication_request
-        builder = AuthenticationRequest::Builder.new(sign: want_authn_requests_signed)
+      def build_request(type)
+        builder = type::Builder.new(sign: want_authn_requests_signed)
         yield builder if block_given?
         builder.build
       end
