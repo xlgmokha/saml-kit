@@ -1,6 +1,11 @@
 RSpec::Matchers.define :have_xpath do |xpath|
+  SAML_NAMESPACES = {
+    'saml' => Saml::Kit::Namespaces::ASSERTION,
+    'samlp' => Saml::Kit::Namespaces::PROTOCOL,
+  }.freeze
+
   match do |actual|
-    xml_document(actual).xpath(xpath).any?
+    xml_document(actual).xpath(xpath, SAML_NAMESPACES).any?
   end
 
   failure_message do |actual|
