@@ -1,6 +1,14 @@
 module Saml
   module Kit
     class LogoutRequest
+      def initialize(xml)
+        @xml = xml
+      end
+
+      def to_xml
+        @xml
+      end
+
       class Builder
         attr_accessor :id, :destination, :issuer, :name_id_format, :now
         attr_accessor :sign
@@ -24,6 +32,10 @@ module Saml
               xml.NameID name_id_options, user.name_id_for(self)
             end
           end
+        end
+
+        def build
+          Saml::Kit::LogoutRequest.new(to_xml)
         end
 
         private
