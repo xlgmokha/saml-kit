@@ -23,8 +23,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
 
       expect(xml_hash['LogoutRequest']['Issuer']).to eql(subject.issuer)
       expect(xml_hash['LogoutRequest']['NameID']).to eql(name_id)
-      doc = Nokogiri::XML(result)
-      expect(doc.xpath("//LogoutRequest//NameID[@Format=\"#{subject.name_id_format}\"]")).to be_present
+      expect(result).to have_xpath("//LogoutRequest//NameID[@Format=\"#{subject.name_id_format}\"]")
     end
   end
 end
