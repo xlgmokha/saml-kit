@@ -94,7 +94,6 @@ module Saml
             protocolSupportEnumeration: Namespaces::PROTOCOL,
           }
         end
-
       end
     end
   end

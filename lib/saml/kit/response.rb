@@ -27,23 +27,23 @@ module Saml
       end
 
       def id
-        to_h.dig(name, 'ID')
+        to_h.fetch(name, {}).fetch('ID', nil)
       end
 
       def in_response_to
-        to_h.dig(name, 'InResponseTo')
+        to_h.fetch(name, {}).fetch('InResponseTo', nil)
       end
 
       def name_id
-        to_h.dig(name, 'Assertion', 'Subject', 'NameID')
+        to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Subject', {}).fetch('NameID', nil)
       end
 
       def issuer
-        to_h.dig(name, 'Issuer')
+        to_h.fetch(name, {}).fetch('Issuer', nil)
       end
 
       def status_code
-        to_h.dig(name, 'Status', 'StatusCode', 'Value')
+        to_h.fetch(name, {}).fetch('Status', {}).fetch('StatusCode', {}).fetch('Value', nil)
       end
 
       def [](key)
@@ -51,17 +51,17 @@ module Saml
       end
 
       def attributes
-        @attributes ||= Hash[to_h.dig(name, 'Assertion', 'AttributeStatement', 'Attribute').map do |item|
+        @attributes ||= Hash[to_h.fetch(name, {}).fetch('Assertion', {}).fetch('AttributeStatement', {}).fetch('Attribute', []).map do |item|
           [item['Name'].to_sym, item['AttributeValue']]
         end].with_indifferent_access
       end
 
       def acs_url
-        to_h.dig(name, 'Destination')
+        to_h.fetch(name, {}).fetch('Destination', nil)
       end
 
       def version
-        to_h.dig(name, 'Version')
+        to_h.fetch(name, {}).fetch('Version', {})
       end
 
       def to_xml
@@ -78,7 +78,7 @@ module Saml
 
       def certificate
         return unless signed?
-        to_h.dig(name, 'Signature', 'KeyInfo', 'X509Data', 'X509Certificate')
+        to_h.fetch(name, {}).fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
       end
 
       def fingerprint
@@ -87,11 +87,11 @@ module Saml
       end
 
       def started_at
-        parse_date(to_h.dig(name, 'Assertion', 'Conditions', 'NotBefore'))
+        parse_date(to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Conditions', {}).fetch('NotBefore', nil))
       end
 
       def expired_at
-        parse_date(to_h.dig(name, 'Assertion', 'Conditions', 'NotOnOrAfter'))
+        parse_date(to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Conditions', {}).fetch('NotOnOrAfter', nil))
       end
 
       def expired?
