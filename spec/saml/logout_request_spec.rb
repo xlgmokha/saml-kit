@@ -27,18 +27,21 @@ RSpec.describe Saml::Kit::LogoutRequest do
     end
 
     it 'includes a signature by default' do
-      travel_to 1.second.from_now
       xml_hash = Hash.from_xml(subject.to_xml)
-
       expect(xml_hash['LogoutRequest']['Signature']).to be_present
     end
 
     it 'excludes a signature' do
-      travel_to 1.second.from_now
       subject.sign = false
       xml_hash = Hash.from_xml(subject.to_xml)
-
       expect(xml_hash['LogoutRequest']['Signature']).to be_nil
+    end
+
+    it 'builds a LogoutRequest' do
+      travel_to 1.second.from_now
+      result = subject.build
+      expect(result).to be_instance_of(Saml::Kit::LogoutRequest)
+      expect(result.to_xml).to eql(subject.to_xml)
     end
   end
 end
