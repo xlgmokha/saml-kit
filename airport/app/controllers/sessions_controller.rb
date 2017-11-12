@@ -3,10 +3,10 @@ class SessionsController < ApplicationController
   skip_before_action :authenticate!
 
   def new
-    @saml_request = authentication_request
+    @saml_request = idp_metadata.build_authentication_request.serialize
     @relay_state = JSON.generate(redirect_to: '/')
     @post_uri = idp_metadata.single_sign_on_service_for(binding: :post)
-    @redirect_uri = redirect_url_for(@saml_request, @relay_state)
+    @redirect_uri = http_redirect_url_for_login(@saml_request, @relay_state)
   end
 
   def create
@@ -24,21 +24,15 @@ class SessionsController < ApplicationController
 
   private
 
-  def redirect_url_for(saml_request, relay_state)
-    uri = idp_metadata.single_sign_on_service_for(binding: :http_redirect)
-    uri.to_s + '?' + {
-      'SAMLRequest' => saml_request,
-      'RelayState' => relay_state,
-    }.map do |(x, y)|
-      "#{x}=#{CGI.escape(y)}"
-    end.join('&')
-  end
-
   def idp_metadata
     Rails.configuration.x.idp_metadata
   end
 
-  def authentication_request
-    idp_metadata.build_authentication_request.serialize
+  def http_redirect_url_for_login(saml_request, relay_state)
+    UrlBuilder.new.http_redirect_url_for(
+      idp_metadata.single_sign_on_service_for(binding: :http_redirect),
+      saml_request,
+      relay_state
+    )
   end
 end
