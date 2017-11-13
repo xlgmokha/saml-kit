@@ -21,4 +21,5 @@ end
 Saml::Kit.configure do |configuration|
   configuration.issuer = ENV['ISSUER']
   configuration.registry = DeferredRegistry.new(configuration.registry, urls: ["http://localhost:3000/metadata"])
+  configuration.logger = Rails.logger
 end

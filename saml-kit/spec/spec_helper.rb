@@ -4,6 +4,8 @@ require "active_support/testing/time_helpers"
 require "ffaker"
 require "webmock/rspec"
 
+Saml::Kit.configuration.logger.level = :fatal
+
 Dir[File.join(Dir.pwd, 'spec/support/**/*.rb')].each { |f| require f }
 RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers

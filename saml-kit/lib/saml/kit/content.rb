@@ -13,7 +13,8 @@ module Saml
         decoded = decode(xml)
         begin
           inflate(decoded)
-        rescue
+        rescue => error
+          Saml::Kit.logger.error(error)
           decoded
         end
       end
