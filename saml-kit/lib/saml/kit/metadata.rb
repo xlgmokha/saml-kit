@@ -40,17 +40,17 @@ module Saml
           {
             text: cert,
             fingerprint: Fingerprint.new(cert).algorithm(hash_algorithm),
-            use: item.attribute('use').value,
+            use: item.attribute('use').value.to_sym,
           }
         end
       end
 
       def encryption_certificates
-        certificates.find_all { |x| x[:use] == "encryption" }
+        certificates.find_all { |x| x[:use] == :encryption }
       end
 
       def signing_certificates
-        certificates.find_all { |x| x[:use] == "signing" }
+        certificates.find_all { |x| x[:use] == :signing }
       end
 
       def single_logout_services
@@ -71,8 +71,16 @@ module Saml
         end
       end
 
+      def to_h
+        @xml_hash ||= Hash.from_xml(to_xml)
+      end
+
       def to_xml
         @xml
+      end
+
+      def to_s
+        to_xml
       end
 
       def self.from(content)

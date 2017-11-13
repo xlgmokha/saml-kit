@@ -14,10 +14,16 @@ module Saml
         end
       end
 
+      def want_assertions_signed
+        attribute = find_by("/md:EntityDescriptor/md:#{name}").attribute("WantAssertionsSigned")
+        attribute.text.downcase == "true"
+      end
+
       private
 
       class Builder
-        attr_accessor :id, :entity_id, :acs_urls, :logout_urls, :name_id_formats
+        attr_accessor :id, :entity_id, :acs_urls, :logout_urls, :name_id_formats, :sign
+        attr_accessor :want_assertions_signed
 
         def initialize(configuration = Saml::Kit.configuration)
           @id = SecureRandom.uuid
@@ -26,6 +32,8 @@ module Saml
           @acs_urls = []
           @logout_urls = []
           @name_id_formats = [Namespaces::PERSISTENT]
+          @sign = true
+          @want_assertions_signed = true
         end
 
         def add_assertion_consumer_service(url, binding: :post)
@@ -37,31 +45,32 @@ module Saml
         end
 
         def to_xml
-          signature = Signature.new(id)
-          xml = ::Builder::XmlMarkup.new
-          xml.instruct!
-          xml.EntityDescriptor entity_descriptor_options do
-            signature.template(xml)
-            xml.SPSSODescriptor descriptor_options do
-              xml.KeyDescriptor use: "signing" do
-                xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
-                  xml.X509Data do
-                    xml.X509Certificate @configuration.stripped_signing_certificate
+          Signature.sign(id, sign: sign) do |xml, signature|
+            xml.instruct!
+            xml.EntityDescriptor entity_descriptor_options do
+              signature.template(xml)
+              xml.SPSSODescriptor descriptor_options do
+                if @configuration.signing_certificate_pem.present?
+                  xml.KeyDescriptor use: "signing" do
+                    xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
+                      xml.X509Data do
+                        xml.X509Certificate @configuration.stripped_signing_certificate
+                      end
+                    end
                   end
                 end
-              end
-              logout_urls.each do |item|
-                xml.SingleLogoutService Binding: item[:binding], Location: item[:location]
-              end
-              name_id_formats.each do |format|
-                xml.NameIDFormat format
-              end
-              acs_urls.each_with_index do |item, index|
-                xml.AssertionConsumerService Binding: item[:binding], Location: item[:location], index: index, isDefault: index == 0 ? true : false
+                logout_urls.each do |item|
+                  xml.SingleLogoutService Binding: item[:binding], Location: item[:location]
+                end
+                name_id_formats.each do |format|
+                  xml.NameIDFormat format
+                end
+                acs_urls.each_with_index do |item, index|
+                  xml.AssertionConsumerService Binding: item[:binding], Location: item[:location], index: index, isDefault: index == 0 ? true : false
+                end
               end
             end
           end
-          signature.finalize(xml)
         end
 
         def build
@@ -80,12 +89,11 @@ module Saml
 
         def descriptor_options
           {
-            AuthnRequestsSigned: "true",
-            WantAssertionsSigned: "true",
+            AuthnRequestsSigned: sign,
+            WantAssertionsSigned: want_assertions_signed,
             protocolSupportEnumeration: Namespaces::PROTOCOL,
           }
         end
-
       end
     end
   end

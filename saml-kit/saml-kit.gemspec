@@ -13,6 +13,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{A simple toolkit for working with SAML.}
   spec.homepage      = "http://www.mokhan.ca"
   spec.license       = "MIT"
+  spec.required_ruby_version = '>= 2.2.0'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.

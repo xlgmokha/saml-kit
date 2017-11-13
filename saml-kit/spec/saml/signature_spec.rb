@@ -1,7 +1,7 @@
 require "spec_helper"
 
 RSpec.describe Saml::Kit::Signature do
-  subject { described_class.new(reference_id, configuration) }
+  subject { described_class.new(reference_id, configuration: configuration) }
   let(:configuration) do
     config = Saml::Kit::Configuration.new
     config.signing_certificate_pem = certificate
@@ -60,5 +60,17 @@ RSpec.describe Saml::Kit::Signature do
     expect(signature['SignedInfo']['Reference']['DigestValue']).to be_present
     expect(signature['SignatureValue']).to be_present
     expect(OpenSSL::X509::Certificate.new(Base64.decode64(signature['KeyInfo']['X509Data']['X509Certificate']))).to be_present
+  end
+
+  it 'does not add a signature' do
+    subject = described_class.new(reference_id, sign: false, configuration: configuration)
+    xml = ::Builder::XmlMarkup.new
+    xml.AuthnRequest do
+      subject.template(xml)
+      xml.Issuer "MyEntityID"
+    end
+    result = Hash.from_xml(subject.finalize(xml))
+    expect(result['AuthnRequest']).to be_present
+    expect(result["AuthnRequest"]["Signature"]).to be_nil
   end
 end
