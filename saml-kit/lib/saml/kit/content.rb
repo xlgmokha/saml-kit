@@ -23,7 +23,7 @@ module Saml
       end
 
       def self.encode(value)
-        Base64.encode64(value).gsub(/\n/, '')
+        Base64.strict_encode64(value).gsub(/\n/, '')
       end
 
       def self.base64_encoded?(value)
