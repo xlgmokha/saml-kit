@@ -6,6 +6,7 @@ require "active_support/core_ext/hash/conversions"
 require "active_support/core_ext/numeric/time"
 require "active_support/duration"
 require "builder"
+require "logger"
 require "net/http"
 require "nokogiri"
 require "securerandom"
@@ -33,12 +34,18 @@ I18n.load_path += Dir[File.expand_path("kit/locales/*.yml", File.dirname(__FILE_
 
 module Saml
   module Kit
-    def self.configuration
-      @config ||= Saml::Kit::Configuration.new
-    end
+    class << self
+      def configuration
+        @config ||= Saml::Kit::Configuration.new
+      end
 
-    def self.configure
-      yield configuration
+      def configure
+        yield configuration
+      end
+
+      def logger
+        configuration.logger
+      end
     end
   end
 end

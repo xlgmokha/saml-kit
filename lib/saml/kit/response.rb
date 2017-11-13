@@ -184,7 +184,8 @@ module Saml
 
       def audiences
         Array(to_h[name]['Assertion']['Conditions']['AudienceRestriction']['Audience'])
-      rescue
+      rescue => error
+        Saml::Kit.logger.error(error)
         []
       end
 
@@ -195,7 +196,8 @@ module Saml
 
       def parse_date(value)
         DateTime.parse(value)
-      rescue
+      rescue => error
+        Saml::Kit.logger.error(error)
         Time.at(0).to_datetime
       end
 
@@ -218,7 +220,8 @@ module Saml
 
         def want_assertions_signed
           request.provider.want_assertions_signed
-        rescue
+        rescue => error
+          Saml::Kit.logger.error(error)
           true
         end
 
