@@ -27,6 +27,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(result['EntityDescriptor']['ID']).to be_present
       expect(result['EntityDescriptor']['entityID']).to eql(entity_id)
       expect(result['EntityDescriptor']['IDPSSODescriptor']['protocolSupportEnumeration']).to eql('urn:oasis:names:tc:SAML:2.0:protocol')
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['WantAuthnRequestsSigned']).to eql('true')
       expect(result['EntityDescriptor']['IDPSSODescriptor']['NameIDFormat']).to match_array([
         Saml::Kit::Namespaces::PERSISTENT,
         Saml::Kit::Namespaces::TRANSIENT,
@@ -37,8 +38,6 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Binding']).to eql('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST')
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Location']).to eql("https://www.example.com/logout")
       expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['Name']).to eql("id")
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['FriendlyName']).to eql("id")
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['NameFormat']).to eql("urn:oasis:names:tc:SAML:2.0:attrname-format:uri")
       expect(result['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']).to eql(Saml::Kit.configuration.stripped_signing_certificate)
 
       expect(result['EntityDescriptor']['Organization']['OrganizationName']).to eql(org_name)
@@ -74,7 +73,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it do
       expect(subject.certificates).to match_array([
         {
-          use: "signing",
+          use: :signing,
           text: certificate,
           fingerprint: "9F:74:13:3B:BC:5A:7B:8B:2D:4F:8B:EF:1E:88:EB:D1:AE:BC:19:BF:CA:19:C6:2F:0F:4B:31:1D:68:98:B0:1B",
         }
@@ -118,19 +117,18 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
         {
           text: signing_certificate,
           fingerprint: "E6:03:E1:2D:F2:70:9C:D6:CC:8B:3E:4C:5A:37:F5:53:D7:B2:78:B1:2E:95:5B:31:5C:56:E8:7F:16:A1:1B:D2",
-          use: 'signing',
+          use: :signing,
         },
         {
           text: encryption_certificate,
           fingerprint: "E1:0A:68:23:E4:17:32:A3:3A:F8:B7:30:A3:1D:D8:75:F4:C5:76:48:A4:C0:C8:D3:5E:F1:AE:AB:5B:B2:37:22",
-          use: 'encryption',
+          use: :encryption,
         },
       ])
     end
     it do
       expect(subject.attributes).to include({
         format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
-        friendly_name: "E-Mail Address",
         name: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
       })
     end
@@ -168,8 +166,8 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
     it do
       expect(subject.certificates).to match_array([
-        { use: "signing", text: signing_certificate, fingerprint: "BE:12:70:84:AD:99:6A:58:28:2A:BC:DA:AB:E8:51:D3:FF:AB:58:30:E0:77:DB:23:57:15:01:B3:86:60:97:80" },
-        { use: "encryption", text: encryption_certificate, fingerprint: "5C:51:0C:8A:6A:02:24:3C:9E:96:96:18:2E:37:65:8F:CC:EA:51:0E:2C:C5:3F:1D:72:47:11:D0:7B:95:26:1F" },
+        { use: :signing, text: signing_certificate, fingerprint: "BE:12:70:84:AD:99:6A:58:28:2A:BC:DA:AB:E8:51:D3:FF:AB:58:30:E0:77:DB:23:57:15:01:B3:86:60:97:80" },
+        { use: :encryption, text: encryption_certificate, fingerprint: "5C:51:0C:8A:6A:02:24:3C:9E:96:96:18:2E:37:65:8F:CC:EA:51:0E:2C:C5:3F:1D:72:47:11:D0:7B:95:26:1F" },
       ])
     end
     it { expect(subject.attributes).to be_present }
@@ -224,23 +222,64 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
   end
 
   describe "#single_sign_on_service_for" do
-    let(:url) { FFaker::Internet.http_url }
+    let(:post_url) { FFaker::Internet.http_url }
+    let(:redirect_url) { FFaker::Internet.http_url }
 
     subject do
       builder = Saml::Kit::IdentityProviderMetadata::Builder.new
-      builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_redirect)
-      builder.add_single_sign_on_service(url, binding: :post)
+      builder.add_single_sign_on_service(redirect_url, binding: :http_redirect)
+      builder.add_single_sign_on_service(post_url, binding: :post)
       builder.build
     end
 
     it 'returns the binding that matches the requested' do
-      result = subject.single_sign_on_service_for(binding: :post)
-      expect(result[:binding]).to eql(Saml::Kit::Namespaces::POST)
-      expect(result[:location]).to eql(url)
+      expect(subject.single_sign_on_service_for(binding: :post)).to eql(post_url)
+      expect(subject.single_sign_on_service_for(binding: :http_redirect)).to eql(redirect_url)
     end
 
     it 'returns nil if the binding cannot be found' do
       expect(subject.single_sign_on_service_for(binding: :soap)).to be_nil
+    end
+  end
+
+  describe "#want_authn_requests_signed" do
+    let(:builder) { described_class::Builder.new }
+
+    it 'returns true when enabled' do
+      builder.want_authn_requests_signed = true
+      subject = builder.build
+      expect(subject.want_authn_requests_signed).to be(true)
+    end
+
+    it 'returns false when disabled' do
+      builder.want_authn_requests_signed = false
+      subject = builder.build
+      expect(subject.want_authn_requests_signed).to be(false)
+    end
+
+    it 'returns true when the attribute is missing' do
+      builder.want_authn_requests_signed = false
+      xml = builder.to_xml.gsub("WantAuthnRequestsSigned=\"false\"", "")
+      subject = described_class.new(xml)
+      expect(subject.want_authn_requests_signed).to be(true)
+    end
+  end
+
+  describe "#build_request" do
+    let(:builder) { described_class::Builder.new }
+
+    it 'it signs the authentication request when the idp metadata demands it' do
+      builder.want_authn_requests_signed = true
+      subject = builder.build
+
+      expect(subject.build_request(Saml::Kit::AuthenticationRequest)).to be_signed
+    end
+
+    it 'does not sign the authentication request when the idp does not require it' do
+      builder.want_authn_requests_signed = false
+      subject = builder.build
+
+      expect(subject.build_request(Saml::Kit::AuthenticationRequest)).to_not be_signed
     end
   end
 end

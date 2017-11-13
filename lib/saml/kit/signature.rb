@@ -16,14 +16,16 @@ module Saml
         SHA512: "http://www.w3.org/2001/04/xmlenc#sha512",
       }.freeze
 
-      attr_reader :configuration, :reference_id
+      attr_reader :configuration, :reference_id, :sign
 
-      def initialize(reference_id, configuration = Saml::Kit.configuration)
+      def initialize(reference_id, configuration: Saml::Kit.configuration, sign: true)
         @reference_id = reference_id
         @configuration = configuration
+        @sign = sign
       end
 
       def template(xml = ::Builder::XmlMarkup.new)
+        return unless sign
         return if reference_id.blank?
 
         xml.Signature "xmlns" => Namespaces::XMLDSIG do
@@ -49,12 +51,18 @@ module Saml
       end
 
       def finalize(xml)
-        if reference_id.present?
+        if sign && reference_id.present?
           document = Xmldsig::SignedDocument.new(xml.target!)
           document.sign(configuration.signing_private_key)
         else
           xml.target!
         end
+      end
+
+      def self.sign(id, sign: true, xml: ::Builder::XmlMarkup.new)
+        signature = new(id, sign: sign)
+        yield xml, signature
+        signature.finalize(xml)
       end
     end
   end

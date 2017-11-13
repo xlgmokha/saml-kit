@@ -71,7 +71,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       expect(subject.certificates).to match_array([
         {
           fingerprint: expected_sha256.upcase.scan(/../).join(":"),
-          use: "signing",
+          use: :signing,
           text: Saml::Kit.configuration.stripped_signing_certificate
         }
       ])

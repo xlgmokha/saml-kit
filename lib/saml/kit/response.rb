@@ -27,23 +27,23 @@ module Saml
       end
 
       def id
-        @xml_hash.dig(name, 'ID')
+        to_h.fetch(name, {}).fetch('ID', nil)
       end
 
       def in_response_to
-        @xml_hash.dig(name, 'InResponseTo')
+        to_h.fetch(name, {}).fetch('InResponseTo', nil)
       end
 
       def name_id
-        @xml_hash.dig(name, 'Assertion', 'Subject', 'NameID')
+        to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Subject', {}).fetch('NameID', nil)
       end
 
       def issuer
-        @xml_hash.dig(name, 'Issuer')
+        to_h.fetch(name, {}).fetch('Issuer', nil)
       end
 
       def status_code
-        @xml_hash.dig(name, 'Status', 'StatusCode', 'Value')
+        to_h.fetch(name, {}).fetch('Status', {}).fetch('StatusCode', {}).fetch('Value', nil)
       end
 
       def [](key)
@@ -51,29 +51,34 @@ module Saml
       end
 
       def attributes
-        @attributes ||= Hash[@xml_hash.dig(name, 'Assertion', 'AttributeStatement', 'Attribute').map do |item|
+        @attributes ||= Hash[to_h.fetch(name, {}).fetch('Assertion', {}).fetch('AttributeStatement', {}).fetch('Attribute', []).map do |item|
           [item['Name'].to_sym, item['AttributeValue']]
         end].with_indifferent_access
       end
 
       def acs_url
-        @xml_hash.dig(name, 'Destination')
+        to_h.fetch(name, {}).fetch('Destination', nil)
       end
 
       def version
-        @xml_hash.dig(name, 'Version')
+        to_h.fetch(name, {}).fetch('Version', {})
       end
 
       def to_xml
         content
       end
 
-      def encode
-        Base64.strict_encode64(to_xml)
+      def to_h
+        @xml_hash
+      end
+
+      def serialize
+        Saml::Kit::Content.encode_raw_saml(to_xml)
       end
 
       def certificate
-        @xml_hash.dig(name, 'Signature', 'KeyInfo', 'X509Data', 'X509Certificate')
+        return unless signed?
+        to_h.fetch(name, {}).fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
       end
 
       def fingerprint
@@ -82,11 +87,11 @@ module Saml
       end
 
       def started_at
-        parse_date(@xml_hash.dig(name, 'Assertion', 'Conditions', 'NotBefore'))
+        parse_date(to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Conditions', {}).fetch('NotBefore', nil))
       end
 
       def expired_at
-        parse_date(@xml_hash.dig(name, 'Assertion', 'Conditions', 'NotOnOrAfter'))
+        parse_date(to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Conditions', {}).fetch('NotOnOrAfter', nil))
       end
 
       def expired?
@@ -97,15 +102,27 @@ module Saml
         Time.current > started_at && !expired?
       end
 
-      def self.parse(saml_response)
-        new(Base64.decode64(saml_response))
+      def signed?
+        to_h[name]['Signature'].present?
       end
 
-      private
+      def trusted?
+        return false if provider.nil?
+        return false unless signed?
+        provider.matches?(fingerprint, use: :signing)
+      end
 
       def provider
         registry.metadata_for(issuer)
       end
+
+      class << self
+        def deserialize(saml_response)
+          new(Saml::Kit::Content.decode_raw_saml(saml_response))
+        end
+      end
+
+      private
 
       def registry
         Saml::Kit.configuration.registry
@@ -129,7 +146,7 @@ module Saml
 
       def must_be_registered
         return unless login_response?
-        return if provider.present? && provider.matches?(fingerprint, use: :signing)
+        return if trusted?
 
         errors[:base] << error_message(:unregistered)
       end
@@ -166,14 +183,14 @@ module Saml
       end
 
       def audiences
-        Array(@xml_hash[name]['Assertion']['Conditions']['AudienceRestriction']['Audience'])
+        Array(to_h[name]['Assertion']['Conditions']['AudienceRestriction']['Audience'])
       rescue
         []
       end
 
       def login_response?
         return false if to_xml.blank?
-        @xml_hash[name].present?
+        to_h[name].present?
       end
 
       def parse_date(value)
@@ -186,6 +203,7 @@ module Saml
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code
+        attr_accessor :issuer
 
         def initialize(user, request)
           @user = user
@@ -195,45 +213,54 @@ module Saml
           @now = Time.now.utc
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
+          @issuer = configuration.issuer
+        end
+
+        def want_assertions_signed
+          request.provider.want_assertions_signed
+        rescue
+          true
         end
 
         def to_xml
-          signature = Signature.new(id)
-          xml = ::Builder::XmlMarkup.new
-          xml.Response response_options do
-            xml.Issuer(configuration.issuer, xmlns: Namespaces::ASSERTION)
-            signature.template(xml)
-            xml.Status do
-              xml.StatusCode Value: status_code
-            end
-            xml.Assertion(assertion_options) do
-              xml.Issuer configuration.issuer
-              xml.Subject do
-                xml.NameID user.name_id_for(request), Format: request.name_id_format
-                xml.SubjectConfirmation Method: Namespaces::BEARER do
-                  xml.SubjectConfirmationData "", subject_confirmation_data_options
-                end
+          Signature.sign(id, sign: want_assertions_signed) do |xml, signature|
+            xml.Response response_options do
+              xml.Issuer(issuer, xmlns: Namespaces::ASSERTION)
+              signature.template(xml)
+              xml.Status do
+                xml.StatusCode Value: status_code
               end
-              xml.Conditions conditions_options do
-                xml.AudienceRestriction do
-                  xml.Audience request.issuer
+              xml.Assertion(assertion_options) do
+                xml.Issuer issuer
+                xml.Subject do
+                  xml.NameID user.name_id_for(request.name_id_format), Format: request.name_id_format
+                  xml.SubjectConfirmation Method: Namespaces::BEARER do
+                    xml.SubjectConfirmationData "", subject_confirmation_data_options
+                  end
                 end
-              end
-              xml.AuthnStatement authn_statement_options do
-                xml.AuthnContext do
-                  xml.AuthnContextClassRef Namespaces::PASSWORD
+                xml.Conditions conditions_options do
+                  xml.AudienceRestriction do
+                    xml.Audience request.issuer
+                  end
                 end
-              end
-              xml.AttributeStatement do
-                user.assertion_attributes_for(request).each do |key, value|
-                  xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
-                    xml.AttributeValue value.to_s
+                xml.AuthnStatement authn_statement_options do
+                  xml.AuthnContext do
+                    xml.AuthnContextClassRef Namespaces::PASSWORD
+                  end
+                end
+                assertion_attributes = user.assertion_attributes_for(request)
+                if assertion_attributes.any?
+                  xml.AttributeStatement do
+                    assertion_attributes.each do |key, value|
+                      xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
+                        xml.AttributeValue value.to_s
+                      end
+                    end
                   end
                 end
               end
             end
           end
-          signature.finalize(xml)
         end
 
         def build

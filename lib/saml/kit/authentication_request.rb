@@ -21,35 +21,63 @@ module Saml
       end
 
       def id
-        @hash[name]['ID']
+        to_h[name]['ID']
       end
 
       def acs_url
-        @hash[name]['AssertionConsumerServiceURL'] || registered_acs_url
+        to_h[name]['AssertionConsumerServiceURL'] || registered_acs_url
       end
 
       def issuer
-        @hash[name]['Issuer']
+        to_h[name]['Issuer']
       end
 
       def name_id_format
-        @hash[name]['NameIDPolicy']['Format']
+        to_h[name]['NameIDPolicy']['Format']
       end
 
       def certificate
-        @hash[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
+        return nil unless signed?
+        to_h[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
       end
 
       def fingerprint
+        return nil unless signed?
         Fingerprint.new(certificate)
+      end
+
+      def signed?
+        to_h[name]['Signature'].present?
+      end
+
+      def to_h
+        @hash
       end
 
       def to_xml
         @content
       end
 
+      def to_s
+        to_xml
+      end
+
+      def serialize
+        Saml::Kit::Content.encode_raw_saml(to_xml)
+      end
+
       def response_for(user)
         Response::Builder.new(user, self).build
+      end
+
+      def trusted?
+        return false if provider.nil?
+        return false unless signed?
+        provider.matches?(fingerprint, use: :signing)
+      end
+
+      def provider
+        registry.metadata_for(issuer)
       end
 
       private
@@ -58,10 +86,6 @@ module Saml
         return if provider.nil?
         acs_urls = provider.assertion_consumer_services
         return acs_urls.first[:location] if acs_urls.any?
-      end
-
-      def provider
-        registry.metadata_for(issuer)
       end
 
       def registry
@@ -74,8 +98,7 @@ module Saml
           errors[:service_provider] << error_message(:unregistered)
           return
         end
-        return if provider.matches?(fingerprint, use: :signing)
-
+        return if trusted?
         errors[:fingerprint] << error_message(:invalid_fingerprint)
       end
 
@@ -106,22 +129,24 @@ module Saml
 
       class Builder
         attr_accessor :id, :issued_at, :issuer, :acs_url, :name_id_format
+        attr_reader :sign
 
-        def initialize(configuration = Saml::Kit.configuration)
+        def initialize(configuration = Saml::Kit.configuration, sign: true)
           @id = SecureRandom.uuid
           @issued_at = Time.now.utc
           @issuer = configuration.issuer
           @name_id_format = Namespaces::PERSISTENT
+          @sign = sign
         end
 
-        def to_xml(xml = ::Builder::XmlMarkup.new)
-          signature = Signature.new(id)
-          xml.tag!('samlp:AuthnRequest', request_options) do
-            xml.tag!('saml:Issuer', issuer)
-            signature.template(xml)
-            xml.tag!('samlp:NameIDPolicy', Format: name_id_format)
+        def to_xml
+          Signature.sign(id, sign: sign) do |xml, signature|
+            xml.tag!('samlp:AuthnRequest', request_options) do
+              xml.tag!('saml:Issuer', issuer)
+              signature.template(xml)
+              xml.tag!('samlp:NameIDPolicy', Format: name_id_format)
+            end
           end
-          signature.finalize(xml)
         end
 
         def build
