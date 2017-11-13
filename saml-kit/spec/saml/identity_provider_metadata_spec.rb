@@ -174,18 +174,18 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
   end
 
   describe "#validate" do
-    let(:service_provider_metadata) do
-      builder = Saml::Kit::ServiceProviderMetadata::Builder.new
-      builder.to_xml
-    end
-    let(:identity_provider_metadata) { IO.read("spec/fixtures/metadata/okta.xml") }
-
     it 'valid when given valid identity provider metadata' do
-      subject = described_class.new(identity_provider_metadata)
-      expect(subject).to be_valid
+      builder = described_class::Builder.new
+      builder.attributes = [:email]
+      builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :post)
+      builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_redirect)
+      builder.add_single_logout_service(FFaker::Internet.http_url, binding: :post)
+      builder.add_single_logout_service(FFaker::Internet.http_url, binding: :http_redirect)
+      expect(builder.build).to be_valid
     end
 
     it 'is invalid, when given service provider metadata' do
+      service_provider_metadata = Saml::Kit::ServiceProviderMetadata::Builder.new.to_xml
       subject = described_class.new(service_provider_metadata)
       expect(subject).to_not be_valid
       expect(subject.errors[:base]).to include(I18n.translate("saml/kit.errors.IDPSSODescriptor.invalid"))
