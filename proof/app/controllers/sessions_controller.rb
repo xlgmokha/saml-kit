@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:new]
+  skip_before_action :verify_authenticity_token, only: [:new, :destroy]
   before_action :load_saml_request, only: [:new, :create]
 
   def new
@@ -13,10 +13,14 @@ class SessionsController < ApplicationController
       session[:user_id] = user.id
       @saml_response = @saml_request.response_for(user)
       @relay_state = params[:RelayState]
-      render layout: nil
+      render layout: "spinner"
     else
       redirect_to new_session_path, error: "Invalid Credentials"
     end
+  end
+
+  def destroy
+    render layout: "spinner"
   end
 
   private
