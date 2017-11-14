@@ -22,7 +22,7 @@ module Saml
         end
       end
 
-      def single_sign_on_service_for(binding)
+      def single_sign_on_service_for(binding:)
         binding = Saml::Kit::Namespaces.binding_for(binding)
         result = single_sign_on_services.find do |item|
           item[:binding] == binding

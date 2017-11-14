@@ -233,8 +233,8 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
 
     it 'returns the binding that matches the requested' do
-      expect(subject.single_sign_on_service_for(:post)).to eql(post_url)
-      expect(subject.single_sign_on_service_for(:http_redirect)).to eql(redirect_url)
+      expect(subject.single_sign_on_service_for(binding: :post)).to eql(post_url)
+      expect(subject.single_sign_on_service_for(binding: :http_redirect)).to eql(redirect_url)
     end
 
     it 'returns nil if the binding cannot be found' do
@@ -295,12 +295,12 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
 
     it 'returns the location for the matching binding' do
-      expect(subject.single_logout_service_for(:post)).to eql(post_url)
-      expect(subject.single_logout_service_for(:http_redirect)).to eql(redirect_url)
+      expect(subject.single_logout_service_for(binding: :post)).to eql(post_url)
+      expect(subject.single_logout_service_for(binding: :http_redirect)).to eql(redirect_url)
     end
 
     it 'returns nil if the binding is not available' do
-      expect(subject.single_logout_service_for(:soap)).to be_nil
+      expect(subject.single_logout_service_for(binding: :soap)).to be_nil
     end
   end
 end
