@@ -62,7 +62,7 @@ module Saml
         end
       end
 
-      def single_logout_service_for(binding)
+      def single_logout_service_for(binding:)
         binding = Saml::Kit::Namespaces.binding_for(binding)
         result = single_logout_services.find do |item|
           item[:binding] == binding
