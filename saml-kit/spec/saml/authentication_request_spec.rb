@@ -22,7 +22,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   it { expect(subject.name_id_format).to eql(name_id_format) }
 
   describe "#to_xml" do
-    subject { described_class::Builder.new(configuration) }
+    subject { described_class::Builder.new(configuration: configuration) }
     let(:configuration) do
       config = Saml::Kit::Configuration.new
       config.issuer = issuer

@@ -5,7 +5,7 @@ module Saml
       include XsdValidatable
       include ActiveModel::Validations
       validates_presence_of :content
-      validates_presence_of :single_logout_service, if: :logout_request?
+      validates_presence_of :single_logout_service, if: :logout?
       validate :must_be_request
       validate :must_have_valid_signature
       validate :must_be_registered
@@ -104,11 +104,11 @@ module Saml
       def must_be_request
         return if to_h.nil?
 
-        errors[:base] << error_message(:invalid) unless logout_request?
+        errors[:base] << error_message(:invalid) unless logout?
       end
 
       def must_be_registered
-        return unless logout_request?
+        return unless logout?
         if provider.nil?
           errors[:provider] << error_message(:unregistered)
           return
@@ -121,7 +121,7 @@ module Saml
         matches_xsd?(PROTOCOL_XSD)
       end
 
-      def logout_request?
+      def logout?
         return false if to_xml.blank?
         to_h[name].present?
       end
@@ -131,13 +131,13 @@ module Saml
         attr_accessor :sign
         attr_reader :user
 
-        def initialize(user, configuration: Saml::Kit.configuration)
+        def initialize(user, configuration: Saml::Kit.configuration, sign: true)
           @user = user
           @id = SecureRandom.uuid
           @issuer = configuration.issuer
           @name_id_format = Saml::Kit::Namespaces::PERSISTENT
           @now = Time.now.utc
-          @sign = true
+          @sign = sign
         end
 
         def to_xml

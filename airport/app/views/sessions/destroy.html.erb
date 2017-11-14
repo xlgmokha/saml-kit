@@ -1,0 +1,10 @@
+<%= form_tag(@post_uri, style: "position: absolute; left: -10000px; top: -10000px;") do %>
+  <%= hidden_field_tag("SAMLRequest", @saml_request) %>
+  <%= submit_tag "Submit" %>
+<% end %>
+
+<%= javascript_tag do %>
+  window.onload = function() {
+    document.forms[0].submit();
+  };
+<% end %>
