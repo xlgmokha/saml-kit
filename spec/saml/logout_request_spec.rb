@@ -157,4 +157,11 @@ RSpec.describe Saml::Kit::LogoutRequest do
       expect(result.to_xml).to eql(subject.to_xml)
     end
   end
+
+  describe "#response_for" do
+    it 'returns a logout response for a particular user' do
+      user = double(:user)
+      expect(subject.response_for(user)).to be_instance_of(Saml::Kit::LogoutResponse)
+    end
+  end
 end

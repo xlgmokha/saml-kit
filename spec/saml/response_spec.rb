@@ -1,14 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Response do
-  describe "#acs_url" do
+  describe "#destination" do
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { }) }
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil) }
     subject { described_class::Builder.new(user, request).build }
 
     it 'returns the acs_url' do
-      expect(subject.acs_url).to eql(acs_url)
+      expect(subject.destination).to eql(acs_url)
     end
   end
 

@@ -56,7 +56,7 @@ module Saml
         end].with_indifferent_access
       end
 
-      def acs_url
+      def destination
         to_h.fetch(name, {}).fetch('Destination', nil)
       end
 
