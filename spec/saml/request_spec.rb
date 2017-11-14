@@ -29,5 +29,14 @@ RSpec.describe Saml::Kit::Request do
     it 'returns an invalid request when the raw request is corrupted' do
       expect(subject.deserialize("nonsense")).to be_invalid
     end
+
+    it 'returns a logout request' do
+      user = double(:user, name_id_for: SecureRandom.uuid)
+      builder = Saml::Kit::LogoutRequest::Builder.new(user)
+
+      result = subject.deserialize(builder.build.serialize)
+      expect(result).to be_instance_of(Saml::Kit::LogoutRequest)
+      expect(result.name_id).to eql(user.name_id_for)
+    end
   end
 end
