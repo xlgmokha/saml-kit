@@ -42,6 +42,10 @@ module Saml
         @xml_hash
       end
 
+      def serialize
+        Saml::Kit::Content.encode_raw_saml(to_xml)
+      end
+
       def to_xml
         content
       end
