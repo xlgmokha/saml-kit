@@ -62,6 +62,14 @@ module Saml
         end
       end
 
+      def single_logout_service_for(binding)
+        binding = Saml::Kit::Namespaces.binding_for(binding)
+        result = single_logout_services.find do |item|
+          item[:binding] == binding
+        end
+        return result[:location] if result
+      end
+
       def matches?(fingerprint, use: :signing)
         if :signing == use.to_sym
           hash_value = fingerprint.algorithm(hash_algorithm)
