@@ -9,7 +9,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   let(:raw_xml) do
     builder = described_class::Builder.new
     builder.id = id
-    builder.issued_at = Time.now.utc
+    builder.now = Time.now.utc
     builder.issuer = issuer
     builder.acs_url = acs_url
     builder.name_id_format = name_id_format

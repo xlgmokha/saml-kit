@@ -20,6 +20,10 @@ class SessionsController < ApplicationController
   end
 
   def destroy
+    user = User.find_by(uuid: @saml_request.name_id)
+    @saml_response = @saml_request.response_for(user)
+    @relay_state = params[:RelayState]
+    reset_session
     render layout: "spinner"
   end
 

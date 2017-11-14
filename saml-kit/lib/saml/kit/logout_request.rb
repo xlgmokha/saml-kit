@@ -19,6 +19,10 @@ module Saml
         @xml_hash = Hash.from_xml(xml)
       end
 
+      def id
+        to_h[name]['ID']
+      end
+
       def issuer
         to_h[name]['Issuer']
       end
@@ -83,6 +87,10 @@ module Saml
 
       def serialize
         Saml::Kit::Content.encode_raw_saml(to_xml)
+      end
+
+      def response_for(user)
+        LogoutResponse::Builder.new(user, self).build
       end
 
       private
