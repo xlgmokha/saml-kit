@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:new, :destroy]
-  before_action :load_saml_request, only: [:new, :create]
+  before_action :load_saml_request, only: [:new, :create, :destroy]
 
   def new
     session[:SAMLRequest] ||= params[:SAMLRequest]
