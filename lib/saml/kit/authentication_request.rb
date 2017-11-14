@@ -128,14 +128,14 @@ module Saml
       end
 
       class Builder
-        attr_accessor :id, :issued_at, :issuer, :acs_url, :name_id_format
+        attr_accessor :id, :now, :issuer, :acs_url, :name_id_format
         attr_reader :sign
 
-        def initialize(configuration = Saml::Kit.configuration, sign: true)
+        def initialize(user = nil, configuration: Saml::Kit.configuration, sign: true)
           @id = SecureRandom.uuid
-          @issued_at = Time.now.utc
           @issuer = configuration.issuer
           @name_id_format = Namespaces::PERSISTENT
+          @now = Time.now.utc
           @sign = sign
         end
 
@@ -161,7 +161,7 @@ module Saml
             "xmlns:saml" => Namespaces::ASSERTION,
             ID: "_#{id}",
             Version: "2.0",
-            IssueInstant: issued_at.utc.iso8601,
+            IssueInstant: now.utc.iso8601,
           }
           options[:AssertionConsumerServiceURL] = acs_url if acs_url.present?
           options
