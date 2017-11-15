@@ -53,7 +53,7 @@ module Saml
       def finalize(xml)
         if sign && reference_id.present?
           document = Xmldsig::SignedDocument.new(xml.target!)
-          document.sign(configuration.signing_private_key)
+          document.sign(private_key)
         else
           xml.target!
         end
@@ -63,6 +63,12 @@ module Saml
         signature = new(id, sign: sign)
         yield xml, signature
         signature.finalize(xml)
+      end
+
+      private
+
+      def private_key
+        configuration.signing_private_key
       end
     end
   end

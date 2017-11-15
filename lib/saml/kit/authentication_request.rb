@@ -142,7 +142,7 @@ module Saml
       class Builder
         attr_accessor :id, :now, :issuer, :acs_url, :name_id_format, :sign, :destination
 
-        def initialize(user = nil, configuration: Saml::Kit.configuration, sign: true)
+        def initialize(configuration: Saml::Kit.configuration, sign: true)
           @id = SecureRandom.uuid
           @issuer = configuration.issuer
           @name_id_format = Namespaces::PERSISTENT
