@@ -39,12 +39,6 @@ module Saml
         end
       end
 
-      def build_request(type, user = nil)
-        builder = type::Builder.new(user, sign: want_authn_requests_signed)
-        yield builder if block_given?
-        builder.build
-      end
-
       class Builder
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats
         attr_accessor :want_authn_requests_signed, :sign

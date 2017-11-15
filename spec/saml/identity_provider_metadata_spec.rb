@@ -265,24 +265,6 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
   end
 
-  describe "#build_request" do
-    let(:builder) { described_class::Builder.new }
-
-    it 'it signs the authentication request when the idp metadata demands it' do
-      builder.want_authn_requests_signed = true
-      subject = builder.build
-
-      expect(subject.build_request(Saml::Kit::AuthenticationRequest)).to be_signed
-    end
-
-    it 'does not sign the authentication request when the idp does not require it' do
-      builder.want_authn_requests_signed = false
-      subject = builder.build
-
-      expect(subject.build_request(Saml::Kit::AuthenticationRequest)).to_not be_signed
-    end
-  end
-
   describe "#single_logout_service_for" do
     let(:builder) { described_class::Builder.new }
     let(:redirect_url) { FFaker::Internet.http_url }
