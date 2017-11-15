@@ -24,6 +24,10 @@ module Saml
         to_h[name]['ID']
       end
 
+      def destination
+        to_h[name]['Destination']
+      end
+
       def acs_url
         to_h[name]['AssertionConsumerServiceURL'] || registered_acs_url
       end
@@ -128,8 +132,7 @@ module Saml
       end
 
       class Builder
-        attr_accessor :id, :now, :issuer, :acs_url, :name_id_format
-        attr_reader :sign
+        attr_accessor :id, :now, :issuer, :acs_url, :name_id_format, :sign, :destination
 
         def initialize(user = nil, configuration: Saml::Kit.configuration, sign: true)
           @id = SecureRandom.uuid
@@ -162,6 +165,7 @@ module Saml
             ID: "_#{id}",
             Version: "2.0",
             IssueInstant: now.utc.iso8601,
+            Destination: destination,
           }
           options[:AssertionConsumerServiceURL] = acs_url if acs_url.present?
           options

@@ -244,7 +244,7 @@ RSpec.describe Saml::Kit::Response do
       xml = builder.to_xml
       subject = described_class.new(xml)
 
-      expected_value = Base64.encode64(Zlib::Deflate.deflate(xml, 9)).gsub(/\n/, '')
+      expected_value = Base64.strict_encode64(Zlib::Deflate.deflate(xml, 9)[2..-5])
       expect(subject.serialize).to eql(expected_value)
     end
   end
