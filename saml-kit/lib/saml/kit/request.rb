@@ -2,7 +2,7 @@ module Saml
   module Kit
     class Request
       def self.deserialize(raw_request)
-        xml = Saml::Kit::Content.decode_raw_saml(raw_request)
+        xml = Saml::Kit::Content.deserialize(raw_request)
         hash = Hash.from_xml(xml)
         if hash['AuthnRequest'].present?
           AuthenticationRequest.new(xml)
@@ -11,6 +11,7 @@ module Saml
         end
       rescue => error
         Saml::Kit.logger.error(error)
+        Saml::Kit.logger.error(error.backtrace.join("\n"))
         InvalidRequest.new(raw_request)
       end
     end

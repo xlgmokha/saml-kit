@@ -77,7 +77,7 @@ module Saml
       end
 
       def serialize
-        Saml::Kit::Content.encode_raw_saml(to_xml)
+        Saml::Kit::Content.serialize(to_xml)
       end
 
       def certificate
@@ -122,7 +122,7 @@ module Saml
 
       class << self
         def deserialize(saml_response)
-          new(Saml::Kit::Content.decode_raw_saml(saml_response))
+          new(Saml::Kit::Content.deserialize(saml_response))
         end
       end
 
