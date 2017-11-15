@@ -31,7 +31,7 @@ class SessionsController < ApplicationController
 
   def destroy
     @post_uri = idp_metadata.single_logout_service_for(binding: :post)
-    @saml_request = idp_metadata.build_request(Saml::Kit::LogoutRequest, current_user).serialize
+    @saml_request = Saml::Kit::LogoutRequest::Builder.new(current_user, sign: true).build.serialize
     render layout: "spinner"
   end
 
