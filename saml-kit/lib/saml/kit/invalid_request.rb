@@ -13,6 +13,10 @@ module Saml
         @raw = raw
         @name = "InvalidRequest"
       end
+
+      def to_xml
+        raw
+      end
     end
   end
 end
