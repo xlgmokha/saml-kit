@@ -1,4 +1,3 @@
-
 module Saml
   module Kit
     class LogoutResponse
@@ -8,6 +7,10 @@ module Saml
         @content = xml
         @name = 'LogoutResponse'
         @xml_hash = Hash.from_xml(xml)
+      end
+
+      def query_string_parameter
+        'SAMLResponse'
       end
 
       def id

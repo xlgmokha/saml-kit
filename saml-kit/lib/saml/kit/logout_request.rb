@@ -19,6 +19,10 @@ module Saml
         @xml_hash = Hash.from_xml(xml)
       end
 
+      def query_string_parameter
+        'SAMLRequest'
+      end
+
       def id
         to_h[name]['ID']
       end
