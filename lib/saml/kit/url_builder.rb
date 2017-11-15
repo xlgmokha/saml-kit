@@ -23,9 +23,9 @@ module Saml
           saml_document.query_string_parameter => Content.encode_raw_saml(saml_document.to_xml),
           'RelayState' => relay_state,
           'SigAlg' => Saml::Kit::Namespaces::SHA256,
-        }.map do |(x, y)|
-          "#{x}=#{y}"
-        end.join('&')
+        }.map do |(key, value)|
+          value.present? ?  "#{key}=#{value}" : nil
+        end.compact.join('&')
         payload = URI.encode(payload)
       end
     end
