@@ -90,7 +90,7 @@ module Saml
       end
 
       def serialize
-        Saml::Kit::Content.encode_raw_saml(to_xml)
+        Saml::Kit::Content.serialize(to_xml)
       end
 
       def response_for(user)
