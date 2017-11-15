@@ -1,16 +1,16 @@
 module Saml
   module Kit
     class UrlBuilder
-      def build(request, binding:, relay_state: nil)
+      def build(saml_document, binding:, relay_state: nil)
         payload = {
-          'SAMLRequest' => Content.encode_raw_saml(request.to_xml),
+          saml_document.query_string_parameter => Content.encode_raw_saml(saml_document.to_xml),
           'RelayState' => relay_state,
           'SigAlg' => Saml::Kit::Namespaces::SHA256,
         }.map do |(x, y)|
           "#{x}=#{y}"
         end.join('&')
         payload = URI.encode(payload)
-        "#{request.destination}?#{payload}&Signature=#{signature_for(payload)}"
+        "#{saml_document.destination}?#{payload}&Signature=#{signature_for(payload)}"
       end
 
       private

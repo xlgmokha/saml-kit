@@ -20,6 +20,10 @@ module Saml
         @hash = Hash.from_xml(@content)
       end
 
+      def query_string_parameter
+        'SAMLRequest'
+      end
+
       def id
         to_h[name]['ID']
       end
@@ -29,7 +33,11 @@ module Saml
       end
 
       def acs_url
-        to_h[name]['AssertionConsumerServiceURL'] || registered_acs_url
+        #if signed? && trusted?
+          to_h[name]['AssertionConsumerServiceURL'] || registered_acs_url
+        #else
+          #registered_acs_url
+        #end
       end
 
       def issuer

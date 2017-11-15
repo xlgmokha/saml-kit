@@ -26,6 +26,10 @@ module Saml
         @request_id = request_id
       end
 
+      def query_string_parameter
+        'SAMLResponse'
+      end
+
       def id
         to_h.fetch(name, {}).fetch('ID', nil)
       end
