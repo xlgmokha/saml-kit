@@ -33,7 +33,7 @@ RSpec.describe Saml::Kit::LogoutResponse do
     subject { builder.build }
 
     it 'returns a compressed and base64 encoded document' do
-      expected_value = Base64.encode64(Zlib::Deflate.deflate(subject.to_xml, 9)).gsub(/\n/, '')
+      expected_value = Base64.strict_encode64(Zlib::Deflate.deflate(subject.to_xml, 9)[2..-5])
       expect(subject.serialize).to eql(expected_value)
     end
   end

@@ -5,6 +5,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   let(:id) { SecureRandom.uuid }
   let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
   let(:issuer) { FFaker::Movie.title }
+  let(:destination) { FFaker::Internet.http_url }
   let(:name_id_format) { Saml::Kit::Namespaces::EMAIL_ADDRESS }
   let(:raw_xml) do
     builder = described_class::Builder.new
@@ -13,6 +14,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     builder.issuer = issuer
     builder.acs_url = acs_url
     builder.name_id_format = name_id_format
+    builder.destination = destination
     builder.to_xml
   end
 
@@ -20,6 +22,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   it { expect(subject.id).to eql("_#{id}") }
   it { expect(subject.acs_url).to eql(acs_url) }
   it { expect(subject.name_id_format).to eql(name_id_format) }
+  it { expect(subject.destination).to eql(destination) }
 
   describe "#to_xml" do
     subject { described_class::Builder.new(configuration: configuration) }
@@ -175,12 +178,10 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   end
 
   describe "#serialize" do
-    it 'returns a compressed and base64 encoded document' do
-      builder = described_class::Builder.new
-      xml = builder.to_xml
-      subject = described_class.new(xml)
+    subject { described_class::Builder.new.build }
 
-      expected_value = Base64.encode64(Zlib::Deflate.deflate(xml, 9)).gsub(/\n/, '')
+    it 'returns a compressed and base64 encoded document' do
+      expected_value = Base64.strict_encode64(Zlib::Deflate.deflate(subject.to_xml, 9)[2..-5])
       expect(subject.serialize).to eql(expected_value)
     end
   end

@@ -24,7 +24,7 @@ module Saml
       end
 
       def self.encode(value)
-        Base64.strict_encode64(value).gsub(/\n/, '')
+        Base64.strict_encode64(value)
       end
 
       def self.base64_encoded?(value)
@@ -32,11 +32,12 @@ module Saml
       end
 
       def self.inflate(value)
-        Zlib::Inflate.new.inflate(value)
+        inflater = Zlib::Inflate.new(-Zlib::MAX_WBITS)
+        inflater.inflate(value)
       end
 
       def self.deflate(value, level: Zlib::BEST_COMPRESSION)
-        Zlib::Deflate.deflate(value, level)
+        Zlib::Deflate.deflate(value, level)[2..-5]
       end
     end
   end

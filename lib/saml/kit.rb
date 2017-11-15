@@ -29,6 +29,7 @@ require "saml/kit/invalid_request"
 require "saml/kit/self_signed_certificate"
 require "saml/kit/service_provider_metadata"
 require "saml/kit/signature"
+require "saml/kit/url_builder"
 require "saml/kit/xml"
 
 I18n.load_path += Dir[File.expand_path("kit/locales/*.yml", File.dirname(__FILE__))]
