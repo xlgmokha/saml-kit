@@ -9,6 +9,7 @@ Saml::Kit.configuration.logger.level = :fatal
 Dir[File.join(Dir.pwd, 'spec/support/**/*.rb')].each { |f| require f }
 RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
+  config.include TestHelpers
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"
 

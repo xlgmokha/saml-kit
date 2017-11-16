@@ -32,6 +32,15 @@ module Saml
         end
       end
 
+      def deserialize(params)
+        if params['SAMLRequest'].present?
+          Saml::Kit::Request.deserialize(CGI.unescape(params['SAMLRequest']))
+        elsif params['SAMLResponse'].present?
+          Saml::Kit::Response.deserialize(CGI.unescape(params['SAMLResponse']))
+        else
+        end
+      end
+
       def http_redirect?
         binding == Namespaces::HTTP_REDIRECT
       end
