@@ -38,6 +38,7 @@ module Saml
         elsif params['SAMLResponse'].present?
           Saml::Kit::Response.deserialize(CGI.unescape(params['SAMLResponse']))
         else
+          raise ArgumentError.new("SAMLRequest or SAMLResponse parameter is required.")
         end
       end
 
