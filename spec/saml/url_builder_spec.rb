@@ -29,7 +29,7 @@ RSpec.describe Saml::Kit::UrlBuilder do
           result = subject.build(response, relay_state: relay_state)
           query_params = to_query_params(result)
           level = Zlib::BEST_COMPRESSION
-          expected = URI.encode(Base64.encode64(Zlib::Deflate.deflate(xml, level)[2..-5]).gsub(/\n/, ''))
+          expected = CGI.escape(Base64.encode64(Zlib::Deflate.deflate(xml, level)[2..-5]).gsub(/\n/, ''))
           expect(result).to include("#{query_string_parameter}=#{expected}")
           expect(query_params[query_string_parameter]).to eql(expected)
         end
@@ -37,8 +37,8 @@ RSpec.describe Saml::Kit::UrlBuilder do
         it 'includes the relay state' do
           result = subject.build(response, relay_state: relay_state)
           query_params = to_query_params(result)
-          expect(query_params['RelayState']).to eql(URI.encode(relay_state))
-          expect(result).to include("RelayState=#{URI.encode(relay_state)}")
+          expect(query_params['RelayState']).to eql(CGI.escape(relay_state))
+          expect(result).to include("RelayState=#{CGI.escape(relay_state)}")
         end
 
         it 'excludes the relay state' do
@@ -49,7 +49,7 @@ RSpec.describe Saml::Kit::UrlBuilder do
         it 'includes a signature' do
           result = subject.build(response, relay_state: relay_state)
           query_params = to_query_params(result)
-          expect(query_params['SigAlg']).to eql(URI.encode(Saml::Kit::Namespaces::SHA256))
+          expect(query_params['SigAlg']).to eql(CGI.escape(Saml::Kit::Namespaces::SHA256))
 
           payload = "#{query_string_parameter}=#{query_params[query_string_parameter]}"
           payload << "&RelayState=#{query_params['RelayState']}"
@@ -61,7 +61,7 @@ RSpec.describe Saml::Kit::UrlBuilder do
         it 'generates the signature correctly when the relay state is absent' do
           result = subject.build(response)
           query_params = to_query_params(result)
-          expect(query_params['SigAlg']).to eql(URI.encode(Saml::Kit::Namespaces::SHA256))
+          expect(query_params['SigAlg']).to eql(CGI.escape(Saml::Kit::Namespaces::SHA256))
 
           payload = "#{query_string_parameter}=#{query_params[query_string_parameter]}"
           payload << "&SigAlg=#{query_params['SigAlg']}"
