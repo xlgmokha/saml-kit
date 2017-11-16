@@ -5,7 +5,7 @@ module Saml
         @private_key = private_key
       end
 
-      def build(saml_document, binding: :http_redirect, relay_state: nil)
+      def build(saml_document, relay_state: nil)
         payload = build_payload(saml_document, relay_state)
         "#{saml_document.destination}?#{payload}&Signature=#{signature_for(payload)}"
       end
