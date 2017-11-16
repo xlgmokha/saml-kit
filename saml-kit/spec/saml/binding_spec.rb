@@ -32,5 +32,10 @@ RSpec.describe Saml::Kit::Binding do
         expect(xml['AuthnRequest']['Signature']).to be_present
       end
     end
+
+    it 'ignores other bindings' do
+      subject = Saml::Kit::Binding.new(binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact', location: location)
+      expect(subject.serialize(Saml::Kit::AuthenticationRequest)).to be_empty
+    end
   end
 end

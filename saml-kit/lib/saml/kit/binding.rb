@@ -18,7 +18,7 @@ module Saml
           builder.destination = location
           document = builder.build
           [UrlBuilder.new.build(document, relay_state: relay_state), {}]
-        else
+        elsif post?
           builder = document_type::Builder.new(sign: true)
           builder.destination = location
           document = builder.build
@@ -27,11 +27,17 @@ module Saml
             'RelayState' => relay_state,
           }
           [location, saml_params]
+        else
+          []
         end
       end
 
       def http_redirect?
         binding == Namespaces::HTTP_REDIRECT
+      end
+
+      def post?
+        binding == Namespaces::POST
       end
 
       def to_h
