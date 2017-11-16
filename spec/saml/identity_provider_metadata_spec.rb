@@ -64,7 +64,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       ])
     end
     it do
-      expect(subject.single_sign_on_services).to match_array([
+      expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
         { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", location: "https://dev-989848.oktapreview.com/app/ciscodev843126_portal_1/exk8dx3jilpueVzpU0h7/sso/saml" },
         { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", location: "https://dev-989848.oktapreview.com/app/ciscodev843126_portal_1/exk8dx3jilpueVzpU0h7/sso/saml" },
       ])
@@ -101,7 +101,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       ])
     end
     it do
-      expect(subject.single_sign_on_services).to match_array([
+      expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
         { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", location: "https://www.example.com/adfs/ls/" },
         { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", location: "https://www.example.com/adfs/ls/" },
       ])
@@ -153,7 +153,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       ])
     end
     it do
-      expect(subject.single_sign_on_services).to match_array([
+      expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
         { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
         { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
       ])
@@ -232,9 +232,16 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       builder.build
     end
 
-    it 'returns the binding that matches the requested' do
-      expect(subject.single_sign_on_service_for(binding: :post)).to eql(post_url)
-      expect(subject.single_sign_on_service_for(binding: :http_redirect)).to eql(redirect_url)
+    it 'returns the POST binding' do
+      result = subject.single_sign_on_service_for(binding: :post)
+      expect(result.location).to eql(post_url)
+      expect(result.binding).to eql(Saml::Kit::Namespaces::POST)
+    end
+
+    it 'returns the HTTP_REDIRECT binding' do
+      result = subject.single_sign_on_service_for(binding: :http_redirect)
+      expect(result.location).to eql(redirect_url)
+      expect(result.binding).to eql(Saml::Kit::Namespaces::HTTP_REDIRECT)
     end
 
     it 'returns nil if the binding cannot be found' do
