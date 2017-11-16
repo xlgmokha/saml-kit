@@ -19,14 +19,13 @@ module Saml
       end
 
       def build_payload(saml_document, relay_state)
-        payload = {
+        {
           saml_document.query_string_parameter => Content.serialize(saml_document.to_xml),
           'RelayState' => relay_state,
           'SigAlg' => Saml::Kit::Namespaces::SHA256,
         }.map do |(key, value)|
-          value.present? ?  "#{key}=#{value}" : nil
+          value.present? ? "#{key}=#{CGI.escape(value)}" : nil
         end.compact.join('&')
-        payload = URI.encode(payload)
       end
     end
   end
