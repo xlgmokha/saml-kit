@@ -122,7 +122,17 @@ module Saml
 
       class << self
         def deserialize(saml_response)
-          new(Saml::Kit::Content.deserialize(saml_response))
+          xml = Saml::Kit::Content.deserialize(saml_response)
+          hash = Hash.from_xml(xml)
+          if hash['Response'].present?
+            new(xml)
+          else
+            LogoutResponse.new(xml)
+          end
+        rescue => error
+          Saml::Kit.logger.error(error)
+          Saml::Kit.logger.error(error.backtrace.join("\n"))
+          InvalidResponse.new(saml_response)
         end
       end
 
@@ -209,7 +219,7 @@ module Saml
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code
-        attr_accessor :issuer
+        attr_accessor :issuer, :sign, :destination
 
         def initialize(user, request)
           @user = user
@@ -220,6 +230,8 @@ module Saml
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
           @issuer = configuration.issuer
+          @destination = request.acs_url
+          @sign = want_assertions_signed
         end
 
         def want_assertions_signed
@@ -230,7 +242,7 @@ module Saml
         end
 
         def to_xml
-          Signature.sign(id, sign: want_assertions_signed) do |xml, signature|
+          Signature.sign(id, sign: sign) do |xml, signature|
             xml.Response response_options do
               xml.Issuer(issuer, xmlns: Namespaces::ASSERTION)
               signature.template(xml)
@@ -285,7 +297,7 @@ module Saml
             ID: id.present? ? "_#{id}" : nil,
             Version: version,
             IssueInstant: now.iso8601,
-            Destination: request.acs_url,
+            Destination: destination,
             Consent: Namespaces::UNSPECIFIED,
             InResponseTo: request.id,
             xmlns: Namespaces::PROTOCOL,

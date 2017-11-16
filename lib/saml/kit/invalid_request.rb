@@ -1,6 +1,6 @@
 module Saml
   module Kit
-    class InvalidRequest
+    class InvalidDocument
       include ActiveModel::Validations
       include XsdValidatable
       attr_reader :raw, :name
@@ -9,13 +9,25 @@ module Saml
         model.errors[:base] << model.error_message(:invalid)
       end
 
-      def initialize(raw)
+      def initialize(raw, name)
         @raw = raw
-        @name = "InvalidRequest"
       end
 
       def to_xml
         raw
+      end
+
+    end
+
+    class InvalidRequest < InvalidDocument
+      def initialize(raw)
+        super raw, "InvalidRequest"
+      end
+    end
+
+    class InvalidResponse < InvalidDocument
+      def initialize(raw)
+        super raw, "InvalidResponse"
       end
     end
   end
