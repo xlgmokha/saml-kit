@@ -24,8 +24,12 @@ RSpec.describe Saml::Kit::Binding do
         url, saml_params = subject.serialize(Saml::Kit::AuthenticationRequest, relay_state: relay_state)
 
         expect(url).to eql(location)
-        expect(saml_params['SAMLRequest']).to be_present
         expect(saml_params['RelayState']).to eql(relay_state)
+        expect(saml_params['SAMLRequest']).to be_present
+        xml = Hash.from_xml(Base64.decode64(saml_params['SAMLRequest']))
+        expect(xml['AuthnRequest']).to be_present
+        expect(xml['AuthnRequest']['Destination']).to eql(location)
+        expect(xml['AuthnRequest']['Signature']).to be_present
       end
     end
   end
