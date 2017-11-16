@@ -45,8 +45,8 @@ module Saml
         @xml_hash
       end
 
-      def serialize
-        Saml::Kit::Content.serialize(to_xml)
+      def serialize(compress: false)
+        Saml::Kit::Content.serialize(to_xml, compress: compress)
       end
 
       def to_xml

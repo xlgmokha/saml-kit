@@ -245,6 +245,15 @@ RSpec.describe Saml::Kit::Response do
       subject = described_class.new(xml)
 
       expected_value = Base64.strict_encode64(Zlib::Deflate.deflate(xml, 9)[2..-5])
+      expect(subject.serialize(compress: true)).to eql(expected_value)
+    end
+
+    it 'returns a base64 encoded document' do
+      builder = described_class::Builder.new(user, request)
+      xml = builder.to_xml
+      subject = described_class.new(xml)
+
+      expected_value = Base64.strict_encode64(xml)
       expect(subject.serialize).to eql(expected_value)
     end
   end
