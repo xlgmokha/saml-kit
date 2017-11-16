@@ -74,8 +74,8 @@ module Saml
         to_xml
       end
 
-      def serialize
-        Saml::Kit::Content.serialize(to_xml)
+      def serialize(compress: false)
+        Saml::Kit::Content.serialize(to_xml, compress: compress)
       end
 
       def response_for(user)

@@ -20,7 +20,7 @@ module Saml
 
       def build_payload(saml_document, relay_state)
         {
-          saml_document.query_string_parameter => Content.serialize(saml_document.to_xml),
+          saml_document.query_string_parameter => Content.serialize(saml_document.to_xml, compress: true),
           'RelayState' => relay_state,
           'SigAlg' => Saml::Kit::Namespaces::SHA256,
         }.map do |(key, value)|
