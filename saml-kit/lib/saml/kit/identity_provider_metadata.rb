@@ -15,19 +15,18 @@ module Saml
       def single_sign_on_services
         xpath = "/md:EntityDescriptor/md:#{name}/md:SingleSignOnService"
         find_all(xpath).map do |item|
-          {
+          Saml::Kit::Binding.new(
             binding: item.attribute("Binding").value,
             location: item.attribute("Location").value,
-          }
+          )
         end
       end
 
       def single_sign_on_service_for(binding:)
         binding = Saml::Kit::Namespaces.binding_for(binding)
-        result = single_sign_on_services.find do |item|
-          item[:binding] == binding
+        single_sign_on_services.find do |item|
+          item.binding?(binding)
         end
-        return result[:location] if result
       end
 
       def attributes

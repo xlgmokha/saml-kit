@@ -14,6 +14,7 @@ require "xmldsig"
 
 require "saml/kit/xsd_validatable"
 require "saml/kit/authentication_request"
+require "saml/kit/binding"
 require "saml/kit/configuration"
 require "saml/kit/content"
 require "saml/kit/default_registry"
