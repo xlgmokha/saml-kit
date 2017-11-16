@@ -62,6 +62,14 @@ RSpec.describe Saml::Kit::Binding do
         expect(xml['LogoutResponse']['Destination']).to eql(location)
         expect(xml['LogoutResponse']['Signature']).to be_present
       end
+
+      it 'excludes the RelayState when blank' do
+        builder = Saml::Kit::AuthenticationRequest::Builder.new
+        url, saml_params = subject.serialize(builder)
+
+        expect(url).to eql(location)
+        expect(saml_params.keys).to_not include('RelayState')
+      end
     end
 
     it 'ignores other bindings' do
