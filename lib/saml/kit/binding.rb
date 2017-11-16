@@ -12,18 +12,18 @@ module Saml
         binding == other
       end
 
-      def serialize(document_type, relay_state: nil)
+      def serialize(builder, relay_state: nil)
         if http_redirect?
-          builder = document_type::Builder.new(sign: false)
+          builder.sign = false
           builder.destination = location
           document = builder.build
           [UrlBuilder.new.build(document, relay_state: relay_state), {}]
         elsif post?
-          builder = document_type::Builder.new(sign: true)
+          builder.sign = true
           builder.destination = location
           document = builder.build
           saml_params = {
-            'SAMLRequest' => Base64.strict_encode64(document.to_xml),
+            document.query_string_parameter => Base64.strict_encode64(document.to_xml),
             'RelayState' => relay_state,
           }
           [location, saml_params]

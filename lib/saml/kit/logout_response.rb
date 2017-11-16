@@ -54,7 +54,7 @@ module Saml
       end
 
       class Builder
-        attr_accessor :id, :issuer, :version, :status_code, :sign, :now
+        attr_accessor :id, :issuer, :version, :status_code, :sign, :now, :destination
         attr_reader :request
 
         def initialize(user, request, configuration: Saml::Kit.configuration, sign: true)
@@ -92,7 +92,7 @@ module Saml
             ID: "_#{id}",
             Version: "2.0",
             IssueInstant: now.utc.iso8601,
-            Destination: "",
+            Destination: destination,
             InResponseTo: request.id,
           }
         end
