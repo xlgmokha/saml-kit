@@ -121,6 +121,12 @@ RSpec.describe Saml::Kit::Binding do
         result = subject.deserialize({ 'SAMLResponse' => "nonsense" })
         expect(result).to be_instance_of(Saml::Kit::InvalidResponse)
       end
+
+      it 'raises an error when a saml parameter is not specified' do
+        expect do
+          subject.deserialize({ })
+        end.to raise_error(ArgumentError)
+      end
     end
   end
 end
