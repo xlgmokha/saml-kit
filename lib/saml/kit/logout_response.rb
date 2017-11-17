@@ -49,8 +49,18 @@ module Saml
         Saml::Kit::Content.serialize(to_xml, compress: compress)
       end
 
+      def provider
+        registry.metadata_for(issuer)
+      end
+
       def to_xml
         content
+      end
+
+      private
+
+      def registry
+        Saml::Kit.configuration.registry
       end
 
       class Builder

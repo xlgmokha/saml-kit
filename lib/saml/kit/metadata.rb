@@ -91,6 +91,14 @@ module Saml
         to_xml
       end
 
+      def verify(algorithm, signature, data)
+        signing_certificates.find do |cert|
+          x509 = OpenSSL::X509::Certificate.new(Base64.decode64(cert[:text]))
+          public_key = x509.public_key
+          public_key.verify(algorithm, signature, data)
+        end
+      end
+
       def self.from(content)
         hash = Hash.from_xml(content)
         entity_descriptor = hash["EntityDescriptor"]

@@ -6,7 +6,7 @@ module Saml
       end
 
       def build(saml_document, relay_state: nil)
-        payload = build_payload(saml_document, relay_state)
+        payload = canonicalize(saml_document, relay_state)
         "#{saml_document.destination}?#{payload}&Signature=#{signature_for(payload)}"
       end
 
@@ -18,7 +18,7 @@ module Saml
         Base64.strict_encode64(private_key.sign(OpenSSL::Digest::SHA256.new, payload))
       end
 
-      def build_payload(saml_document, relay_state)
+      def canonicalize(saml_document, relay_state)
         {
           saml_document.query_string_parameter => Content.serialize(saml_document.to_xml, compress: true),
           'RelayState' => relay_state,

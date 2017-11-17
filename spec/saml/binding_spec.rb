@@ -82,6 +82,13 @@ RSpec.describe Saml::Kit::Binding do
   describe "#deserialize" do
     describe "HTTP-Redirect binding" do
       let(:subject) { Saml::Kit::Binding.new(binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location) }
+      let(:issuer) { FFaker::Internet.http_url }
+      let(:provider) { Saml::Kit::IdentityProviderMetadata::Builder.new.build }
+
+      before :each do
+        allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
+        allow(Saml::Kit.configuration).to receive(:issuer).and_return(issuer)
+      end
 
       it 'deserializes the SAMLRequest to an AuthnRequest' do
         url, _ = subject.serialize(Saml::Kit::AuthenticationRequest::Builder.new)
@@ -103,7 +110,7 @@ RSpec.describe Saml::Kit::Binding do
 
       it 'deserializes the SAMLResponse to a Response' do
         user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
-        request = double(:request, id: SecureRandom.uuid, provider: nil, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url)
+        request = double(:request, id: SecureRandom.uuid, provider: nil, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: issuer)
         url, _ = subject.serialize(Saml::Kit::Response::Builder.new(user, request))
         result = subject.deserialize(query_params_from(url))
         expect(result).to be_instance_of(Saml::Kit::Response)
@@ -111,7 +118,7 @@ RSpec.describe Saml::Kit::Binding do
 
       it 'deserializes the SAMLResponse to a LogoutResponse' do
         user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
-        request = double(:request, id: SecureRandom.uuid, provider: nil, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url)
+        request = double(:request, id: SecureRandom.uuid, provider: provider, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url)
         url, _ = subject.serialize(Saml::Kit::LogoutResponse::Builder.new(user, request))
         result = subject.deserialize(query_params_from(url))
         expect(result).to be_instance_of(Saml::Kit::LogoutResponse)
@@ -126,6 +133,15 @@ RSpec.describe Saml::Kit::Binding do
         expect do
           subject.deserialize({ })
         end.to raise_error(ArgumentError)
+      end
+
+      it 'raises an error when the signature does not match' do
+        url, _ = subject.serialize(Saml::Kit::AuthenticationRequest::Builder.new)
+        query_params = query_params_from(url)
+        query_params['Signature'] = 'invalid'
+        expect do
+          subject.deserialize(query_params)
+        end.to raise_error(/Invalid Signature/)
       end
     end
   end
