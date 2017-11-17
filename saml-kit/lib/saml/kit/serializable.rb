@@ -1,6 +1,6 @@
 module Saml
   module Kit
-    module Content
+    module Serializable
       def decode(value)
         Base64.decode64(value)
       end
