@@ -1,6 +1,12 @@
 module Saml
   module Kit
     class HttpPostBinding < Binding
+      include Content
+
+      def initialize(location:)
+        super(binding: Saml::Kit::Namespaces::HTTP_POST, location: location)
+      end
+
       def serialize(builder, relay_state: nil)
         builder.sign = true
         builder.destination = location
@@ -13,8 +19,8 @@ module Saml
       end
 
       def deserialize(params)
-        saml_param = saml_param_from(params)
-        Saml::Kit::Document.to_saml_document(saml_param)
+        xml = decode(saml_param_from(params))
+        Saml::Kit::Document.to_saml_document(xml)
       end
     end
   end

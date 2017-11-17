@@ -1,6 +1,11 @@
 module Saml
   module Kit
     class HttpRedirectBinding < Binding
+      include Content
+      def initialize(location:)
+        super(binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location)
+      end
+
       def serialize(builder, relay_state: nil)
         builder.sign = false
         builder.destination = location
@@ -17,8 +22,8 @@ module Saml
       private
 
       def deserialize_document_from!(params)
-        saml_param = saml_param_from(params)
-        Saml::Kit::Document.to_saml_document(CGI.unescape(saml_param))
+        xml = inflate(decode(CGI.unescape(saml_param_from(params))))
+        Saml::Kit::Document.to_saml_document(xml)
       end
 
       def ensure_valid_signature!(params, document)
