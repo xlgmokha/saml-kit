@@ -1,12 +1,8 @@
 module Saml
   module Kit
-    class LogoutResponse
-      attr_reader :content, :name
-
+    class LogoutResponse < Document
       def initialize(xml)
-        @content = xml
-        @name = 'LogoutResponse'
-        @xml_hash = Hash.from_xml(xml)
+        super(xml, name: 'LogoutResponse')
       end
 
       def query_string_parameter
@@ -41,16 +37,8 @@ module Saml
         to_h[name]['Destination']
       end
 
-      def to_h
-        @xml_hash
-      end
-
       def provider
         registry.metadata_for(issuer)
-      end
-
-      def to_xml
-        content
       end
 
       private

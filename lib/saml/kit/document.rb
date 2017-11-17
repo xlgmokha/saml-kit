@@ -18,7 +18,7 @@ module Saml
       end
 
       def to_xml
-        @content
+        content
       end
 
       def to_s
