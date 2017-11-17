@@ -34,9 +34,22 @@ class SessionsController < ApplicationController
   end
 
   def load_saml_request(raw_saml_request = session[:SAMLRequest] || params[:SAMLRequest])
-    @saml_request = Saml::Kit::Request.deserialize(raw_saml_request)
+    @saml_request = binding_for(request).deserialize(params)
+    #@saml_request = Saml::Kit::Request.deserialize(raw_saml_request)
     if @saml_request.invalid?
       render_error(:forbidden, model: @saml_request)
+    end
+  end
+
+  def idp
+    Idp.default(request)
+  end
+
+  def binding_for(request)
+    if request.post?
+      idp.single_sign_on_service_for(binding: :post)
+    else
+      idp.single_sign_on_service_for(binding: :http_redirect)
     end
   end
 end
