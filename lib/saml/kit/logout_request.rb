@@ -1,9 +1,6 @@
 module Saml
   module Kit
-    class LogoutRequest
-      PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
-      include XsdValidatable
-      include ActiveModel::Validations
+    class LogoutRequest < Document
       validates_presence_of :content
       validates_presence_of :single_logout_service, if: :logout?
       validate :must_be_request
@@ -11,12 +8,8 @@ module Saml
       validate :must_be_registered
       validate :must_match_xsd
 
-      attr_reader :content, :name
-
       def initialize(xml)
-        @content = xml
-        @name = "LogoutRequest"
-        @xml_hash = Hash.from_xml(xml)
+        super(xml, name: "LogoutRequest")
       end
 
       def query_string_parameter
@@ -53,14 +46,6 @@ module Saml
         return urls.first[:location] if urls.any?
       end
 
-      def to_h
-        @xml_hash
-      end
-
-      def to_xml
-        @content
-      end
-
       def trusted?
         return false if provider.nil?
         return false unless signed?
@@ -83,10 +68,6 @@ module Saml
 
       def signed?
         to_h[name]['Signature'].present?
-      end
-
-      def to_s
-        to_xml
       end
 
       def response_for(user)
