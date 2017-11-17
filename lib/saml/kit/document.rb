@@ -10,7 +10,7 @@ module Saml
       def initialize(xml, name:)
         @content = xml
         @name = name
-        @xml_hash = Hash.from_xml(xml)
+        @xml_hash = Hash.from_xml(xml) || {}
       end
 
       def to_h

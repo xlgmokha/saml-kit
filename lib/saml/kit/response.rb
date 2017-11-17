@@ -1,11 +1,7 @@
 module Saml
   module Kit
-    class Response
-      PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
-      include ActiveModel::Validations
-      include XsdValidatable
-
-      attr_reader :content, :name, :request_id
+    class Response < Document
+      attr_reader :request_id
       validates_presence_of :content
       validates_presence_of :id
       validate :must_have_valid_signature
@@ -20,10 +16,8 @@ module Saml
       validate :must_match_issuer
 
       def initialize(xml, request_id: nil)
-        @content = xml
-        @xml_hash = Hash.from_xml(xml) || {}
-        @name = 'Response'
         @request_id = request_id
+        super(xml, name: "Response")
       end
 
       def query_string_parameter
@@ -66,14 +60,6 @@ module Saml
 
       def version
         to_h.fetch(name, {}).fetch('Version', {})
-      end
-
-      def to_xml
-        content
-      end
-
-      def to_h
-        @xml_hash
       end
 
       def certificate
