@@ -60,7 +60,7 @@ module Saml
         return if params['Signature'].blank? || params['SigAlg'].blank?
 
         signature = Base64.decode64(params['Signature'])
-        canonical_form = ['SAMLRequest', 'RelayState', 'SigAlg'].map do |key|
+        canonical_form = ['SAMLRequest', 'SAMLResponse', 'RelayState', 'SigAlg'].map do |key|
           value = params[key]
           value.present? ? "#{key}=#{value}" : nil
         end.compact.join('&')
