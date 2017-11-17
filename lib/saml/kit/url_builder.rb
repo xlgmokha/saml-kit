@@ -20,12 +20,25 @@ module Saml
 
       def canonicalize(saml_document, relay_state)
         {
-          saml_document.query_string_parameter => Content.serialize(saml_document.to_xml, compress: true),
+          saml_document.query_string_parameter => serialize(saml_document.to_xml),
           'RelayState' => relay_state,
           'SigAlg' => Saml::Kit::Namespaces::SHA256,
         }.map do |(key, value)|
           value.present? ? "#{key}=#{CGI.escape(value)}" : nil
         end.compact.join('&')
+      end
+
+      def serialize(value)
+        encode(deflate(value))
+      end
+
+      # drop header and checksum as per spec.
+      def deflate(value, level: Zlib::BEST_COMPRESSION)
+        Zlib::Deflate.deflate(value, level)[2..-5]
+      end
+
+      def encode(value)
+        Base64.strict_encode64(value)
       end
     end
   end
