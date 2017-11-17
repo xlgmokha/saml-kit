@@ -6,7 +6,7 @@ module Saml
       end
 
       def initialize(xml)
-        super(xml, "InvalidDocument")
+        super(xml, name: "InvalidDocument")
       end
     end
   end
