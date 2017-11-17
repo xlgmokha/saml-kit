@@ -33,13 +33,9 @@ module Saml
       end
 
       def deserialize(params)
-        if params['SAMLRequest'].present?
-          Saml::Kit::Request.deserialize(CGI.unescape(params['SAMLRequest']))
-        elsif params['SAMLResponse'].present?
-          Saml::Kit::Response.deserialize(CGI.unescape(params['SAMLResponse']))
-        else
-          raise ArgumentError.new("SAMLRequest or SAMLResponse parameter is required.")
-        end
+        document = deserialize_document_from!(params)
+        ensure_valid_signature!(params, document)
+        document
       end
 
       def http_redirect?
@@ -52,6 +48,46 @@ module Saml
 
       def to_h
         { binding: binding, location: location }
+      end
+
+      private
+
+      def ensure_valid_signature!(params, document)
+        return if params['Signature'].blank? || params['SigAlg'].blank?
+
+        signature = CGI.unescape(Base64.decode64(params['Signature']))
+        algorithm_uri = params['SigAlg']
+
+        canonical_form = ['SAMLRequest', 'RelayState', 'SigAlg'].map do |key|
+          value = params[key]
+          value.present? ? "#{key}=#{value}" : nil
+        end.compact.join('&')
+
+        valid = document.provider.verify(algorithm_for(algorithm_uri), signature, canonical_form)
+        raise ArgumentError.new("Invalid Signature") unless valid
+      end
+
+      def deserialize_document_from!(params)
+        if params['SAMLRequest'].present?
+          Saml::Kit::Request.deserialize(CGI.unescape(params['SAMLRequest']))
+        elsif params['SAMLResponse'].present?
+          Saml::Kit::Response.deserialize(CGI.unescape(params['SAMLResponse']))
+        else
+          raise ArgumentError.new("SAMLRequest or SAMLResponse parameter is required.")
+        end
+      end
+
+      def algorithm_for(algorithm)
+        case algorithm =~ /(rsa-)?sha(.*?)$/i && $2.to_i
+        when 256
+          OpenSSL::Digest::SHA256.new
+        when 384
+          OpenSSL::Digest::SHA384.new
+        when 512
+          OpenSSL::Digest::SHA512.new
+        else
+          OpenSSL::Digest::SHA1.new
+        end
       end
     end
   end
