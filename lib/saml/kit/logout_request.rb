@@ -89,10 +89,6 @@ module Saml
         to_xml
       end
 
-      def serialize
-        Saml::Kit::Content.serialize(to_xml)
-      end
-
       def response_for(user)
         LogoutResponse::Builder.new(user, self).build
       end

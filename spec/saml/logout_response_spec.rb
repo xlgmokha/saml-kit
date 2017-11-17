@@ -23,23 +23,4 @@ RSpec.describe Saml::Kit::LogoutResponse do
       end
     end
   end
-
-  describe "#serialize" do
-    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { }) }
-    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil) }
-    let(:acs_url) { FFaker::Internet.http_url }
-    let(:issuer) { FFaker::Internet.http_url }
-    let(:builder) { described_class::Builder.new(user, request) }
-    subject { builder.build }
-
-    it 'returns a compressed and base64 encoded document' do
-      expected_value = Base64.strict_encode64(Zlib::Deflate.deflate(subject.to_xml, 9)[2..-5])
-      expect(subject.serialize(compress: true)).to eql(expected_value)
-    end
-
-    it 'returns a base64 encoded document' do
-      expected_value = Base64.strict_encode64(subject.to_xml)
-      expect(subject.serialize).to eql(expected_value)
-    end
-  end
 end

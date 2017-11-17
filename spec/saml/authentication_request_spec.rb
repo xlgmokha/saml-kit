@@ -176,18 +176,4 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       expect(subject.acs_url).to eql(acs_url)
     end
   end
-
-  describe "#serialize" do
-    subject { described_class::Builder.new.build }
-
-    it 'returns a compressed and base64 encoded document' do
-      expected_value = Base64.strict_encode64(Zlib::Deflate.deflate(subject.to_xml, 9)[2..-5])
-      expect(subject.serialize(compress: true)).to eql(expected_value)
-    end
-
-    it 'returns a base64 encoded document' do
-      expected_value = Base64.strict_encode64(subject.to_xml)
-      expect(subject.serialize).to eql(expected_value)
-    end
-  end
 end

@@ -39,11 +39,11 @@ module Saml
           document
         elsif post?
           if params['SAMLRequest'].present?
-            Saml::Kit::Request.deserialize(params['SAMLRequest'])
+            deserialize_request(params['SAMLRequest'])
           elsif params['SAMLResponse'].present?
-            Saml::Kit::Response.deserialize(params['SAMLResponse'])
+            deserialize_response(params['SAMLResponse'])
           else
-          raise ArgumentError.new("Missing SAMLRequest or SAMLResponse")
+            raise ArgumentError.new("Missing SAMLRequest or SAMLResponse")
           end
         else
           raise ArgumentError.new("Unsupported binding")
@@ -79,9 +79,9 @@ module Saml
 
       def deserialize_document_from!(params)
         if params['SAMLRequest'].present?
-          Saml::Kit::Request.deserialize(CGI.unescape(params['SAMLRequest']))
+          deserialize_request(CGI.unescape(params['SAMLRequest']))
         elsif params['SAMLResponse'].present?
-          Saml::Kit::Response.deserialize(CGI.unescape(params['SAMLResponse']))
+          deserialize_response(CGI.unescape(params['SAMLResponse']))
         else
           raise ArgumentError.new("SAMLRequest or SAMLResponse parameter is required.")
         end
@@ -98,6 +98,34 @@ module Saml
         else
           OpenSSL::Digest::SHA1.new
         end
+      end
+
+      def deserialize_request(raw_request)
+        xml = Saml::Kit::Content.deserialize(raw_request)
+        hash = Hash.from_xml(xml)
+        if hash['AuthnRequest'].present?
+          AuthenticationRequest.new(xml)
+        else
+          LogoutRequest.new(xml)
+        end
+      rescue => error
+        Saml::Kit.logger.error(error)
+        Saml::Kit.logger.error(error.backtrace.join("\n"))
+        InvalidRequest.new(raw_request)
+      end
+
+      def deserialize_response(saml_response)
+        xml = Saml::Kit::Content.deserialize(saml_response)
+        hash = Hash.from_xml(xml)
+        if hash['Response'].present?
+          Response.new(xml)
+        else
+          LogoutResponse.new(xml)
+        end
+      rescue => error
+        Saml::Kit.logger.error(error)
+        Saml::Kit.logger.error(error.backtrace.join("\n"))
+        InvalidResponse.new(saml_response)
       end
     end
   end

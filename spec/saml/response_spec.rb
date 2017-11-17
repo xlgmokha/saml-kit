@@ -75,30 +75,6 @@ RSpec.describe Saml::Kit::Response do
     end
   end
 
-  describe ".deserialize" do
-    subject { described_class }
-    let(:raw_response) { IO.read('spec/fixtures/encoded_response.txt') }
-
-    it 'decodes the response to the raw xml' do
-      result = Hash.from_xml(subject.deserialize(raw_response).to_xml)
-      expect(result['Response']['ID']).to eql('_75358cd9-f357-4b2d-999f-f53382ba8263')
-      expect(result['Response']['Version']).to eql('2.0')
-      expect(result['Response']['IssueInstant']).to eql("2017-10-22T23:36:44Z")
-      expect(result['Response']['Destination']).to eql('http://localhost:4000/session')
-      expect(result['Response']['Issuer']).to eql('proof.dev')
-      expect(result['Response']['Status']['StatusCode']['Value']).to eql('urn:oasis:names:tc:SAML:2.0:status:Success')
-      expect(result['Response']['Assertion']['ID']).to eql("_78cacf76-243e-4509-9ace-d1985353b3fe")
-      expect(result['Response']['Assertion']['IssueInstant']).to eql("2017-10-22T23:36:44Z")
-      expect(result['Response']['Assertion']['Issuer']).to eql("proof.dev")
-      expect(result['Response']['Assertion']['Subject']['NameID']).to eql("ea64c235-e18d-4b9a-8672-06ef84dabdec")
-      expect(result['Response']['Assertion']['Conditions']['NotBefore']).to eql("2017-10-22T23:36:39Z")
-      expect(result['Response']['Assertion']['Conditions']['NotOnOrAfter']).to eql("2017-10-23T02:36:44Z")
-      expect(result['Response']['Assertion']['Conditions']['AudienceRestriction']['Audience']).to eql('airport.dev')
-      expect(result['Response']['Assertion']['AttributeStatement']['Attribute'][0]['Name']).to eql('id')
-      expect(result['Response']['Assertion']['AttributeStatement']['Attribute'][0]['AttributeValue']).to eql("ea64c235-e18d-4b9a-8672-06ef84dabdec")
-    end
-  end
-
   describe "#valid?" do
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
@@ -230,31 +206,6 @@ RSpec.describe Saml::Kit::Response do
 
       expect(subject).to be_invalid
       expect(subject.errors[:audience]).to be_present
-    end
-  end
-
-  describe "#serialize" do
-    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { }) }
-    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil) }
-    let(:acs_url) { FFaker::Internet.http_url }
-    let(:issuer) { FFaker::Internet.http_url }
-
-    it 'returns a compressed and base64 encoded document' do
-      builder = described_class::Builder.new(user, request)
-      xml = builder.to_xml
-      subject = described_class.new(xml)
-
-      expected_value = Base64.strict_encode64(Zlib::Deflate.deflate(xml, 9)[2..-5])
-      expect(subject.serialize(compress: true)).to eql(expected_value)
-    end
-
-    it 'returns a base64 encoded document' do
-      builder = described_class::Builder.new(user, request)
-      xml = builder.to_xml
-      subject = described_class.new(xml)
-
-      expected_value = Base64.strict_encode64(xml)
-      expect(subject.serialize).to eql(expected_value)
     end
   end
 end
