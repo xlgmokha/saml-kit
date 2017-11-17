@@ -7,12 +7,13 @@ module Saml
       BEARER = "urn:oasis:names:tc:SAML:2.0:cm:bearer"
       EMAIL_ADDRESS = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
       ENVELOPED_SIG = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
+      HTTP_ARTIFACT = 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact'
+      HTTP_POST = POST = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
       HTTP_REDIRECT = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
       METADATA = "urn:oasis:names:tc:SAML:2.0:metadata"
       PASSWORD = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password"
       PASSWORD_PROTECTED = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
       PERSISTENT = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
-      POST = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
       PROTOCOL = "urn:oasis:names:tc:SAML:2.0:protocol"
       REQUESTER_ERROR = "urn:oasis:names:tc:SAML:2.0:status:Requester"
       RESPONDER_ERROR = "urn:oasis:names:tc:SAML:2.0:status:Responder"
@@ -33,7 +34,7 @@ module Saml
 
       def self.binding_for(binding)
         if :post == binding
-          Namespaces::POST
+          Namespaces::HTTP_POST
         elsif :http_redirect == binding
           Namespaces::HTTP_REDIRECT
         else
