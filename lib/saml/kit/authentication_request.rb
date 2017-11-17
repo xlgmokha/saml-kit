@@ -1,10 +1,6 @@
 module Saml
   module Kit
-    class AuthenticationRequest
-      PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
-      include XsdValidatable
-      include ActiveModel::Validations
-
+    class AuthenticationRequest < Document
       validates_presence_of :content
       validates_presence_of :acs_url, if: :login_request?
       validate :must_be_request
@@ -12,12 +8,8 @@ module Saml
       validate :must_be_registered
       validate :must_match_xsd
 
-      attr_reader :content, :name
-
       def initialize(xml)
-        @content = xml
-        @name = "AuthnRequest"
-        @hash = Hash.from_xml(@content)
+        super(xml, name: "AuthnRequest")
       end
 
       def query_string_parameter
@@ -60,18 +52,6 @@ module Saml
 
       def signed?
         to_h[name]['Signature'].present?
-      end
-
-      def to_h
-        @hash
-      end
-
-      def to_xml
-        @content
-      end
-
-      def to_s
-        to_xml
       end
 
       def response_for(user)
@@ -121,7 +101,7 @@ module Saml
       end
 
       def must_be_request
-        return if @hash.nil?
+        return if to_h.nil?
 
         errors[:base] << error_message(:invalid) unless login_request?
       end
@@ -132,7 +112,7 @@ module Saml
 
       def login_request?
         return false if to_xml.blank?
-        @hash[name].present?
+        to_h[name].present?
       end
 
       class Builder
