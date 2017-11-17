@@ -2,10 +2,10 @@ require 'spec_helper'
 
 RSpec.describe Saml::Kit::HttpRedirectBinding do
   let(:location) { FFaker::Internet.http_url }
+  subject { Saml::Kit::HttpRedirectBinding.new(location: location) }
 
   describe "#serialize" do
     let(:relay_state) { "ECHO" }
-    let(:subject) { Saml::Kit::HttpRedirectBinding.new(binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location) }
 
     it 'encodes the request using the HTTP-Redirect encoding' do
       builder = Saml::Kit::AuthenticationRequest::Builder.new
@@ -18,7 +18,6 @@ RSpec.describe Saml::Kit::HttpRedirectBinding do
   end
 
   describe "#deserialize" do
-    let(:subject) { Saml::Kit::HttpRedirectBinding.new(binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location) }
     let(:issuer) { FFaker::Internet.http_url }
     let(:provider) { Saml::Kit::IdentityProviderMetadata::Builder.new.build }
 
@@ -41,8 +40,9 @@ RSpec.describe Saml::Kit::HttpRedirectBinding do
     end
 
     it 'returns an invalid request when the SAMLRequest is invalid' do
-      result = subject.deserialize({ 'SAMLRequest' => "nonsense" })
-      expect(result).to be_instance_of(Saml::Kit::InvalidDocument)
+      expect do
+        subject.deserialize({ 'SAMLRequest' => "nonsense" })
+      end.to raise_error(Zlib::DataError)
     end
 
     it 'deserializes the SAMLResponse to a Response' do
@@ -61,9 +61,10 @@ RSpec.describe Saml::Kit::HttpRedirectBinding do
       expect(result).to be_instance_of(Saml::Kit::LogoutResponse)
     end
 
-    it 'returns an invalid response when the SAMLResponse is invalid' do
-      result = subject.deserialize({ 'SAMLResponse' => "nonsense" })
-      expect(result).to be_instance_of(Saml::Kit::InvalidDocument)
+    it 'raise an error when the content is invalid' do
+      expect do
+        subject.deserialize({ 'SAMLResponse' => "nonsense" })
+      end.to raise_error(Zlib::DataError)
     end
 
     it 'raises an error when a saml parameter is not specified' do

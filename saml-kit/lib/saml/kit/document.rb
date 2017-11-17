@@ -2,8 +2,7 @@
 module Saml
   module Kit
     class Document
-      def self.to_saml_document(saml)
-        xml = Saml::Kit::Content.deserialize(saml)
+      def self.to_saml_document(xml)
         hash = Hash.from_xml(xml)
         if hash['Response'].present?
           Response.new(xml)
@@ -16,7 +15,7 @@ module Saml
         end
       rescue => error
         Saml::Kit.logger.error(error)
-        InvalidDocument.new(saml)
+        InvalidDocument.new(xml)
       end
     end
   end
