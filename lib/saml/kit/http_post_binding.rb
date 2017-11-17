@@ -1,7 +1,7 @@
 module Saml
   module Kit
     class HttpPostBinding < Binding
-      include Content
+      include Serializable
 
       def initialize(location:)
         super(binding: Saml::Kit::Namespaces::HTTP_POST, location: location)

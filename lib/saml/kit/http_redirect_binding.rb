@@ -1,7 +1,8 @@
 module Saml
   module Kit
     class HttpRedirectBinding < Binding
-      include Content
+      include Serializable
+
       def initialize(location:)
         super(binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location)
       end

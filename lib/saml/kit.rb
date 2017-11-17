@@ -12,11 +12,12 @@ require "nokogiri"
 require "securerandom"
 require "xmldsig"
 
+require "saml/kit/serializable"
 require "saml/kit/xsd_validatable"
+
 require "saml/kit/authentication_request"
 require "saml/kit/binding"
 require "saml/kit/configuration"
-require "saml/kit/content"
 require "saml/kit/document"
 require "saml/kit/default_registry"
 require "saml/kit/fingerprint"
