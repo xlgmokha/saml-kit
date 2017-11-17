@@ -1,21 +1,12 @@
 module Saml
   module Kit
-    class InvalidDocument
-      include ActiveModel::Validations
-      include XsdValidatable
-      attr_reader :raw, :name
-
+    class InvalidDocument < Document
       validate do |model|
         model.errors[:base] << model.error_message(:invalid)
       end
 
-      def initialize(raw)
-        @raw = raw
-        @name = "InvalidDocument"
-      end
-
-      def to_xml
-        raw
+      def initialize(xml)
+        super(xml, "InvalidDocument")
       end
     end
   end
