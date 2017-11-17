@@ -17,13 +17,8 @@ module Saml
       private
 
       def deserialize_document_from!(params)
-        if params['SAMLRequest'].present?
-          deserialize_request(CGI.unescape(params['SAMLRequest']))
-        elsif params['SAMLResponse'].present?
-          deserialize_response(CGI.unescape(params['SAMLResponse']))
-        else
-          raise ArgumentError.new("SAMLRequest or SAMLResponse parameter is required.")
-        end
+        saml_param = saml_param_from(params)
+        Saml::Kit::Document.to_saml_document(CGI.unescape(saml_param))
       end
 
       def ensure_valid_signature!(params, document)
@@ -38,7 +33,6 @@ module Saml
         valid = document.provider.verify(algorithm_for(params['SigAlg']), signature, canonical_form)
         raise ArgumentError.new("Invalid Signature") unless valid
       end
-
 
       def algorithm_for(algorithm)
         case algorithm =~ /(rsa-)?sha(.*?)$/i && $2.to_i

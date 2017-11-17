@@ -42,7 +42,7 @@ RSpec.describe Saml::Kit::HttpRedirectBinding do
 
     it 'returns an invalid request when the SAMLRequest is invalid' do
       result = subject.deserialize({ 'SAMLRequest' => "nonsense" })
-      expect(result).to be_instance_of(Saml::Kit::InvalidRequest)
+      expect(result).to be_instance_of(Saml::Kit::InvalidDocument)
     end
 
     it 'deserializes the SAMLResponse to a Response' do
@@ -63,7 +63,7 @@ RSpec.describe Saml::Kit::HttpRedirectBinding do
 
     it 'returns an invalid response when the SAMLResponse is invalid' do
       result = subject.deserialize({ 'SAMLResponse' => "nonsense" })
-      expect(result).to be_instance_of(Saml::Kit::InvalidResponse)
+      expect(result).to be_instance_of(Saml::Kit::InvalidDocument)
     end
 
     it 'raises an error when a saml parameter is not specified' do

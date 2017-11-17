@@ -13,13 +13,8 @@ module Saml
       end
 
       def deserialize(params)
-        if params['SAMLRequest'].present?
-          deserialize_request(params['SAMLRequest'])
-        elsif params['SAMLResponse'].present?
-          deserialize_response(params['SAMLResponse'])
-        else
-          raise ArgumentError.new("Missing SAMLRequest or SAMLResponse")
-        end
+        saml_param = saml_param_from(params)
+        Saml::Kit::Document.to_saml_document(saml_param)
       end
     end
   end

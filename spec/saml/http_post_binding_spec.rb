@@ -88,7 +88,7 @@ RSpec.describe Saml::Kit::HttpPostBinding do
     it 'raises an error when SAMLRequest and SAMLResponse are missing' do
       expect do
         subject.deserialize({})
-      end.to raise_error(/Missing SAMLRequest or SAMLResponse/)
+      end.to raise_error(/SAMLRequest or SAMLResponse parameter is required/)
     end
 
     [
