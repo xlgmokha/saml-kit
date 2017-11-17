@@ -7,7 +7,7 @@ RSpec.describe Saml::Kit::Binding do
     let(:relay_state) { "ECHO" }
 
     describe "HTTP-REDIRECT BINDING" do
-      let(:subject) { Saml::Kit::Binding.new(binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location) }
+      let(:subject) { Saml::Kit::HttpRedirectBinding.new(binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location) }
 
       it 'encodes the request using the HTTP-Redirect encoding' do
         builder = Saml::Kit::AuthenticationRequest::Builder.new
@@ -20,7 +20,7 @@ RSpec.describe Saml::Kit::Binding do
     end
 
     describe "HTTP-POST Binding" do
-      let(:subject) { Saml::Kit::Binding.new(binding: Saml::Kit::Namespaces::POST, location: location) }
+      let(:subject) { Saml::Kit::HttpPostBinding.new(binding: Saml::Kit::Namespaces::POST, location: location) }
 
       it 'encodes the request using the HTTP-POST encoding for a AuthenticationRequest' do
         builder = Saml::Kit::AuthenticationRequest::Builder.new
@@ -81,7 +81,7 @@ RSpec.describe Saml::Kit::Binding do
 
   describe "#deserialize" do
     describe "HTTP-Redirect binding" do
-      let(:subject) { Saml::Kit::Binding.new(binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location) }
+      let(:subject) { Saml::Kit::HttpRedirectBinding.new(binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location) }
       let(:issuer) { FFaker::Internet.http_url }
       let(:provider) { Saml::Kit::IdentityProviderMetadata::Builder.new.build }
 
@@ -146,7 +146,7 @@ RSpec.describe Saml::Kit::Binding do
     end
 
     describe "HTTP Post binding" do
-      let(:subject) { Saml::Kit::Binding.new(binding: Saml::Kit::Namespaces::POST, location: location) }
+      let(:subject) { Saml::Kit::HttpPostBinding.new(binding: Saml::Kit::Namespaces::POST, location: location) }
 
       it 'deserializes to an AuthnRequest' do
         builder = Saml::Kit::AuthenticationRequest::Builder.new

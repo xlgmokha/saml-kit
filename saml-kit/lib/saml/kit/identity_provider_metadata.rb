@@ -15,10 +15,8 @@ module Saml
       def single_sign_on_services
         xpath = "/md:EntityDescriptor/md:#{name}/md:SingleSignOnService"
         find_all(xpath).map do |item|
-          Saml::Kit::Binding.new(
-            binding: item.attribute("Binding").value,
-            location: item.attribute("Location").value,
-          )
+          binding = item.attribute("Binding").value
+          binding_type_for(binding).new(binding: binding, location: item.attribute("Location").value)
         end
       end
 
@@ -35,6 +33,19 @@ module Saml
             format: item.attribute("NameFormat").try(:value),
             name: item.attribute("Name").value,
           }
+        end
+      end
+
+      private
+
+      def binding_type_for(binding)
+        case binding
+        when Namespaces::HTTP_REDIRECT
+          Saml::Kit::HttpRedirectBinding
+        when Namespaces::POST
+          Saml::Kit::HttpPostBinding
+        else
+          Saml::Kit::Binding
         end
       end
 
