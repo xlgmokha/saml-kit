@@ -33,9 +33,13 @@ module Saml
       end
 
       def deserialize(params)
-        document = deserialize_document_from!(params)
-        ensure_valid_signature!(params, document)
-        document
+        if http_redirect?
+          document = deserialize_document_from!(params)
+          ensure_valid_signature!(params, document)
+          document
+        elsif post?
+        else
+        end
       end
 
       def http_redirect?
@@ -55,15 +59,13 @@ module Saml
       def ensure_valid_signature!(params, document)
         return if params['Signature'].blank? || params['SigAlg'].blank?
 
-        signature = CGI.unescape(Base64.decode64(params['Signature']))
-        algorithm_uri = params['SigAlg']
-
+        signature = Base64.decode64(params['Signature'])
         canonical_form = ['SAMLRequest', 'RelayState', 'SigAlg'].map do |key|
           value = params[key]
           value.present? ? "#{key}=#{value}" : nil
         end.compact.join('&')
 
-        valid = document.provider.verify(algorithm_for(algorithm_uri), signature, canonical_form)
+        valid = document.provider.verify(algorithm_for(params['SigAlg']), signature, canonical_form)
         raise ArgumentError.new("Invalid Signature") unless valid
       end
 
