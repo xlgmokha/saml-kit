@@ -38,7 +38,15 @@ module Saml
           ensure_valid_signature!(params, document)
           document
         elsif post?
+          if params['SAMLRequest'].present?
+            Saml::Kit::Request.deserialize(params['SAMLRequest'])
+          elsif params['SAMLResponse'].present?
+            Saml::Kit::Response.deserialize(params['SAMLResponse'])
+          else
+          raise ArgumentError.new("Missing SAMLRequest or SAMLResponse")
+          end
         else
+          raise ArgumentError.new("Unsupported binding")
         end
       end
 

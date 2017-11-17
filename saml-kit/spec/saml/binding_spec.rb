@@ -74,7 +74,7 @@ RSpec.describe Saml::Kit::Binding do
     end
 
     it 'ignores other bindings' do
-      subject = Saml::Kit::Binding.new(binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact', location: location)
+      subject = Saml::Kit::Binding.new(binding: Saml::Kit::Namespaces::HTTP_ARTIFACT, location: location)
       expect(subject.serialize(Saml::Kit::AuthenticationRequest)).to be_empty
     end
   end
@@ -142,6 +142,50 @@ RSpec.describe Saml::Kit::Binding do
         expect do
           subject.deserialize(query_params)
         end.to raise_error(/Invalid Signature/)
+      end
+    end
+
+    describe "HTTP Post binding" do
+      let(:subject) { Saml::Kit::Binding.new(binding: Saml::Kit::Namespaces::POST, location: location) }
+
+      it 'deserializes to an AuthnRequest' do
+        builder = Saml::Kit::AuthenticationRequest::Builder.new
+        _, params = subject.serialize(builder)
+        result = subject.deserialize(params)
+        expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
+      end
+
+      it 'deserializes to a LogoutRequest' do
+        user = double(:user, name_id_for: SecureRandom.uuid)
+        builder = Saml::Kit::LogoutRequest::Builder.new(user)
+        _, params = subject.serialize(builder)
+        result = subject.deserialize(params)
+        expect(result).to be_instance_of(Saml::Kit::LogoutRequest)
+      end
+
+      it 'deserializes to a Response' do
+        user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
+        request = double(:request, id: SecureRandom.uuid, provider: nil, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url)
+        builder = Saml::Kit::Response::Builder.new(user, request)
+        _, params = subject.serialize(builder)
+        result = subject.deserialize(params)
+        expect(result).to be_instance_of(Saml::Kit::Response)
+      end
+
+      it 'raises an error when SAMLRequest and SAMLResponse are missing' do
+        expect do
+          subject.deserialize({})
+        end.to raise_error(/Missing SAMLRequest or SAMLResponse/)
+      end
+    end
+
+    describe "Artifact binding" do
+      let(:subject) { Saml::Kit::Binding.new(binding: Saml::Kit::Namespaces::HTTP_ARTIFACT, location: location) }
+
+      it 'raises an error' do
+        expect do
+          subject.deserialize('SAMLRequest' => "CORRUPT")
+        end.to raise_error(/Unsupported binding/)
       end
     end
   end
