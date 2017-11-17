@@ -12,7 +12,7 @@ en:
       IDPSSODescriptor:
         invalid: "must contain IDPSSODescriptor."
         invalid_signature: "invalid signature."
-      InvalidRequest:
+      InvalidDocument:
         invalid: "must contain valid SAMLRequest"
       Response:
         invalid: "must contain Response."

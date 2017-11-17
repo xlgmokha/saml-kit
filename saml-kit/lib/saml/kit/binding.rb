@@ -26,32 +26,14 @@ module Saml
 
       protected
 
-      def deserialize_request(raw_request)
-        xml = Saml::Kit::Content.deserialize(raw_request)
-        hash = Hash.from_xml(xml)
-        if hash['AuthnRequest'].present?
-          AuthenticationRequest.new(xml)
+      def saml_param_from(params)
+        if params['SAMLRequest'].present?
+          params['SAMLRequest']
+        elsif params['SAMLResponse'].present?
+          params['SAMLResponse']
         else
-          LogoutRequest.new(xml)
+          raise ArgumentError.new("SAMLRequest or SAMLResponse parameter is required.")
         end
-      rescue => error
-        Saml::Kit.logger.error(error)
-        Saml::Kit.logger.error(error.backtrace.join("\n"))
-        InvalidRequest.new(raw_request)
-      end
-
-      def deserialize_response(saml_response)
-        xml = Saml::Kit::Content.deserialize(saml_response)
-        hash = Hash.from_xml(xml)
-        if hash['Response'].present?
-          Response.new(xml)
-        else
-          LogoutResponse.new(xml)
-        end
-      rescue => error
-        Saml::Kit.logger.error(error)
-        Saml::Kit.logger.error(error.backtrace.join("\n"))
-        InvalidResponse.new(saml_response)
       end
     end
   end
