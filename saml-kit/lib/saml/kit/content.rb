@@ -1,10 +1,6 @@
 module Saml
   module Kit
     class Content
-      def self.serialize(xml, compress: false)
-        compress ? encode(deflate(xml)) : encode(xml)
-      end
-
       def self.deserialize(xml)
         decoded = decode(xml)
         begin
