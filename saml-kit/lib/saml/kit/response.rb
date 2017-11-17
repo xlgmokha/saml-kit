@@ -76,10 +76,6 @@ module Saml
         @xml_hash
       end
 
-      def serialize(compress: false)
-        Saml::Kit::Content.serialize(to_xml, compress: compress)
-      end
-
       def certificate
         return unless signed?
         to_h.fetch(name, {}).fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
@@ -118,22 +114,6 @@ module Saml
 
       def provider
         registry.metadata_for(issuer)
-      end
-
-      class << self
-        def deserialize(saml_response)
-          xml = Saml::Kit::Content.deserialize(saml_response)
-          hash = Hash.from_xml(xml)
-          if hash['Response'].present?
-            new(xml)
-          else
-            LogoutResponse.new(xml)
-          end
-        rescue => error
-          Saml::Kit.logger.error(error)
-          Saml::Kit.logger.error(error.backtrace.join("\n"))
-          InvalidResponse.new(saml_response)
-        end
       end
 
       private
