@@ -2,7 +2,7 @@ module Saml
   module Kit
     class LogoutRequest < Document
       include Requestable
-      validates_presence_of :single_logout_service, if: :logout?
+      validates_presence_of :single_logout_service, if: :expected_type?
       validate :must_be_registered
 
       def initialize(xml)
@@ -30,7 +30,7 @@ module Saml
       private
 
       def must_be_registered
-        return unless logout?
+        return unless expected_type?
         if provider.nil?
           errors[:provider] << error_message(:unregistered)
           return
@@ -39,9 +39,6 @@ module Saml
         errors[:fingerprint] << error_message(:invalid_fingerprint)
       end
 
-      def logout?
-        request?
-      end
 
       class Builder
         attr_accessor :id, :destination, :issuer, :name_id_format, :now

@@ -52,14 +52,14 @@ module Saml
       private
 
       def must_be_registered
-        return unless login?
+        return unless expected_type?
         return if trusted?
 
         errors[:base] << error_message(:unregistered)
       end
 
       def must_be_valid_version
-        return unless login?
+        return unless expected_type?
         return if "2.0" == version
         errors[:version] << error_message(:invalid_version)
       end
@@ -73,12 +73,12 @@ module Saml
       end
 
       def must_be_active_session
-        return unless login?
+        return unless expected_type?
         errors[:base] << error_message(:expired) unless active?
       end
 
       def must_match_issuer
-        return unless login?
+        return unless expected_type?
 
         unless audiences.include?(Saml::Kit.configuration.issuer)
           errors[:audience] << error_message(:must_match_issuer)
@@ -90,10 +90,6 @@ module Saml
       rescue => error
         Saml::Kit.logger.error(error)
         []
-      end
-
-      def login?
-        response?
       end
 
       def parse_date(value)
