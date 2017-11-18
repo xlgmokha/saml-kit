@@ -3,7 +3,6 @@ module Saml
     class AuthenticationRequest < Document
       include Requestable
       validates_presence_of :acs_url, if: :login?
-      validate :must_be_request
       validate :must_have_valid_signature
       validate :must_be_registered
       validate :must_match_xsd
@@ -54,12 +53,6 @@ module Saml
         xml.errors.each do |error|
           errors[:base] << error
         end
-      end
-
-      def must_be_request
-        return if to_h.nil?
-
-        errors[:base] << error_message(:invalid) unless login?
       end
 
       def must_match_xsd
