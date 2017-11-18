@@ -120,7 +120,7 @@ RSpec.describe Saml::Kit::Response do
       allow(metadata).to receive(:matches?).and_return(false)
       subject = described_class.new(builder.to_xml)
       expect(subject).to be_invalid
-      expect(subject.errors[:base]).to be_present
+      expect(subject.errors[:fingerprint]).to be_present
     end
 
     it 'validates the schema of the response' do

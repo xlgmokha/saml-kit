@@ -3,7 +3,6 @@ module Saml
     class AuthenticationRequest < Document
       include Requestable
       validates_presence_of :acs_url, if: :expected_type?
-      validate :must_be_registered
 
       def initialize(xml)
         super(xml, name: "AuthnRequest")
@@ -31,16 +30,6 @@ module Saml
         return if provider.nil?
         acs_urls = provider.assertion_consumer_services
         return acs_urls.first[:location] if acs_urls.any?
-      end
-
-      def must_be_registered
-        return unless expected_type?
-        if provider.nil?
-          errors[:service_provider] << error_message(:unregistered)
-          return
-        end
-        return if trusted?
-        errors[:fingerprint] << error_message(:invalid_fingerprint)
       end
 
       class Builder

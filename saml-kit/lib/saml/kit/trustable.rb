@@ -5,6 +5,7 @@ module Saml
 
       included do
         validate :must_have_valid_signature
+        validate :must_be_registered
       end
 
       def certificate
@@ -45,6 +46,16 @@ module Saml
         xml.errors.each do |error|
           errors[:base] << error
         end
+      end
+
+      def must_be_registered
+        return unless expected_type?
+        if provider.nil?
+          errors[:provider] << error_message(:unregistered)
+          return
+        end
+        return if trusted?
+        errors[:fingerprint] << error_message(:invalid_fingerprint)
       end
     end
   end

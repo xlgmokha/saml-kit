@@ -3,7 +3,6 @@ module Saml
     class LogoutRequest < Document
       include Requestable
       validates_presence_of :single_logout_service, if: :expected_type?
-      validate :must_be_registered
 
       def initialize(xml)
         super(xml, name: "LogoutRequest")
@@ -29,15 +28,6 @@ module Saml
 
       private
 
-      def must_be_registered
-        return unless expected_type?
-        if provider.nil?
-          errors[:provider] << error_message(:unregistered)
-          return
-        end
-        return if trusted?
-        errors[:fingerprint] << error_message(:invalid_fingerprint)
-      end
 
 
       class Builder
