@@ -1,6 +1,8 @@
 module Saml
   module Kit
     class Response < Document
+      include Respondable
+
       attr_reader :request_id
       validates_presence_of :content
       validates_presence_of :id
@@ -26,10 +28,6 @@ module Saml
 
       def name_id
         to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Subject', {}).fetch('NameID', nil)
-      end
-
-      def status_code
-        to_h.fetch(name, {}).fetch('Status', {}).fetch('StatusCode', {}).fetch('Value', nil)
       end
 
       def [](key)
