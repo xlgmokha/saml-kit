@@ -16,10 +16,6 @@ module Saml
         to_h[name]['IssueInstant']
       end
 
-      def version
-        to_h[name]['Version']
-      end
-
       def destination
         to_h[name]['Destination']
       end
@@ -77,7 +73,7 @@ module Saml
 
       class Builder
         attr_accessor :id, :destination, :issuer, :name_id_format, :now
-        attr_accessor :sign
+        attr_accessor :sign, :version
         attr_reader :user
 
         def initialize(user, configuration: Saml::Kit.configuration, sign: true)
@@ -86,6 +82,7 @@ module Saml
           @issuer = configuration.issuer
           @name_id_format = Saml::Kit::Namespaces::PERSISTENT
           @now = Time.now.utc
+          @version = "2.0"
           @sign = sign
         end
 
@@ -109,7 +106,7 @@ module Saml
         def logout_request_options
           {
             ID: "_#{id}",
-            Version: "2.0",
+            Version: version,
             IssueInstant: now.utc.iso8601,
             Destination: destination,
             xmlns: Namespaces::PROTOCOL,

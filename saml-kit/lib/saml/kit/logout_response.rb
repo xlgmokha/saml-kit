@@ -9,10 +9,6 @@ module Saml
         to_h[name]['IssueInstant']
       end
 
-      def version
-        to_h[name]['Version']
-      end
-
       def status_code
         to_h[name]['Status']['StatusCode']['Value']
       end
