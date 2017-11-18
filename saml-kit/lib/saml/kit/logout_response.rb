@@ -3,7 +3,8 @@ module Saml
     class LogoutResponse < Document
       include Respondable
 
-      def initialize(xml)
+      def initialize(xml, request_id: nil)
+        @request_id = request_id
         super(xml, name: "LogoutResponse")
       end
 
@@ -37,7 +38,7 @@ module Saml
         end
 
         def build
-          LogoutResponse.new(to_xml)
+          LogoutResponse.new(to_xml, request_id: request.id)
         end
 
         private

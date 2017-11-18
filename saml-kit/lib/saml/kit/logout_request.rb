@@ -28,8 +28,6 @@ module Saml
 
       private
 
-
-
       class Builder
         attr_accessor :id, :destination, :issuer, :name_id_format, :now
         attr_accessor :sign, :version
