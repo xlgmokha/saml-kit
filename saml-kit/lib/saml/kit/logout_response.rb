@@ -21,10 +21,6 @@ module Saml
         to_h[name]['Destination']
       end
 
-      def provider
-        registry.metadata_for(issuer)
-      end
-
       private
 
       class Builder
