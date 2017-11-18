@@ -22,10 +22,6 @@ module Saml
         super(xml, name: "Response", query_string_parameter: 'SAMLResponse')
       end
 
-      def in_response_to
-        to_h.fetch(name, {}).fetch('InResponseTo', nil)
-      end
-
       def name_id
         to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Subject', {}).fetch('NameID', nil)
       end
