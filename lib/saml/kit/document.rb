@@ -6,6 +6,7 @@ module Saml
       include ActiveModel::Validations
       include Trustable
       validates_presence_of :content
+      validates_presence_of :id
       validate :must_match_xsd
       validate :must_be_expected_type
       validate :must_be_valid_version
