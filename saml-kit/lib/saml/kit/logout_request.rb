@@ -5,7 +5,6 @@ module Saml
       validates_presence_of :single_logout_service, if: :logout?
       validate :must_have_valid_signature
       validate :must_be_registered
-      validate :must_match_xsd
 
       def initialize(xml)
         super(xml, name: "LogoutRequest")
@@ -49,10 +48,6 @@ module Saml
         end
         return if trusted?
         errors[:fingerprint] << error_message(:invalid_fingerprint)
-      end
-
-      def must_match_xsd
-        matches_xsd?(PROTOCOL_XSD)
       end
 
       def logout?

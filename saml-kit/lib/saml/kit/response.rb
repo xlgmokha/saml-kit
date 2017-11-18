@@ -7,7 +7,6 @@ module Saml
       validates_presence_of :id
       validate :must_have_valid_signature
       validate :must_be_registered
-      validate :must_match_xsd
       validate :must_be_valid_version
       validates_inclusion_of :status_code, in: [Namespaces::SUCCESS]
 
@@ -68,10 +67,6 @@ module Saml
         return if trusted?
 
         errors[:base] << error_message(:unregistered)
-      end
-
-      def must_match_xsd
-        matches_xsd?(PROTOCOL_XSD)
       end
 
       def must_be_valid_version
