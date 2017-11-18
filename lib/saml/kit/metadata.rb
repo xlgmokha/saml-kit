@@ -55,19 +55,15 @@ module Saml
 
       def single_logout_services
         find_all("/md:EntityDescriptor/md:#{name}/md:SingleLogoutService").map do |item|
-          {
-            binding: item.attribute("Binding").value,
-            location: item.attribute("Location").value,
-          }
+          binding = item.attribute("Binding").value
+          location = item.attribute("Location").value
+          binding_for(binding, location)
         end
       end
 
       def single_logout_service_for(binding:)
         binding = Saml::Kit::Namespaces.binding_for(binding)
-        result = single_logout_services.find do |item|
-          item[:binding] == binding
-        end
-        return result[:location] if result
+        single_logout_services.find { |x| x.binding?(binding) }
       end
 
       def matches?(fingerprint, use: :signing)
@@ -150,6 +146,17 @@ module Saml
           errors[:base] << error
         end
         result
+      end
+
+      def binding_for(binding, location)
+        case binding
+        when Namespaces::HTTP_REDIRECT
+          Saml::Kit::HttpRedirectBinding.new(location: location)
+        when Namespaces::POST
+          Saml::Kit::HttpPostBinding.new(location: location)
+        else
+          Saml::Kit::Binding.new(binding: binding, location: location)
+        end
       end
     end
   end

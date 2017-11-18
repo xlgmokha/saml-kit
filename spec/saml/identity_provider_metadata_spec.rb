@@ -53,7 +53,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
     it do
       location = "https://www.example.com/adfs/ls/"
-      expect(subject.single_logout_services).to match_array([
+      expect(subject.single_logout_services.map(&:to_h)).to match_array([
         { location: location, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
         { location: location, binding: Saml::Kit::Namespaces::HTTP_POST },
       ])
@@ -178,8 +178,8 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
 
     it 'returns the location for the matching binding' do
-      expect(subject.single_logout_service_for(binding: :post)).to eql(post_url)
-      expect(subject.single_logout_service_for(binding: :http_redirect)).to eql(redirect_url)
+      expect(subject.single_logout_service_for(binding: :post).location).to eql(post_url)
+      expect(subject.single_logout_service_for(binding: :http_redirect).location).to eql(redirect_url)
     end
 
     it 'returns nil if the binding is not available' do

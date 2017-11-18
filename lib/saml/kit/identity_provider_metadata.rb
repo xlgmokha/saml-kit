@@ -23,9 +23,7 @@ module Saml
 
       def single_sign_on_service_for(binding:)
         binding = Saml::Kit::Namespaces.binding_for(binding)
-        single_sign_on_services.find do |item|
-          item.binding?(binding)
-        end
+        single_sign_on_services.find { |x| x.binding?(binding) }
       end
 
       def attributes
@@ -38,17 +36,6 @@ module Saml
       end
 
       private
-
-      def binding_for(binding, location)
-        case binding
-        when Namespaces::HTTP_REDIRECT
-          Saml::Kit::HttpRedirectBinding.new(location: location)
-        when Namespaces::POST
-          Saml::Kit::HttpPostBinding.new(location: location)
-        else
-          Saml::Kit::Binding.new(binding: binding, location: location)
-        end
-      end
 
       class Builder
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats
