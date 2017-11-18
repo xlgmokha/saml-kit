@@ -4,7 +4,6 @@ module Saml
       extend ActiveSupport::Concern
 
       included do
-        validate :must_be_response
       end
 
       def query_string_parameter
@@ -17,17 +16,6 @@ module Saml
 
       def in_response_to
         to_h.fetch(name, {}).fetch('InResponseTo', nil)
-      end
-
-      def must_be_response
-        return if to_xml.blank?
-
-        errors[:base] << error_message(:invalid) unless response?
-      end
-
-      def response?
-        return false if to_xml.blank?
-        to_h[name].present?
       end
     end
   end

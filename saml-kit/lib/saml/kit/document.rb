@@ -7,6 +7,7 @@ module Saml
       include Trustable
       validates_presence_of :content
       validate :must_match_xsd
+      validate :must_be_expected_type
 
       attr_reader :content, :name
 
@@ -30,6 +31,11 @@ module Saml
 
       def destination
         to_h.fetch(name, {}).fetch('Destination', nil)
+      end
+
+      def expected_type?
+        return false if to_xml.blank?
+        to_h[name].present?
       end
 
       def to_h
@@ -66,6 +72,12 @@ module Saml
 
       def must_match_xsd
         matches_xsd?(PROTOCOL_XSD)
+      end
+
+      def must_be_expected_type
+        return if to_h.nil?
+
+        errors[:base] << error_message(:invalid) unless expected_type?
       end
     end
   end
