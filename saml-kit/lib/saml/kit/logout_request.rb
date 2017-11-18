@@ -1,6 +1,7 @@
 module Saml
   module Kit
     class LogoutRequest < Document
+      include Requestable
       validates_presence_of :content
       validates_presence_of :single_logout_service, if: :logout?
       validate :must_be_request
@@ -9,7 +10,7 @@ module Saml
       validate :must_match_xsd
 
       def initialize(xml)
-        super(xml, name: "LogoutRequest", query_string_parameter: 'SAMLRequest')
+        super(xml, name: "LogoutRequest")
       end
 
       def issue_instant

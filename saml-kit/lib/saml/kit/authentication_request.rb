@@ -1,6 +1,7 @@
 module Saml
   module Kit
     class AuthenticationRequest < Document
+      include Requestable
       validates_presence_of :content
       validates_presence_of :acs_url, if: :login_request?
       validate :must_be_request
@@ -9,7 +10,7 @@ module Saml
       validate :must_match_xsd
 
       def initialize(xml)
-        super(xml, name: "AuthnRequest", query_string_parameter: 'SAMLRequest')
+        super(xml, name: "AuthnRequest")
       end
 
       def acs_url
