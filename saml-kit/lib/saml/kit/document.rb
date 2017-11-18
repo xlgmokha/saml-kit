@@ -19,6 +19,10 @@ module Saml
         to_h.fetch(name, {}).fetch('ID', nil)
       end
 
+      def issuer
+        to_h.fetch(name, {}).fetch('Issuer', nil)
+      end
+
       def to_h
         @xml_hash
       end

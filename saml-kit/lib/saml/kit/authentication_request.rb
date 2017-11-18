@@ -24,10 +24,6 @@ module Saml
         #end
       end
 
-      def issuer
-        to_h[name]['Issuer']
-      end
-
       def name_id_format
         to_h[name]['NameIDPolicy']['Format']
       end
