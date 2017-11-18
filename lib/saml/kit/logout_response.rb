@@ -2,11 +2,7 @@ module Saml
   module Kit
     class LogoutResponse < Document
       def initialize(xml)
-        super(xml, name: 'LogoutResponse')
-      end
-
-      def query_string_parameter
-        'SAMLResponse'
+        super(xml, name: "LogoutResponse", query_string_parameter: 'SAMLResponse')
       end
 
       def id

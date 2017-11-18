@@ -17,11 +17,7 @@ module Saml
 
       def initialize(xml, request_id: nil)
         @request_id = request_id
-        super(xml, name: "Response")
-      end
-
-      def query_string_parameter
-        'SAMLResponse'
+        super(xml, name: "Response", query_string_parameter: 'SAMLResponse')
       end
 
       def id
