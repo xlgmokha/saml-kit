@@ -15,6 +15,10 @@ module Saml
         @xml_hash = Hash.from_xml(xml) || {}
       end
 
+      def id
+        to_h.fetch(name, {}).fetch('ID', nil)
+      end
+
       def to_h
         @xml_hash
       end

@@ -12,10 +12,6 @@ module Saml
         super(xml, name: "AuthnRequest", query_string_parameter: 'SAMLRequest')
       end
 
-      def id
-        to_h[name]['ID']
-      end
-
       def destination
         to_h[name]['Destination']
       end

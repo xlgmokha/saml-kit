@@ -12,10 +12,6 @@ module Saml
         super(xml, name: "LogoutRequest", query_string_parameter: 'SAMLRequest')
       end
 
-      def id
-        to_h[name]['ID']
-      end
-
       def issuer
         to_h[name]['Issuer']
       end

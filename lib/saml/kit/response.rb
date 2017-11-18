@@ -20,10 +20,6 @@ module Saml
         super(xml, name: "Response", query_string_parameter: 'SAMLResponse')
       end
 
-      def id
-        to_h.fetch(name, {}).fetch('ID', nil)
-      end
-
       def in_response_to
         to_h.fetch(name, {}).fetch('InResponseTo', nil)
       end

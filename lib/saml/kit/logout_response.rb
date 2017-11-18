@@ -5,10 +5,6 @@ module Saml
         super(xml, name: "LogoutResponse", query_string_parameter: 'SAMLResponse')
       end
 
-      def id
-        to_h[name]['ID']
-      end
-
       def issue_instant
         to_h[name]['IssueInstant']
       end
