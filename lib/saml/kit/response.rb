@@ -5,7 +5,6 @@ module Saml
 
       attr_reader :request_id
       validates_presence_of :id
-      validate :must_be_valid_version
       validates_inclusion_of :status_code, in: [Namespaces::SUCCESS]
 
       validate :must_match_request_id
@@ -49,12 +48,6 @@ module Saml
       end
 
       private
-
-      def must_be_valid_version
-        return unless expected_type?
-        return if "2.0" == version
-        errors[:version] << error_message(:invalid_version)
-      end
 
       def must_match_request_id
         return if request_id.nil?

@@ -8,6 +8,7 @@ module Saml
       validates_presence_of :content
       validate :must_match_xsd
       validate :must_be_expected_type
+      validate :must_be_valid_version
 
       attr_reader :content, :name
 
@@ -78,6 +79,12 @@ module Saml
         return if to_h.nil?
 
         errors[:base] << error_message(:invalid) unless expected_type?
+      end
+
+      def must_be_valid_version
+        return unless expected_type?
+        return if "2.0" == version
+        errors[:version] << error_message(:invalid_version)
       end
     end
   end
