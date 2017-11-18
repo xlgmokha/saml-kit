@@ -4,6 +4,7 @@ module Saml
       extend ActiveSupport::Concern
 
       included do
+        validates_inclusion_of :status_code, in: [Namespaces::SUCCESS]
       end
 
       def query_string_parameter
