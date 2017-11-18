@@ -23,6 +23,10 @@ module Saml
           @status_code = Namespaces::SUCCESS
           @sign = sign
           @issuer = configuration.issuer
+          provider = configuration.registry.metadata_for(@issuer)
+          if provider
+            @destination = provider.single_logout_service_for(binding: :post).try(:location)
+          end
         end
 
         def to_xml
