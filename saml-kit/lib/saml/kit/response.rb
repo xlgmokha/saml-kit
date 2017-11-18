@@ -5,7 +5,6 @@ module Saml
 
       attr_reader :request_id
       validates_presence_of :id
-      validates_inclusion_of :status_code, in: [Namespaces::SUCCESS]
 
       validate :must_match_request_id
       validate :must_be_active_session
