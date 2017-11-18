@@ -1,16 +1,14 @@
 module Saml
   module Kit
     class LogoutResponse < Document
+      include Respondable
+
       def initialize(xml)
         super(xml, name: "LogoutResponse", query_string_parameter: 'SAMLResponse')
       end
 
       def issue_instant
         to_h[name]['IssueInstant']
-      end
-
-      def status_code
-        to_h[name]['Status']['StatusCode']['Value']
       end
 
       def in_response_to
