@@ -3,7 +3,6 @@ module Saml
     class AuthenticationRequest < Document
       include Requestable
       validates_presence_of :acs_url, if: :login?
-      validate :must_have_valid_signature
       validate :must_be_registered
 
       def initialize(xml)
@@ -42,16 +41,6 @@ module Saml
         end
         return if trusted?
         errors[:fingerprint] << error_message(:invalid_fingerprint)
-      end
-
-      def must_have_valid_signature
-        return if to_xml.blank?
-
-        xml = Saml::Kit::Xml.new(to_xml)
-        xml.valid?
-        xml.errors.each do |error|
-          errors[:base] << error
-        end
       end
 
       def login?
