@@ -85,7 +85,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     end
 
     it 'returns each logout url and binding' do
-      expect(subject.single_logout_services).to match_array([
+      expect(subject.single_logout_services.map(&:to_h)).to match_array([
         { location: logout_post_url, binding: Saml::Kit::Namespaces::POST },
         { location: logout_redirect_url, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
       ])
