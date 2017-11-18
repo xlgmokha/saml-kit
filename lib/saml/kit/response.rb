@@ -3,9 +3,6 @@ module Saml
     class Response < Document
       include Respondable
 
-      attr_reader :request_id
-
-      validate :must_match_request_id
       validate :must_be_active_session
       validate :must_match_issuer
 
@@ -46,14 +43,6 @@ module Saml
       end
 
       private
-
-      def must_match_request_id
-        return if request_id.nil?
-
-        if in_response_to != request_id
-          errors[:in_response_to] << error_message(:invalid_response_to)
-        end
-      end
 
       def must_be_active_session
         return unless expected_type?
