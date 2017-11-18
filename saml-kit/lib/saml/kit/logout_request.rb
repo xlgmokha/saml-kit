@@ -3,7 +3,6 @@ module Saml
     class LogoutRequest < Document
       include Requestable
       validates_presence_of :single_logout_service, if: :logout?
-      validate :must_be_request
       validate :must_have_valid_signature
       validate :must_be_registered
       validate :must_match_xsd
@@ -40,12 +39,6 @@ module Saml
         xml.errors.each do |error|
           errors[:base] << error
         end
-      end
-
-      def must_be_request
-        return if to_h.nil?
-
-        errors[:base] << error_message(:invalid) unless logout?
       end
 
       def must_be_registered
