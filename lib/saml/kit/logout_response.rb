@@ -11,10 +11,6 @@ module Saml
         to_h[name]['IssueInstant']
       end
 
-      def in_response_to
-        to_h[name]['InResponseTo']
-      end
-
       private
 
       class Builder
