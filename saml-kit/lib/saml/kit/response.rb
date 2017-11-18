@@ -4,7 +4,6 @@ module Saml
       include Respondable
 
       attr_reader :request_id
-      validates_presence_of :id
 
       validate :must_match_request_id
       validate :must_be_active_session
