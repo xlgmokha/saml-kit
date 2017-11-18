@@ -2,7 +2,7 @@ module Saml
   module Kit
     class AuthenticationRequest < Document
       include Requestable
-      validates_presence_of :acs_url, if: :login_request?
+      validates_presence_of :acs_url, if: :login?
       validate :must_be_request
       validate :must_have_valid_signature
       validate :must_be_registered
@@ -37,7 +37,7 @@ module Saml
       end
 
       def must_be_registered
-        return unless login_request?
+        return unless login?
         if provider.nil?
           errors[:service_provider] << error_message(:unregistered)
           return
@@ -59,14 +59,14 @@ module Saml
       def must_be_request
         return if to_h.nil?
 
-        errors[:base] << error_message(:invalid) unless login_request?
+        errors[:base] << error_message(:invalid) unless login?
       end
 
       def must_match_xsd
         matches_xsd?(PROTOCOL_XSD)
       end
 
-      def login_request?
+      def login?
         return false if to_xml.blank?
         to_h[name].present?
       end
