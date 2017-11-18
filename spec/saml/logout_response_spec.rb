@@ -14,9 +14,9 @@ RSpec.describe Saml::Kit::LogoutResponse do
 
     describe "#build" do
       it 'builds a logout response' do
-        allow(configuration).to receive(:registery).and_return(registry)
+        allow(configuration).to receive(:registry).and_return(registry)
         allow(registry).to receive(:metadata_for).with(issuer).and_return(provider)
-        allow(registry).to receive(:single_logout_service_for).and_return(binding)
+        allow(provider).to receive(:single_logout_service_for).and_return(binding)
 
         travel_to 1.second.from_now
 
