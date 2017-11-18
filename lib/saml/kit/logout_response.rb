@@ -47,7 +47,7 @@ module Saml
           {
             xmlns: Namespaces::PROTOCOL,
             ID: "_#{id}",
-            Version: "2.0",
+            Version: version,
             IssueInstant: now.utc.iso8601,
             Destination: destination,
             InResponseTo: request.id,

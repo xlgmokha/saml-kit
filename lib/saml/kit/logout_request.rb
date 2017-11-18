@@ -8,10 +8,6 @@ module Saml
         super(xml, name: "LogoutRequest")
       end
 
-      def issue_instant
-        to_h[name]['IssueInstant']
-      end
-
       def name_id
         to_h[name]['NameID']
       end

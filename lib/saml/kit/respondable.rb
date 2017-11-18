@@ -21,10 +21,6 @@ module Saml
         to_h.fetch(name, {}).fetch('InResponseTo', nil)
       end
 
-      def issue_instant
-        to_h[name]['IssueInstant']
-      end
-
       private
 
       def must_match_request_id
