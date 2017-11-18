@@ -5,7 +5,6 @@ module Saml
 
       attr_reader :request_id
       validates_presence_of :id
-      validate :must_have_valid_signature
       validate :must_be_registered
       validate :must_be_valid_version
       validates_inclusion_of :status_code, in: [Namespaces::SUCCESS]
@@ -51,16 +50,6 @@ module Saml
       end
 
       private
-
-      def must_have_valid_signature
-        return if to_xml.blank?
-
-        xml = Saml::Kit::Xml.new(to_xml)
-        xml.valid?
-        xml.errors.each do |error|
-          errors[:base] << error
-        end
-      end
 
       def must_be_registered
         return unless login?
