@@ -4,7 +4,7 @@ module Saml
       include Respondable
 
       def initialize(xml)
-        super(xml, name: "LogoutResponse", query_string_parameter: 'SAMLResponse')
+        super(xml, name: "LogoutResponse")
       end
 
       def issue_instant
