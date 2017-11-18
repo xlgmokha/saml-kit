@@ -6,7 +6,6 @@ module Saml
       attr_reader :request_id
       validates_presence_of :id
       validate :must_have_valid_signature
-      validate :must_be_response
       validate :must_be_registered
       validate :must_match_xsd
       validate :must_be_valid_version
@@ -64,14 +63,8 @@ module Saml
         end
       end
 
-      def must_be_response
-        return if to_xml.blank?
-
-        errors[:base] << error_message(:invalid) unless login_response?
-      end
-
       def must_be_registered
-        return unless login_response?
+        return unless login?
         return if trusted?
 
         errors[:base] << error_message(:unregistered)
@@ -82,7 +75,7 @@ module Saml
       end
 
       def must_be_valid_version
-        return unless login_response?
+        return unless login?
         return if "2.0" == version
         errors[:version] << error_message(:invalid_version)
       end
@@ -96,12 +89,12 @@ module Saml
       end
 
       def must_be_active_session
-        return unless login_response?
+        return unless login?
         errors[:base] << error_message(:expired) unless active?
       end
 
       def must_match_issuer
-        return unless login_response?
+        return unless login?
 
         unless audiences.include?(Saml::Kit.configuration.issuer)
           errors[:audience] << error_message(:must_match_issuer)
@@ -115,9 +108,8 @@ module Saml
         []
       end
 
-      def login_response?
-        return false if to_xml.blank?
-        to_h[name].present?
+      def login?
+        response?
       end
 
       def parse_date(value)

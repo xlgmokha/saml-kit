@@ -56,8 +56,7 @@ module Saml
       end
 
       def logout?
-        return false if to_xml.blank?
-        to_h[name].present?
+        request?
       end
 
       class Builder
