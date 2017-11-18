@@ -2,7 +2,6 @@ module Saml
   module Kit
     class AuthenticationRequest < Document
       include Requestable
-      validates_presence_of :content
       validates_presence_of :acs_url, if: :login_request?
       validate :must_be_request
       validate :must_have_valid_signature

@@ -5,6 +5,7 @@ module Saml
       include XsdValidatable
       include ActiveModel::Validations
       include Trustable
+      validates_presence_of :content
 
       attr_reader :content, :name
 
