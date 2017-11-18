@@ -1,53 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::IdentityProviderMetadata do
-  describe described_class::Builder do
-    subject { described_class.new }
-    let(:email) { FFaker::Internet.email }
-    let(:org_name) { FFaker::Movie.title }
-    let(:url) { "https://#{FFaker::Internet.domain_name}" }
-    let(:entity_id) { FFaker::Movie.title }
-
-    it 'builds a proper metadata' do
-      subject.contact_email = email
-      subject.entity_id = entity_id
-      subject.organization_name = org_name
-      subject.organization_url = url
-      subject.name_id_formats = [
-        Saml::Kit::Namespaces::PERSISTENT,
-        Saml::Kit::Namespaces::TRANSIENT,
-        Saml::Kit::Namespaces::EMAIL_ADDRESS,
-      ]
-      subject.add_single_sign_on_service("https://www.example.com/login", binding: :http_redirect)
-      subject.add_single_logout_service("https://www.example.com/logout", binding: :post)
-      subject.attributes << "id"
-
-      result = Hash.from_xml(subject.build.to_xml)
-
-      expect(result['EntityDescriptor']['ID']).to be_present
-      expect(result['EntityDescriptor']['entityID']).to eql(entity_id)
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['protocolSupportEnumeration']).to eql('urn:oasis:names:tc:SAML:2.0:protocol')
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['WantAuthnRequestsSigned']).to eql('true')
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['NameIDFormat']).to match_array([
-        Saml::Kit::Namespaces::PERSISTENT,
-        Saml::Kit::Namespaces::TRANSIENT,
-        Saml::Kit::Namespaces::EMAIL_ADDRESS,
-      ])
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Binding']).to eql('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect')
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Location']).to eql("https://www.example.com/login")
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Binding']).to eql('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST')
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Location']).to eql("https://www.example.com/logout")
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['Name']).to eql("id")
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']).to eql(Saml::Kit.configuration.stripped_signing_certificate)
-
-      expect(result['EntityDescriptor']['Organization']['OrganizationName']).to eql(org_name)
-      expect(result['EntityDescriptor']['Organization']['OrganizationDisplayName']).to eql(org_name)
-      expect(result['EntityDescriptor']['Organization']['OrganizationURL']).to eql(url)
-      expect(result['EntityDescriptor']['ContactPerson']['contactType']).to eql("technical")
-      expect(result['EntityDescriptor']['ContactPerson']['Company']).to eql("mailto:#{email}")
-    end
-  end
-
   subject { described_class.new(raw_metadata) }
 
   context "okta metadata" do
@@ -56,85 +9,24 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       Hash.from_xml(raw_metadata)['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']
     end
 
-    it { expect(subject.entity_id).to eql("http://www.okta.com/exk8dx3jilpueVzpU0h7") }
+    it { expect(subject.entity_id).to eql("http://www.okta.com/1") }
+    it { expect(subject.name_id_formats).to match_array([ Saml::Kit::Namespaces::EMAIL_ADDRESS, Saml::Kit::Namespaces::UNSPECIFIED_NAMEID ]) }
     it do
-      expect(subject.name_id_formats).to match_array([
-        "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-        "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-      ])
-    end
-    it do
+      location = "https://dev.oktapreview.com/app/example/1/sso/saml"
       expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
-        { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", location: "https://dev-989848.oktapreview.com/app/ciscodev843126_portal_1/exk8dx3jilpueVzpU0h7/sso/saml" },
-        { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", location: "https://dev-989848.oktapreview.com/app/ciscodev843126_portal_1/exk8dx3jilpueVzpU0h7/sso/saml" },
+        { binding: Saml::Kit::Namespaces::HTTP_POST, location: location },
+        { binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location },
       ])
     end
     it { expect(subject.single_logout_services).to be_empty }
     it do
-      expect(subject.certificates).to match_array([
-        {
-          use: :signing,
-          text: certificate,
-          fingerprint: "9F:74:13:3B:BC:5A:7B:8B:2D:4F:8B:EF:1E:88:EB:D1:AE:BC:19:BF:CA:19:C6:2F:0F:4B:31:1D:68:98:B0:1B",
-        }
-      ])
+      fingerprint = "9F:74:13:3B:BC:5A:7B:8B:2D:4F:8B:EF:1E:88:EB:D1:AE:BC:19:BF:CA:19:C6:2F:0F:4B:31:1D:68:98:B0:1B"
+      expect(subject.certificates).to match_array([use: :signing, text: certificate, fingerprint: fingerprint])
     end
     it { expect(subject.attributes).to be_empty }
   end
 
-  context "active directory metadata" do
-    let(:raw_metadata) { IO.read("spec/fixtures/metadata/ad_with_logout.xml") }
-    let(:xml_hash) { Hash.from_xml(raw_metadata) }
-    let(:signing_certificate) do
-      xml_hash['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor'].find { |x| x['use'] == 'signing' }['KeyInfo']['X509Data']['X509Certificate']
-    end
-    let(:encryption_certificate) do
-      xml_hash['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor'].find { |x| x['use'] == 'encryption' }['KeyInfo']['X509Data']['X509Certificate']
-    end
-
-    it { expect(subject.entity_id).to eql("https://www.example.com/adfs/services/trust") }
-    it do
-      expect(subject.name_id_formats).to match_array([
-        "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-        "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
-        "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-      ])
-    end
-    it do
-      expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
-        { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", location: "https://www.example.com/adfs/ls/" },
-        { binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", location: "https://www.example.com/adfs/ls/" },
-      ])
-    end
-    it do
-      expect(subject.single_logout_services).to match_array([
-        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
-        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
-      ])
-    end
-    it do
-      expect(subject.certificates).to match_array([
-        {
-          text: signing_certificate,
-          fingerprint: "E6:03:E1:2D:F2:70:9C:D6:CC:8B:3E:4C:5A:37:F5:53:D7:B2:78:B1:2E:95:5B:31:5C:56:E8:7F:16:A1:1B:D2",
-          use: :signing,
-        },
-        {
-          text: encryption_certificate,
-          fingerprint: "E1:0A:68:23:E4:17:32:A3:3A:F8:B7:30:A3:1D:D8:75:F4:C5:76:48:A4:C0:C8:D3:5E:F1:AE:AB:5B:B2:37:22",
-          use: :encryption,
-        },
-      ])
-    end
-    it do
-      expect(subject.attributes).to include({
-        format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
-        name: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
-      })
-    end
-  end
-
-  context "active directory windows server 2012 metadata" do
+  context "active directory" do
     let(:raw_metadata) { IO.read("spec/fixtures/metadata/ad_2012.xml") }
     let(:xml_hash) { Hash.from_xml(raw_metadata) }
     let(:signing_certificate) do
@@ -147,21 +39,23 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it { expect(subject.entity_id).to eql("http://www.example.com/adfs/services/trust") }
     it do
       expect(subject.name_id_formats).to match_array([
-        "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-        "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
-        "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+        Saml::Kit::Namespaces::EMAIL_ADDRESS,
+        Saml::Kit::Namespaces::PERSISTENT,
+        Saml::Kit::Namespaces::TRANSIENT,
       ])
     end
     it do
+      location = "https://www.example.com/adfs/ls/"
       expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
-        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
-        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
+        { location: location, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
+        { location: location, binding: Saml::Kit::Namespaces::HTTP_POST },
       ])
     end
     it do
+      location = "https://www.example.com/adfs/ls/"
       expect(subject.single_logout_services).to match_array([
-        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" },
-        { location: "https://www.example.com/adfs/ls/", binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" },
+        { location: location, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
+        { location: location, binding: Saml::Kit::Namespaces::HTTP_POST },
       ])
     end
     it do
@@ -290,6 +184,53 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
 
     it 'returns nil if the binding is not available' do
       expect(subject.single_logout_service_for(binding: :soap)).to be_nil
+    end
+  end
+
+  describe described_class::Builder do
+    subject { described_class.new }
+    let(:email) { FFaker::Internet.email }
+    let(:org_name) { FFaker::Movie.title }
+    let(:url) { "https://#{FFaker::Internet.domain_name}" }
+    let(:entity_id) { FFaker::Movie.title }
+
+    it 'builds a proper metadata' do
+      subject.contact_email = email
+      subject.entity_id = entity_id
+      subject.organization_name = org_name
+      subject.organization_url = url
+      subject.name_id_formats = [
+        Saml::Kit::Namespaces::PERSISTENT,
+        Saml::Kit::Namespaces::TRANSIENT,
+        Saml::Kit::Namespaces::EMAIL_ADDRESS,
+      ]
+      subject.add_single_sign_on_service("https://www.example.com/login", binding: :http_redirect)
+      subject.add_single_logout_service("https://www.example.com/logout", binding: :post)
+      subject.attributes << "id"
+
+      result = Hash.from_xml(subject.build.to_xml)
+
+      expect(result['EntityDescriptor']['ID']).to be_present
+      expect(result['EntityDescriptor']['entityID']).to eql(entity_id)
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['protocolSupportEnumeration']).to eql(Saml::Kit::Namespaces::PROTOCOL)
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['WantAuthnRequestsSigned']).to eql('true')
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['NameIDFormat']).to match_array([
+        Saml::Kit::Namespaces::PERSISTENT,
+        Saml::Kit::Namespaces::TRANSIENT,
+        Saml::Kit::Namespaces::EMAIL_ADDRESS,
+      ])
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Binding']).to eql(Saml::Kit::Namespaces::HTTP_REDIRECT)
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Location']).to eql("https://www.example.com/login")
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Binding']).to eql(Saml::Kit::Namespaces::HTTP_POST)
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Location']).to eql("https://www.example.com/logout")
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['Name']).to eql("id")
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']).to eql(Saml::Kit.configuration.stripped_signing_certificate)
+
+      expect(result['EntityDescriptor']['Organization']['OrganizationName']).to eql(org_name)
+      expect(result['EntityDescriptor']['Organization']['OrganizationDisplayName']).to eql(org_name)
+      expect(result['EntityDescriptor']['Organization']['OrganizationURL']).to eql(url)
+      expect(result['EntityDescriptor']['ContactPerson']['contactType']).to eql("technical")
+      expect(result['EntityDescriptor']['ContactPerson']['Company']).to eql("mailto:#{email}")
     end
   end
 end
