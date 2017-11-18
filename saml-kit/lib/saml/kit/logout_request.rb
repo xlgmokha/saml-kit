@@ -2,7 +2,6 @@ module Saml
   module Kit
     class LogoutRequest < Document
       include Requestable
-      validates_presence_of :content
       validates_presence_of :single_logout_service, if: :logout?
       validate :must_be_request
       validate :must_have_valid_signature
