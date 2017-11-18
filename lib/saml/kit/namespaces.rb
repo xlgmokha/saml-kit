@@ -28,6 +28,7 @@ module Saml
       SUCCESS = "urn:oasis:names:tc:SAML:2.0:status:Success"
       TRANSIENT = "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
       UNSPECIFIED = "urn:oasis:names:tc:SAML:2.0:consent:unspecified"
+      UNSPECIFIED_NAMEID = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
       URI = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
       VERSION_MISMATCH_ERROR = "urn:oasis:names:tc:SAML:2.0:status:VersionMismatch"
       XMLDSIG = "http://www.w3.org/2000/09/xmldsig#"
