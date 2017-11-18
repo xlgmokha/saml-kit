@@ -43,10 +43,6 @@ module Saml
 
       private
 
-      def registry
-        Saml::Kit.configuration.registry
-      end
-
       class Builder
         attr_accessor :id, :issuer, :version, :status_code, :sign, :now, :destination
         attr_reader :request

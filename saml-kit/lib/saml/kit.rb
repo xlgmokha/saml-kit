@@ -14,6 +14,7 @@ require "xmldsig"
 
 require "saml/kit/serializable"
 require "saml/kit/xsd_validatable"
+require "saml/kit/trustable"
 require "saml/kit/document"
 
 require "saml/kit/authentication_request"

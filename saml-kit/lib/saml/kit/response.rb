@@ -62,16 +62,6 @@ module Saml
         to_h.fetch(name, {}).fetch('Version', {})
       end
 
-      def certificate
-        return unless signed?
-        to_h.fetch(name, {}).fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
-      end
-
-      def fingerprint
-        return if certificate.blank?
-        Fingerprint.new(certificate)
-      end
-
       def started_at
         parse_date(to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Conditions', {}).fetch('NotBefore', nil))
       end
@@ -88,25 +78,7 @@ module Saml
         Time.current > started_at && !expired?
       end
 
-      def signed?
-        to_h[name]['Signature'].present?
-      end
-
-      def trusted?
-        return false if provider.nil?
-        return false unless signed?
-        provider.matches?(fingerprint, use: :signing)
-      end
-
-      def provider
-        registry.metadata_for(issuer)
-      end
-
       private
-
-      def registry
-        Saml::Kit.configuration.registry
-      end
 
       def must_have_valid_signature
         return if to_xml.blank?
