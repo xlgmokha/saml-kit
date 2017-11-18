@@ -17,10 +17,6 @@ module Saml
         to_h[name]['InResponseTo']
       end
 
-      def destination
-        to_h[name]['Destination']
-      end
-
       private
 
       class Builder

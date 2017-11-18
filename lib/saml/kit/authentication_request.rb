@@ -12,10 +12,6 @@ module Saml
         super(xml, name: "AuthnRequest", query_string_parameter: 'SAMLRequest')
       end
 
-      def destination
-        to_h[name]['Destination']
-      end
-
       def acs_url
         #if signed? && trusted?
           to_h[name]['AssertionConsumerServiceURL'] || registered_acs_url

@@ -16,10 +16,6 @@ module Saml
         to_h[name]['IssueInstant']
       end
 
-      def destination
-        to_h[name]['Destination']
-      end
-
       def name_id
         to_h[name]['NameID']
       end

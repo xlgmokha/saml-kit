@@ -42,9 +42,6 @@ module Saml
         end].with_indifferent_access
       end
 
-      def destination
-        to_h.fetch(name, {}).fetch('Destination', nil)
-      end
 
       def started_at
         parse_date(to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Conditions', {}).fetch('NotBefore', nil))

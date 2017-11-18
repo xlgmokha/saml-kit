@@ -27,6 +27,10 @@ module Saml
         to_h.fetch(name, {}).fetch('Version', {})
       end
 
+      def destination
+        to_h.fetch(name, {}).fetch('Destination', nil)
+      end
+
       def to_h
         @xml_hash
       end
