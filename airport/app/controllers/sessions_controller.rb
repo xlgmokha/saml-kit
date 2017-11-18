@@ -17,7 +17,7 @@ class SessionsController < ApplicationController
     # * URI
     # * SAMLRequest/SAMLResponse
     post_binding = idp_metadata.single_sign_on_service_for(binding: :post)
-    @post_uri, @saml_request = post_binding.serialize(builder, relay_state: @relay_state)
+    @post_uri, @saml_params = post_binding.serialize(builder, relay_state: @relay_state)
   end
 
   def create

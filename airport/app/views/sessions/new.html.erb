@@ -4,8 +4,9 @@
       <%= link_to "Log in to IDP via redirect", @redirect_uri %>
 
       <%= form_tag @post_uri.to_s, method: :post do %>
-        <%= hidden_field_tag 'SAMLRequest', @saml_request %>
-        <%= hidden_field_tag 'RelayState', @relay_state %>
+        <% @saml_params.each do |(key, value)| %>
+          <%= hidden_field_tag key, value %>
+        <% end %>
         <%= submit_tag "Log In to IDP via POST" %>
       <% end %>
     </div>

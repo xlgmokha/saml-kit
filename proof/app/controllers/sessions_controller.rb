@@ -46,10 +46,7 @@ class SessionsController < ApplicationController
   end
 
   def binding_for(request)
-    if request.post?
-      idp.single_sign_on_service_for(binding: :post)
-    else
-      idp.single_sign_on_service_for(binding: :http_redirect)
-    end
+    target_binding = request.post? ? :post : :http_redirect
+    idp.single_sign_on_service_for(binding: target_binding)
   end
 end
