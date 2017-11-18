@@ -46,39 +46,11 @@ module Saml
         return urls.first[:location] if urls.any?
       end
 
-      def trusted?
-        return false if provider.nil?
-        return false unless signed?
-        provider.matches?(fingerprint, use: :signing)
-      end
-
-      def provider
-        registry.metadata_for(issuer)
-      end
-
-      def certificate
-        return nil unless signed?
-        to_h[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
-      end
-
-      def fingerprint
-        return nil unless signed?
-        Fingerprint.new(certificate)
-      end
-
-      def signed?
-        to_h[name]['Signature'].present?
-      end
-
       def response_for(user)
         LogoutResponse::Builder.new(user, self).build
       end
 
       private
-
-      def registry
-        Saml::Kit.configuration.registry
-      end
 
       def must_have_valid_signature
         return if to_xml.blank?

@@ -4,6 +4,7 @@ module Saml
       PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
       include XsdValidatable
       include ActiveModel::Validations
+      include Trustable
 
       attr_reader :content, :name
 

@@ -40,32 +40,8 @@ module Saml
         to_h[name]['NameIDPolicy']['Format']
       end
 
-      def certificate
-        return nil unless signed?
-        to_h[name]['Signature']['KeyInfo']['X509Data']['X509Certificate']
-      end
-
-      def fingerprint
-        return nil unless signed?
-        Fingerprint.new(certificate)
-      end
-
-      def signed?
-        to_h[name]['Signature'].present?
-      end
-
       def response_for(user)
         Response::Builder.new(user, self).build
-      end
-
-      def trusted?
-        return false if provider.nil?
-        return false unless signed?
-        provider.matches?(fingerprint, use: :signing)
-      end
-
-      def provider
-        registry.metadata_for(issuer)
       end
 
       private
@@ -74,10 +50,6 @@ module Saml
         return if provider.nil?
         acs_urls = provider.assertion_consumer_services
         return acs_urls.first[:location] if acs_urls.any?
-      end
-
-      def registry
-        Saml::Kit.configuration.registry
       end
 
       def must_be_registered
