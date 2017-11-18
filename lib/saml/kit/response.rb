@@ -5,7 +5,6 @@ module Saml
 
       attr_reader :request_id
       validates_presence_of :id
-      validate :must_be_registered
       validate :must_be_valid_version
       validates_inclusion_of :status_code, in: [Namespaces::SUCCESS]
 
@@ -50,13 +49,6 @@ module Saml
       end
 
       private
-
-      def must_be_registered
-        return unless expected_type?
-        return if trusted?
-
-        errors[:base] << error_message(:unregistered)
-      end
 
       def must_be_valid_version
         return unless expected_type?

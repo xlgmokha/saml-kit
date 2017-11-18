@@ -99,7 +99,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       builder = described_class::Builder.new
       subject = described_class.new(builder.to_xml)
       expect(subject).to be_invalid
-      expect(subject.errors[:service_provider]).to be_present
+      expect(subject.errors[:provider]).to be_present
     end
 
     it 'is invalid when an assertion consumer service url is not provided' do
