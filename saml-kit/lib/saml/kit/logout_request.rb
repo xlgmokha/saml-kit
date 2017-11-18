@@ -9,11 +9,7 @@ module Saml
       validate :must_match_xsd
 
       def initialize(xml)
-        super(xml, name: "LogoutRequest")
-      end
-
-      def query_string_parameter
-        'SAMLRequest'
+        super(xml, name: "LogoutRequest", query_string_parameter: 'SAMLRequest')
       end
 
       def id

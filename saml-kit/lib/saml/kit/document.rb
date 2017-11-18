@@ -6,9 +6,10 @@ module Saml
       include ActiveModel::Validations
       include Trustable
 
-      attr_reader :content, :name
+      attr_reader :content, :name, :query_string_parameter
 
-      def initialize(xml, name:)
+      def initialize(xml, name:, query_string_parameter:)
+        @query_string_parameter = query_string_parameter
         @content = xml
         @name = name
         @xml_hash = Hash.from_xml(xml) || {}

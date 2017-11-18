@@ -9,11 +9,7 @@ module Saml
       validate :must_match_xsd
 
       def initialize(xml)
-        super(xml, name: "AuthnRequest")
-      end
-
-      def query_string_parameter
-        'SAMLRequest'
+        super(xml, name: "AuthnRequest", query_string_parameter: 'SAMLRequest')
       end
 
       def id
