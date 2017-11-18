@@ -112,7 +112,7 @@ RSpec.describe Saml::Kit::Response do
       xml = Saml::Kit::IdentityProviderMetadata::Builder.new.to_xml
       subject = described_class.new(xml)
       expect(subject).to be_invalid
-      expect(subject.errors[:base]).to be_present
+      expect(subject.errors[:base]).to include(subject.error_message(:invalid))
     end
 
     it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do

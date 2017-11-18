@@ -60,8 +60,7 @@ module Saml
       end
 
       def login?
-        return false if to_xml.blank?
-        to_h[name].present?
+        request?
       end
 
       class Builder

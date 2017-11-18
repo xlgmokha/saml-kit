@@ -2,6 +2,7 @@ module Saml
   module Kit
     module Requestable
       extend ActiveSupport::Concern
+
       included do
         validate :must_be_request
       end
