@@ -208,4 +208,16 @@ RSpec.describe Saml::Kit::Response do
       expect(subject.errors[:audience]).to be_present
     end
   end
+
+  describe described_class::Builder do
+    subject { described_class.new(user, request) }
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
+    let(:request) { double(:request, id: SecureRandom.uuid, acs_url: FFaker::Internet.http_url, provider: nil, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url) }
+
+    describe "#build" do
+      it 'builds a response with the request_id' do
+        expect(subject.build.request_id).to eql(request.id)
+      end
+    end
+  end
 end

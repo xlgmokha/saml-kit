@@ -196,7 +196,7 @@ module Saml
         end
 
         def build
-          Response.new(to_xml)
+          Response.new(to_xml, request_id: request.id)
         end
 
         private
