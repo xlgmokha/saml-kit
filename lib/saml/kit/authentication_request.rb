@@ -77,12 +77,14 @@ module Saml
 
       class Builder
         attr_accessor :id, :now, :issuer, :acs_url, :name_id_format, :sign, :destination
+        attr_accessor :version
 
         def initialize(configuration: Saml::Kit.configuration, sign: true)
           @id = SecureRandom.uuid
           @issuer = configuration.issuer
           @name_id_format = Namespaces::PERSISTENT
           @now = Time.now.utc
+          @version = "2.0"
           @sign = sign
         end
 
@@ -107,7 +109,7 @@ module Saml
             "xmlns:samlp" => Namespaces::PROTOCOL,
             "xmlns:saml" => Namespaces::ASSERTION,
             ID: "_#{id}",
-            Version: "2.0",
+            Version: version,
             IssueInstant: now.utc.iso8601,
             Destination: destination,
           }

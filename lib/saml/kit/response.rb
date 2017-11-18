@@ -46,10 +46,6 @@ module Saml
         to_h.fetch(name, {}).fetch('Destination', nil)
       end
 
-      def version
-        to_h.fetch(name, {}).fetch('Version', {})
-      end
-
       def started_at
         parse_date(to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Conditions', {}).fetch('NotBefore', nil))
       end
