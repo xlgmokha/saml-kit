@@ -6,6 +6,7 @@ module Saml
       include ActiveModel::Validations
       include Trustable
       validates_presence_of :content
+      validate :must_match_xsd
 
       attr_reader :content, :name
 
@@ -43,20 +44,28 @@ module Saml
         to_xml
       end
 
-      def self.to_saml_document(xml)
-        hash = Hash.from_xml(xml)
-        if hash['Response'].present?
-          Response.new(xml)
-        elsif hash['LogoutResponse'].present?
-          LogoutResponse.new(xml)
-        elsif hash['AuthnRequest'].present?
-          AuthenticationRequest.new(xml)
-        elsif hash['LogoutRequest'].present?
-          LogoutRequest.new(xml)
+      class << self
+        def to_saml_document(xml)
+          hash = Hash.from_xml(xml)
+          if hash['Response'].present?
+            Response.new(xml)
+          elsif hash['LogoutResponse'].present?
+            LogoutResponse.new(xml)
+          elsif hash['AuthnRequest'].present?
+            AuthenticationRequest.new(xml)
+          elsif hash['LogoutRequest'].present?
+            LogoutRequest.new(xml)
+          end
+        rescue => error
+          Saml::Kit.logger.error(error)
+          InvalidDocument.new(xml)
         end
-      rescue => error
-        Saml::Kit.logger.error(error)
-        InvalidDocument.new(xml)
+      end
+
+      private
+
+      def must_match_xsd
+        matches_xsd?(PROTOCOL_XSD)
       end
     end
   end

@@ -5,7 +5,6 @@ module Saml
       validates_presence_of :acs_url, if: :login?
       validate :must_have_valid_signature
       validate :must_be_registered
-      validate :must_match_xsd
 
       def initialize(xml)
         super(xml, name: "AuthnRequest")
@@ -53,10 +52,6 @@ module Saml
         xml.errors.each do |error|
           errors[:base] << error
         end
-      end
-
-      def must_match_xsd
-        matches_xsd?(PROTOCOL_XSD)
       end
 
       def login?
