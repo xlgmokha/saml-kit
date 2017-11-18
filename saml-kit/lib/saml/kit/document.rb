@@ -35,6 +35,10 @@ module Saml
         to_h.fetch(name, {}).fetch('Destination', nil)
       end
 
+      def issue_instant
+        to_h[name]['IssueInstant']
+      end
+
       def expected_type?
         return false if to_xml.blank?
         to_h[name].present?
