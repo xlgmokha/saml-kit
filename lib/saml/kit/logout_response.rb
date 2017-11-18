@@ -7,10 +7,6 @@ module Saml
         super(xml, name: "LogoutResponse")
       end
 
-      def issue_instant
-        to_h[name]['IssueInstant']
-      end
-
       private
 
       class Builder
