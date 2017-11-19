@@ -6,14 +6,13 @@ en:
         invalid: "must contain AuthnRequest."
         invalid_fingerprint: "does not match."
         unregistered: "is unregistered."
-      SPSSODescriptor:
-        invalid: "must contain SPSSODescriptor."
-        invalid_signature: "invalid signature."
       IDPSSODescriptor:
         invalid: "must contain IDPSSODescriptor."
         invalid_signature: "invalid signature."
       InvalidDocument:
         invalid: "must contain valid SAMLRequest"
+      LogoutResponse:
+        unregistered: "is unregistered."
       Response:
         invalid: "must contain Response."
         unregistered: "must originate from registered identity provider."
@@ -21,3 +20,6 @@ en:
         invalid_version: "must be 2.0."
         invalid_response_to: "must match request id."
         must_match_issuer: "must match entityId."
+      SPSSODescriptor:
+        invalid: "must contain SPSSODescriptor."
+        invalid_signature: "invalid signature."

@@ -1,6 +1,8 @@
-<%= form_tag(@post_uri, style: "position: absolute; left: -10000px; top: -10000px;") do %>
-  <%= hidden_field_tag("SAMLRequest", @saml_request) %>
-  <%= submit_tag "Submit" %>
+<h1>Loggout out of SP</h1>
+<%= form_tag(@url, style: "position: absolute; left: -10000px; top: -10000px;") do %>
+  <%= @saml_params.each do |(key, value)| %>
+    <%= hidden_field_tag key, value %>
+  <% end %>
 <% end %>
 
 <%= javascript_tag do %>

@@ -22,7 +22,7 @@ class Idp
         builder.attributes << :email
         builder.attributes << :created_at
         builder.build
-        end
+      end
     end
   end
 end
