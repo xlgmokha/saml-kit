@@ -9,7 +9,7 @@ module Saml
         services('AssertionConsumerService')
       end
 
-      def assertion_consumer_services_for(binding:)
+      def assertion_consumer_service_for(binding:)
         service_for(binding: binding, type: 'AssertionConsumerService')
       end
 

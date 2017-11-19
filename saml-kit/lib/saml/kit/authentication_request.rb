@@ -10,7 +10,7 @@ module Saml
 
       def acs_url
         #if signed? && trusted?
-          to_h[name]['AssertionConsumerServiceURL'] || registered_acs_url
+          to_h[name]['AssertionConsumerServiceURL'] || registered_acs_url(binding: :post)
         #else
           #registered_acs_url
         #end
@@ -26,10 +26,9 @@ module Saml
 
       private
 
-      def registered_acs_url
+      def registered_acs_url(binding:)
         return if provider.nil?
-        acs_urls = provider.assertion_consumer_services
-        return acs_urls.first[:location] if acs_urls.any?
+        provider.assertion_consumer_service_for(binding: binding).try(:location)
       end
 
       class Builder
