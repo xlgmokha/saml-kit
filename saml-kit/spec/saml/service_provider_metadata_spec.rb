@@ -78,7 +78,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     end
 
     it 'returns each acs url and binding' do
-      expect(subject.assertion_consumer_services).to match_array([
+      expect(subject.assertion_consumer_services.map(&:to_h)).to match_array([
         { location: acs_post_url, binding: Saml::Kit::Namespaces::POST },
         { location: acs_redirect_url, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
       ])

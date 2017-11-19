@@ -6,12 +6,11 @@ module Saml
       end
 
       def assertion_consumer_services
-        find_all("/md:EntityDescriptor/md:#{name}/md:AssertionConsumerService").map do |item|
-          {
-            binding: item.attribute("Binding").value,
-            location: item.attribute("Location").value,
-          }
-        end
+        services('AssertionConsumerService')
+      end
+
+      def assertion_consumer_services_for(binding:)
+        service_for(binding: binding, type: 'AssertionConsumerService')
       end
 
       def want_assertions_signed
