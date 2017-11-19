@@ -17,6 +17,10 @@ module Saml
       def deflate(value, level: Zlib::BEST_COMPRESSION)
         Zlib::Deflate.deflate(value, level)[2..-5]
       end
+
+      def unescape(value)
+        CGI.unescape(value)
+      end
     end
   end
 end
