@@ -15,7 +15,7 @@ module Saml
       def single_logout_service
         return if provider.nil?
         urls = provider.single_logout_services
-        return urls.first[:location] if urls.any?
+        urls.first
       end
 
       def response_for(user)
