@@ -161,7 +161,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
   describe "#response_for" do
     it 'returns a logout response for a particular user' do
       user = double(:user)
-      expect(subject.response_for(user)).to be_instance_of(Saml::Kit::LogoutResponse)
+      expect(subject.response_for(user)).to be_instance_of(Saml::Kit::LogoutResponse::Builder)
     end
   end
 end
