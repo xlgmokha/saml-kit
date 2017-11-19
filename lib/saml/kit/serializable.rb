@@ -14,12 +14,17 @@ module Saml
         inflater.inflate(value)
       end
 
+      # drop header and checksum as per spec.
       def deflate(value, level: Zlib::BEST_COMPRESSION)
         Zlib::Deflate.deflate(value, level)[2..-5]
       end
 
       def unescape(value)
         CGI.unescape(value)
+      end
+
+      def escape(value)
+        CGI.escape(value)
       end
     end
   end
