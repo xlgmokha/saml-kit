@@ -53,17 +53,25 @@ module Saml
         certificates.find_all { |x| x[:use] == :signing }
       end
 
-      def single_logout_services
-        find_all("/md:EntityDescriptor/md:#{name}/md:SingleLogoutService").map do |item|
+      def services(type)
+        find_all("/md:EntityDescriptor/md:#{name}/md:#{type}").map do |item|
           binding = item.attribute("Binding").value
           location = item.attribute("Location").value
           binding_for(binding, location)
         end
       end
 
-      def single_logout_service_for(binding:)
+      def service_for(binding:, type:)
         binding = Saml::Kit::Namespaces.binding_for(binding)
-        single_logout_services.find { |x| x.binding?(binding) }
+        services(type).find { |x| x.binding?(binding) }
+      end
+
+      def single_logout_services
+        services('SingleLogoutService')
+      end
+
+      def single_logout_service_for(binding:)
+        service_for(binding: binding, type: 'SingleLogoutService')
       end
 
       def matches?(fingerprint, use: :signing)

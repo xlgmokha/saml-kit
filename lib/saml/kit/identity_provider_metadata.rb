@@ -13,17 +13,11 @@ module Saml
       end
 
       def single_sign_on_services
-        xpath = "/md:EntityDescriptor/md:#{name}/md:SingleSignOnService"
-        find_all(xpath).map do |item|
-          binding = item.attribute("Binding").value
-          location = item.attribute("Location").value
-          binding_for(binding, location)
-        end
+        services('SingleSignOnService')
       end
 
       def single_sign_on_service_for(binding:)
-        binding = Saml::Kit::Namespaces.binding_for(binding)
-        single_sign_on_services.find { |x| x.binding?(binding) }
+        service_for(binding: binding, type: 'SingleSignOnService')
       end
 
       def attributes
