@@ -1,6 +1,7 @@
-<%= form_tag(@saml_response.destination, style: "position: absolute; left: -10000px; top: -10000px;") do %>
-  <%= hidden_field_tag("SAMLResponse", @saml_response.serialize) %>
-  <%= hidden_field_tag("RelayState", @relay_state) %>
+<%= form_tag(@url, style: "position: absolute; left: -10000px; top: -10000px;") do %>
+  <% @saml_params.each do |(key, value)| %>
+    <%= hidden_field_tag key, value %>
+  <% end %>
   <%= submit_tag "Submit" %>
 <% end %>
 

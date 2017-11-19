@@ -11,8 +11,8 @@ class SessionsController < ApplicationController
     if user = User.login(user_params[:email], user_params[:password])
       reset_session
       session[:user_id] = user.id
-      @saml_response = @saml_request.response_for(user)
-      @relay_state = params[:RelayState]
+      binding = @saml_request.provider.single_logout_service_for(binding: :post)
+      @url, @saml_params = binding.serialize(@saml_request.response_for(user), relay_state: session[:RelayState])
       render layout: "spinner"
     else
       redirect_to new_session_path, error: "Invalid Credentials"

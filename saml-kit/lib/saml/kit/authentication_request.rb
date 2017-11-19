@@ -21,7 +21,7 @@ module Saml
       end
 
       def response_for(user)
-        Response::Builder.new(user, self).build
+        Response::Builder.new(user, self)
       end
 
       private
