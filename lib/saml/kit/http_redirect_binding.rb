@@ -23,7 +23,8 @@ module Saml
       private
 
       def deserialize_document_from!(params)
-        xml = inflate(decode(CGI.unescape(saml_param_from(params))))
+        xml = inflate(decode(unescape(saml_param_from(params))))
+        Saml::Kit.logger.debug(xml)
         Saml::Kit::Document.to_saml_document(xml)
       end
 
