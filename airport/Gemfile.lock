@@ -2,8 +2,8 @@ PATH
   remote: ../saml-kit
   specs:
     saml-kit (0.1.0)
-      activemodel (~> 5.1)
-      activesupport (~> 5.1)
+      activemodel (>= 4.2.0)
+      activesupport (>= 4.2.0)
       builder (~> 3.2)
       nokogiri (~> 1.8)
       xmldsig (~> 0.6)
@@ -261,4 +261,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.15.4
+   1.16.0
