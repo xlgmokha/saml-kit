@@ -4,8 +4,9 @@ module Saml
       extend ActiveSupport::Concern
 
       included do
-        validate :must_have_valid_signature
+        validate :must_have_valid_signature, unless: :signature_manually_verified
         validate :must_be_registered
+        validate :must_be_trusted, unless: :signature_manually_verified
       end
 
       def certificate
@@ -19,7 +20,7 @@ module Saml
       end
 
       def signed?
-        to_h[name]['Signature'].present?
+        to_h.fetch(name, {}).fetch('Signature', nil).present?
       end
 
       def trusted?
@@ -36,7 +37,13 @@ module Saml
         Saml::Kit.configuration.registry
       end
 
+      def signature_verified!
+        @signature_manually_verified = true
+      end
+
       private
+
+      attr_reader :signature_manually_verified
 
       def must_have_valid_signature
         return if to_xml.blank?
@@ -50,10 +57,11 @@ module Saml
 
       def must_be_registered
         return unless expected_type?
-        if provider.nil?
-          errors[:provider] << error_message(:unregistered)
-          return
-        end
+        return if provider.present?
+        errors[:provider] << error_message(:unregistered)
+      end
+
+      def must_be_trusted
         return if trusted?
         errors[:fingerprint] << error_message(:invalid_fingerprint)
       end
