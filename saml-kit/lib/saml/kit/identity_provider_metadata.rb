@@ -33,7 +33,7 @@ module Saml
 
       class Builder
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats
-        attr_accessor :want_authn_requests_signed, :sign
+        attr_accessor :want_authn_requests_signed, :authn_requests_signed, :sign
         attr_reader :logout_urls, :single_sign_on_urls
 
         def initialize(configuration = Saml::Kit.configuration)
@@ -46,6 +46,7 @@ module Saml
           @configuration = configuration
           @sign = true
           @want_authn_requests_signed = true
+          @authn_requests_signed = true
         end
 
         def add_single_sign_on_service(url, binding: :post)
@@ -112,8 +113,9 @@ module Saml
 
         def idp_sso_descriptor_options
           {
+            AuthnRequestsSigned: authn_requests_signed,
+            WantAuthnRequestsSigned: want_authn_requests_signed,
             protocolSupportEnumeration: Namespaces::PROTOCOL,
-            WantAuthnRequestsSigned: want_authn_requests_signed
           }
         end
       end
