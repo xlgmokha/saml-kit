@@ -81,5 +81,17 @@ RSpec.describe Saml::Kit::HttpRedirectBinding do
         subject.deserialize(query_params)
       end.to raise_error(/Invalid Signature/)
     end
+
+    it 'returns a signed document, when a signature is missing' do
+      builder = Saml::Kit::ServiceProviderMetadata::Builder.new
+      builder.add_assertion_consumer_service(FFaker::Internet.http_url, binding: :post)
+      provider = builder.build
+      allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
+
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest::Builder.new)
+      result = subject.deserialize(query_params_from(url))
+      expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
+      expect(result).to be_valid
+    end
   end
 end

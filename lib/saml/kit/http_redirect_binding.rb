@@ -17,6 +17,7 @@ module Saml
       def deserialize(params)
         document = deserialize_document_from!(params)
         ensure_valid_signature!(params, document)
+        document.signature_verified!
         document
       end
 

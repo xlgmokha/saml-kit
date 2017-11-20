@@ -94,6 +94,7 @@ RSpec.describe Saml::Kit::Response do
     end
 
     it 'is invalid when blank' do
+      allow(registry).to receive(:metadata_for).and_return(nil)
       subject = described_class.new("")
       expect(subject).to be_invalid
       expect(subject.errors[:content]).to be_present
@@ -109,6 +110,7 @@ RSpec.describe Saml::Kit::Response do
     end
 
     it 'is invalid when not a Response' do
+      allow(registry).to receive(:metadata_for).and_return(nil)
       xml = Saml::Kit::IdentityProviderMetadata::Builder.new.to_xml
       subject = described_class.new(xml)
       expect(subject).to be_invalid
