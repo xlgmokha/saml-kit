@@ -1,8 +1,8 @@
 class SessionsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:new, :destroy]
   before_action :load_saml_request, only: [:new, :create, :destroy]
-  rescue_from ActiveRecord::RecordInvalid do |record|
-    render_error(:forbidden, model: record)
+  rescue_from ActiveRecord::RecordInvalid do |error|
+    render_error(:forbidden, model: error.record)
   end
 
   def new
@@ -42,7 +42,7 @@ class SessionsController < ApplicationController
     params.require(:user).permit(:email, :password)
   end
 
-  def load_saml_request(raw_saml_request = session[:SAMLRequest] || params[:SAMLRequest])
+  def load_saml_request
     @saml_request = request_binding_for(request).deserialize(params)
     raise ActiveRecord::RecordInvalid.new(@saml_request) if @saml_request.invalid?
     @saml_request
