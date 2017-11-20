@@ -214,7 +214,6 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(result['EntityDescriptor']['entityID']).to eql(entity_id)
       expect(result['EntityDescriptor']['IDPSSODescriptor']['protocolSupportEnumeration']).to eql(Saml::Kit::Namespaces::PROTOCOL)
       expect(result['EntityDescriptor']['IDPSSODescriptor']['WantAuthnRequestsSigned']).to eql('true')
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['AuthnRequestsSigned']).to eql('true')
       expect(result['EntityDescriptor']['IDPSSODescriptor']['NameIDFormat']).to match_array([
         Saml::Kit::Namespaces::PERSISTENT,
         Saml::Kit::Namespaces::TRANSIENT,
