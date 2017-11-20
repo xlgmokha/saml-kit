@@ -12,7 +12,6 @@ class SessionsController < ApplicationController
     # * RelayState
     redirect_binding = idp_metadata.single_sign_on_service_for(binding: :http_redirect)
     @redirect_uri, _ = redirect_binding.serialize(builder, relay_state: @relay_state)
-
     # HTTP POST
     # * URI
     # * SAMLRequest/SAMLResponse

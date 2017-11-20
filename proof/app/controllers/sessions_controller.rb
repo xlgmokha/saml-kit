@@ -43,7 +43,7 @@ class SessionsController < ApplicationController
   end
 
   def load_saml_request
-    @saml_request = request_binding_for(request).deserialize(params)
+    @saml_request = request_binding_for(request).deserialize(raw_params_for(request))
     raise ActiveRecord::RecordInvalid.new(@saml_request) if @saml_request.invalid?
     @saml_request
   end
@@ -55,5 +55,13 @@ class SessionsController < ApplicationController
   def request_binding_for(request)
     target_binding = request.post? ? :post : :http_redirect
     idp.single_sign_on_service_for(binding: target_binding)
+  end
+
+  def raw_params_for(request)
+    if request.post?
+      request.params
+    else
+      Hash[request.query_string.split("&").map { |x| x.split("=", 2) }]
+    end
   end
 end
