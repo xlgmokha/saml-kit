@@ -14,12 +14,13 @@ en:
       LogoutResponse:
         unregistered: "is unregistered."
       Response:
-        invalid: "must contain Response."
-        unregistered: "must originate from registered identity provider."
         expired: "must not be expired."
-        invalid_version: "must be 2.0."
+        invalid: "must contain Response."
+        invalid_fingerprint: "does not match."
         invalid_response_to: "must match request id."
+        invalid_version: "must be 2.0."
         must_match_issuer: "must match entityId."
+        unregistered: "must originate from registered identity provider."
       SPSSODescriptor:
         invalid: "must contain SPSSODescriptor."
         invalid_signature: "invalid signature."
