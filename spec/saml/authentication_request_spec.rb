@@ -148,6 +148,20 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       end
       expect(described_class.new(signature.finalize(xml))).to be_invalid
     end
+
+    it 'validates a request without a signature' do
+      now = Time.now.utc
+raw_xml = <<-XML
+<samlp:AuthnRequest AssertionConsumerServiceURL='#{acs_url}' ID='_#{SecureRandom.uuid}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
+  <saml:Issuer>#{issuer}</saml:Issuer>
+  <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::EMAIL_ADDRESS}'/>
+</samlp:AuthnRequest>
+XML
+
+      subject = described_class.new(raw_xml)
+      subject.signature_verified!
+      expect(subject).to be_valid
+    end
   end
 
   describe "#acs_url" do
