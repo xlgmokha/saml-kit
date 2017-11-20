@@ -10,12 +10,12 @@ class SessionsController < ApplicationController
     # * SigAlg
     # * Signature
     # * RelayState
-    redirect_binding = idp_metadata.single_sign_on_service_for(binding: :http_redirect)
+    redirect_binding = idp.single_sign_on_service_for(binding: :http_redirect)
     @redirect_uri, _ = redirect_binding.serialize(builder, relay_state: @relay_state)
     # HTTP POST
     # * URI
     # * SAMLRequest/SAMLResponse
-    post_binding = idp_metadata.single_sign_on_service_for(binding: :post)
+    post_binding = idp.single_sign_on_service_for(binding: :post)
     @post_uri, @saml_params = post_binding.serialize(builder, relay_state: @relay_state)
   end
 
@@ -38,7 +38,7 @@ class SessionsController < ApplicationController
       reset_session
       redirect_to new_session_path
     else
-      saml_binding = idp_metadata.single_logout_service_for(binding: :post)
+      saml_binding = idp.single_logout_service_for(binding: :post)
       builder = Saml::Kit::LogoutRequest::Builder.new(current_user, sign: true)
       @url, @saml_params = saml_binding.serialize(builder)
       render layout: "spinner"
@@ -47,7 +47,7 @@ class SessionsController < ApplicationController
 
   private
 
-  def idp_metadata
+  def idp
     Rails.configuration.x.idp_metadata
   end
 
