@@ -2,11 +2,10 @@
   <% @saml_params.each do |(key, value)| %>
     <%= hidden_field_tag key, value %>
   <% end %>
-  <%= submit_tag "Submit" %>
 <% end %>
 
 <%= javascript_tag do %>
-  window.onload= function () {
+  window.onload = function () {
     document.forms[0].submit();
   };
 <% end %>

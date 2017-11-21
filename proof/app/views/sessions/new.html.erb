@@ -9,9 +9,6 @@
         <div class="form-group">
           <%= form.password_field :password, class: 'form-control', placeholder: User.human_attribute_name(:password), required: :required %>
         </div>
-        <% @raw_params.each_pair do |key, value| %>
-          <%= hidden_field_tag key, value %>
-        <% end %>
         <%= form.button t('.login'), type: 'submit', class: 'btn btn-primary', data: { disable_with: t('.loading') } %>
       <% end %>
     </div>

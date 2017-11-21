@@ -1,25 +1,31 @@
 class SessionsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:new, :destroy]
-  before_action :saml_request, only: [:new, :create, :destroy]
-  rescue_from ActiveRecord::RecordInvalid do |error|
-    render_error(:forbidden, model: error.record)
-  end
 
   def new
-    @raw_params = raw_params
-    session[:request_binding] = request.post? ? :post : :http_redirect
+    target_binding = request.post? ? :post : :http_redirect
+    binding = idp.single_sign_on_service_for(binding: target_binding)
+    saml_request = binding.deserialize(raw_params)
+    if saml_request.invalid?
+      return render_error(:forbidden, model: saml_request)
+    end
+    session[:saml] = { params: raw_params.to_h, binding: target_binding }
   end
 
   def create
     if user = User.login(user_params[:email], user_params[:password])
-      reset_session
-      session[:user_id] = user.id
+      binding = idp.single_sign_on_service_for(binding: session[:saml][:binding])
+      saml_request = binding.deserialize(session[:saml][:params])
+      if saml_request.invalid?
+        return render_error(:forbidden, model: saml_request)
+      end
+
       response_binding = saml_request.provider.assertion_consumer_service_for(binding: :post)
       saml_response = saml_request.response_for(user)
       @url, @saml_params = response_binding.serialize(saml_response, relay_state: saml_params[:RelayState])
+      reset_session
+      session[:user_id] = user.id
       render layout: "spinner"
     else
-      @raw_params = raw_params
       flash[:error] = "Invalid Credentials"
       render :new
     end
@@ -27,6 +33,10 @@ class SessionsController < ApplicationController
 
   def destroy
     if saml_params[:SAMLRequest].present?
+      binding = idp.single_logout_service_for(binding: :post)
+      saml_request = binding.deserialize(raw_params).tap do |saml|
+        raise ActiveRecord::RecordInvalid.new(saml) if saml.invalid?
+      end
       user = User.find_by(uuid: saml_request.name_id)
       response_binding = saml_request.provider.single_logout_service_for(binding: :post)
       saml_response = saml_request.response_for(user)
@@ -48,22 +58,8 @@ class SessionsController < ApplicationController
     params.permit(:SAMLRequest, :SAMLResponse, :SAMLEncoding, :SigAlg, :Signature)
   end
 
-  def saml_request
-    @saml_request ||= request_binding.deserialize(raw_params).tap do |saml_request|
-      if saml_request.invalid?
-        raise ActiveRecord::RecordInvalid.new(saml_request)
-      end
-    end
-  end
-
   def idp
     Idp.default(request)
-  end
-
-  def request_binding
-    target_binding = session[:request_binding]
-    target_binding = target_binding || (request.post? ? :post : :http_redirect)
-    idp.single_sign_on_service_for(binding: target_binding)
   end
 
   def raw_params
