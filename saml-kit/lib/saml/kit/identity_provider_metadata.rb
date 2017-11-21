@@ -112,8 +112,8 @@ module Saml
 
         def idp_sso_descriptor_options
           {
+            WantAuthnRequestsSigned: want_authn_requests_signed,
             protocolSupportEnumeration: Namespaces::PROTOCOL,
-            WantAuthnRequestsSigned: want_authn_requests_signed
           }
         end
       end

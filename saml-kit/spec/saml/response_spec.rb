@@ -209,6 +209,24 @@ RSpec.describe Saml::Kit::Response do
       expect(subject).to be_invalid
       expect(subject.errors[:audience]).to be_present
     end
+
+    it 'is invalid' do
+      now = Time.now.utc
+      destination = FFaker::Internet.http_url
+      raw_xml = <<-XML
+<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="_#{SecureRandom.uuid}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{destination}" Consent="#{Saml::Kit::Namespaces::UNSPECIFIED}" InResponseTo="#{request.id}">
+  <Issuer xmlns="#{Saml::Kit::Namespaces::ASSERTION}">#{request.issuer}</Issuer>
+  <samlp:Status>
+    <samlp:StatusCode Value="#{Saml::Kit::Namespaces::RESPONDER_ERROR}"/>
+  </samlp:Status>
+</samlp:Response>
+      XML
+
+      allow(registry).to receive(:metadata_for).with(request.issuer).and_return(metadata)
+      subject = described_class.new(raw_xml)
+      expect(subject).to be_invalid
+    end
   end
 
   describe described_class::Builder do

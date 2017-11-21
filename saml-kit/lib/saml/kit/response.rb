@@ -46,11 +46,13 @@ module Saml
 
       def must_be_active_session
         return unless expected_type?
+        return unless success?
         errors[:base] << error_message(:expired) unless active?
       end
 
       def must_match_issuer
         return unless expected_type?
+        return unless success?
 
         unless audiences.include?(Saml::Kit.configuration.issuer)
           errors[:audience] << error_message(:must_match_issuer)

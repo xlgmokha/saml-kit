@@ -21,6 +21,10 @@ module Saml
         to_h.fetch(name, {}).fetch('InResponseTo', nil)
       end
 
+      def success?
+        Namespaces::SUCCESS == status_code
+      end
+
       private
 
       def must_match_request_id
