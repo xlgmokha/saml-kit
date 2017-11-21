@@ -3,19 +3,33 @@ require 'spec_helper'
 RSpec.describe Saml::Kit::Response do
   describe "#destination" do
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
-    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { }) }
-    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil) }
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
     subject { described_class::Builder.new(user, request).build }
 
-    it 'returns the acs_url' do
-      expect(subject.destination).to eql(acs_url)
+    describe "when the request is signed and trusted" do
+      let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil, signed?: true, trusted?: true) }
+
+      it 'returns the ACS embedded in the request' do
+        expect(subject.destination).to eql(acs_url)
+      end
+    end
+
+    describe "when the request is not trusted" do
+      let(:registered_acs_url) { FFaker::Internet.uri("https") }
+      let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, signed?: true, trusted?: false) }
+      let(:provider) { instance_double(Saml::Kit::ServiceProviderMetadata, want_assertions_signed: false) }
+
+      it 'returns the registered ACS embedded in the metadata' do
+        allow(provider).to receive(:assertion_consumer_service_for).and_return(double(location: registered_acs_url))
+        expect(subject.destination).to eql(registered_acs_url)
+      end
     end
   end
 
   describe "#to_xml" do
     subject { described_class::Builder.new(user, request) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
-    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil) }
+    let(:request) { double(id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil, trusted?: true, signed?: true) }
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:issuer) { FFaker::Movie.title }
     let(:email) { FFaker::Internet.email }
@@ -76,7 +90,7 @@ RSpec.describe Saml::Kit::Response do
   end
 
   describe "#valid?" do
-    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil) }
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
     let(:builder) { described_class::Builder.new(user, request) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
@@ -232,7 +246,7 @@ RSpec.describe Saml::Kit::Response do
   describe described_class::Builder do
     subject { described_class.new(user, request) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
-    let(:request) { double(:request, id: SecureRandom.uuid, acs_url: FFaker::Internet.http_url, provider: nil, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url) }
+    let(:request) { double(:request, id: SecureRandom.uuid, acs_url: FFaker::Internet.http_url, provider: nil, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url, signed?: true, trusted?: true) }
 
     describe "#build" do
       it 'builds a response with the request_id' do

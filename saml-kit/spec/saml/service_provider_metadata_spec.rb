@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::ServiceProviderMetadata do
-  let(:entity_id) { FFaker::Internet.http_url }
-  let(:acs_post_url) { FFaker::Internet.http_url }
-  let(:acs_redirect_url) { FFaker::Internet.http_url }
-  let(:logout_post_url) { FFaker::Internet.http_url }
-  let(:logout_redirect_url) { FFaker::Internet.http_url }
+  let(:entity_id) { FFaker::Internet.uri("https") }
+  let(:acs_post_url) { FFaker::Internet.uri("https") }
+  let(:acs_redirect_url) { FFaker::Internet.uri("https") }
+  let(:logout_post_url) { FFaker::Internet.uri("https") }
+  let(:logout_redirect_url) { FFaker::Internet.uri("https") }
 
   describe described_class::Builder do
     let(:acs_url) { FFaker::Internet.http_url }
@@ -148,6 +148,19 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       subject = described_class.new(metadata_xml)
       expect(subject).to be_invalid
       expect(subject.errors[:base]).to include("invalid signature.")
+    end
+
+    it 'is invalid when 0 ACS endpoints are specified' do
+      xml = <<-XML
+<?xml version="1.0" encoding="UTF-8"?>
+<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="_#{SecureRandom.uuid}" entityID="#{entity_id}">
+  <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
+    <SingleLogoutService Binding="#{Saml::Kit::Namespaces::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
+    <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
+  </SPSSODescriptor>
+</EntityDescriptor>
+      XML
+      expect(described_class.new(xml)).to be_invalid
     end
   end
 

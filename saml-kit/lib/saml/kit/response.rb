@@ -88,7 +88,7 @@ module Saml
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
           @issuer = configuration.issuer
-          @destination = request.acs_url
+          @destination = destination_for(request)
           @sign = want_assertions_signed
         end
 
@@ -145,6 +145,14 @@ module Saml
         end
 
         private
+
+        def destination_for(request)
+          if request.signed? && request.trusted?
+            request.acs_url || request.provider.assertion_consumer_service_for(binding: :post).try(:location)
+          else
+            request.provider.assertion_consumer_service_for(binding: :post).try(:location)
+          end
+        end
 
         def configuration
           Saml::Kit.configuration
