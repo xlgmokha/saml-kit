@@ -1,48 +1,25 @@
 class SessionsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:create, :destroy]
-  skip_before_action :authenticate!
+  skip_before_action :authenticate!, only: [:new]
 
   def new
-    builder = Saml::Kit::AuthenticationRequest::Builder.new
-    @relay_state = JSON.generate(redirect_to: '/')
     # HTTP Redirect
     # * URI
     # * SigAlg
     # * Signature
     # * RelayState
     redirect_binding = idp.single_sign_on_service_for(binding: :http_redirect)
-    @redirect_uri, _ = redirect_binding.serialize(builder, relay_state: @relay_state)
+    @redirect_uri, _ = redirect_binding.serialize(builder_for(:login), relay_state: relay_state)
     # HTTP POST
     # * URI
     # * SAMLRequest/SAMLResponse
     post_binding = idp.single_sign_on_service_for(binding: :post)
-    @post_uri, @saml_params = post_binding.serialize(builder, relay_state: @relay_state)
-  end
-
-  def create
-    saml_binding = request_binding_for(request)
-    @saml_response = saml_binding.deserialize(params)
-    return render :error, status: :forbidden if @saml_response.invalid?
-
-    session[:user] = { id: @saml_response.name_id }.merge(@saml_response.attributes)
-    redirect_to dashboard_path
+    @post_uri, @saml_params = post_binding.serialize(builder_for(:login), relay_state: relay_state)
   end
 
   def destroy
-    if params['SAMLRequest'].present?
-      # IDP initiated logout
-    elsif params['SAMLResponse'].present?
-      saml_binding = request_binding_for(request)
-      saml_response = saml_binding.deserialize(params)
-      raise ActiveRecordRecordInvalid.new(saml_response) if saml_response.invalid?
-      reset_session
-      redirect_to new_session_path
-    else
-      saml_binding = idp.single_logout_service_for(binding: :post)
-      builder = Saml::Kit::LogoutRequest::Builder.new(current_user, sign: true)
-      @url, @saml_params = saml_binding.serialize(builder)
-      render layout: "spinner"
-    end
+    saml_binding = idp.single_logout_service_for(binding: :post)
+    @url, @saml_params = saml_binding.serialize(builder_for(:logout))
+    render layout: "spinner"
   end
 
   private
@@ -51,12 +28,16 @@ class SessionsController < ApplicationController
     Rails.configuration.x.idp_metadata
   end
 
-  def request_binding_for(request)
-    target_binding = request.post? ? :post : :http_redirect
-    sp.single_logout_service_for(binding: target_binding)
+  def relay_state
+    JSON.generate(redirect_to: '/')
   end
 
-  def sp
-    Sp.default(request)
+  def builder_for(type)
+    case type
+    when :login
+      Saml::Kit::AuthenticationRequest::Builder.new
+    when :logout
+      Saml::Kit::LogoutRequest::Builder.new(current_user)
+    end
   end
 end
