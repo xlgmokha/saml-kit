@@ -102,35 +102,6 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       expect(subject.errors[:provider]).to be_present
     end
 
-    it 'is invalid when an assertion consumer service url is not provided' do
-      allow(metadata).to receive(:matches?).and_return(true)
-      allow(metadata).to receive(:assertion_consumer_service_for).and_return(nil)
-
-      builder = described_class::Builder.new
-      builder.acs_url = nil
-      xml = builder.to_xml
-
-      subject = described_class.new(xml)
-      expect(subject).to be_invalid
-      expect(subject.errors[:acs_url]).to be_present
-    end
-
-    it 'is valid when an the ACS is available via the registry' do
-      allow(registry).to receive(:metadata_for).with(issuer)
-        .and_return(metadata)
-      allow(metadata).to receive(:matches?).and_return(true)
-      allow(metadata).to receive(:assertion_consumer_service_for).and_return(
-        Saml::Kit::HttpPostBinding.new(location: acs_url)
-      )
-
-      builder = described_class::Builder.new
-      builder.issuer = issuer
-      builder.acs_url = nil
-      xml = builder.to_xml
-
-      expect(described_class.new(xml)).to be_valid
-    end
-
     it 'validates the schema of the request' do
       xml = ::Builder::XmlMarkup.new
       id = SecureRandom.uuid
@@ -175,19 +146,13 @@ XML
       expect(subject.acs_url).to eql(acs_url)
     end
 
-    it 'returns the registered ACS url' do
+    it 'returns nil' do
       builder = described_class::Builder.new
       builder.issuer = issuer
       builder.acs_url = nil
       subject = builder.build
 
-      allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
-      allow(registry).to receive(:metadata_for).and_return(metadata)
-      allow(registry).to receive(:metadata_for).with(issuer).and_return(metadata)
-      allow(metadata).to receive(:assertion_consumer_service_for).and_return(
-        Saml::Kit::HttpPostBinding.new(location: acs_url)
-      )
-      expect(subject.acs_url).to eql(acs_url)
+      expect(subject.acs_url).to be_nil
     end
   end
 end

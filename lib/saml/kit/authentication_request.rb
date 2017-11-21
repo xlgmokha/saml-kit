@@ -2,18 +2,13 @@ module Saml
   module Kit
     class AuthenticationRequest < Document
       include Requestable
-      validates_presence_of :acs_url, if: :expected_type?
 
       def initialize(xml)
         super(xml, name: "AuthnRequest")
       end
 
       def acs_url
-        #if signed? && trusted?
-          to_h[name]['AssertionConsumerServiceURL'] || registered_acs_url(binding: :post)
-        #else
-          #registered_acs_url
-        #end
+        to_h[name]['AssertionConsumerServiceURL']
       end
 
       def name_id_format
@@ -25,11 +20,6 @@ module Saml
       end
 
       private
-
-      def registered_acs_url(binding:)
-        return if provider.nil?
-        provider.assertion_consumer_service_for(binding: binding).try(:location)
-      end
 
       class Builder
         attr_accessor :id, :now, :issuer, :acs_url, :name_id_format, :sign, :destination
