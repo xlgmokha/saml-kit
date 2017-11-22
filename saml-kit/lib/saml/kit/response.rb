@@ -109,6 +109,7 @@ module Saml
               end
               xml.Assertion(assertion_options) do
                 xml.Issuer issuer
+                signature.template(reference_id)
                 xml.Subject do
                   xml.NameID user.name_id_for(request.name_id_format), Format: request.name_id_format
                   xml.SubjectConfirmation Method: Namespaces::BEARER do
