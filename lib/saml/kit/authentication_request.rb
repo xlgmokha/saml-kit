@@ -35,10 +35,10 @@ module Saml
         end
 
         def to_xml
-          Signature.sign(id, sign: sign) do |xml, signature|
+          Signature.sign(sign: sign) do |xml, signature|
             xml.tag!('samlp:AuthnRequest', request_options) do
               xml.tag!('saml:Issuer', issuer)
-              signature.template(xml)
+              signature.template(id)
               xml.tag!('samlp:NameIDPolicy', Format: name_id_format)
             end
           end
