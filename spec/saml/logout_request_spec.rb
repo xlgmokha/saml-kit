@@ -38,7 +38,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       allow(metadata).to receive(:single_logout_services).and_return([
-        Saml::Kit::HttpPostBinding.new(location: FFaker::Internet.http_url)
+        Saml::Kit::Bindings::HttpPost.new(location: FFaker::Internet.http_url)
       ])
     end
 
@@ -94,7 +94,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
       allow(registry).to receive(:metadata_for).with(builder.issuer).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       allow(metadata).to receive(:single_logout_services).and_return([
-        Saml::Kit::HttpPostBinding.new(location: FFaker::Internet.http_url)
+        Saml::Kit::Bindings::HttpPost.new(location: FFaker::Internet.http_url)
       ])
 
       expect(builder.build).to be_valid
