@@ -48,8 +48,8 @@ module Saml
         @xml_hash
       end
 
-      def to_xml
-        content
+      def to_xml(pretty: false)
+        pretty ? Nokogiri::XML(content).to_xml(indent: 2) : content
       end
 
       def to_s
