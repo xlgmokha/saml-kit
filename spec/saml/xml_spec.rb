@@ -8,9 +8,9 @@ RSpec.describe Saml::Kit::Xml do
     let(:signed_xml) do
       builder = Saml::Kit::ServiceProviderMetadata::Builder.new
       builder.entity_id = FFaker::Movie.title
-      builder.add_assertion_consumer_service(login_url, binding: :post)
+      builder.add_assertion_consumer_service(login_url, binding: :http_post)
       builder.add_assertion_consumer_service(login_url, binding: :http_redirect)
-      builder.add_single_logout_service(logout_url, binding: :post)
+      builder.add_single_logout_service(logout_url, binding: :http_post)
       builder.add_single_logout_service(logout_url, binding: :http_redirect)
       builder.to_xml
     end

@@ -10,7 +10,6 @@ module Saml
       HTTP_POST = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
       HTTP_REDIRECT = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
       ALL = {
-        post: HTTP_POST,
         http_post: HTTP_POST,
         http_redirect: HTTP_REDIRECT,
         http_artifact: HTTP_ARTIFACT,
