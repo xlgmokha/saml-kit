@@ -5,6 +5,7 @@ class AssertionsController < ApplicationController
   def create
     saml_binding = sp.assertion_consumer_service_for(binding: :post)
     @saml_response = saml_binding.deserialize(params)
+    logger.debug(@saml_response.to_xml(pretty: true))
     return render :error, status: :forbidden if @saml_response.invalid?
 
     session[:user] = { id: @saml_response.name_id }.merge(@saml_response.attributes)
