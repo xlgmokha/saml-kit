@@ -2,7 +2,7 @@ class SessionsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:new, :destroy]
 
   def new
-    target_binding = request.post? ? :post : :http_redirect
+    target_binding = request.post? ? :http_post : :http_redirect
     binding = idp.single_sign_on_service_for(binding: target_binding)
     saml_request = binding.deserialize(raw_params)
     if saml_request.invalid?
@@ -19,7 +19,7 @@ class SessionsController < ApplicationController
         return render_error(:forbidden, model: saml_request)
       end
 
-      response_binding = saml_request.provider.assertion_consumer_service_for(binding: :post)
+      response_binding = saml_request.provider.assertion_consumer_service_for(binding: :http_post)
       saml_response = saml_request.response_for(user)
       @url, @saml_params = response_binding.serialize(saml_response, relay_state: saml_params[:RelayState])
       reset_session
@@ -33,12 +33,12 @@ class SessionsController < ApplicationController
 
   def destroy
     if saml_params[:SAMLRequest].present?
-      binding = idp.single_logout_service_for(binding: :post)
+      binding = idp.single_logout_service_for(binding: :http_post)
       saml_request = binding.deserialize(raw_params).tap do |saml|
         raise ActiveRecord::RecordInvalid.new(saml) if saml.invalid?
       end
       user = User.find_by(uuid: saml_request.name_id)
-      response_binding = saml_request.provider.single_logout_service_for(binding: :post)
+      response_binding = saml_request.provider.single_logout_service_for(binding: :http_post)
       saml_response = saml_request.response_for(user)
       @url, @saml_params = response_binding.serialize(saml_response, relay_state: saml_params[:RelayState])
       reset_session

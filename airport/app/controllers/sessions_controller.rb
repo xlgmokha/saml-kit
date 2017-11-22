@@ -12,12 +12,12 @@ class SessionsController < ApplicationController
     # HTTP POST
     # * URI
     # * SAMLRequest/SAMLResponse
-    post_binding = idp.single_sign_on_service_for(binding: :post)
+    post_binding = idp.single_sign_on_service_for(binding: :http_post)
     @post_uri, @saml_params = post_binding.serialize(builder_for(:login), relay_state: relay_state)
   end
 
   def destroy
-    saml_binding = idp.single_logout_service_for(binding: :post)
+    saml_binding = idp.single_logout_service_for(binding: :http_post)
     @url, @saml_params = saml_binding.serialize(builder_for(:logout))
     render layout: "spinner"
   end
@@ -36,7 +36,7 @@ class SessionsController < ApplicationController
     case type
     when :login
       builder = Saml::Kit::AuthenticationRequest::Builder.new
-      builder.acs_url = Sp.default(request).assertion_consumer_service_for(binding: :post).location
+      builder.acs_url = Sp.default(request).assertion_consumer_service_for(binding: :http_post).location
       builder
     when :logout
       Saml::Kit::LogoutRequest::Builder.new(current_user)

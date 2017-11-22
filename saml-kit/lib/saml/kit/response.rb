@@ -158,9 +158,9 @@ module Saml
 
         def destination_for(request)
           if request.signed? && request.trusted?
-            request.acs_url || request.provider.assertion_consumer_service_for(binding: :post).try(:location)
+            request.acs_url || request.provider.assertion_consumer_service_for(binding: :http_post).try(:location)
           else
-            request.provider.assertion_consumer_service_for(binding: :post).try(:location)
+            request.provider.assertion_consumer_service_for(binding: :http_post).try(:location)
           end
         end
 

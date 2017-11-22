@@ -26,7 +26,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     XML
     it 'builds the service provider metadata' do
       subject.entity_id = entity_id
-      subject.add_assertion_consumer_service(acs_url, binding: :post)
+      subject.add_assertion_consumer_service(acs_url, binding: :http_post)
       subject.name_id_formats = [
         Saml::Kit::Namespaces::PERSISTENT,
         Saml::Kit::Namespaces::TRANSIENT,
@@ -59,9 +59,9 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     let(:builder) { described_class::Builder.new }
     subject do
       builder.entity_id = entity_id
-      builder.add_assertion_consumer_service(acs_post_url, binding: :post)
+      builder.add_assertion_consumer_service(acs_post_url, binding: :http_post)
       builder.add_assertion_consumer_service(acs_redirect_url, binding: :http_redirect)
-      builder.add_single_logout_service(logout_post_url, binding: :post)
+      builder.add_single_logout_service(logout_post_url, binding: :http_post)
       builder.add_single_logout_service(logout_redirect_url, binding: :http_redirect)
       builder.build
     end
@@ -106,9 +106,9 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     let(:service_provider_metadata) do
       builder = described_class::Builder.new
       builder.entity_id = entity_id
-      builder.add_assertion_consumer_service(acs_post_url, binding: :post)
+      builder.add_assertion_consumer_service(acs_post_url, binding: :http_post)
       builder.add_assertion_consumer_service(acs_redirect_url, binding: :http_redirect)
-      builder.add_single_logout_service(logout_post_url, binding: :post)
+      builder.add_single_logout_service(logout_post_url, binding: :http_post)
       builder.add_single_logout_service(logout_redirect_url, binding: :http_redirect)
       builder.to_xml
     end

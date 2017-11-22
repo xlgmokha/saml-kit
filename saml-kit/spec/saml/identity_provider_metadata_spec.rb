@@ -71,9 +71,9 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it 'valid when given valid identity provider metadata' do
       builder = described_class::Builder.new
       builder.attributes = [:email]
-      builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :post)
+      builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_post)
       builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_redirect)
-      builder.add_single_logout_service(FFaker::Internet.http_url, binding: :post)
+      builder.add_single_logout_service(FFaker::Internet.http_url, binding: :http_post)
       builder.add_single_logout_service(FFaker::Internet.http_url, binding: :http_redirect)
       expect(builder.build).to be_valid
     end
@@ -122,12 +122,12 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     subject do
       builder = Saml::Kit::IdentityProviderMetadata::Builder.new
       builder.add_single_sign_on_service(redirect_url, binding: :http_redirect)
-      builder.add_single_sign_on_service(post_url, binding: :post)
+      builder.add_single_sign_on_service(post_url, binding: :http_post)
       builder.build
     end
 
     it 'returns the POST binding' do
-      result = subject.single_sign_on_service_for(binding: :post)
+      result = subject.single_sign_on_service_for(binding: :http_post)
       expect(result.location).to eql(post_url)
       expect(result.binding).to eql(Saml::Kit::Bindings::HTTP_POST)
     end
@@ -174,11 +174,11 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
 
     before :each do
       builder.add_single_logout_service(redirect_url, binding: :http_redirect)
-      builder.add_single_logout_service(post_url, binding: :post)
+      builder.add_single_logout_service(post_url, binding: :http_post)
     end
 
     it 'returns the location for the matching binding' do
-      expect(subject.single_logout_service_for(binding: :post).location).to eql(post_url)
+      expect(subject.single_logout_service_for(binding: :http_post).location).to eql(post_url)
       expect(subject.single_logout_service_for(binding: :http_redirect).location).to eql(redirect_url)
     end
 
@@ -205,7 +205,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
         Saml::Kit::Namespaces::EMAIL_ADDRESS,
       ]
       subject.add_single_sign_on_service("https://www.example.com/login", binding: :http_redirect)
-      subject.add_single_logout_service("https://www.example.com/logout", binding: :post)
+      subject.add_single_logout_service("https://www.example.com/logout", binding: :http_post)
       subject.attributes << "id"
 
       result = Hash.from_xml(subject.build.to_xml)

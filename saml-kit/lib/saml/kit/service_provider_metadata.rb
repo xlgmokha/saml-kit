@@ -35,11 +35,11 @@ module Saml
           @want_assertions_signed = true
         end
 
-        def add_assertion_consumer_service(url, binding: :post)
+        def add_assertion_consumer_service(url, binding: :http_post)
           @acs_urls.push(location: url, binding: Bindings.binding_for(binding))
         end
 
-        def add_single_logout_service(url, binding: :post)
+        def add_single_logout_service(url, binding: :http_post)
           @logout_urls.push(location: url, binding: Bindings.binding_for(binding))
         end
 
