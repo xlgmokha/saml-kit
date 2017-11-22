@@ -4,10 +4,10 @@ class AssertionsController < ApplicationController
 
   def create
     saml_binding = sp.assertion_consumer_service_for(binding: :post)
-    saml_response = saml_binding.deserialize(params)
-    return render :error, status: :forbidden if saml_response.invalid?
+    @saml_response = saml_binding.deserialize(params)
+    return render :error, status: :forbidden if @saml_response.invalid?
 
-    session[:user] = { id: saml_response.name_id }.merge(saml_response.attributes)
+    session[:user] = { id: @saml_response.name_id }.merge(@saml_response.attributes)
     redirect_to dashboard_path
   end
 

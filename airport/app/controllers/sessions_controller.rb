@@ -35,7 +35,9 @@ class SessionsController < ApplicationController
   def builder_for(type)
     case type
     when :login
-      Saml::Kit::AuthenticationRequest::Builder.new
+      builder = Saml::Kit::AuthenticationRequest::Builder.new
+      builder.acs_url = Sp.default(request).assertion_consumer_service_for(binding: :post).location
+      builder
     when :logout
       Saml::Kit::LogoutRequest::Builder.new(current_user)
     end
