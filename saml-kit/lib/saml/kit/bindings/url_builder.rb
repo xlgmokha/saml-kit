@@ -1,37 +1,39 @@
 module Saml
   module Kit
-    class UrlBuilder
-      include Serializable
+    module Bindings
+      class UrlBuilder
+        include Serializable
 
-      def initialize(private_key: Saml::Kit.configuration.signing_private_key)
-        @private_key = private_key
-      end
+        def initialize(private_key: Saml::Kit.configuration.signing_private_key)
+          @private_key = private_key
+        end
 
-      def build(saml_document, relay_state: nil)
-        payload = canonicalize(saml_document, relay_state)
-        "#{saml_document.destination}?#{payload}&Signature=#{signature_for(payload)}"
-      end
+        def build(saml_document, relay_state: nil)
+          payload = canonicalize(saml_document, relay_state)
+          "#{saml_document.destination}?#{payload}&Signature=#{signature_for(payload)}"
+        end
 
-      private
+        private
 
-      attr_reader :private_key
+        attr_reader :private_key
 
-      def signature_for(payload)
-        encode(private_key.sign(OpenSSL::Digest::SHA256.new, payload))
-      end
+        def signature_for(payload)
+          encode(private_key.sign(OpenSSL::Digest::SHA256.new, payload))
+        end
 
-      def canonicalize(saml_document, relay_state)
-        {
-          saml_document.query_string_parameter => serialize(saml_document.to_xml),
-          'RelayState' => relay_state,
-          'SigAlg' => Saml::Kit::Namespaces::SHA256,
-        }.map do |(key, value)|
-          value.present? ? "#{key}=#{escape(value)}" : nil
-        end.compact.join('&')
-      end
+        def canonicalize(saml_document, relay_state)
+          {
+            saml_document.query_string_parameter => serialize(saml_document.to_xml),
+            'RelayState' => relay_state,
+            'SigAlg' => Saml::Kit::Namespaces::SHA256,
+          }.map do |(key, value)|
+            value.present? ? "#{key}=#{escape(value)}" : nil
+          end.compact.join('&')
+        end
 
-      def serialize(value)
-        encode(deflate(value))
+        def serialize(value)
+          encode(deflate(value))
+        end
       end
     end
   end

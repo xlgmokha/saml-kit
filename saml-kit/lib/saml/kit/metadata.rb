@@ -160,11 +160,11 @@ module Saml
       def binding_for(binding, location)
         case binding
         when Namespaces::HTTP_REDIRECT
-          Saml::Kit::HttpRedirectBinding.new(location: location)
+          Saml::Kit::Bindings::HttpRedirect.new(location: location)
         when Namespaces::POST
-          Saml::Kit::HttpPostBinding.new(location: location)
+          Saml::Kit::Bindings::HttpPost.new(location: location)
         else
-          Saml::Kit::Binding.new(binding: binding, location: location)
+          Saml::Kit::Bindings::Binding.new(binding: binding, location: location)
         end
       end
     end

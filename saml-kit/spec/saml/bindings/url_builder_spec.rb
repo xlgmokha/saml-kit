@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Saml::Kit::UrlBuilder do
+RSpec.describe Saml::Kit::Bindings::UrlBuilder do
   describe "#build" do
     let(:xml) { "<xml></xml>" }
     let(:destination) { FFaker::Internet.http_url }

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-RSpec.describe Saml::Kit::HttpRedirectBinding do
+RSpec.describe Saml::Kit::Bindings::HttpRedirect do
   let(:location) { FFaker::Internet.http_url }
-  subject { Saml::Kit::HttpRedirectBinding.new(location: location) }
+  subject { described_class.new(location: location) }
 
   describe "#serialize" do
     let(:relay_state) { "ECHO" }

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-RSpec.describe Saml::Kit::Binding do
+RSpec.describe Saml::Kit::Bindings::Binding do
   let(:location) { FFaker::Internet.http_url }
-  subject { Saml::Kit::Binding.new(binding: Saml::Kit::Namespaces::HTTP_ARTIFACT, location: location) }
+  subject { described_class.new(binding: Saml::Kit::Namespaces::HTTP_ARTIFACT, location: location) }
 
   describe "#serialize" do
     it 'ignores other bindings' do

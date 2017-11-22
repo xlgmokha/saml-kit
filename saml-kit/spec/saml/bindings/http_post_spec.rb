@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-RSpec.describe Saml::Kit::HttpPostBinding do
+RSpec.describe Saml::Kit::Bindings::HttpPost do
   let(:location) { FFaker::Internet.http_url }
-  subject { Saml::Kit::HttpPostBinding.new(location: location) }
+  subject { described_class.new(location: location) }
 
   describe "#serialize" do
     let(:relay_state) { "ECHO" }
