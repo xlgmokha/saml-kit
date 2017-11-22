@@ -6,6 +6,7 @@ module Saml
       end
 
       def register(metadata)
+        Saml::Kit.logger.debug(metadata.to_xml(pretty: true))
         @items[metadata.entity_id] = metadata
       end
 

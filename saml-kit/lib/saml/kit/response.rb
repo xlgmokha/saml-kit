@@ -42,6 +42,14 @@ module Saml
         Time.current > started_at && !expired?
       end
 
+      def signed?
+        super || to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Signature', nil).present?
+      end
+
+      def certificate
+        super || to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
+      end
+
       private
 
       def must_be_active_session
@@ -77,7 +85,7 @@ module Saml
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code
-        attr_accessor :issuer, :sign, :destination
+        attr_accessor :issuer, :sign, :destination, :encrypt
 
         def initialize(user, request)
           @user = user
@@ -90,6 +98,7 @@ module Saml
           @issuer = configuration.issuer
           @destination = destination_for(request)
           @sign = want_assertions_signed
+          @encrypt = false
         end
 
         def want_assertions_signed

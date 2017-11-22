@@ -78,6 +78,7 @@ module Saml
         if :signing == use.to_sym
           hash_value = fingerprint.algorithm(hash_algorithm)
           signing_certificates.find do |signing_certificate|
+            Saml::Kit.logger.debug [hash_value, signing_certificate[:fingerprint]].inspect
             hash_value == signing_certificate[:fingerprint]
           end
         end
@@ -87,8 +88,8 @@ module Saml
         @xml_hash ||= Hash.from_xml(to_xml)
       end
 
-      def to_xml
-        @xml
+      def to_xml(pretty: false)
+        pretty ? Nokogiri::XML(@xml).to_xml(indent: 2) : @xml
       end
 
       def to_s
