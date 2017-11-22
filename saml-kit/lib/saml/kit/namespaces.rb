@@ -7,9 +7,6 @@ module Saml
       BEARER = "urn:oasis:names:tc:SAML:2.0:cm:bearer"
       EMAIL_ADDRESS = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
       ENVELOPED_SIG = "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
-      HTTP_ARTIFACT = 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact'
-      HTTP_POST = POST = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-      HTTP_REDIRECT = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
       METADATA = "urn:oasis:names:tc:SAML:2.0:metadata"
       PASSWORD = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password"
       PASSWORD_PROTECTED = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
@@ -32,16 +29,6 @@ module Saml
       URI = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
       VERSION_MISMATCH_ERROR = "urn:oasis:names:tc:SAML:2.0:status:VersionMismatch"
       XMLDSIG = "http://www.w3.org/2000/09/xmldsig#"
-
-      def self.binding_for(binding)
-        if :post == binding
-          Namespaces::HTTP_POST
-        elsif :http_redirect == binding
-          Namespaces::HTTP_REDIRECT
-        else
-          nil
-        end
-      end
     end
   end
 end

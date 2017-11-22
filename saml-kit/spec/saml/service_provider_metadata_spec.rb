@@ -79,15 +79,15 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
     it 'returns each acs url and binding' do
       expect(subject.assertion_consumer_services.map(&:to_h)).to match_array([
-        { location: acs_post_url, binding: Saml::Kit::Namespaces::POST },
-        { location: acs_redirect_url, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
+        { location: acs_post_url, binding: Saml::Kit::Bindings::HTTP_POST },
+        { location: acs_redirect_url, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
       ])
     end
 
     it 'returns each logout url and binding' do
       expect(subject.single_logout_services.map(&:to_h)).to match_array([
-        { location: logout_post_url, binding: Saml::Kit::Namespaces::POST },
-        { location: logout_redirect_url, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
+        { location: logout_post_url, binding: Saml::Kit::Bindings::HTTP_POST },
+        { location: logout_redirect_url, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
       ])
     end
 
@@ -155,7 +155,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 <?xml version="1.0" encoding="UTF-8"?>
 <EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="_#{SecureRandom.uuid}" entityID="#{entity_id}">
   <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
-    <SingleLogoutService Binding="#{Saml::Kit::Namespaces::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
+    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
     <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
   </SPSSODescriptor>
 </EntityDescriptor>

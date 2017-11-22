@@ -62,7 +62,7 @@ module Saml
       end
 
       def service_for(binding:, type:)
-        binding = Saml::Kit::Namespaces.binding_for(binding)
+        binding = Saml::Kit::Bindings.binding_for(binding)
         services(type).find { |x| x.binding?(binding) }
       end
 
@@ -158,14 +158,7 @@ module Saml
       end
 
       def binding_for(binding, location)
-        case binding
-        when Namespaces::HTTP_REDIRECT
-          Saml::Kit::Bindings::HttpRedirect.new(location: location)
-        when Namespaces::POST
-          Saml::Kit::Bindings::HttpPost.new(location: location)
-        else
-          Saml::Kit::Bindings::Binding.new(binding: binding, location: location)
-        end
+        Bindings.create_for(binding, location)
       end
     end
   end

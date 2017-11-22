@@ -36,11 +36,11 @@ module Saml
         end
 
         def add_assertion_consumer_service(url, binding: :post)
-          @acs_urls.push(location: url, binding: Namespaces.binding_for(binding))
+          @acs_urls.push(location: url, binding: Bindings.binding_for(binding))
         end
 
         def add_single_logout_service(url, binding: :post)
-          @logout_urls.push(location: url, binding: Namespaces.binding_for(binding))
+          @logout_urls.push(location: url, binding: Bindings.binding_for(binding))
         end
 
         def to_xml
