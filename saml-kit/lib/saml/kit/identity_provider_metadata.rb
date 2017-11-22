@@ -57,10 +57,10 @@ module Saml
         end
 
         def to_xml
-          Signature.sign(id, sign: sign) do |xml, signature|
+          Signature.sign(sign: sign) do |xml, signature|
             xml.instruct!
             xml.EntityDescriptor entity_descriptor_options do
-              signature.template(xml)
+              signature.template(id)
               xml.IDPSSODescriptor idp_sso_descriptor_options do
                 xml.KeyDescriptor use: "signing" do
                   xml.KeyInfo "xmlns": Namespaces::XMLDSIG do

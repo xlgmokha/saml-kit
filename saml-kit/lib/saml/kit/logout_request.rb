@@ -40,11 +40,11 @@ module Saml
         end
 
         def to_xml
-          Signature.sign(id, sign: sign) do |xml, signature|
+          Signature.sign(sign: sign) do |xml, signature|
             xml.instruct!
             xml.LogoutRequest logout_request_options do
               xml.Issuer({ xmlns: Namespaces::ASSERTION }, issuer)
-              signature.template(xml)
+              signature.template(id)
               xml.NameID name_id_options, user.name_id_for(name_id_format)
             end
           end

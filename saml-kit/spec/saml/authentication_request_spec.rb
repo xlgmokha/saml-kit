@@ -103,21 +103,16 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
 
     it 'validates the schema of the request' do
-      xml = ::Builder::XmlMarkup.new
       id = SecureRandom.uuid
-      options = {
-        "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL,
-        AssertionConsumerServiceURL: acs_url,
-        ID: "_#{id}",
-      }
-      signature = Saml::Kit::Signature.new(id)
-      xml.tag!('samlp:AuthnRequest', options) do
-        signature.template(xml)
-        xml.Fake do
-          xml.NotAllowed "Huh?"
+      signed_xml = Saml::Kit::Signature.sign(sign: true) do |xml, signature|
+        xml.tag!('samlp:AuthnRequest', "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, AssertionConsumerServiceURL: acs_url, ID: "_#{id}") do
+          signature.template(id)
+          xml.Fake do
+            xml.NotAllowed "Huh?"
+          end
         end
       end
-      expect(described_class.new(signature.finalize(xml))).to be_invalid
+      expect(described_class.new(signed_xml)).to be_invalid
     end
 
     it 'validates a request without a signature' do

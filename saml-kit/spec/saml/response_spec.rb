@@ -142,17 +142,16 @@ RSpec.describe Saml::Kit::Response do
     it 'validates the schema of the response' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      xml = ::Builder::XmlMarkup.new
       id = SecureRandom.uuid
-      options = { "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, ID: "_#{id}", }
-      signature = Saml::Kit::Signature.new(id)
-      xml.tag!("samlp:Response", options) do
-        signature.template(xml)
-        xml.Fake do
-          xml.NotAllowed "Huh?"
+      signed_xml = Saml::Kit::Signature.sign(sign: true) do |xml, signature|
+        xml.tag! "samlp:Response", "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, ID: "_#{id}" do
+          signature.template(id)
+          xml.Fake do
+            xml.NotAllowed "Huh?"
+          end
         end
       end
-      subject = described_class.new(signature.finalize(xml))
+      subject = described_class.new(signed_xml)
       expect(subject).to be_invalid
       expect(subject.errors[:base]).to be_present
     end

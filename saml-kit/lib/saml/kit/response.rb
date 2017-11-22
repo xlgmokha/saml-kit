@@ -100,10 +100,10 @@ module Saml
         end
 
         def to_xml
-          Signature.sign(id, sign: sign) do |xml, signature|
+          Signature.sign(sign: sign) do |xml, signature|
             xml.Response response_options do
               xml.Issuer(issuer, xmlns: Namespaces::ASSERTION)
-              signature.template(xml)
+              signature.template(id)
               xml.Status do
                 xml.StatusCode Value: status_code
               end

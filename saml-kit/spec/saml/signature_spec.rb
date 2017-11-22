@@ -1,7 +1,6 @@
 require "spec_helper"
 
 RSpec.describe Saml::Kit::Signature do
-  subject { described_class.new(reference_id, configuration: configuration) }
   let(:configuration) do
     config = Saml::Kit::Configuration.new
     config.signing_certificate_pem = certificate
@@ -32,17 +31,18 @@ RSpec.describe Saml::Kit::Signature do
   let(:password) { "password" }
 
   it 'generates a signature' do
-    xml = ::Builder::XmlMarkup.new
     options = {
       "xmlns:samlp" => "urn:oasis:names:tc:SAML:2.0:protocol",
       "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion",
       ID: "_#{reference_id}",
     }
-    xml.tag!('samlp:AuthnRequest', options) do
-      subject.template(xml)
-      xml.tag!('saml:Issuer', "MyEntityID")
+    signed_xml = described_class.sign(sign: true, configuration: configuration) do |xml, signature|
+      xml.tag!('samlp:AuthnRequest', options) do
+        signature.template(reference_id)
+        xml.tag!('saml:Issuer', "MyEntityID")
+      end
     end
-    result = Hash.from_xml(subject.finalize(xml))
+    result = Hash.from_xml(signed_xml)
 
     signature = result["AuthnRequest"]["Signature"]
     expect(signature['xmlns']).to eql("http://www.w3.org/2000/09/xmldsig#")
@@ -63,13 +63,13 @@ RSpec.describe Saml::Kit::Signature do
   end
 
   it 'does not add a signature' do
-    subject = described_class.new(reference_id, sign: false, configuration: configuration)
-    xml = ::Builder::XmlMarkup.new
-    xml.AuthnRequest do
-      subject.template(xml)
-      xml.Issuer "MyEntityID"
+    signed_xml = described_class.sign(sign: false, configuration: configuration) do |xml, signature|
+      xml.AuthnRequest do
+        signature.template(reference_id)
+        xml.Issuer "MyEntityID"
+      end
     end
-    result = Hash.from_xml(subject.finalize(xml))
+    result = Hash.from_xml(signed_xml)
     expect(result['AuthnRequest']).to be_present
     expect(result["AuthnRequest"]["Signature"]).to be_nil
   end
