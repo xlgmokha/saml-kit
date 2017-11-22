@@ -5,7 +5,7 @@ module Saml
         include Serializable
 
         def initialize(location:)
-          super(binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location)
+          super(binding: Saml::Kit::Bindings::HTTP_REDIRECT, location: location)
         end
 
         def serialize(builder, relay_state: nil)

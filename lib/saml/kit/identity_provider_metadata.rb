@@ -48,12 +48,12 @@ module Saml
           @want_authn_requests_signed = true
         end
 
-        def add_single_sign_on_service(url, binding: :post)
-          @single_sign_on_urls.push(location: url, binding: Namespaces.binding_for(binding))
+        def add_single_sign_on_service(url, binding: :http_post)
+          @single_sign_on_urls.push(location: url, binding: Bindings.binding_for(binding))
         end
 
-        def add_single_logout_service(url, binding: :post)
-          @logout_urls.push(location: url, binding: Namespaces.binding_for(binding))
+        def add_single_logout_service(url, binding: :http_post)
+          @logout_urls.push(location: url, binding: Bindings.binding_for(binding))
         end
 
         def to_xml

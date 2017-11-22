@@ -14,8 +14,8 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it do
       location = "https://dev.oktapreview.com/app/example/1/sso/saml"
       expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
-        { binding: Saml::Kit::Namespaces::HTTP_POST, location: location },
-        { binding: Saml::Kit::Namespaces::HTTP_REDIRECT, location: location },
+        { binding: Saml::Kit::Bindings::HTTP_POST, location: location },
+        { binding: Saml::Kit::Bindings::HTTP_REDIRECT, location: location },
       ])
     end
     it { expect(subject.single_logout_services).to be_empty }
@@ -47,15 +47,15 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it do
       location = "https://www.example.com/adfs/ls/"
       expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
-        { location: location, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
-        { location: location, binding: Saml::Kit::Namespaces::HTTP_POST },
+        { location: location, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
+        { location: location, binding: Saml::Kit::Bindings::HTTP_POST },
       ])
     end
     it do
       location = "https://www.example.com/adfs/ls/"
       expect(subject.single_logout_services.map(&:to_h)).to match_array([
-        { location: location, binding: Saml::Kit::Namespaces::HTTP_REDIRECT },
-        { location: location, binding: Saml::Kit::Namespaces::HTTP_POST },
+        { location: location, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
+        { location: location, binding: Saml::Kit::Bindings::HTTP_POST },
       ])
     end
     it do
@@ -129,13 +129,13 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it 'returns the POST binding' do
       result = subject.single_sign_on_service_for(binding: :post)
       expect(result.location).to eql(post_url)
-      expect(result.binding).to eql(Saml::Kit::Namespaces::POST)
+      expect(result.binding).to eql(Saml::Kit::Bindings::HTTP_POST)
     end
 
     it 'returns the HTTP_REDIRECT binding' do
       result = subject.single_sign_on_service_for(binding: :http_redirect)
       expect(result.location).to eql(redirect_url)
-      expect(result.binding).to eql(Saml::Kit::Namespaces::HTTP_REDIRECT)
+      expect(result.binding).to eql(Saml::Kit::Bindings::HTTP_REDIRECT)
     end
 
     it 'returns nil if the binding cannot be found' do
@@ -219,9 +219,9 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
         Saml::Kit::Namespaces::TRANSIENT,
         Saml::Kit::Namespaces::EMAIL_ADDRESS,
       ])
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Binding']).to eql(Saml::Kit::Namespaces::HTTP_REDIRECT)
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Binding']).to eql(Saml::Kit::Bindings::HTTP_REDIRECT)
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Location']).to eql("https://www.example.com/login")
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Binding']).to eql(Saml::Kit::Namespaces::HTTP_POST)
+      expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Binding']).to eql(Saml::Kit::Bindings::HTTP_POST)
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Location']).to eql("https://www.example.com/logout")
       expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['Name']).to eql("id")
       expect(result['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']).to eql(Saml::Kit.configuration.stripped_signing_certificate)
