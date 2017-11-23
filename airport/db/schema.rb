@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 20171123220807) do
     t.text "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["issuer"], name: "index_metadata_on_issuer"
+    t.index ["issuer"], name: "index_metadata_on_issuer", unique: true
   end
 
 end
