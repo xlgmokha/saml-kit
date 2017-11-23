@@ -2,6 +2,12 @@ module Saml
   module Kit
     class Xml
       include ActiveModel::Validations
+      NAMESPACES = {
+        "NameFormat": Namespaces::ATTR_SPLAT,
+        "ds": Namespaces::XMLDSIG,
+        "md": Namespaces::METADATA,
+        "saml": Namespaces::ASSERTION,
+      }.freeze
 
       attr_reader :raw_xml, :document
 
@@ -10,9 +16,7 @@ module Saml
 
       def initialize(raw_xml)
         @raw_xml = raw_xml
-        @document = Nokogiri::XML(raw_xml, nil, nil, Nokogiri::XML::ParseOptions::STRICT) do |config|
-          config.noblanks
-        end
+        @document = Nokogiri::XML(raw_xml)
       end
 
       def x509_certificates
@@ -20,6 +24,18 @@ module Saml
         document.search(xpath, Xmldsig::NAMESPACES).map do |item|
           OpenSSL::X509::Certificate.new(Base64.decode64(item.text))
         end
+      end
+
+      def find_by(xpath)
+        document.at_xpath(xpath, NAMESPACES)
+      end
+
+      def find_all(xpath)
+        document.search(xpath, NAMESPACES)
+      end
+
+      def to_xml(pretty: true)
+        pretty ? document.to_xml(indent: 2) : raw_xml
       end
 
       private

@@ -12,7 +12,7 @@ module Saml
       end
 
       def name_id
-        to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Subject', {}).fetch('NameID', nil)
+        assertion.fetch('Subject', {}).fetch('NameID', nil)
       end
 
       def [](key)
@@ -20,18 +20,17 @@ module Saml
       end
 
       def attributes
-        @attributes ||= Hash[to_h.fetch(name, {}).fetch('Assertion', {}).fetch('AttributeStatement', {}).fetch('Attribute', []).map do |item|
+        @attributes ||= Hash[assertion.fetch('AttributeStatement', {}).fetch('Attribute', []).map do |item|
           [item['Name'].to_sym, item['AttributeValue']]
         end].with_indifferent_access
       end
 
-
       def started_at
-        parse_date(to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Conditions', {}).fetch('NotBefore', nil))
+        parse_date(assertion.fetch('Conditions', {}).fetch('NotBefore', nil))
       end
 
       def expired_at
-        parse_date(to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Conditions', {}).fetch('NotOnOrAfter', nil))
+        parse_date(assertion.fetch('Conditions', {}).fetch('NotOnOrAfter', nil))
       end
 
       def expired?
@@ -42,8 +41,21 @@ module Saml
         Time.current > started_at && !expired?
       end
 
+      def encrypted?
+        to_h[name]['EncryptedAssertion'].present?
+      end
+
+      def assertion
+        if encrypted?
+          decrypted = Cryptography.new.decrypt(to_h.fetch(name, {}).fetch('EncryptedAssertion', {}))
+          Hash.from_xml(decrypted)
+        else
+          to_h.fetch(name, {}).fetch('Assertion', {})
+        end
+      end
+
       def signed?
-        super || to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Signature', nil).present?
+        super || assertion.fetch('Signature', nil).present?
       end
 
       def certificate

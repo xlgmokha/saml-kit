@@ -7,7 +7,7 @@ module Saml
 
       def want_authn_requests_signed
         xpath = "/md:EntityDescriptor/md:#{name}"
-        attribute = find_by(xpath).attribute("WantAuthnRequestsSigned")
+        attribute = document.find_by(xpath).attribute("WantAuthnRequestsSigned")
         return true if attribute.nil?
         attribute.text.downcase == "true"
       end
@@ -21,7 +21,7 @@ module Saml
       end
 
       def attributes
-        find_all("/md:EntityDescriptor/md:#{name}/saml:Attribute").map do |item|
+        document.find_all("/md:EntityDescriptor/md:#{name}/saml:Attribute").map do |item|
           {
             format: item.attribute("NameFormat").try(:value),
             name: item.attribute("Name").value,

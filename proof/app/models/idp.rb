@@ -1,6 +1,5 @@
 class Idp
   class << self
-
     def default(request)
       @idp ||= begin
         host = "#{request.protocol}#{request.host}:#{request.port}"
