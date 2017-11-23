@@ -1,0 +1,16 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <%= link_to "register", new_registration_path %>
+      <table class="table">
+        <tbody>
+        <% @metadatum.each do |metadata| %>
+          <tr>
+            <td><%= link_to metadata.issuer, registration_path(metadata) %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

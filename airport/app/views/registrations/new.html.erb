@@ -1,0 +1,13 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Register an Identity Provider</h1>
+
+      <%= form_with url: registrations_path do |form| %>
+        <%= form.label :url %>
+        <%= form.url_field :url, required: true %>
+        <%= form.submit %>
+      <% end %>
+    </div>
+  </div>
+</div>
