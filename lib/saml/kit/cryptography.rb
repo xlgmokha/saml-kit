@@ -9,20 +9,20 @@ module Saml
 
       def decrypt(data)
         encrypt_data = data['EncryptedData']
-        symmetric_key = retrieve_symmetric_key(encrypt_data)
+        symmetric_key = symmetric_key_from(encrypt_data)
         cipher_text = Base64.decode64(encrypt_data["CipherData"]["CipherValue"])
-        retrieve_plaintext(cipher_text, symmetric_key, encrypt_data["EncryptionMethod"]['Algorithm'])
+        to_plaintext(cipher_text, symmetric_key, encrypt_data["EncryptionMethod"]['Algorithm'])
       end
 
       private
 
-      def retrieve_symmetric_key(encrypted_data)
+      def symmetric_key_from(encrypted_data)
         encrypted_key = encrypted_data['KeyInfo']['EncryptedKey']
         cipher_text = Base64.decode64(encrypted_key['CipherData']['CipherValue'])
-        retrieve_plaintext(cipher_text, private_key, encrypted_key["EncryptionMethod"]['Algorithm'])
+        to_plaintext(cipher_text, private_key, encrypted_key["EncryptionMethod"]['Algorithm'])
       end
 
-      def retrieve_plaintext(cipher_text, symmetric_key, algorithm)
+      def to_plaintext(cipher_text, symmetric_key, algorithm)
         case algorithm
         when 'http://www.w3.org/2001/04/xmlenc#tripledes-cbc'
           cipher = OpenSSL::Cipher.new('DES-EDE3-CBC').decrypt

@@ -424,10 +424,56 @@ RSpec.describe Saml::Kit::Response do
   end
 
   describe "encrypted assertion" do
+    let(:id) { SecureRandom.uuid }
+    let(:now) { Time.now.utc }
+    let(:acs_url) { FFaker::Internet.uri("https") }
+    let(:password) { FFaker::Movie.title }
+    let(:assertion) do
+      FFaker::Movie.title
+      <<-XML
+<Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="_11d39a7f-1b86-43ed-90d7-68090a857ca8" IssueInstant="2017-11-23T04:33:58Z" Version="2.0">
+ <Issuer>#{FFaker::Internet.uri("https")}</Issuer>
+ <Subject>
+   <NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">fdddf7ad-c4a4-443c-b96d-c953913b7b4e</NameID>
+   <SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+     <SubjectConfirmationData InResponseTo="cc8c4131-9336-4d1a-82f2-4ad92abeee22" NotOnOrAfter="2017-11-23T07:33:58Z" Recipient="https://westyundt.ca/acs"/>
+   </SubjectConfirmation>
+ </Subject>
+ <Conditions NotBefore="2017-11-23T04:33:58Z" NotOnOrAfter="2017-11-23T07:33:58Z">
+   <AudienceRestriction>
+     <Audience>American Wolves</Audience>
+   </AudienceRestriction>
+ </Conditions>
+ <AuthnStatement AuthnInstant="2017-11-23T04:33:58Z" SessionIndex="_11d39a7f-1b86-43ed-90d7-68090a857ca8" SessionNotOnOrAfter="2017-11-23T07:33:58Z">
+   <AuthnContext>
+     <AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</AuthnContextClassRef>
+   </AuthnContext>
+ </AuthnStatement>
+ <AttributeStatement>
+   <Attribute Name="email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="email">
+     <AttributeValue>sidney_bayer@nienowemmerich.com</AttributeValue>
+   </Attribute>
+   <Attribute Name="created_at" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="created_at">
+     <AttributeValue>2017-11-23T04:33:58Z</AttributeValue>
+   </Attribute>
+ </AttributeStatement>
+</Assertion>
+XML
+    end
+
     it 'parses the encrypted assertion' do
-      id = SecureRandom.uuid
-      now = Time.now.utc
-      acs_url = FFaker::Internet.uri("https")
+      certificate_pem, private_key_pem = Saml::Kit::SelfSignedCertificate.new(password).create
+      public_key = OpenSSL::X509::Certificate.new(certificate_pem).public_key
+      private_key = OpenSSL::PKey::RSA.new(private_key_pem, password)
+
+      allow(Saml::Kit.configuration).to receive(:encryption_private_key).and_return(private_key)
+
+      cipher = OpenSSL::Cipher.new('AES-128-CBC')
+      cipher.encrypt
+      key = cipher.random_key
+      iv = cipher.random_iv
+      encrypted = cipher.update(assertion) + cipher.final
+
       xml = <<-XML
 <samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" xmlns:saml="#{Saml::Kit::Namespaces::ASSERTION}" ID="_#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{acs_url}" InResponseTo="_#{SecureRandom.uuid}">
   <saml:Issuer>#{FFaker::Internet.uri("https")}</saml:Issuer>
@@ -441,14 +487,14 @@ RSpec.describe Saml::Kit::Response do
       <xenc:EncryptedKey>
         <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5"/>
         <xenc:CipherData>
-          <xenc:CipherValue>KRlkBAccafKExzq07FsT/rLRH37UM6kPGlgxrUOP+sOggqqgzUn0uSR0m2d4ZLAEoHCc6VefZKHv8s9xchWliu4Lgxff+9Sfybqjd/MQmvL7zkZ4MELcGZcm73SHUFbK3yZzx6imczabR+K5+tIn7q9jYyQqw05DdD39LmbVvDI=</xenc:CipherValue>
+          <xenc:CipherValue>#{Base64.encode64(public_key.public_encrypt(key))}</xenc:CipherValue>
         </xenc:CipherData>
       </xenc:EncryptedKey>
     </dsig:KeyInfo>
-   <xenc:CipherData>
-      <xenc:CipherValue>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</xenc:CipherValue>
-   </xenc:CipherData>
-</xenc:EncryptedData>
+    <xenc:CipherData>
+      <xenc:CipherValue>#{Base64.encode64(iv + encrypted)}</xenc:CipherValue>
+    </xenc:CipherData>
+    </xenc:EncryptedData>
   </saml:EncryptedAssertion>
 </samlp:Response>
 XML

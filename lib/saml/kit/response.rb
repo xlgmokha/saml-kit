@@ -20,9 +20,11 @@ module Saml
       end
 
       def attributes
-        @attributes ||= Hash[assertion.fetch('AttributeStatement', {}).fetch('Attribute', []).map do |item|
-          [item['Name'].to_sym, item['AttributeValue']]
-        end].with_indifferent_access
+        @attributes ||= Hash[
+          assertion.fetch('AttributeStatement', {}).fetch('Attribute', []).map do |item|
+            [item['Name'].to_sym, item['AttributeValue']]
+          end
+        ].with_indifferent_access
       end
 
       def started_at
@@ -48,7 +50,8 @@ module Saml
       def assertion
         if encrypted?
           decrypted = Cryptography.new.decrypt(to_h.fetch(name, {}).fetch('EncryptedAssertion', {}))
-          Hash.from_xml(decrypted)
+          Saml::Kit.logger.debug(decrypted)
+          Hash.from_xml(decrypted)['Assertion']
         else
           to_h.fetch(name, {}).fetch('Assertion', {})
         end
