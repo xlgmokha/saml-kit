@@ -10,6 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 20171123220807) do
+
+  create_table "metadata", force: :cascade do |t|
+    t.string "issuer"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["issuer"], name: "index_metadata_on_issuer"
+  end
 
 end
