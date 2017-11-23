@@ -3,14 +3,7 @@ module Saml
     class Metadata
       include ActiveModel::Validations
       include XsdValidatable
-
       METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
-      NAMESPACES = {
-        "NameFormat": Namespaces::ATTR_SPLAT,
-        "ds": Namespaces::XMLDSIG,
-        "md": Namespaces::METADATA,
-        "saml": Namespaces::ASSERTION,
-      }.freeze
 
       validates_presence_of :metadata
       validate :must_contain_descriptor
@@ -27,16 +20,16 @@ module Saml
       end
 
       def entity_id
-        find_by("/md:EntityDescriptor/@entityID").value
+        document.find_by("/md:EntityDescriptor/@entityID").value
       end
 
       def name_id_formats
-        find_all("/md:EntityDescriptor/md:#{name}/md:NameIDFormat").map(&:text)
+        document.find_all("/md:EntityDescriptor/md:#{name}/md:NameIDFormat").map(&:text)
       end
 
       def certificates
-        @certificates ||= find_all("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
-          cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", NAMESPACES).text
+        @certificates ||= document.find_all("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
+          cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", Xml::NAMESPACES).text
           {
             text: cert,
             fingerprint: Fingerprint.new(cert).algorithm(hash_algorithm),
@@ -54,7 +47,7 @@ module Saml
       end
 
       def services(type)
-        find_all("/md:EntityDescriptor/md:#{name}/md:#{type}").map do |item|
+        document.find_all("/md:EntityDescriptor/md:#{name}/md:#{type}").map do |item|
           binding = item.attribute("Binding").value
           location = item.attribute("Location").value
           binding_for(binding, location)
@@ -89,7 +82,7 @@ module Saml
       end
 
       def to_xml(pretty: false)
-        pretty ? Nokogiri::XML(@xml).to_xml(indent: 2) : @xml
+        document.to_xml(pretty: pretty)
       end
 
       def to_s
@@ -117,19 +110,11 @@ module Saml
       private
 
       def document
-        @document ||= Nokogiri::XML(@xml)
-      end
-
-      def find_by(xpath)
-        document.at_xpath(xpath, NAMESPACES)
-      end
-
-      def find_all(xpath)
-        document.search(xpath, NAMESPACES)
+        @document ||= Xml.new(xml)
       end
 
       def metadata
-        find_by("/md:EntityDescriptor/md:#{name}").present?
+        document.find_by("/md:EntityDescriptor/md:#{name}").present?
       end
 
       def must_contain_descriptor
