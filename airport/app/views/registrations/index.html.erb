@@ -22,30 +22,22 @@
                 </ul>
               </td>
               <td>
-                <ul>
-                  <% metadata.to_saml.single_sign_on_services.each do |service| %>
-                    <li>
-                      <%= form_with url: session_path, data: { remote: false } do |form| %>
-                        <%= form.hidden_field :entity_id, value: metadata.entity_id %>
-                        <%= form.hidden_field :binding, value: Saml::Kit::Bindings.to_symbol(service.binding) %>
-                        <%= form.submit service.binding %>
-                      <% end %>
-                    </li>
+                <% metadata.to_saml.single_sign_on_services.each do |service| %>
+                  <%= form_with url: session_path, data: { remote: false } do |form| %>
+                    <%= form.hidden_field :entity_id, value: metadata.entity_id %>
+                    <%= form.hidden_field :binding, value: Saml::Kit::Bindings.to_symbol(service.binding) %>
+                    <%= form.submit Saml::Kit::Bindings.to_symbol(service.binding).to_s.upcase %>
                   <% end %>
-                </ul>
+                <% end %>
               </td>
               <td>
-                <ul>
-                  <% metadata.to_saml.single_logout_services.each do |service| %>
-                    <li>
-                      <%= form_with url: session_path, method: :delete, data: { remote: false } do |form| %>
-                        <%= form.hidden_field :entity_id, value: metadata.entity_id %>
-                        <%= form.hidden_field :binding, value: Saml::Kit::Bindings.to_symbol(service.binding) %>
-                        <%= form.submit service.binding %>
-                      <% end %>
-                    </li>
+                <% metadata.to_saml.single_logout_services.each do |service| %>
+                  <%= form_with url: session_path, method: :delete, data: { remote: false } do |form| %>
+                    <%= form.hidden_field :entity_id, value: metadata.entity_id %>
+                    <%= form.hidden_field :binding, value: Saml::Kit::Bindings.to_symbol(service.binding) %>
+                    <%= form.submit Saml::Kit::Bindings.to_symbol(service.binding).to_s.upcase %>
                   <% end %>
-                </ul>
+                <% end %>
               </td>
             </tr>
           <% end %>
