@@ -14,3 +14,19 @@
  *= require_tree .
  *= require_self
  */
+@keyframes spinner {
+  0% { transform: rotate(0deg) }
+  100% { transform: rotate(360deg) }
+}
+
+.spinner {
+  margin: auto;
+  width: 48px;
+  height: 48px;
+  animation: spinner 0.65s infinite steps(12);
+}
+
+.spinner svg {
+  width: 48px;
+  height: 48px;
+}

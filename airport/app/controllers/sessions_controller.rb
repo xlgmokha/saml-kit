@@ -11,14 +11,12 @@ class SessionsController < ApplicationController
       post_binding = idp.single_sign_on_service_for(binding: :http_post)
       @post_uri, @saml_params = post_binding.serialize(builder_for(:login), relay_state: relay_state)
     end
-    render layout: "spinner"
   end
 
   def destroy
     binding = :http_redirect == params[:binding].to_sym ? :http_redirect : :http_post
     saml_binding = idp.single_logout_service_for(binding: binding)
     @url, @saml_params = saml_binding.serialize(builder_for(:logout))
-    render layout: "spinner"
   end
 
   private

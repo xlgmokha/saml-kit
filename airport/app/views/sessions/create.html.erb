@@ -3,11 +3,19 @@
     window.location.href = '<%= @redirect_uri %>';
   <% end  %>
 <% else %>
-  <%= form_tag(@post_uri, style: "position: absolute; left: -10000px; top: -10000px;") do %>
-    <%= @saml_params.each do |(key, value)| %>
-      <%= hidden_field_tag key, value %>
-    <% end %>
-  <% end %>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h1>Sending Post to IDP</h1>
+        <%= render partial: 'spinner' %>
+        <%= form_tag(@post_uri, style: "position: absolute; left: -10000px; top: -10000px;") do %>
+          <%= @saml_params.each do |(key, value)| %>
+            <%= hidden_field_tag key, value %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
 
   <%= javascript_tag do %>
     window.onload = function() {
