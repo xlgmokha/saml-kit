@@ -11,6 +11,8 @@
         </div>
         <%= form.button t('.login'), type: 'submit', class: 'btn btn-primary', data: { disable_with: t('.loading') } %>
       <% end %>
+
+      <%= debug @saml_request.to_xhtml %>
     </div>
   </div>
 </div>

@@ -4,9 +4,9 @@ class SessionsController < ApplicationController
   def new
     target_binding = request.post? ? :http_post : :http_redirect
     binding = idp.single_sign_on_service_for(binding: target_binding)
-    saml_request = binding.deserialize(raw_params)
-    return render_error(:forbidden, model: saml_request) if saml_request.invalid?
-    return post_back(saml_request, current_user) if current_user?
+    @saml_request = binding.deserialize(raw_params)
+    return render_error(:forbidden, model: @saml_request) if @saml_request.invalid?
+    return post_back(@saml_request, current_user) if current_user?
 
     session[:saml] = { params: raw_params.to_h, binding: target_binding }
   end
