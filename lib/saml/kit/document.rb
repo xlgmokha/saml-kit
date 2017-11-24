@@ -52,6 +52,10 @@ module Saml
         pretty ? Nokogiri::XML(content).to_xml(indent: 2) : content
       end
 
+      def to_xhtml
+        Nokogiri::XML(content, &:noblanks).to_xhtml
+      end
+
       def to_s
         to_xml
       end
