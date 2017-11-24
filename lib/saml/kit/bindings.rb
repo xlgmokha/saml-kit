@@ -19,6 +19,17 @@ module Saml
         ALL[binding]
       end
 
+      def self.to_symbol(binding)
+        case binding
+        when HTTP_REDIRECT
+          :http_redirect
+        when HTTP_POST
+          :http_post
+        else
+          binding
+        end
+      end
+
       def self.create_for(binding, location)
         case binding
         when HTTP_REDIRECT
