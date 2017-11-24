@@ -1,0 +1,17 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Received Response</h1>
+      <%= render partial: "spinner" %>
+      <%= debug @saml_response.to_xhtml %>
+    </div>
+  </div>
+</div>
+
+<%= javascript_tag do %>
+  window.onload = function(){
+    window.setTimeout(function(){
+      window.location.href = '<%= registrations_path %>';
+    }, 5000);
+  };
+<% end %>

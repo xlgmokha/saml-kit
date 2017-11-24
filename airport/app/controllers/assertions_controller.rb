@@ -8,7 +8,6 @@ class AssertionsController < ApplicationController
     return render :error, status: :forbidden if @saml_response.invalid?
 
     session[@saml_response.issuer] = { id: @saml_response.name_id }.merge(@saml_response.attributes)
-    redirect_to registrations_path
   end
 
   def destroy
@@ -16,10 +15,9 @@ class AssertionsController < ApplicationController
       # IDP initiated logout
     elsif params['SAMLResponse'].present?
       saml_binding = sp.single_logout_service_for(binding: :http_post)
-      saml_response = saml_binding.deserialize(params)
-      raise ActiveRecordRecordInvalid.new(saml_response) if saml_response.invalid?
-      session[saml_response.issuer] = nil
-      redirect_to registrations_path
+      @saml_response = saml_binding.deserialize(params)
+      raise ActiveRecordRecordInvalid.new(@saml_response) if @saml_response.invalid?
+      session[@saml_response.issuer] = nil
     end
   end
 
