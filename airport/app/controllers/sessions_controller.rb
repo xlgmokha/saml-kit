@@ -4,12 +4,13 @@ class SessionsController < ApplicationController
   end
 
   def create
+    @saml_builder = builder_for(:login)
     if :http_redirect == params[:binding].to_sym
       redirect_binding = idp.single_sign_on_service_for(binding: :http_redirect)
-      @redirect_uri, _ = redirect_binding.serialize(builder_for(:login), relay_state: relay_state)
+      @redirect_uri, _ = redirect_binding.serialize(@saml_builder, relay_state: relay_state)
     else
       post_binding = idp.single_sign_on_service_for(binding: :http_post)
-      @post_uri, @saml_params = post_binding.serialize(builder_for(:login), relay_state: relay_state)
+      @post_uri, @saml_params = post_binding.serialize(@saml_builder, relay_state: relay_state)
     end
   end
 
