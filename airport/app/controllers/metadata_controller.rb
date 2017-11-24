@@ -1,6 +1,5 @@
 class MetadataController < ApplicationController
   force_ssl if: :ssl_configured?
-  #skip_before_action :authenticate!
 
   def show
     render xml: to_xml, content_type: "application/samlmetadata+xml"
