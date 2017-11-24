@@ -7,6 +7,15 @@
         <% @metadatum.each do |metadata| %>
           <tr>
             <td><%= link_to metadata.entity_id, registration_path(metadata) %></td>
+            <% metadata.to_saml.single_sign_on_services.each do |service| %>
+              <td>
+                <%= form_with url: session_path, data: { remote: false } do |form| %>
+                  <%= form.hidden_field :entity_id, value: metadata.entity_id %>
+                  <%= form.hidden_field :binding, value: Saml::Kit::Bindings.to_symbol(service.binding) %>
+                  <%= form.submit service.binding %>
+                <% end %>
+              </td>
+            <% end %>
           </tr>
         <% end %>
         </tbody>
