@@ -5,9 +5,9 @@ class SessionsController < ApplicationController
     target_binding = request.post? ? :http_post : :http_redirect
     binding = idp.single_sign_on_service_for(binding: target_binding)
     saml_request = binding.deserialize(raw_params)
-    if saml_request.invalid?
-      return render_error(:forbidden, model: saml_request)
-    end
+    return render_error(:forbidden, model: saml_request) if saml_request.invalid?
+    return post_back(saml_request, current_user) if current_user?
+
     session[:saml] = { params: raw_params.to_h, binding: target_binding }
   end
 
@@ -15,16 +15,9 @@ class SessionsController < ApplicationController
     if user = User.login(user_params[:email], user_params[:password])
       binding = idp.single_sign_on_service_for(binding: session[:saml][:binding])
       saml_request = binding.deserialize(session[:saml][:params])
-      if saml_request.invalid?
-        return render_error(:forbidden, model: saml_request)
-      end
+      return render_error(:forbidden, model: saml_request) if saml_request.invalid?
 
-      response_binding = saml_request.provider.assertion_consumer_service_for(binding: :http_post)
-      saml_response = saml_request.response_for(user)
-      @url, @saml_params = response_binding.serialize(saml_response, relay_state: saml_params[:RelayState])
-      reset_session
-      session[:user_id] = user.id
-      render layout: "spinner"
+      post_back(saml_request, user)
     else
       flash[:error] = "Invalid Credentials"
       render :new
@@ -68,5 +61,14 @@ class SessionsController < ApplicationController
     else
       Hash[request.query_string.split("&").map { |x| x.split("=", 2) }]
     end
+  end
+
+  def post_back(saml_request, user)
+    response_binding = saml_request.provider.assertion_consumer_service_for(binding: :http_post)
+    saml_response = saml_request.response_for(user)
+    @url, @saml_params = response_binding.serialize(saml_response, relay_state: saml_params[:RelayState])
+    reset_session
+    session[:user_id] = user.id
+    render :create, layout: "spinner"
   end
 end

@@ -5,4 +5,16 @@ class ApplicationController < ActionController::Base
     @model = model
     render template: "errors/#{status}", status: status
   end
+
+  def current_user
+    return nil if session[:user_id].blank?
+    @current_user ||= User.find(session[:user_id])
+  rescue ActiveRecord::RecordNotFound => error
+    logger.error(error)
+    nil
+  end
+
+  def current_user?
+    current_user.present?
+  end
 end
