@@ -1,6 +1,4 @@
 class SessionsController < ApplicationController
-  skip_before_action :authenticate!, only: [:new, :create]
-
   def new
     @metadatum = Metadatum.all
   end
@@ -17,7 +15,8 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    saml_binding = idp.single_logout_service_for(binding: :http_post)
+    binding = :http_redirect == params[:binding].to_sym ? :http_redirect : :http_post
+    saml_binding = idp.single_logout_service_for(binding: binding)
     @url, @saml_params = saml_binding.serialize(builder_for(:logout))
     render layout: "spinner"
   end
@@ -32,7 +31,7 @@ class SessionsController < ApplicationController
     JSON.generate(redirect_to: '/')
   end
 
-  def builder_for(type)
+  def builder_for(type, entity_id: nil)
     case type
     when :login
       builder = Saml::Kit::AuthenticationRequest::Builder.new

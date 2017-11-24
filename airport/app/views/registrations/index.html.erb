@@ -3,21 +3,52 @@
     <div class="col">
       <%= link_to "register", new_registration_path %>
       <table class="table">
-        <tbody>
-        <% @metadatum.each do |metadata| %>
+        <thead>
           <tr>
-            <td><%= link_to metadata.entity_id, registration_path(metadata) %></td>
-            <% metadata.to_saml.single_sign_on_services.each do |service| %>
-              <td>
-                <%= form_with url: session_path, data: { remote: false } do |form| %>
-                  <%= form.hidden_field :entity_id, value: metadata.entity_id %>
-                  <%= form.hidden_field :binding, value: Saml::Kit::Bindings.to_symbol(service.binding) %>
-                  <%= form.submit service.binding %>
-                <% end %>
-              </td>
-            <% end %>
+            <th>Entity Id</th>
+            <th>Login</th>
+            <th>Logout</th>
           </tr>
-        <% end %>
+        </thead>
+        <tbody>
+          <% @metadatum.each do |metadata| %>
+            <tr>
+              <td>
+                <%= link_to metadata.entity_id, registration_path(metadata) %>
+                <ul>
+                  <% current_user(metadata.entity_id).attributes.each do |attribute| %>
+                    <li> <%= attribute %> </li>
+                  <% end if current_user?(metadata.entity_id) %>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <% metadata.to_saml.single_sign_on_services.each do |service| %>
+                    <li>
+                      <%= form_with url: session_path, data: { remote: false } do |form| %>
+                        <%= form.hidden_field :entity_id, value: metadata.entity_id %>
+                        <%= form.hidden_field :binding, value: Saml::Kit::Bindings.to_symbol(service.binding) %>
+                        <%= form.submit service.binding %>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <% metadata.to_saml.single_logout_services.each do |service| %>
+                    <li>
+                      <%= form_with url: session_path, method: :delete, data: { remote: false } do |form| %>
+                        <%= form.hidden_field :entity_id, value: metadata.entity_id %>
+                        <%= form.hidden_field :binding, value: Saml::Kit::Bindings.to_symbol(service.binding) %>
+                        <%= form.submit service.binding %>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ul>
+              </td>
+            </tr>
+          <% end %>
         </tbody>
       </table>
     </div>

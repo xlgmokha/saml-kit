@@ -6,5 +6,5 @@ Rails.application.routes.draw do
   post "/assertions/logout" => "assertions#destroy", as: :logout
   resource :metadata, only: [:show]
   resources :registrations, only: [:index, :show, :new, :create]
-  root to: "sessions#new"
+  root to: "registrations#index"
 end

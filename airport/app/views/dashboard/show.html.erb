@@ -1,13 +1,6 @@
 <div class="container">
   <div class="row">
     <div class="col">
-      <h1>Welcome <%= current_user.email %></h1>
-      <ul>
-        <% current_user.attributes.each do |attribute| %>
-          <li> <%= attribute %> </li>
-        <% end %>
-      </ul>
-      <%= link_to "logout", session_path, method: :delete %>
     </div>
   </div>
 </div>
