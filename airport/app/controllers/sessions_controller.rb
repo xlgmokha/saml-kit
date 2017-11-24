@@ -17,7 +17,8 @@ class SessionsController < ApplicationController
   def destroy
     binding = :http_redirect == params[:binding].to_sym ? :http_redirect : :http_post
     saml_binding = idp.single_logout_service_for(binding: binding)
-    @url, @saml_params = saml_binding.serialize(builder_for(:logout))
+    @saml_builder = builder_for(:logout)
+    @url, @saml_params = saml_binding.serialize(@saml_builder)
   end
 
   private

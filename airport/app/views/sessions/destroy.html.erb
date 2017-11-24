@@ -8,10 +8,13 @@
           <%= hidden_field_tag key, value %>
         <% end %>
       <% end %>
+      <%= debug @saml_builder.build.to_xhtml %>
     </div>
   </div>
 </div>
 
 <%= javascript_tag do %>
-  window.onload = function() { document.forms[0].submit(); };
+  window.onload = function() {
+    window.setTimeout(function() { document.forms[0].submit(); }, 5000);
+  };
 <% end %>
