@@ -1,6 +1,19 @@
 <% if :http_redirect == params[:binding].to_sym %>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h1>Redirecting to IDP</h1>
+        <%= render partial: 'spinner' %>
+        <%= debug @saml_builder.build.to_xhtml %>
+      </div>
+    </div>
+  </div>
   <%= javascript_tag do %>
-    window.location.href = '<%= @redirect_uri %>';
+    window.onload = function() {
+      window.setTimeout(function() {
+        window.location.href = '<%= @redirect_uri %>';
+      }, 5000);
+    };
   <% end  %>
 <% else %>
   <div class="container">
