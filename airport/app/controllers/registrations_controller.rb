@@ -1,6 +1,4 @@
 class RegistrationsController < ApplicationController
-  #skip_before_action :authenticate!
-
   def index
     @metadatum = Metadatum.all.limit(10)
   end
