@@ -1,12 +1,24 @@
-<h1>Logging Out of IDP</h1>
-<%= form_tag(@url, style: "position: absolute; left: -10000px; top: -10000px;") do %>
-  <%= @saml_params.each do |(key, value)| %>
-    <%= hidden_field_tag key, value %>
-  <% end %>
-<% end %>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <%= render partial: 'spinner' %>
+      <h1>Logging Out of IDP</h1>
+      <%= form_tag(@url, style: "position: absolute; left: -10000px; top: -10000px;") do %>
+        <%= @saml_params.each do |(key, value)| %>
+          <%= hidden_field_tag key, value %>
+        <% end %>
+      <% end %>
+      <%= debug @saml_response.build.to_xhtml %>
+    </div>
+  </div>
+</div>
 
 <%= javascript_tag do %>
-  window.onload= function () {
-    document.forms[0].submit();
+  function startTimer(duration) {
+    setInterval(function(){ if (--duration < 0) { document.forms[0].submit(); } }, 1000);
+  }
+  window.onload = function () {
+    var fiveSeconds = 5;
+    startTimer(fiveSeconds);
   };
 <% end %>
