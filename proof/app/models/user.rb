@@ -5,11 +5,7 @@ class User < ApplicationRecord
   end
 
   def name_id_for(name_id_format)
-    if Saml::Kit::Namespaces::PERSISTENT == name_id_format
-      uuid
-    else
-      email
-    end
+    Saml::Kit::Namespaces::PERSISTENT == name_id_format ? uuid : email
   end
 
   def assertion_attributes_for(request)
