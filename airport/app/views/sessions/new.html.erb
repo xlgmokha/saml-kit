@@ -1,13 +1,10 @@
 <div class="container">
   <div class="row">
     <div class="col">
-      <%= link_to "Log in to IDP via redirect", @redirect_uri %>
-
-      <%= form_tag @post_uri.to_s, method: :post do %>
-        <% @saml_params.each do |(key, value)| %>
-          <%= hidden_field_tag key, value %>
-        <% end %>
-        <%= submit_tag "Log In to IDP via POST" %>
+      <%= form_with url: session_path, data: { remote: false } do |form| %>
+        <%= form.select "entity_id", @metadatum.pluck(:entity_id, :entity_id) %>
+        <%= form.select "binding", [["HTTP Post", :http_post], ["HTTP Redirect", :http_redirect]] %>
+        <%= form.submit "Log In to IDP" %>
       <% end %>
     </div>
   </div>

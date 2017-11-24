@@ -1,19 +1,19 @@
 class SessionsController < ApplicationController
-  skip_before_action :authenticate!, only: [:new]
+  skip_before_action :authenticate!, only: [:new, :create]
 
   def new
-    # HTTP Redirect
-    # * URI
-    # * SigAlg
-    # * Signature
-    # * RelayState
-    redirect_binding = idp.single_sign_on_service_for(binding: :http_redirect)
-    @redirect_uri, _ = redirect_binding.serialize(builder_for(:login), relay_state: relay_state)
-    # HTTP POST
-    # * URI
-    # * SAMLRequest/SAMLResponse
-    post_binding = idp.single_sign_on_service_for(binding: :http_post)
-    @post_uri, @saml_params = post_binding.serialize(builder_for(:login), relay_state: relay_state)
+    @metadatum = Metadatum.all
+  end
+
+  def create
+    if :http_redirect == params[:binding].to_sym
+      redirect_binding = idp.single_sign_on_service_for(binding: :http_redirect)
+      @redirect_uri, _ = redirect_binding.serialize(builder_for(:login), relay_state: relay_state)
+    else
+      post_binding = idp.single_sign_on_service_for(binding: :http_post)
+      @post_uri, @saml_params = post_binding.serialize(builder_for(:login), relay_state: relay_state)
+    end
+    render layout: "spinner"
   end
 
   def destroy
@@ -24,8 +24,8 @@ class SessionsController < ApplicationController
 
   private
 
-  def idp
-    Rails.configuration.x.idp_metadata
+  def idp(entity_id = params[:entity_id])
+    Saml::Kit.configuration.registry.metadata_for(params[:entity_id])
   end
 
   def relay_state

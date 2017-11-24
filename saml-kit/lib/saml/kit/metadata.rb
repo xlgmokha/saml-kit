@@ -50,7 +50,7 @@ module Saml
         document.find_all("/md:EntityDescriptor/md:#{name}/md:#{type}").map do |item|
           binding = item.attribute("Binding").value
           location = item.attribute("Location").value
-          binding_for(binding, location)
+          Saml::Kit::Bindings.create_for(binding, location)
         end
       end
 
@@ -140,10 +140,6 @@ module Saml
           errors[:base] << error
         end
         result
-      end
-
-      def binding_for(binding, location)
-        Bindings.create_for(binding, location)
       end
     end
   end

@@ -6,7 +6,7 @@
         <tbody>
         <% @metadatum.each do |metadata| %>
           <tr>
-            <td><%= link_to metadata.issuer, registration_path(metadata) %></td>
+            <td><%= link_to metadata.entity_id, registration_path(metadata) %></td>
           </tr>
         <% end %>
         </tbody>

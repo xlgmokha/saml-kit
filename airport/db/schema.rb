@@ -13,11 +13,11 @@
 ActiveRecord::Schema.define(version: 20171123220807) do
 
   create_table "metadata", force: :cascade do |t|
-    t.string "issuer"
+    t.string "entity_id"
     t.text "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["issuer"], name: "index_metadata_on_issuer", unique: true
+    t.index ["entity_id"], name: "index_metadata_on_entity_id", unique: true
   end
 
 end

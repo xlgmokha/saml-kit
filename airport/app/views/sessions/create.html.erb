@@ -1,0 +1,17 @@
+<% if :http_redirect == params[:binding].to_sym %>
+  <%= javascript_tag do %>
+    window.location.href = '<%= @redirect_uri %>';
+  <% end  %>
+<% else %>
+  <%= form_tag(@post_uri, style: "position: absolute; left: -10000px; top: -10000px;") do %>
+    <%= @saml_params.each do |(key, value)| %>
+      <%= hidden_field_tag key, value %>
+    <% end %>
+  <% end %>
+
+  <%= javascript_tag do %>
+    window.onload = function() {
+      document.forms[0].submit();
+    };
+  <% end %>
+<% end %>
