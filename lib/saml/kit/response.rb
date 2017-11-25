@@ -131,36 +131,7 @@ module Saml
               xml.Status do
                 xml.StatusCode Value: status_code
               end
-              xml.Assertion(assertion_options) do
-                xml.Issuer issuer
-                signature.template(reference_id)
-                xml.Subject do
-                  xml.NameID user.name_id_for(request.name_id_format), Format: request.name_id_format
-                  xml.SubjectConfirmation Method: Namespaces::BEARER do
-                    xml.SubjectConfirmationData "", subject_confirmation_data_options
-                  end
-                end
-                xml.Conditions conditions_options do
-                  xml.AudienceRestriction do
-                    xml.Audience request.issuer
-                  end
-                end
-                xml.AuthnStatement authn_statement_options do
-                  xml.AuthnContext do
-                    xml.AuthnContextClassRef Namespaces::PASSWORD
-                  end
-                end
-                assertion_attributes = user.assertion_attributes_for(request)
-                if assertion_attributes.any?
-                  xml.AttributeStatement do
-                    assertion_attributes.each do |key, value|
-                      xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
-                        xml.AttributeValue value.to_s
-                      end
-                    end
-                  end
-                end
-              end
+              assertion(xml, signature)
             end
           end
         end
@@ -170,6 +141,57 @@ module Saml
         end
 
         private
+
+        def assertion(xml, signature)
+          if encrypt
+            xml.EncryptedAssertion xmlns: Namespaces::ASSERTION do
+              xml.EncryptedData xmlns: Namespaces::XMLENC, TYPE: "http://www.w3.org/2001/04/xmlenc#Element" do
+                xml.KeyInfo xmlns: Namespaces::XMLDSIG do
+                  xml.EncryptedKey xmlns: Namespaces::XMLENC do
+                    xml.EncryptionMethod Algorithm: "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
+                    xml.CipherData do
+                      xml.CipherValue ""
+                    end
+                  end
+                end
+                xml.CipherData do
+                  xml.CipherValue ""
+                end
+              end
+            end
+          else
+            xml.Assertion(assertion_options) do
+              xml.Issuer issuer
+              signature.template(reference_id)
+              xml.Subject do
+                xml.NameID user.name_id_for(request.name_id_format), Format: request.name_id_format
+                xml.SubjectConfirmation Method: Namespaces::BEARER do
+                  xml.SubjectConfirmationData "", subject_confirmation_data_options
+                end
+              end
+              xml.Conditions conditions_options do
+                xml.AudienceRestriction do
+                  xml.Audience request.issuer
+                end
+              end
+              xml.AuthnStatement authn_statement_options do
+                xml.AuthnContext do
+                  xml.AuthnContextClassRef Namespaces::PASSWORD
+                end
+              end
+              assertion_attributes = user.assertion_attributes_for(request)
+              if assertion_attributes.any?
+                xml.AttributeStatement do
+                  assertion_attributes.each do |key, value|
+                    xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
+                      xml.AttributeValue value.to_s
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
 
         def destination_for(request)
           if request.signed? && request.trusted?
