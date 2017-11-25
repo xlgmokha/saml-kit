@@ -406,7 +406,11 @@ RSpec.describe Saml::Kit::Response do
   describe described_class::Builder do
     subject { described_class.new(user, request) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
-    let(:request) { double(:request, id: SecureRandom.uuid, acs_url: FFaker::Internet.http_url, provider: nil, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url, signed?: true, trusted?: true) }
+    let(:request) { double(:request, id: SecureRandom.uuid, acs_url: FFaker::Internet.http_url, provider: provider, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url, signed?: true, trusted?: true) }
+    let(:provider) { double(want_assertions_signed: false, encryption_certificates: [{ text: encryption_pem }]) }
+    let(:encryption_pem) do
+      Saml::Kit.configuration.encryption_certificate_pem
+    end
 
     describe "#build" do
       it 'builds a response with the request_id' do

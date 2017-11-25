@@ -143,26 +143,10 @@ module Saml
         private
 
         def assertion(xml, signature)
-          if encrypt
-            xml.EncryptedAssertion xmlns: Namespaces::ASSERTION do
-              xml.EncryptedData xmlns: Namespaces::XMLENC, TYPE: "http://www.w3.org/2001/04/xmlenc#Element" do
-                xml.KeyInfo xmlns: Namespaces::XMLDSIG do
-                  xml.EncryptedKey xmlns: Namespaces::XMLENC do
-                    xml.EncryptionMethod Algorithm: "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
-                    xml.CipherData do
-                      xml.CipherValue ""
-                    end
-                  end
-                end
-                xml.CipherData do
-                  xml.CipherValue ""
-                end
-              end
-            end
-          else
+          with_encryption(xml) do |xml|
             xml.Assertion(assertion_options) do
               xml.Issuer issuer
-              signature.template(reference_id)
+              signature.template(reference_id) unless encrypt
               xml.Subject do
                 xml.NameID user.name_id_for(request.name_id_format), Format: request.name_id_format
                 xml.SubjectConfirmation Method: Namespaces::BEARER do
@@ -190,6 +174,41 @@ module Saml
                 end
               end
             end
+          end
+        end
+
+        def with_encryption(xml)
+          if encrypt
+            temp = ::Builder::XmlMarkup.new
+            yield temp
+            raw_xml_to_encrypt = temp.target!
+
+            encryption_certificate = OpenSSL::X509::Certificate.new(request.provider.encryption_certificates.first[:text])
+            public_key = encryption_certificate.public_key
+
+            cipher = OpenSSL::Cipher.new('AES-256-CBC')
+            cipher.encrypt
+            key = cipher.random_key
+            iv = cipher.random_iv
+            encrypted = cipher.update(raw_xml_to_encrypt) + cipher.final
+
+            xml.EncryptedAssertion xmlns: Namespaces::ASSERTION do
+              xml.EncryptedData xmlns: Namespaces::XMLENC, TYPE: "http://www.w3.org/2001/04/xmlenc#Element" do
+                xml.KeyInfo xmlns: Namespaces::XMLDSIG do
+                  xml.EncryptedKey xmlns: Namespaces::XMLENC do
+                    xml.EncryptionMethod Algorithm: "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
+                    xml.CipherData do
+                      xml.CipherValue Base64.encode64(public_key.public_encrypt(key))
+                    end
+                  end
+                end
+                xml.CipherData do
+                  xml.CipherValue Base64.encode64(iv + encrypted)
+                end
+              end
+            end
+          else
+            yield xml
           end
         end
 
