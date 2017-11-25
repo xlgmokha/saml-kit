@@ -35,6 +35,10 @@ module Saml
         OpenSSL::X509::Certificate.new(signing_certificate_pem)
       end
 
+      def encryption_x509
+        OpenSSL::X509::Certificate.new(encryption_certificate_pem)
+      end
+
       def signing_private_key
         OpenSSL::PKey::RSA.new(signing_private_key_pem, signing_private_key_password)
       end

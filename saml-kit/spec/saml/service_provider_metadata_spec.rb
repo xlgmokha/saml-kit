@@ -50,8 +50,11 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['isDefault']).to eql('true')
       expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['index']).to eql('0')
       expect(result['EntityDescriptor']['Signature']).to be_present
-      expect(result['EntityDescriptor']['SPSSODescriptor']['KeyDescriptor']['use']).to eql("signing")
-      expect(result['EntityDescriptor']['SPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']).to eql(Saml::Kit.configuration.stripped_signing_certificate)
+      expect(result['EntityDescriptor']['SPSSODescriptor']['KeyDescriptor'].map { |x| x['use'] }).to match_array(['signing', 'encryption'])
+      expect(result['EntityDescriptor']['SPSSODescriptor']['KeyDescriptor'].map { |x| x['KeyInfo']['X509Data']['X509Certificate'] }).to match_array([
+        Saml::Kit.configuration.stripped_signing_certificate,
+        Saml::Kit.configuration.stripped_encryption_certificate,
+      ])
     end
   end
 
@@ -68,12 +71,18 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
     it 'returns each of the certificates' do
       expected_sha256 = OpenSSL::Digest::SHA256.new.hexdigest(Saml::Kit.configuration.signing_x509.to_der)
+      expected_encryption_sha256 = OpenSSL::Digest::SHA256.new.hexdigest(Saml::Kit.configuration.encryption_x509.to_der)
       expect(subject.certificates).to match_array([
         {
           fingerprint: expected_sha256.upcase.scan(/../).join(":"),
           use: :signing,
           text: Saml::Kit.configuration.stripped_signing_certificate
-        }
+        },
+        {
+          fingerprint: expected_encryption_sha256.upcase.scan(/../).join(":"),
+          use: :encryption,
+          text: Saml::Kit.configuration.stripped_encryption_certificate
+        },
       ])
     end
 
