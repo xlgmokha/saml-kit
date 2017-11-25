@@ -409,7 +409,7 @@ RSpec.describe Saml::Kit::Response do
     let(:request) { double(:request, id: SecureRandom.uuid, acs_url: FFaker::Internet.http_url, provider: provider, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url, signed?: true, trusted?: true) }
     let(:provider) { double(want_assertions_signed: false, encryption_certificates: [{ text: encryption_pem }]) }
     let(:encryption_pem) do
-      Saml::Kit.configuration.encryption_certificate_pem
+      Saml::Kit.configuration.stripped_encryption_certificate
     end
 
     describe "#build" do
@@ -423,6 +423,9 @@ RSpec.describe Saml::Kit::Response do
         subject.encrypt = true
         result = Hash.from_xml(subject.to_xml)
         expect(result['Response']['EncryptedAssertion']).to be_present
+        decrypted = Saml::Kit::Cryptography.new.decrypt(result['Response']['EncryptedAssertion'])
+        decrypted_hash = Hash.from_xml(decrypted)
+        #expect(decrypted_hash['Assertion']).to be_present
       end
     end
   end

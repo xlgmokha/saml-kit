@@ -58,6 +58,15 @@ module Saml
                     end
                   end
                 end
+                if @configuration.encryption_certificate_pem.present?
+                  xml.KeyDescriptor use: "encryption" do
+                    xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
+                      xml.X509Data do
+                        xml.X509Certificate @configuration.stripped_encryption_certificate
+                      end
+                    end
+                  end
+                end
                 logout_urls.each do |item|
                   xml.SingleLogoutService Binding: item[:binding], Location: item[:location]
                 end

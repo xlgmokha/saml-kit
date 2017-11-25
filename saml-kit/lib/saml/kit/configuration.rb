@@ -24,7 +24,11 @@ module Saml
       end
 
       def stripped_signing_certificate
-        signing_certificate_pem.to_s.gsub(BEGIN_CERT, '').gsub(END_CERT, '').gsub(/\n/, '')
+        normalize(signing_certificate_pem)
+      end
+
+      def stripped_encryption_certificate
+        normalize(encryption_certificate_pem)
       end
 
       def signing_x509
@@ -37,6 +41,12 @@ module Saml
 
       def encryption_private_key
         OpenSSL::PKey::RSA.new(encryption_private_key_pem, encryption_private_key_password)
+      end
+
+      private
+
+      def normalize(certificate)
+        certificate.to_s.gsub(BEGIN_CERT, '').gsub(END_CERT, '').gsub(/\n/, '')
       end
     end
   end
