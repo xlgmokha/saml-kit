@@ -183,7 +183,7 @@ module Saml
             yield temp
             raw_xml_to_encrypt = temp.target!
 
-            encryption_certificate = OpenSSL::X509::Certificate.new(request.provider.encryption_certificates.first[:text])
+            encryption_certificate = OpenSSL::X509::Certificate.new(Base64.decode64(request.provider.encryption_certificates.first[:text]))
             public_key = encryption_certificate.public_key
 
             cipher = OpenSSL::Cipher.new('AES-256-CBC')
@@ -194,9 +194,10 @@ module Saml
 
             xml.EncryptedAssertion xmlns: Namespaces::ASSERTION do
               xml.EncryptedData xmlns: Namespaces::XMLENC, TYPE: "http://www.w3.org/2001/04/xmlenc#Element" do
+                xml.EncryptionMethod Algorithm: "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
                 xml.KeyInfo xmlns: Namespaces::XMLDSIG do
                   xml.EncryptedKey xmlns: Namespaces::XMLENC do
-                    xml.EncryptionMethod Algorithm: "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
+                    xml.EncryptionMethod Algorithm: "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
                     xml.CipherData do
                       xml.CipherValue Base64.encode64(public_key.public_encrypt(key))
                     end
