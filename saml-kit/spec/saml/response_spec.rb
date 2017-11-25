@@ -415,7 +415,7 @@ RSpec.describe Saml::Kit::Response do
     end
 
     describe "#to_xml" do
-      xit 'generates an EncryptedAssertion' do
+      it 'generates an EncryptedAssertion' do
         subject.encrypt = true
         result = Hash.from_xml(subject.to_xml)
         expect(result['Response']['EncryptedAssertion']).to be_present

@@ -29,6 +29,7 @@ module Saml
       URI = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
       VERSION_MISMATCH_ERROR = "urn:oasis:names:tc:SAML:2.0:status:VersionMismatch"
       XMLDSIG = "http://www.w3.org/2000/09/xmldsig#"
+      XMLENC = "http://www.w3.org/2001/04/xmlenc#"
     end
   end
 end
