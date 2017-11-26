@@ -18,8 +18,6 @@ module Saml
         attribute.text.downcase == "true"
       end
 
-      private
-
       class Builder
         attr_accessor :id, :entity_id, :acs_urls, :logout_urls, :name_id_formats, :sign
         attr_accessor :want_assertions_signed
