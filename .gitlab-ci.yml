@@ -1,0 +1,15 @@
+image: ruby:2.2
+
+before_script:
+  - apt-get update && apt-get install -y locales
+  - echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+  - locale-gen
+  - export LC_ALL=en_US.UTF-8
+  - ruby -v
+  - which ruby
+  - gem install bundler --no-ri --no-rdoc
+  - bundle install --jobs $(nproc) "${FLAGS[@]}"
+
+rspec:
+  script:
+    - bundle exec rspec
