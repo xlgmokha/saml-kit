@@ -192,6 +192,9 @@ module Saml
             iv = cipher.random_iv
             encrypted = cipher.update(raw_xml_to_encrypt) + cipher.final
 
+            puts ['+iv', iv].inspect
+            puts ['+key', key].inspect
+
             xml.EncryptedAssertion xmlns: Namespaces::ASSERTION do
               xml.EncryptedData xmlns: Namespaces::XMLENC, TYPE: "http://www.w3.org/2001/04/xmlenc#Element" do
                 xml.EncryptionMethod Algorithm: "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
