@@ -2,12 +2,15 @@ module Saml
   module Kit
     module Crypto
       class OaepCipher
+        ALGORITHMS = {
+          'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p' => true,
+        }
         def initialize(algorithm, key)
           @key = key
         end
 
         def self.matches?(algorithm)
-          'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p' == algorithm
+          ALGORITHMS[algorithm]
         end
 
         def decrypt(cipher_text)
