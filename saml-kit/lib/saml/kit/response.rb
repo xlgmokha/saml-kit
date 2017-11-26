@@ -48,13 +48,16 @@ module Saml
       end
 
       def assertion
-        if encrypted?
-          decrypted = Cryptography.new.decrypt(to_h.fetch(name, {}).fetch('EncryptedAssertion', {}))
-          Saml::Kit.logger.debug(decrypted)
-          Hash.from_xml(decrypted)['Assertion']
-        else
-          to_h.fetch(name, {}).fetch('Assertion', {})
-        end
+        @assertion =
+          begin
+            if encrypted?
+              decrypted = Cryptography.new.decrypt(to_h.fetch(name, {}).fetch('EncryptedAssertion', {}))
+              Saml::Kit.logger.debug(decrypted)
+              Hash.from_xml(decrypted)['Assertion']
+            else
+              to_h.fetch(name, {}).fetch('Assertion', {})
+            end
+          end
       end
 
       def signed?

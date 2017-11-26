@@ -412,6 +412,10 @@ RSpec.describe Saml::Kit::Response do
       Saml::Kit.configuration.stripped_encryption_certificate
     end
 
+    before :each do
+      allow(Saml::Kit.configuration).to receive(:issuer).and_return(FFaker::Internet.uri("https"))
+    end
+
     describe "#build" do
       it 'builds a response with the request_id' do
         expect(subject.build.request_id).to eql(request.id)
@@ -431,11 +435,11 @@ RSpec.describe Saml::Kit::Response do
         expect(decrypted_hash['Assertion']['Subject']).to be_present
         expect(decrypted_hash['Assertion']['Subject']['NameID']).to be_present
         expect(decrypted_hash['Assertion']['Subject']['SubjectConfirmation']).to be_present
-        expect(decrypted_hash['Assertion']['Subject']['Conditions']).to be_present
-        expect(decrypted_hash['Assertion']['Subject']['Conditions']['AudienceRestriction']).to be_present
-        expect(decrypted_hash['Assertion']['Subject']['AuthnStatement']).to be_present
-        expect(decrypted_hash['Assertion']['Subject']['AuthnStatement']['AuthnContext']).to be_present
-        expect(decrypted_hash['Assertion']['Subject']['AuthnStatement']['AuthnContext']['AuthnContextClassRef']).to be_present
+        expect(decrypted_hash['Assertion']['Conditions']).to be_present
+        expect(decrypted_hash['Assertion']['Conditions']['AudienceRestriction']).to be_present
+        expect(decrypted_hash['Assertion']['AuthnStatement']).to be_present
+        expect(decrypted_hash['Assertion']['AuthnStatement']['AuthnContext']).to be_present
+        expect(decrypted_hash['Assertion']['AuthnStatement']['AuthnContext']['AuthnContextClassRef']).to be_present
       end
     end
   end
