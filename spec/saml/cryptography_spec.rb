@@ -2,8 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Saml::Kit::Cryptography do
   describe "#decrypt" do
-    #let(:secret) { FFaker::Movie.title }
-    let(:secret) { "SECRET" }
+    let(:secret) { FFaker::Movie.title }
     let(:password) { FFaker::Movie.title }
 
     it 'decrypts the data' do
