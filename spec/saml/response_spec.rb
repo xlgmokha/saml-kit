@@ -424,10 +424,18 @@ RSpec.describe Saml::Kit::Response do
         result = Hash.from_xml(subject.to_xml)
         expect(result['Response']['EncryptedAssertion']).to be_present
         encrypted_assertion = result['Response']['EncryptedAssertion']
-        decrypted = Saml::Kit::Cryptography.new.decrypt(encrypted_assertion)
-        puts decrypted.inspect
-        decrypted_hash = Hash.from_xml(decrypted)
+        decrypted_assertion = Saml::Kit::Cryptography.new.decrypt(encrypted_assertion)
+        decrypted_hash = Hash.from_xml(decrypted_assertion)
         expect(decrypted_hash['Assertion']).to be_present
+        expect(decrypted_hash['Assertion']['Issuer']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']['NameID']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']['SubjectConfirmation']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']['Conditions']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']['Conditions']['AudienceRestriction']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']['AuthnStatement']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']['AuthnStatement']['AuthnContext']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']['AuthnStatement']['AuthnContext']['AuthnContextClassRef']).to be_present
       end
     end
   end
