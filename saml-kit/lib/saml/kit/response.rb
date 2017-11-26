@@ -65,7 +65,7 @@ module Saml
       end
 
       def certificate
-        super || to_h.fetch(name, {}).fetch('Assertion', {}).fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
+        super || assertion.fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
       end
 
       private
@@ -86,7 +86,7 @@ module Saml
       end
 
       def audiences
-        Array(to_h[name]['Assertion']['Conditions']['AudienceRestriction']['Audience'])
+        Array(assertion['Conditions']['AudienceRestriction']['Audience'])
       rescue => error
         Saml::Kit.logger.error(error)
         []
@@ -199,7 +199,7 @@ module Saml
             Saml::Kit.logger.debug ['+key', key].inspect
 
             xml.EncryptedAssertion xmlns: Namespaces::ASSERTION do
-              xml.EncryptedData xmlns: Namespaces::XMLENC, TYPE: "http://www.w3.org/2001/04/xmlenc#Element" do
+              xml.EncryptedData xmlns: Namespaces::XMLENC do
                 xml.EncryptionMethod Algorithm: "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
                 xml.KeyInfo xmlns: Namespaces::XMLDSIG do
                   xml.EncryptedKey xmlns: Namespaces::XMLENC do

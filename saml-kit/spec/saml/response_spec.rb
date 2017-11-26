@@ -406,19 +406,30 @@ RSpec.describe Saml::Kit::Response do
   describe described_class::Builder do
     subject { described_class.new(user, request) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
-    let(:request) { double(:request, id: SecureRandom.uuid, acs_url: FFaker::Internet.http_url, provider: provider, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url, signed?: true, trusted?: true) }
+    let(:request) { double(:request, id: "_#{SecureRandom.uuid}", acs_url: FFaker::Internet.http_url, provider: provider, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: issuer, signed?: true, trusted?: true) }
     let(:provider) { double(want_assertions_signed: false, encryption_certificates: [{ text: encryption_pem }]) }
     let(:encryption_pem) do
       Saml::Kit.configuration.stripped_encryption_certificate
     end
+    let(:issuer) { FFaker::Internet.uri("https") }
 
     before :each do
-      allow(Saml::Kit.configuration).to receive(:issuer).and_return(FFaker::Internet.uri("https"))
+      allow(Saml::Kit.configuration).to receive(:issuer).and_return(issuer)
     end
 
     describe "#build" do
       it 'builds a response with the request_id' do
         expect(subject.build.request_id).to eql(request.id)
+      end
+
+      it 'builds a valid encrypted assertion' do
+        allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
+        allow(provider).to receive(:matches?).and_return(true)
+
+        subject.sign = true
+        subject.encrypt = true
+        result = subject.build
+        expect(result).to be_valid
       end
     end
 
@@ -502,7 +513,7 @@ XML
     <samlp:StatusCode Value="#{Saml::Kit::Namespaces::SUCCESS}"/>
   </samlp:Status>
   <saml:EncryptedAssertion>
-    <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Type="http://www.w3.org/2001/04/xmlenc#Element">
+    <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
     <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
     <dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
       <xenc:EncryptedKey>
