@@ -6,9 +6,10 @@ require 'saml/kit/crypto/unknown_cipher'
 module Saml
   module Kit
     module Crypto
+      DECRYPTORS = [ SimpleCipher, RsaCipher, OaepCipher, UnknownCipher ]
+
       def self.decryptor_for(algorithm, key)
-        decryptors = [ SimpleCipher, RsaCipher, OaepCipher, UnknownCipher ]
-        decryptors.find { |x| x.matches?(algorithm) }.new(algorithm, key)
+        DECRYPTORS.find { |x| x.matches?(algorithm) }.new(algorithm, key)
       end
     end
   end
