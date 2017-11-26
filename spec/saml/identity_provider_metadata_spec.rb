@@ -224,8 +224,11 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Binding']).to eql(Saml::Kit::Bindings::HTTP_POST)
       expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Location']).to eql("https://www.example.com/logout")
       expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['Name']).to eql("id")
-      expect(result['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']).to eql(Saml::Kit.configuration.stripped_signing_certificate)
-
+      certificates = result['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor'].map { |x| x['KeyInfo']['X509Data']['X509Certificate'] }
+      expect(certificates).to match_array([
+        Saml::Kit.configuration.stripped_signing_certificate,
+        Saml::Kit.configuration.stripped_encryption_certificate,
+      ])
       expect(result['EntityDescriptor']['Organization']['OrganizationName']).to eql(org_name)
       expect(result['EntityDescriptor']['Organization']['OrganizationDisplayName']).to eql(org_name)
       expect(result['EntityDescriptor']['Organization']['OrganizationURL']).to eql(url)

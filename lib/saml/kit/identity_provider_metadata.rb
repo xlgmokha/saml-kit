@@ -62,10 +62,21 @@ module Saml
             xml.EntityDescriptor entity_descriptor_options do
               signature.template(id)
               xml.IDPSSODescriptor idp_sso_descriptor_options do
-                xml.KeyDescriptor use: "signing" do
-                  xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
-                    xml.X509Data do
-                      xml.X509Certificate @configuration.stripped_signing_certificate
+                if @configuration.signing_certificate_pem.present?
+                  xml.KeyDescriptor use: "signing" do
+                    xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
+                      xml.X509Data do
+                        xml.X509Certificate @configuration.stripped_signing_certificate
+                      end
+                    end
+                  end
+                end
+                if @configuration.encryption_certificate_pem.present?
+                  xml.KeyDescriptor use: "encryption" do
+                    xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
+                      xml.X509Data do
+                        xml.X509Certificate @configuration.stripped_encryption_certificate
+                      end
                     end
                   end
                 end
