@@ -423,9 +423,11 @@ RSpec.describe Saml::Kit::Response do
         subject.encrypt = true
         result = Hash.from_xml(subject.to_xml)
         expect(result['Response']['EncryptedAssertion']).to be_present
-        decrypted = Saml::Kit::Cryptography.new.decrypt(result['Response']['EncryptedAssertion'])
+        encrypted_assertion = result['Response']['EncryptedAssertion']
+        decrypted = Saml::Kit::Cryptography.new.decrypt(encrypted_assertion)
+        puts decrypted.inspect
         decrypted_hash = Hash.from_xml(decrypted)
-        #expect(decrypted_hash['Assertion']).to be_present
+        expect(decrypted_hash['Assertion']).to be_present
       end
     end
   end

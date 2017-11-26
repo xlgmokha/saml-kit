@@ -39,10 +39,15 @@ module Saml
         end
 
         if cipher
+          iv = cipher_text[0..cipher.iv_len-1]
           data = cipher_text[cipher.iv_len..-1]
-          cipher.padding = 0
+          #cipher.padding = 0
           cipher.key = symmetric_key
-          cipher.iv = cipher_text[0..cipher.iv_len-1]
+          cipher.iv = iv
+
+          puts ['-key', symmetric_key].inspect
+          puts ['-iv', iv].inspect
+
           cipher.update(data) + cipher.final
         elsif rsa
           rsa.private_decrypt(cipher_text)
