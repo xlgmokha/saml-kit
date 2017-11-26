@@ -45,8 +45,8 @@ module Saml
           cipher.key = symmetric_key
           cipher.iv = iv
 
-          puts ['-key', symmetric_key].inspect
-          puts ['-iv', iv].inspect
+          Saml::Kit.logger.debug ['-key', symmetric_key].inspect
+          Saml::Kit.logger.debug ['-iv', iv].inspect
 
           cipher.update(data) + cipher.final
         elsif rsa

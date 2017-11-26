@@ -192,8 +192,8 @@ module Saml
             iv = cipher.random_iv
             encrypted = cipher.update(raw_xml_to_encrypt) + cipher.final
 
-            puts ['+iv', iv].inspect
-            puts ['+key', key].inspect
+            Saml::Kit.logger.debug ['+iv', iv].inspect
+            Saml::Kit.logger.debug ['+key', key].inspect
 
             xml.EncryptedAssertion xmlns: Namespaces::ASSERTION do
               xml.EncryptedData xmlns: Namespaces::XMLENC, TYPE: "http://www.w3.org/2001/04/xmlenc#Element" do
