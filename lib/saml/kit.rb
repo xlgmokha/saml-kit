@@ -23,6 +23,7 @@ require "saml/kit/document"
 
 require "saml/kit/authentication_request"
 require "saml/kit/bindings"
+require "saml/kit/certificate"
 require "saml/kit/configuration"
 require "saml/kit/crypto"
 require "saml/kit/cryptography"

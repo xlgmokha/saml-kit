@@ -30,20 +30,16 @@ module Saml
       def certificates
         @certificates ||= document.find_all("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
           cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", Xml::NAMESPACES).text
-          {
-            text: cert,
-            fingerprint: Fingerprint.new(cert).algorithm(hash_algorithm),
-            use: item.attribute('use').value.to_sym,
-          }
+          Certificate.new(cert, use: item.attribute('use').value.to_sym)
         end
       end
 
       def encryption_certificates
-        certificates.find_all { |x| x[:use] == :encryption }
+        certificates.find_all(&:encryption?)
       end
 
       def signing_certificates
-        certificates.find_all { |x| x[:use] == :signing }
+        certificates.find_all(&:signing?)
       end
 
       def services(type)
@@ -68,12 +64,8 @@ module Saml
       end
 
       def matches?(fingerprint, use: :signing)
-        if :signing == use.to_sym
-          hash_value = fingerprint.algorithm(hash_algorithm)
-          signing_certificates.find do |signing_certificate|
-            Saml::Kit.logger.debug [hash_value, signing_certificate[:fingerprint]].inspect
-            hash_value == signing_certificate[:fingerprint]
-          end
+        certificates.find do |certificate|
+          certificate.for?(use) && certificate.fingerprint == fingerprint
         end
       end
 
@@ -91,9 +83,7 @@ module Saml
 
       def verify(algorithm, signature, data)
         signing_certificates.find do |cert|
-          x509 = OpenSSL::X509::Certificate.new(Base64.decode64(cert[:text]))
-          public_key = x509.public_key
-          public_key.verify(algorithm, signature, data)
+          cert.public_key.verify(algorithm, signature, data)
         end
       end
 

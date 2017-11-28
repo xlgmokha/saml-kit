@@ -10,20 +10,6 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
   describe described_class::Builder do
     let(:acs_url) { FFaker::Internet.http_url }
 
-    <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-  ID="_a94ad660-23cc-4491-8fe0-1429b7f5a6d8"
-  entityID="https://service.dev/metadata">
-  <md:SPSSODescriptor
-    AuthnRequestsSigned="true"
-    WantAssertionsSigned="true"
-    protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-    <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
-    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://service.dev/acs" index="0" isDefault="true"/>
-  </md:SPSSODescriptor>
-</md:EntityDescriptor>
-    XML
     it 'builds the service provider metadata' do
       subject.entity_id = entity_id
       subject.add_assertion_consumer_service(acs_url, binding: :http_post)
@@ -70,19 +56,9 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     end
 
     it 'returns each of the certificates' do
-      expected_sha256 = OpenSSL::Digest::SHA256.new.hexdigest(Saml::Kit.configuration.signing_x509.to_der)
-      expected_encryption_sha256 = OpenSSL::Digest::SHA256.new.hexdigest(Saml::Kit.configuration.encryption_x509.to_der)
       expect(subject.certificates).to match_array([
-        {
-          fingerprint: expected_sha256.upcase.scan(/../).join(":"),
-          use: :signing,
-          text: Saml::Kit.configuration.stripped_signing_certificate
-        },
-        {
-          fingerprint: expected_encryption_sha256.upcase.scan(/../).join(":"),
-          use: :encryption,
-          text: Saml::Kit.configuration.stripped_encryption_certificate
-        },
+        Saml::Kit::Certificate.new(Saml::Kit.configuration.stripped_signing_certificate, use: :signing),
+        Saml::Kit::Certificate.new(Saml::Kit.configuration.stripped_encryption_certificate, use: :encryption),
       ])
     end
 

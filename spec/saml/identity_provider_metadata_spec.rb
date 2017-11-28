@@ -21,7 +21,8 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it { expect(subject.single_logout_services).to be_empty }
     it do
       fingerprint = "9F:74:13:3B:BC:5A:7B:8B:2D:4F:8B:EF:1E:88:EB:D1:AE:BC:19:BF:CA:19:C6:2F:0F:4B:31:1D:68:98:B0:1B"
-      expect(subject.certificates).to match_array([use: :signing, text: certificate, fingerprint: fingerprint])
+      expect(subject.certificates).to match_array([Saml::Kit::Certificate.new(certificate, use: :signing)])
+      expect(subject.certificates.first.fingerprint.to_s).to eql(fingerprint)
     end
     it { expect(subject.attributes).to be_empty }
   end
@@ -60,8 +61,8 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
     it do
       expect(subject.certificates).to match_array([
-        { use: :signing, text: signing_certificate, fingerprint: "BE:12:70:84:AD:99:6A:58:28:2A:BC:DA:AB:E8:51:D3:FF:AB:58:30:E0:77:DB:23:57:15:01:B3:86:60:97:80" },
-        { use: :encryption, text: encryption_certificate, fingerprint: "5C:51:0C:8A:6A:02:24:3C:9E:96:96:18:2E:37:65:8F:CC:EA:51:0E:2C:C5:3F:1D:72:47:11:D0:7B:95:26:1F" },
+        Saml::Kit::Certificate.new(signing_certificate, use: :signing),
+        Saml::Kit::Certificate.new(encryption_certificate, use: :encryption),
       ])
     end
     it { expect(subject.attributes).to be_present }
