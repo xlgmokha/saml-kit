@@ -4,7 +4,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata::Builder do
   subject { described_class.new }
   let(:email) { FFaker::Internet.email }
   let(:org_name) { FFaker::Movie.title }
-  let(:url) { "https://#{FFaker::Internet.domain_name}" }
+  let(:url) { FFaker::Internet.uri("https") }
   let(:entity_id) { FFaker::Movie.title }
 
   it 'builds a proper metadata' do
