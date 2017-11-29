@@ -25,7 +25,7 @@ module Saml
       end
 
       def x509
-        OpenSSL::X509::Certificate.new(Base64.decode64(value))
+        self.class.to_x509(value)
       end
 
       def public_key
@@ -46,6 +46,13 @@ module Saml
 
       def to_s
         value
+      end
+
+      def self.to_x509(value)
+        OpenSSL::X509::Certificate.new(Base64.decode64(value))
+      rescue OpenSSL::X509::CertificateError => error
+        Saml::Kit.logger.warn(error)
+        OpenSSL::X509::Certificate.new(value)
       end
     end
   end

@@ -22,7 +22,7 @@ module Saml
       def x509_certificates
         xpath = "//ds:KeyInfo/ds:X509Data/ds:X509Certificate"
         document.search(xpath, Xmldsig::NAMESPACES).map do |item|
-          OpenSSL::X509::Certificate.new(Base64.decode64(item.text))
+          Certificate.to_x509(item.text)
         end
       end
 

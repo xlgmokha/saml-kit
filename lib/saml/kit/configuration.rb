@@ -32,11 +32,11 @@ module Saml
       end
 
       def signing_x509
-        OpenSSL::X509::Certificate.new(signing_certificate_pem)
+        Certificate.to_x509(signing_certificate_pem)
       end
 
       def encryption_x509
-        OpenSSL::X509::Certificate.new(encryption_certificate_pem)
+        Certificate.to_x509(encryption_certificate_pem)
       end
 
       def signing_private_key

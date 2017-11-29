@@ -407,7 +407,7 @@ RSpec.describe Saml::Kit::Response do
     subject { described_class.new(user, request) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
     let(:request) { double(:request, id: "_#{SecureRandom.uuid}", acs_url: FFaker::Internet.http_url, provider: provider, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: issuer, signed?: true, trusted?: true) }
-    let(:provider) { double(want_assertions_signed: false, encryption_certificates: [{ text: encryption_pem }]) }
+    let(:provider) { double(want_assertions_signed: false, encryption_certificates: [Saml::Kit::Certificate.new(encryption_pem, use: :encryption)]) }
     let(:encryption_pem) do
       Saml::Kit.configuration.stripped_encryption_certificate
     end

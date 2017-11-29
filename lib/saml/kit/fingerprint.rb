@@ -4,10 +4,7 @@ module Saml
       attr_reader :x509
 
       def initialize(raw_certificate)
-        @x509 = OpenSSL::X509::Certificate.new(raw_certificate)
-      rescue OpenSSL::X509::CertificateError => error
-        Saml::Kit.logger.warn(error)
-        @x509 = OpenSSL::X509::Certificate.new(Base64.decode64(raw_certificate))
+        @x509 = Certificate.to_x509(raw_certificate)
       end
 
       def algorithm(algorithm)
