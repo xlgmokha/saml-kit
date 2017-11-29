@@ -186,7 +186,7 @@ module Saml
             yield temp
             raw_xml_to_encrypt = temp.target!
 
-            encryption_certificate = request.provider.encryption_certificates.first.x509
+            encryption_certificate = request.provider.encryption_certificates.first
             public_key = encryption_certificate.public_key
 
             cipher = OpenSSL::Cipher.new('AES-256-CBC')
