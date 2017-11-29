@@ -40,6 +40,8 @@ require "saml/kit/service_provider_metadata"
 require "saml/kit/signature"
 require "saml/kit/xml"
 
+require "saml/kit/builders"
+
 I18n.load_path += Dir[File.expand_path("kit/locales/*.yml", File.dirname(__FILE__))]
 
 module Saml
