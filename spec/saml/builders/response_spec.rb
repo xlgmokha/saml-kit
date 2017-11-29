@@ -1,6 +1,58 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Response::Builder do
+  describe described_class do
+    subject { described_class.new(user, request) }
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
+    let(:request) { double(:request, id: "_#{SecureRandom.uuid}", acs_url: FFaker::Internet.http_url, provider: provider, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: issuer, signed?: true, trusted?: true) }
+    let(:provider) { double(want_assertions_signed: false, encryption_certificates: [Saml::Kit::Certificate.new(encryption_pem, use: :encryption)]) }
+    let(:encryption_pem) do
+      Saml::Kit.configuration.stripped_encryption_certificate
+    end
+    let(:issuer) { FFaker::Internet.uri("https") }
+
+    before :each do
+      allow(Saml::Kit.configuration).to receive(:issuer).and_return(issuer)
+    end
+
+    describe "#build" do
+      it 'builds a response with the request_id' do
+        expect(subject.build.request_id).to eql(request.id)
+      end
+
+      it 'builds a valid encrypted assertion' do
+        allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
+        allow(provider).to receive(:matches?).and_return(true)
+
+        subject.sign = true
+        subject.encrypt = true
+        result = subject.build
+        expect(result).to be_valid
+      end
+    end
+
+    describe "#to_xml" do
+      it 'generates an EncryptedAssertion' do
+        subject.encrypt = true
+        result = Hash.from_xml(subject.to_xml)
+        expect(result['Response']['EncryptedAssertion']).to be_present
+        encrypted_assertion = result['Response']['EncryptedAssertion']
+        decrypted_assertion = Saml::Kit::Cryptography.new.decrypt(encrypted_assertion)
+        decrypted_hash = Hash.from_xml(decrypted_assertion)
+        expect(decrypted_hash['Assertion']).to be_present
+        expect(decrypted_hash['Assertion']['Issuer']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']['NameID']).to be_present
+        expect(decrypted_hash['Assertion']['Subject']['SubjectConfirmation']).to be_present
+        expect(decrypted_hash['Assertion']['Conditions']).to be_present
+        expect(decrypted_hash['Assertion']['Conditions']['AudienceRestriction']).to be_present
+        expect(decrypted_hash['Assertion']['AuthnStatement']).to be_present
+        expect(decrypted_hash['Assertion']['AuthnStatement']['AuthnContext']).to be_present
+        expect(decrypted_hash['Assertion']['AuthnStatement']['AuthnContext']['AuthnContextClassRef']).to be_present
+      end
+    end
+  end
+
   describe "#to_xml" do
     subject { described_class.new(user, request) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
