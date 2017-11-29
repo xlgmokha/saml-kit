@@ -66,6 +66,12 @@ module Saml
           ServiceProviderMetadata.new(to_xml)
         end
 
+        def self.build
+          builder = new
+          yield builder
+          builder.build
+        end
+
         private
 
         def entity_descriptor_options
