@@ -21,6 +21,8 @@ module Saml
       def self.builder_class
         Saml::Kit::Builders::ServiceProviderMetadata
       end
+
+      Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::ServiceProviderMetadata::Builder', 'Saml::Kit::Builders::ServiceProviderMetadata')
     end
   end
 end

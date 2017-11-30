@@ -98,6 +98,8 @@ module Saml
         Saml::Kit.logger.error(error)
         Time.at(0).to_datetime
       end
+
+      Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::Response::Builder', 'Saml::Kit::Builders::Response')
     end
   end
 end

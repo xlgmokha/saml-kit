@@ -7,6 +7,8 @@ module Saml
         @request_id = request_id
         super(xml, name: "LogoutResponse")
       end
+
+      Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::LogoutResponse::Builder', 'Saml::Kit::Builders::LogoutResponse')
     end
   end
 end

@@ -142,4 +142,11 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       expect(result.assertion_consumer_service_for(binding: :http_post).location).to eql(acs_url)
     end
   end
+
+  describe "deprecations" do
+    it 'resolves the old builder constant' do
+      subject = Saml::Kit::ServiceProviderMetadata::Builder.new
+      expect(subject).to be_present
+    end
+  end
 end

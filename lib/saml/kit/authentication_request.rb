@@ -18,6 +18,8 @@ module Saml
       def response_for(user)
         Saml::Kit::Builders::Response.new(user, self)
       end
+
+      Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::AuthenticationRequest::Builder', 'Saml::Kit::Builders::AuthenticationRequest')
     end
   end
 end

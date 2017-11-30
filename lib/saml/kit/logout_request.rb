@@ -21,6 +21,8 @@ module Saml
       def response_for(user)
         Saml::Kit::Builders::LogoutResponse.new(user, self)
       end
+
+      Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::LogoutRequest::Builder', 'Saml::Kit::Builders::LogoutRequest')
     end
   end
 end
