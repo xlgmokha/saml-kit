@@ -70,7 +70,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
 
   describe "#validate" do
     it 'valid when given valid identity provider metadata' do
-      builder = described_class::Builder.new
+      builder = Saml::Kit::Builders::IdentityProviderMetadata.new
       builder.attributes = [:email]
       builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_post)
       builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_redirect)
@@ -121,7 +121,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     let(:redirect_url) { FFaker::Internet.http_url }
 
     subject do
-      builder = Saml::Kit::IdentityProviderMetadata::Builder.new
+      builder = Saml::Kit::Builders::IdentityProviderMetadata.new
       builder.add_single_sign_on_service(redirect_url, binding: :http_redirect)
       builder.add_single_sign_on_service(post_url, binding: :http_post)
       builder.build
@@ -145,7 +145,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
   end
 
   describe "#want_authn_requests_signed" do
-    let(:builder) { described_class::Builder.new }
+    let(:builder) { Saml::Kit::Builders::IdentityProviderMetadata.new }
 
     it 'returns true when enabled' do
       builder.want_authn_requests_signed = true
@@ -168,7 +168,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
   end
 
   describe "#single_logout_service_for" do
-    let(:builder) { described_class::Builder.new }
+    let(:builder) { Saml::Kit::Builders::IdentityProviderMetadata.new }
     let(:redirect_url) { FFaker::Internet.http_url }
     let(:post_url) { FFaker::Internet.http_url }
     let(:subject) { builder.build }

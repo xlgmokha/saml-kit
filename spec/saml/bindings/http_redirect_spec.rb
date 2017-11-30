@@ -19,7 +19,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
   describe "#deserialize" do
     let(:issuer) { FFaker::Internet.http_url }
-    let(:provider) { Saml::Kit::IdentityProviderMetadata::Builder.new.build }
+    let(:provider) { Saml::Kit::Builders::IdentityProviderMetadata.new.build }
 
     before :each do
       allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)

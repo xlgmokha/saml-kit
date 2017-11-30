@@ -1,7 +1,7 @@
 module Saml
   module Kit
-    class IdentityProviderMetadata < Metadata
-      class Builder
+    module Builders
+      class IdentityProviderMetadata
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats
         attr_accessor :want_authn_requests_signed, :sign
         attr_reader :logout_urls, :single_sign_on_urls
@@ -76,7 +76,7 @@ module Saml
         end
 
         def build
-          IdentityProviderMetadata.new(to_xml)
+          Saml::Kit::IdentityProviderMetadata.new(to_xml)
         end
 
         private

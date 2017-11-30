@@ -62,7 +62,7 @@ RSpec.describe Saml::Kit::Response do
 
     it 'is invalid when not a Response' do
       allow(registry).to receive(:metadata_for).and_return(nil)
-      xml = Saml::Kit::IdentityProviderMetadata::Builder.new.to_xml
+      xml = Saml::Kit::Builders::IdentityProviderMetadata.new.to_xml
       subject = described_class.new(xml)
       expect(subject).to be_invalid
       expect(subject.errors[:base]).to include(subject.error_message(:invalid))

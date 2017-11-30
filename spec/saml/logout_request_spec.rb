@@ -60,7 +60,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
     end
 
     it 'is invalid when not a LogoutRequest' do
-      xml = Saml::Kit::IdentityProviderMetadata::Builder.new.to_xml
+      xml = Saml::Kit::Builders::IdentityProviderMetadata.new.to_xml
       subject = described_class.new(xml)
       expect(subject).to be_invalid
       expect(subject.errors[:base]).to include(subject.error_message(:invalid))

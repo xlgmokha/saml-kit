@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Saml::Kit::IdentityProviderMetadata::Builder do
+RSpec.describe Saml::Kit::Builders::IdentityProviderMetadata do
   subject { described_class.new }
   let(:email) { FFaker::Internet.email }
   let(:org_name) { FFaker::Movie.title }

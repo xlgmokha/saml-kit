@@ -9,7 +9,7 @@ RSpec.describe Saml::Kit::DefaultRegistry do
     builder.build
   end
   let(:identity_provider_metadata) do
-    builder = Saml::Kit::IdentityProviderMetadata::Builder.new
+    builder = Saml::Kit::Builders::IdentityProviderMetadata.new
     builder.entity_id = entity_id
     builder.build
   end
