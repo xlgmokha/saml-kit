@@ -80,7 +80,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
 
     it 'is invalid, when given service provider metadata' do
-      service_provider_metadata = Saml::Kit::ServiceProviderMetadata::Builder.new.to_xml
+      service_provider_metadata = Saml::Kit::Builders::ServiceProviderMetadata.new.to_xml
       subject = described_class.new(service_provider_metadata)
       expect(subject).to_not be_valid
       expect(subject.errors[:base]).to include(I18n.translate("saml/kit.errors.IDPSSODescriptor.invalid"))

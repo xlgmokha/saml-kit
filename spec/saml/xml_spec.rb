@@ -6,7 +6,7 @@ RSpec.describe Saml::Kit::Xml do
     let(:logout_url) { "https://#{FFaker::Internet.domain_name}/logout" }
 
     let(:signed_xml) do
-      builder = Saml::Kit::ServiceProviderMetadata::Builder.new
+      builder = Saml::Kit::Builders::ServiceProviderMetadata.new
       builder.entity_id = FFaker::Movie.title
       builder.add_assertion_consumer_service(login_url, binding: :http_post)
       builder.add_assertion_consumer_service(login_url, binding: :http_redirect)

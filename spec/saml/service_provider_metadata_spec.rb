@@ -8,7 +8,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
   let(:logout_redirect_url) { FFaker::Internet.uri("https") }
 
   describe described_class do
-    let(:builder) { described_class::Builder.new }
+    let(:builder) { Saml::Kit::Builders::ServiceProviderMetadata.new }
     subject do
       builder.entity_id = entity_id
       builder.add_assertion_consumer_service(acs_post_url, binding: :http_post)
@@ -52,7 +52,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
   describe "#validate" do
     let(:service_provider_metadata) do
-      builder = described_class::Builder.new
+      builder = Saml::Kit::Builders::ServiceProviderMetadata.new
       builder.entity_id = entity_id
       builder.add_assertion_consumer_service(acs_post_url, binding: :http_post)
       builder.add_assertion_consumer_service(acs_redirect_url, binding: :http_redirect)
@@ -113,7 +113,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
   end
 
   describe "#matches?" do
-    subject { described_class::Builder.new.build }
+    subject { Saml::Kit::Builders::ServiceProviderMetadata.new.build }
 
     it 'returns true when the fingerprint matches one of the signing certificates' do
       certificate = Hash.from_xml(subject.to_xml)['EntityDescriptor']['Signature']['KeyInfo']['X509Data']['X509Certificate']

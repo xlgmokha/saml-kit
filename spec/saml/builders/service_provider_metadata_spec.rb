@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Saml::Kit::ServiceProviderMetadata::Builder do
+RSpec.describe Saml::Kit::Builders::ServiceProviderMetadata do
   let(:acs_url) { FFaker::Internet.http_url }
   let(:entity_id) { FFaker::Internet.uri("https") }
 

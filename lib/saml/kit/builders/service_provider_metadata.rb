@@ -1,7 +1,7 @@
 module Saml
   module Kit
-    class ServiceProviderMetadata < Metadata
-      class Builder
+    module Builders
+      class ServiceProviderMetadata
         attr_accessor :id, :entity_id, :acs_urls, :logout_urls, :name_id_formats, :sign
         attr_accessor :want_assertions_signed
 
@@ -63,7 +63,7 @@ module Saml
         end
 
         def build
-          ServiceProviderMetadata.new(to_xml)
+          Saml::Kit::ServiceProviderMetadata.new(to_xml)
         end
 
         def self.build

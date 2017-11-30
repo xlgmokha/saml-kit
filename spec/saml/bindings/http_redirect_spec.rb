@@ -83,7 +83,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'returns a signed document, when a signature is missing' do
-      builder = Saml::Kit::ServiceProviderMetadata::Builder.new
+      builder = Saml::Kit::Builders::ServiceProviderMetadata.new
       builder.add_assertion_consumer_service(FFaker::Internet.http_url, binding: :http_post)
       provider = builder.build
       allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)

@@ -76,7 +76,7 @@ RSpec.describe Saml::Kit::Builders::Response do
     end
 
     it 'does not add a signature when the SP does not want assertions signed' do
-      builder = Saml::Kit::ServiceProviderMetadata::Builder.new
+      builder = Saml::Kit::Builders::ServiceProviderMetadata.new
       builder.want_assertions_signed = false
       metadata = builder.build
       allow(request).to receive(:provider).and_return(metadata)
