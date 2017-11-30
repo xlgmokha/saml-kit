@@ -6,11 +6,19 @@ certificate, private_key = Saml::Kit::SelfSignedCertificate.new(password).create
 
 puts
 puts "Certificate:"
+puts "** File Format:"
 print certificate
+
+puts "** ENV Format:"
+puts certificate.inspect
 
 puts
 puts "Private Key:"
+puts "** File Format:"
 puts private_key
+
+puts "** ENV Format:"
+puts private_key.inspect
 
 puts
 puts "Private Key Password:"
