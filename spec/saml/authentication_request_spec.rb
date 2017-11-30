@@ -8,14 +8,14 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   let(:destination) { FFaker::Internet.http_url }
   let(:name_id_format) { Saml::Kit::Namespaces::EMAIL_ADDRESS }
   let(:raw_xml) do
-    builder = Saml::Kit::Builders::AuthenticationRequest.new
-    builder.id = id
-    builder.now = Time.now.utc
-    builder.issuer = issuer
-    builder.acs_url = acs_url
-    builder.name_id_format = name_id_format
-    builder.destination = destination
-    builder.to_xml
+    described_class.build do |builder|
+      builder.id = id
+      builder.now = Time.now.utc
+      builder.issuer = issuer
+      builder.acs_url = acs_url
+      builder.name_id_format = name_id_format
+      builder.destination = destination
+    end.to_xml
   end
 
   it { expect(subject.issuer).to eql(issuer) }
