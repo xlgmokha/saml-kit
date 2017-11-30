@@ -5,9 +5,8 @@ module Saml
 
       class_methods do
         def build
-          puts builder_class.inspect
           builder = builder_class.new
-          yield builder
+          yield builder if block_given?
           builder.build
         end
       end

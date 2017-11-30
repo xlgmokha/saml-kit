@@ -83,21 +83,19 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
 
     it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do
-      builder = Saml::Kit::Builders::AuthenticationRequest.new
-      builder.issuer = issuer
-      builder.acs_url = acs_url
-      xml = builder.to_xml
-
       allow(metadata).to receive(:matches?).and_return(false)
-      subject = described_class.new(xml)
+      subject = described_class.build do |builder|
+        builder.issuer = issuer
+        builder.acs_url = acs_url
+      end
+
       expect(subject).to be_invalid
       expect(subject.errors[:fingerprint]).to be_present
     end
 
     it 'is invalid when the service provider is not known' do
       allow(registry).to receive(:metadata_for).and_return(nil)
-      builder = Saml::Kit::Builders::AuthenticationRequest.new
-      subject = described_class.new(builder.to_xml)
+      subject = described_class.build
       expect(subject).to be_invalid
       expect(subject.errors[:provider]).to be_present
     end
@@ -133,18 +131,18 @@ XML
   describe "#acs_url" do
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::ServiceProviderMetadata) }
-    let(:builder) { Saml::Kit::Builders::AuthenticationRequest.new }
 
     it 'returns the ACS in the request' do
-      builder.acs_url = acs_url
-      subject = builder.build
+      subject = described_class.build do |builder|
+        builder.acs_url = acs_url
+      end
       expect(subject.acs_url).to eql(acs_url)
     end
 
     it 'returns nil' do
-      builder.issuer = issuer
-      builder.acs_url = nil
-      subject = builder.build
+      subject = described_class.build do |builder|
+        builder.acs_url = nil
+      end
 
       expect(subject.acs_url).to be_nil
     end
