@@ -8,7 +8,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     let(:relay_state) { "ECHO" }
 
     it 'encodes the request using the HTTP-Redirect encoding' do
-      builder = Saml::Kit::Builders::AuthenticationRequest.new
+      builder = Saml::Kit::AuthenticationRequest.builder_class.new
       url, _ = subject.serialize(builder, relay_state: relay_state)
       expect(url).to start_with(location)
       expect(url).to have_query_param('SAMLRequest')
@@ -19,7 +19,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
   describe "#deserialize" do
     let(:issuer) { FFaker::Internet.http_url }
-    let(:provider) { Saml::Kit::Builders::IdentityProviderMetadata.new.build }
+    let(:provider) { Saml::Kit::IdentityProviderMetadata.build }
 
     before :each do
       allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
@@ -27,14 +27,14 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'deserializes the SAMLRequest to an AuthnRequest' do
-      url, _ = subject.serialize(Saml::Kit::Builders::AuthenticationRequest.new)
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder_class.new)
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
     end
 
     it 'deserializes the SAMLRequest to a LogoutRequest' do
       user = double(:user, name_id_for: SecureRandom.uuid)
-      url, _ = subject.serialize(Saml::Kit::Builders::LogoutRequest.new(user))
+      url, _ = subject.serialize(Saml::Kit::LogoutRequest.builder_class.new(user))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::LogoutRequest)
     end
@@ -48,7 +48,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     it 'deserializes the SAMLResponse to a Response' do
       user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
       request = double(:request, id: SecureRandom.uuid, provider: nil, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: issuer, signed?: true, trusted?: true)
-      url, _ = subject.serialize(Saml::Kit::Builders::Response.new(user, request))
+      url, _ = subject.serialize(Saml::Kit::Response.builder_class.new(user, request))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::Response)
     end
@@ -56,7 +56,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     it 'deserializes the SAMLResponse to a LogoutResponse' do
       user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
       request = double(:request, id: SecureRandom.uuid, provider: provider, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url)
-      url, _ = subject.serialize(Saml::Kit::Builders::LogoutResponse.new(user, request))
+      url, _ = subject.serialize(Saml::Kit::LogoutResponse.builder_class.new(user, request))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::LogoutResponse)
     end
@@ -74,7 +74,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'raises an error when the signature does not match' do
-      url, _ = subject.serialize(Saml::Kit::Builders::AuthenticationRequest.new)
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder_class.new)
       query_params = query_params_from(url)
       query_params['Signature'] = 'invalid'
       expect do
@@ -83,9 +83,9 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'returns a signed document, when a signature is missing' do
-      builder = Saml::Kit::Builders::ServiceProviderMetadata.new
-      builder.add_assertion_consumer_service(FFaker::Internet.http_url, binding: :http_post)
-      provider = builder.build
+      provider = Saml::Kit::ServiceProviderMetadata.build do |builder|
+        builder.add_assertion_consumer_service(FFaker::Internet.http_url, binding: :http_post)
+      end
       allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
 
       url, _ = subject.serialize(Saml::Kit::Builders::AuthenticationRequest.new)

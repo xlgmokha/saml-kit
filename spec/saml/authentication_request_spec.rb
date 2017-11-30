@@ -52,7 +52,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
 
     it 'is invalid when not an AuthnRequest' do
-      xml = Saml::Kit::Builders::IdentityProviderMetadata.new.to_xml
+      xml = Saml::Kit::IdentityProviderMetadata.build.to_xml
       subject = described_class.new(xml)
       expect(subject).to be_invalid
       expect(subject.errors[:base]).to include(subject.error_message(:invalid))

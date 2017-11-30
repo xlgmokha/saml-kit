@@ -8,7 +8,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
     let(:relay_state) { "ECHO" }
 
     it 'encodes the request using the HTTP-POST encoding for a AuthenticationRequest' do
-      builder = Saml::Kit::Builders::AuthenticationRequest.new
+      builder = Saml::Kit::AuthenticationRequest.builder_class.new
       url, saml_params = subject.serialize(builder, relay_state: relay_state)
 
       expect(url).to eql(location)
@@ -22,7 +22,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
 
     it 'returns a SAMLRequest for a LogoutRequest' do
       user = double(:user, name_id_for: SecureRandom.uuid)
-      builder = Saml::Kit::Builders::LogoutRequest.new(user)
+      builder = Saml::Kit::LogoutRequest.builder_class.new(user)
       url, saml_params = subject.serialize(builder, relay_state: relay_state)
 
       expect(url).to eql(location)
@@ -37,7 +37,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
     it 'returns a SAMLResponse for a LogoutResponse' do
       user = double(:user, name_id_for: SecureRandom.uuid)
       request = instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid)
-      builder = Saml::Kit::Builders::LogoutResponse.new(user, request)
+      builder = Saml::Kit::LogoutResponse.builder_class.new(user, request)
       url, saml_params = subject.serialize(builder, relay_state: relay_state)
 
       expect(url).to eql(location)
@@ -50,7 +50,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
     end
 
     it 'excludes the RelayState when blank' do
-      builder = Saml::Kit::Builders::AuthenticationRequest.new
+      builder = Saml::Kit::AuthenticationRequest.builder_class.new
       url, saml_params = subject.serialize(builder)
 
       expect(url).to eql(location)
@@ -60,7 +60,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
 
   describe "#deserialize" do
     it 'deserializes to an AuthnRequest' do
-      builder = Saml::Kit::Builders::AuthenticationRequest.new
+      builder = Saml::Kit::AuthenticationRequest.builder_class.new
       _, params = subject.serialize(builder)
       result = subject.deserialize(params)
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
@@ -68,7 +68,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
 
     it 'deserializes to a LogoutRequest' do
       user = double(:user, name_id_for: SecureRandom.uuid)
-      builder = Saml::Kit::Builders::LogoutRequest.new(user)
+      builder = Saml::Kit::LogoutRequest.builder_class.new(user)
       _, params = subject.serialize(builder)
       result = subject.deserialize(params)
       expect(result).to be_instance_of(Saml::Kit::LogoutRequest)
@@ -77,7 +77,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
     it 'deserializes to a Response' do
       user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
       request = double(:request, id: SecureRandom.uuid, provider: nil, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url, signed?: true, trusted?: true)
-      builder = Saml::Kit::Builders::Response.new(user, request)
+      builder = Saml::Kit::Response.builder_class.new(user, request)
       _, params = subject.serialize(builder)
       result = subject.deserialize(params)
       expect(result).to be_instance_of(Saml::Kit::Response)
