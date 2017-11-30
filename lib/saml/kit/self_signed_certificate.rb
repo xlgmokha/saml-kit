@@ -11,7 +11,7 @@ module Saml
         certificate = OpenSSL::X509::Certificate.new
         certificate.subject = certificate.issuer = OpenSSL::X509::Name.parse("/C=CA/ST=Alberta/L=Calgary/O=SamlKit/OU=SamlKit/CN=SamlKit")
         certificate.not_before = DateTime.now.beginning_of_day
-        certificate.not_after = 5.years.from_now.end_of_day
+        certificate.not_after = 30.days.from_now
         certificate.public_key = public_key
         certificate.serial = 0x0
         certificate.version = 2
