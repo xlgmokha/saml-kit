@@ -97,6 +97,12 @@ module Saml
         end
       end
 
+      def self.build
+        builder = builder_class.new
+        yield builder
+        builder.build
+      end
+
       private
 
       def document

@@ -18,12 +18,9 @@ module Saml
         attribute.text.downcase == "true"
       end
 
-      def self.build
-        builder = Saml::Kit::Builders::ServiceProviderMetadata.new
-        yield builder
-        builder.build
+      def self.builder_class
+        Saml::Kit::Builders::ServiceProviderMetadata
       end
-
     end
   end
 end
