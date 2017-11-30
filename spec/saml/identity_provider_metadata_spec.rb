@@ -70,17 +70,18 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
 
   describe "#validate" do
     it 'valid when given valid identity provider metadata' do
-      builder = Saml::Kit::Builders::IdentityProviderMetadata.new
-      builder.attributes = [:email]
-      builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_post)
-      builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_redirect)
-      builder.add_single_logout_service(FFaker::Internet.http_url, binding: :http_post)
-      builder.add_single_logout_service(FFaker::Internet.http_url, binding: :http_redirect)
-      expect(builder.build).to be_valid
+      subject = described_class.build do |builder|
+        builder.attributes = [:email]
+        builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_post)
+        builder.add_single_sign_on_service(FFaker::Internet.http_url, binding: :http_redirect)
+        builder.add_single_logout_service(FFaker::Internet.http_url, binding: :http_post)
+        builder.add_single_logout_service(FFaker::Internet.http_url, binding: :http_redirect)
+      end
+      expect(subject).to be_valid
     end
 
     it 'is invalid, when given service provider metadata' do
-      service_provider_metadata = Saml::Kit::Builders::ServiceProviderMetadata.new.to_xml
+      service_provider_metadata = Saml::Kit::ServiceProviderMetadata.build.to_xml
       subject = described_class.new(service_provider_metadata)
       expect(subject).to_not be_valid
       expect(subject.errors[:base]).to include(I18n.translate("saml/kit.errors.IDPSSODescriptor.invalid"))
@@ -121,10 +122,10 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     let(:redirect_url) { FFaker::Internet.http_url }
 
     subject do
-      builder = Saml::Kit::Builders::IdentityProviderMetadata.new
-      builder.add_single_sign_on_service(redirect_url, binding: :http_redirect)
-      builder.add_single_sign_on_service(post_url, binding: :http_post)
-      builder.build
+      described_class.build do |builder|
+        builder.add_single_sign_on_service(redirect_url, binding: :http_redirect)
+        builder.add_single_sign_on_service(post_url, binding: :http_post)
+      end
     end
 
     it 'returns the POST binding' do
@@ -145,37 +146,37 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
   end
 
   describe "#want_authn_requests_signed" do
-    let(:builder) { Saml::Kit::Builders::IdentityProviderMetadata.new }
-
     it 'returns true when enabled' do
-      builder.want_authn_requests_signed = true
-      subject = builder.build
+      subject = described_class.build do |builder|
+        builder.want_authn_requests_signed = true
+      end
       expect(subject.want_authn_requests_signed).to be(true)
     end
 
     it 'returns false when disabled' do
-      builder.want_authn_requests_signed = false
-      subject = builder.build
+      subject = described_class.build do |builder|
+        builder.want_authn_requests_signed = false
+      end
       expect(subject.want_authn_requests_signed).to be(false)
     end
 
     it 'returns true when the attribute is missing' do
-      builder.want_authn_requests_signed = false
-      xml = builder.to_xml.gsub("WantAuthnRequestsSigned=\"false\"", "")
+      xml = described_class.build do |builder|
+        builder.want_authn_requests_signed = false
+      end.to_xml.gsub("WantAuthnRequestsSigned=\"false\"", "")
       subject = described_class.new(xml)
       expect(subject.want_authn_requests_signed).to be(true)
     end
   end
 
   describe "#single_logout_service_for" do
-    let(:builder) { Saml::Kit::Builders::IdentityProviderMetadata.new }
-    let(:redirect_url) { FFaker::Internet.http_url }
-    let(:post_url) { FFaker::Internet.http_url }
-    let(:subject) { builder.build }
-
-    before :each do
-      builder.add_single_logout_service(redirect_url, binding: :http_redirect)
-      builder.add_single_logout_service(post_url, binding: :http_post)
+    let(:redirect_url) { FFaker::Internet.uri("https") }
+    let(:post_url) { FFaker::Internet.uri("https") }
+    let(:subject) do
+      described_class.build do |builder|
+        builder.add_single_logout_service(redirect_url, binding: :http_redirect)
+        builder.add_single_logout_service(post_url, binding: :http_post)
+      end
     end
 
     it 'returns the location for the matching binding' do
