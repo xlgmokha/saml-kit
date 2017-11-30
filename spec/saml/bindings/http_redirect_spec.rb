@@ -8,7 +8,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     let(:relay_state) { "ECHO" }
 
     it 'encodes the request using the HTTP-Redirect encoding' do
-      builder = Saml::Kit::AuthenticationRequest::Builder.new
+      builder = Saml::Kit::Builders::AuthenticationRequest.new
       url, _ = subject.serialize(builder, relay_state: relay_state)
       expect(url).to start_with(location)
       expect(url).to have_query_param('SAMLRequest')
@@ -27,7 +27,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'deserializes the SAMLRequest to an AuthnRequest' do
-      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest::Builder.new)
+      url, _ = subject.serialize(Saml::Kit::Builders::AuthenticationRequest.new)
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
     end
@@ -74,7 +74,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'raises an error when the signature does not match' do
-      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest::Builder.new)
+      url, _ = subject.serialize(Saml::Kit::Builders::AuthenticationRequest.new)
       query_params = query_params_from(url)
       query_params['Signature'] = 'invalid'
       expect do
@@ -88,7 +88,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       provider = builder.build
       allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
 
-      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest::Builder.new)
+      url, _ = subject.serialize(Saml::Kit::Builders::AuthenticationRequest.new)
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
       expect(result).to be_valid

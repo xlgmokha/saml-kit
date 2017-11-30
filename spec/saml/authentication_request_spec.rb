@@ -8,7 +8,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   let(:destination) { FFaker::Internet.http_url }
   let(:name_id_format) { Saml::Kit::Namespaces::EMAIL_ADDRESS }
   let(:raw_xml) do
-    builder = described_class::Builder.new
+    builder = Saml::Kit::Builders::AuthenticationRequest.new
     builder.id = id
     builder.now = Time.now.utc
     builder.issuer = issuer
@@ -25,7 +25,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   it { expect(subject.destination).to eql(destination) }
 
   describe "#to_xml" do
-    subject { described_class::Builder.new(configuration: configuration) }
+    subject { Saml::Kit::Builders::AuthenticationRequest.new(configuration: configuration) }
     let(:configuration) do
       config = Saml::Kit::Configuration.new
       config.issuer = issuer
@@ -83,7 +83,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
 
     it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do
-      builder = described_class::Builder.new
+      builder = Saml::Kit::Builders::AuthenticationRequest.new
       builder.issuer = issuer
       builder.acs_url = acs_url
       xml = builder.to_xml
@@ -96,7 +96,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
     it 'is invalid when the service provider is not known' do
       allow(registry).to receive(:metadata_for).and_return(nil)
-      builder = described_class::Builder.new
+      builder = Saml::Kit::Builders::AuthenticationRequest.new
       subject = described_class.new(builder.to_xml)
       expect(subject).to be_invalid
       expect(subject.errors[:provider]).to be_present
@@ -133,16 +133,15 @@ XML
   describe "#acs_url" do
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::ServiceProviderMetadata) }
+    let(:builder) { Saml::Kit::Builders::AuthenticationRequest.new }
 
     it 'returns the ACS in the request' do
-      builder = described_class::Builder.new
       builder.acs_url = acs_url
       subject = builder.build
       expect(subject.acs_url).to eql(acs_url)
     end
 
     it 'returns nil' do
-      builder = described_class::Builder.new
       builder.issuer = issuer
       builder.acs_url = nil
       subject = builder.build

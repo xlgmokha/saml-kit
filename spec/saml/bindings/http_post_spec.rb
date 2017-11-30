@@ -8,7 +8,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
     let(:relay_state) { "ECHO" }
 
     it 'encodes the request using the HTTP-POST encoding for a AuthenticationRequest' do
-      builder = Saml::Kit::AuthenticationRequest::Builder.new
+      builder = Saml::Kit::Builders::AuthenticationRequest.new
       url, saml_params = subject.serialize(builder, relay_state: relay_state)
 
       expect(url).to eql(location)
@@ -50,7 +50,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
     end
 
     it 'excludes the RelayState when blank' do
-      builder = Saml::Kit::AuthenticationRequest::Builder.new
+      builder = Saml::Kit::Builders::AuthenticationRequest.new
       url, saml_params = subject.serialize(builder)
 
       expect(url).to eql(location)
@@ -60,7 +60,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
 
   describe "#deserialize" do
     it 'deserializes to an AuthnRequest' do
-      builder = Saml::Kit::AuthenticationRequest::Builder.new
+      builder = Saml::Kit::Builders::AuthenticationRequest.new
       _, params = subject.serialize(builder)
       result = subject.deserialize(params)
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)

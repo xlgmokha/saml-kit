@@ -1,7 +1,7 @@
 module Saml
   module Kit
-    class AuthenticationRequest < Document
-      class Builder
+    module Builders
+      class AuthenticationRequest
         attr_accessor :id, :now, :issuer, :acs_url, :name_id_format, :sign, :destination
         attr_accessor :version
 
@@ -25,7 +25,7 @@ module Saml
         end
 
         def build
-          AuthenticationRequest.new(to_xml)
+          Saml::Kit::AuthenticationRequest.new(to_xml)
         end
 
         private

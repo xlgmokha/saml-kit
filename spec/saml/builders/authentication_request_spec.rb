@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Saml::Kit::AuthenticationRequest::Builder do
+RSpec.describe Saml::Kit::Builders::AuthenticationRequest do
   subject { described_class.new(configuration: configuration) }
   let(:configuration) do
     config = Saml::Kit::Configuration.new
