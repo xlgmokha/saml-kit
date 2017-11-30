@@ -1,7 +1,7 @@
 module Saml
   module Kit
-    class Response < Document
-      class Builder
+    module Builders
+      class Response
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code
@@ -42,7 +42,7 @@ module Saml
         end
 
         def build
-          Response.new(to_xml, request_id: request.id)
+          Saml::Kit::Response.new(to_xml, request_id: request.id)
         end
 
         private

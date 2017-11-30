@@ -4,7 +4,7 @@ RSpec.describe Saml::Kit::Response do
   describe "#destination" do
     let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
-    subject { described_class::Builder.new(user, request).build }
+    subject { Saml::Kit::Builders::Response.new(user, request).build }
 
     describe "when the request is signed and trusted" do
       let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil, signed?: true, trusted?: true) }
@@ -29,7 +29,7 @@ RSpec.describe Saml::Kit::Response do
   describe "#valid?" do
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
-    let(:builder) { described_class::Builder.new(user, request) }
+    let(:builder) { Saml::Kit::Builders::Response.new(user, request) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
 

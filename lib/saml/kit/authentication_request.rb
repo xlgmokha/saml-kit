@@ -16,7 +16,7 @@ module Saml
       end
 
       def response_for(user)
-        Response::Builder.new(user, self)
+        Saml::Kit::Builders::Response.new(user, self)
       end
     end
   end

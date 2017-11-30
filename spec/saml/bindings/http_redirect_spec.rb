@@ -48,7 +48,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     it 'deserializes the SAMLResponse to a Response' do
       user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
       request = double(:request, id: SecureRandom.uuid, provider: nil, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: issuer, signed?: true, trusted?: true)
-      url, _ = subject.serialize(Saml::Kit::Response::Builder.new(user, request))
+      url, _ = subject.serialize(Saml::Kit::Builders::Response.new(user, request))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::Response)
     end

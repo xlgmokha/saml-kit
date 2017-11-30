@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Saml::Kit::Response::Builder do
+RSpec.describe Saml::Kit::Builders::Response do
   subject { described_class.new(user, request) }
   let(:email) { FFaker::Internet.email }
   let(:acs_url) { FFaker::Internet.uri("https") }
