@@ -104,4 +104,29 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(decrypted_hash['Assertion']['AuthnStatement']['AuthnContext']['AuthnContextClassRef']).to be_present
     end
   end
+
+  describe "#destination" do
+    let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
+    subject { described_class.new(user, request).build }
+
+    describe "when the request is signed and trusted" do
+      let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil, signed?: true, trusted?: true) }
+
+      it 'returns the ACS embedded in the request' do
+        expect(subject.destination).to eql(acs_url)
+      end
+    end
+
+    describe "when the request is not trusted" do
+      let(:registered_acs_url) { FFaker::Internet.uri("https") }
+      let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, signed?: true, trusted?: false) }
+      let(:provider) { instance_double(Saml::Kit::ServiceProviderMetadata, want_assertions_signed: false) }
+
+      it 'returns the registered ACS embedded in the metadata' do
+        allow(provider).to receive(:assertion_consumer_service_for).and_return(double(location: registered_acs_url))
+        expect(subject.destination).to eql(registered_acs_url)
+      end
+    end
+  end
 end
