@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+require 'saml/kit'
+
+password = STDIN.read.strip
+certificate, private_key = Saml::Kit::SelfSignedCertificate.new(password).create
+
+puts
+puts "Certificate:"
+print certificate
+
+puts
+puts "Private Key:"
+puts private_key
+
+puts
+puts "Private Key Password:"
+puts password.inspect
