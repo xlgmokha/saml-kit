@@ -4,9 +4,9 @@ RSpec.describe Saml::Kit::Response do
   describe "#valid?" do
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
-    let(:builder) { Saml::Kit::Builders::Response.new(user, request) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
+    subject { described_class.build(user, request) }
 
     before :each do
       allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
@@ -16,7 +16,7 @@ RSpec.describe Saml::Kit::Response do
     it 'is valid' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      expect(builder.build).to be_valid
+      expect(subject).to be_valid
     end
 
     it 'is invalid when blank' do
@@ -30,15 +30,16 @@ RSpec.describe Saml::Kit::Response do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       status_code = FFaker::Movie.title
-      builder.status_code = status_code
-      subject = described_class.new(builder.to_xml.gsub(status_code, "TAMPERED"))
+      xml = described_class.build(user, request) do |builder|
+        builder.status_code = status_code
+      end.to_xml.gsub(status_code, "TAMPERED")
+      subject = described_class.new(xml)
       expect(subject).to be_invalid
     end
 
     it 'is invalid when not a Response' do
       allow(registry).to receive(:metadata_for).and_return(nil)
-      xml = Saml::Kit::Builders::IdentityProviderMetadata.new.to_xml
-      subject = described_class.new(xml)
+      subject = described_class.new(Saml::Kit::IdentityProviderMetadata.build.to_xml)
       expect(subject).to be_invalid
       expect(subject.errors[:base]).to include(subject.error_message(:invalid))
     end
@@ -46,7 +47,6 @@ RSpec.describe Saml::Kit::Response do
     it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(false)
-      subject = described_class.new(builder.to_xml)
       expect(subject).to be_invalid
       expect(subject.errors[:fingerprint]).to be_present
     end
@@ -71,8 +71,9 @@ RSpec.describe Saml::Kit::Response do
     it 'validates the version' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      builder.version = "1.1"
-      subject = described_class.new(builder.to_xml)
+      subject = described_class.build(user, request) do |builder|
+        builder.version = "1.1"
+      end
       expect(subject).to be_invalid
       expect(subject.errors[:version]).to be_present
     end
@@ -80,8 +81,9 @@ RSpec.describe Saml::Kit::Response do
     it 'validates the id' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      builder.id = nil
-      subject = described_class.new(builder.to_xml)
+      subject = described_class.build(user, request) do |builder|
+        builder.id = nil
+      end
       expect(subject).to be_invalid
       expect(subject.errors[:id]).to be_present
     end
@@ -89,8 +91,9 @@ RSpec.describe Saml::Kit::Response do
     it 'validates the status code' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      builder.status_code = Saml::Kit::Namespaces::REQUESTER_ERROR
-      subject = described_class.new(builder.to_xml)
+      subject = described_class.build(user, request) do |builder|
+        builder.status_code = Saml::Kit::Namespaces::REQUESTER_ERROR
+      end
       expect(subject).to be_invalid
       expect(subject.errors[:status_code]).to be_present
     end
@@ -98,7 +101,9 @@ RSpec.describe Saml::Kit::Response do
     it 'validates the InResponseTo' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      subject = described_class.new(builder.to_xml, request_id: SecureRandom.uuid)
+      xml = described_class.build(user, request).to_xml
+      subject = described_class.new(xml, request_id: SecureRandom.uuid)
+
       expect(subject).to be_invalid
       expect(subject.errors[:in_response_to]).to be_present
     end
@@ -107,7 +112,7 @@ RSpec.describe Saml::Kit::Response do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
 
-      subject = described_class.new(builder.to_xml)
+      subject = described_class.build(user, request)
       travel_to Saml::Kit.configuration.session_timeout.from_now + 5.seconds
       expect(subject).to_not be_valid
       expect(subject.errors[:base]).to be_present
@@ -117,7 +122,7 @@ RSpec.describe Saml::Kit::Response do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
 
-      subject = described_class.new(builder.to_xml)
+      subject = described_class.build(user, request)
       travel_to 5.seconds.ago
       expect(subject).to be_invalid
       expect(subject.errors[:base]).to be_present
@@ -127,9 +132,8 @@ RSpec.describe Saml::Kit::Response do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
 
-      allow(Saml::Kit.configuration).to receive(:issuer).and_return(FFaker::Internet.http_url)
-      allow(request).to receive(:issuer).and_return(FFaker::Internet.http_url)
-      subject = described_class.new(builder.to_xml)
+      allow(Saml::Kit.configuration).to receive(:issuer).and_return(FFaker::Internet.uri("https"))
+      allow(request).to receive(:issuer).and_return(FFaker::Internet.uri("https"))
 
       expect(subject).to be_invalid
       expect(subject.errors[:audience]).to be_present
@@ -137,7 +141,7 @@ RSpec.describe Saml::Kit::Response do
 
     it 'is invalid' do
       now = Time.now.utc
-      destination = FFaker::Internet.http_url
+      destination = FFaker::Internet.uri("https")
       raw_xml = <<-XML
 <?xml version="1.0"?>
 <samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="_#{SecureRandom.uuid}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{destination}" Consent="#{Saml::Kit::Namespaces::UNSPECIFIED}" InResponseTo="#{request.id}">

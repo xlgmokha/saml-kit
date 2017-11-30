@@ -2,7 +2,6 @@ require 'spec_helper'
 
 RSpec.describe Saml::Kit::LogoutRequest do
   subject { described_class.build(user) }
-  #let(:builder) { Saml::Kit::Builders::LogoutRequest.new(user) }
   let(:user) { double(:user, name_id_for: name_id) }
   let(:name_id) { SecureRandom.uuid }
 
