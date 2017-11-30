@@ -149,4 +149,20 @@ XML
       expect(subject.acs_url).to be_nil
     end
   end
+
+  describe ".build" do
+    let(:url) { FFaker::Internet.uri("https") }
+    let(:entity_id) { FFaker::Internet.uri("https") }
+
+    it 'provides a nice API for building metadata' do
+      result = described_class.build do |builder|
+        builder.issuer = entity_id
+        builder.acs_url = url
+      end
+
+      expect(result).to be_instance_of(described_class)
+      expect(result.issuer).to eql(entity_id)
+      expect(result.acs_url).to eql(url)
+    end
+  end
 end

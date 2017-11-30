@@ -137,7 +137,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
         builder.add_assertion_consumer_service(acs_url, binding: :http_post)
       end
 
-      expect(result).to be_instance_of(Saml::Kit::ServiceProviderMetadata)
+      expect(result).to be_instance_of(described_class)
       expect(result.entity_id).to eql(entity_id)
       expect(result.assertion_consumer_service_for(binding: :http_post).location).to eql(acs_url)
     end

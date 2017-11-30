@@ -198,7 +198,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
         builder.add_single_sign_on_service(url, binding: :http_post)
       end
 
-      expect(result).to be_instance_of(Saml::Kit::IdentityProviderMetadata)
+      expect(result).to be_instance_of(described_class)
       expect(result.entity_id).to eql(entity_id)
       expect(result.single_sign_on_service_for(binding: :http_post).location).to eql(url)
     end

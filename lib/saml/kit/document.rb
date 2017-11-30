@@ -5,6 +5,7 @@ module Saml
       include XsdValidatable
       include ActiveModel::Validations
       include Trustable
+      include Buildable
       validates_presence_of :content
       validates_presence_of :id
       validate :must_match_xsd
@@ -75,6 +76,21 @@ module Saml
         rescue => error
           Saml::Kit.logger.error(error)
           InvalidDocument.new(xml)
+        end
+
+        def builder_class
+          case name
+          when Saml::Kit::Builders::Response.to_s
+            Saml::Kit::Builders::Response
+          when Saml::Kit::Builders::LogoutResponse.to_s
+            Saml::Kit::Builders::LogoutResponse
+          when Saml::Kit::AuthenticationRequest.to_s
+            Saml::Kit::Builders::AuthenticationRequest
+          when Saml::Kit::Builders::LogoutRequest.to_s
+            Saml::Kit::Builders::LogoutRequest
+          else
+            raise ArgumentError.new("Unknown SAML Document")
+          end
         end
       end
 

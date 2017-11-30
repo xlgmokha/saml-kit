@@ -13,6 +13,7 @@ require "nokogiri"
 require "securerandom"
 require "xmldsig"
 
+require "saml/kit/buildable"
 require "saml/kit/namespaces"
 require "saml/kit/serializable"
 require "saml/kit/xsd_validatable"

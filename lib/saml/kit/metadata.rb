@@ -3,6 +3,7 @@ module Saml
     class Metadata
       include ActiveModel::Validations
       include XsdValidatable
+      include Buildable
       METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
 
       validates_presence_of :metadata
@@ -95,12 +96,6 @@ module Saml
         elsif entity_descriptor.keys.include?("IDPSSODescriptor")
           Saml::Kit::IdentityProviderMetadata.new(content)
         end
-      end
-
-      def self.build
-        builder = builder_class.new
-        yield builder
-        builder.build
       end
 
       private
