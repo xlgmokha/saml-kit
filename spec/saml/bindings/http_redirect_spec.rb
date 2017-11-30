@@ -88,7 +88,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       end
       allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
 
-      url, _ = subject.serialize(Saml::Kit::Builders::AuthenticationRequest.new)
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder_class.new)
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
       expect(result).to be_valid

@@ -4,14 +4,14 @@ RSpec.describe Saml::Kit::DefaultRegistry do
   subject { described_class.new }
   let(:entity_id) { FFaker::Internet.http_url }
   let(:service_provider_metadata) do
-    builder = Saml::Kit::Builders::ServiceProviderMetadata.new
-    builder.entity_id = entity_id
-    builder.build
+    Saml::Kit::ServiceProviderMetadata.build do |builder|
+      builder.entity_id = entity_id
+    end
   end
   let(:identity_provider_metadata) do
-    builder = Saml::Kit::Builders::IdentityProviderMetadata.new
-    builder.entity_id = entity_id
-    builder.build
+    Saml::Kit::IdentityProviderMetadata.build do |builder|
+      builder.entity_id = entity_id
+    end
   end
 
   describe "#metadata_for" do
