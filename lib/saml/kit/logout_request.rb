@@ -19,7 +19,7 @@ module Saml
       end
 
       def response_for(user)
-        LogoutResponse::Builder.new(user, self)
+        Saml::Kit::Builders::LogoutResponse.new(user, self)
       end
     end
   end

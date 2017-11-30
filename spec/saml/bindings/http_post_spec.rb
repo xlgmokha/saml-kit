@@ -37,7 +37,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
     it 'returns a SAMLResponse for a LogoutResponse' do
       user = double(:user, name_id_for: SecureRandom.uuid)
       request = instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid)
-      builder = Saml::Kit::LogoutResponse::Builder.new(user, request)
+      builder = Saml::Kit::Builders::LogoutResponse.new(user, request)
       url, saml_params = subject.serialize(builder, relay_state: relay_state)
 
       expect(url).to eql(location)

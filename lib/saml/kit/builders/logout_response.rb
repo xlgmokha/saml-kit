@@ -1,7 +1,7 @@
 module Saml
   module Kit
-    class LogoutResponse < Document
-      class Builder
+    module Builders
+      class LogoutResponse
         attr_accessor :id, :issuer, :version, :status_code, :sign, :now, :destination
         attr_reader :request
 
@@ -33,7 +33,7 @@ module Saml
         end
 
         def build
-          LogoutResponse.new(to_xml, request_id: request.id)
+          Saml::Kit::LogoutResponse.new(to_xml, request_id: request.id)
         end
 
         private

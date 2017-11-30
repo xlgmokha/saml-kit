@@ -56,7 +56,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     it 'deserializes the SAMLResponse to a LogoutResponse' do
       user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
       request = double(:request, id: SecureRandom.uuid, provider: provider, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url)
-      url, _ = subject.serialize(Saml::Kit::LogoutResponse::Builder.new(user, request))
+      url, _ = subject.serialize(Saml::Kit::Builders::LogoutResponse.new(user, request))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::LogoutResponse)
     end
