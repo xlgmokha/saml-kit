@@ -22,7 +22,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
 
     it 'returns a SAMLRequest for a LogoutRequest' do
       user = double(:user, name_id_for: SecureRandom.uuid)
-      builder = Saml::Kit::LogoutRequest::Builder.new(user)
+      builder = Saml::Kit::Builders::LogoutRequest.new(user)
       url, saml_params = subject.serialize(builder, relay_state: relay_state)
 
       expect(url).to eql(location)
@@ -68,7 +68,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
 
     it 'deserializes to a LogoutRequest' do
       user = double(:user, name_id_for: SecureRandom.uuid)
-      builder = Saml::Kit::LogoutRequest::Builder.new(user)
+      builder = Saml::Kit::Builders::LogoutRequest.new(user)
       _, params = subject.serialize(builder)
       result = subject.deserialize(params)
       expect(result).to be_instance_of(Saml::Kit::LogoutRequest)

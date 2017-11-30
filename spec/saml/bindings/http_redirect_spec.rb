@@ -34,7 +34,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
     it 'deserializes the SAMLRequest to a LogoutRequest' do
       user = double(:user, name_id_for: SecureRandom.uuid)
-      url, _ = subject.serialize(Saml::Kit::LogoutRequest::Builder.new(user))
+      url, _ = subject.serialize(Saml::Kit::Builders::LogoutRequest.new(user))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::LogoutRequest)
     end

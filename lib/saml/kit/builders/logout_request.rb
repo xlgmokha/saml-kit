@@ -1,7 +1,7 @@
 module Saml
   module Kit
-    class LogoutRequest < Document
-      class Builder
+    module Builders
+      class LogoutRequest
         attr_accessor :id, :destination, :issuer, :name_id_format, :now
         attr_accessor :sign, :version
         attr_reader :user
