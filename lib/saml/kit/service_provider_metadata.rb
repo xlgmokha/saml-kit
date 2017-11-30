@@ -17,6 +17,13 @@ module Saml
         attribute = document.find_by("/md:EntityDescriptor/md:#{name}").attribute("WantAssertionsSigned")
         attribute.text.downcase == "true"
       end
+
+      def self.build
+        builder = Saml::Kit::Builders::ServiceProviderMetadata.new
+        yield builder
+        builder.build
+      end
+
     end
   end
 end
