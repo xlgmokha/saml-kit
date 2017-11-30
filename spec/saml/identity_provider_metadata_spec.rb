@@ -187,4 +187,20 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(subject.single_logout_service_for(binding: :soap)).to be_nil
     end
   end
+
+  describe ".build" do
+    let(:url) { FFaker::Internet.uri("https") }
+    let(:entity_id) { FFaker::Internet.uri("https") }
+
+    it 'provides a nice API for building metadata' do
+      result = described_class.build do |builder|
+        builder.entity_id = entity_id
+        builder.add_single_sign_on_service(url, binding: :http_post)
+      end
+
+      expect(result).to be_instance_of(Saml::Kit::IdentityProviderMetadata)
+      expect(result.entity_id).to eql(entity_id)
+      expect(result.single_sign_on_service_for(binding: :http_post).location).to eql(url)
+    end
+  end
 end

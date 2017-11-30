@@ -28,6 +28,10 @@ module Saml
           }
         end
       end
+
+      def self.builder_class
+        Saml::Kit::Builders::IdentityProviderMetadata
+      end
     end
   end
 end
