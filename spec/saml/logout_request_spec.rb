@@ -1,14 +1,17 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::LogoutRequest do
-  subject { builder.build }
-  let(:builder) { Saml::Kit::Builders::LogoutRequest.new(user) }
+  subject { described_class.build(user) }
+  #let(:builder) { Saml::Kit::Builders::LogoutRequest.new(user) }
   let(:user) { double(:user, name_id_for: name_id) }
   let(:name_id) { SecureRandom.uuid }
 
   it 'parses the issuer' do
-    builder.issuer = FFaker::Internet.http_url
-    expect(subject.issuer).to eql(builder.issuer)
+    issuer = FFaker::Internet.uri("https")
+    subject = described_class.build(user) do |builder|
+      builder.issuer = issuer
+    end
+    expect(subject.issuer).to eql(issuer)
   end
 
   it 'parses the issue instant' do
@@ -21,8 +24,11 @@ RSpec.describe Saml::Kit::LogoutRequest do
   end
 
   it 'parses the destination' do
-    builder.destination = FFaker::Internet.http_url
-    expect(subject.destination).to eql(builder.destination)
+    destination = FFaker::Internet.uri("https")
+    subject = described_class.build(user) do |builder|
+      builder.destination = destination
+    end
+    expect(subject.destination).to eql(destination)
   end
 
   it 'parses the name_id' do
@@ -43,14 +49,16 @@ RSpec.describe Saml::Kit::LogoutRequest do
     end
 
     it 'is valid when left untampered' do
-      expect(builder.build).to be_valid
+      expect(subject).to be_valid
     end
 
     it 'is invalid if the document has been tampered with' do
-      builder.issuer = FFaker::Internet.http_url
-      raw_xml = builder.to_xml.gsub(builder.issuer, 'corrupt')
-      subject = described_class.new(raw_xml)
-      expect(subject).to be_invalid
+      issuer = FFaker::Internet.uri("https")
+      raw_xml = described_class.build(user) do |builder|
+        builder.issuer = issuer
+      end.to_xml.gsub(issuer, 'corrupt')
+
+      expect(described_class.new(raw_xml)).to be_invalid
     end
 
     it 'is invalid when blank' do
@@ -60,22 +68,19 @@ RSpec.describe Saml::Kit::LogoutRequest do
     end
 
     it 'is invalid when not a LogoutRequest' do
-      xml = Saml::Kit::Builders::IdentityProviderMetadata.new.to_xml
-      subject = described_class.new(xml)
+      subject = described_class.new(Saml::Kit::IdentityProviderMetadata.build.to_xml)
       expect(subject).to be_invalid
       expect(subject.errors[:base]).to include(subject.error_message(:invalid))
     end
 
     it 'is invalid when the fingerprint of the certificate does not match the registered fingerprint' do
       allow(metadata).to receive(:matches?).and_return(false)
-      subject = builder.build
       expect(subject).to be_invalid
       expect(subject.errors[:fingerprint]).to be_present
     end
 
     it 'is invalid when the provider is not known' do
       allow(registry).to receive(:metadata_for).and_return(nil)
-      subject = builder.build
       expect(subject).to be_invalid
       expect(subject.errors[:provider]).to be_present
     end
@@ -84,20 +89,22 @@ RSpec.describe Saml::Kit::LogoutRequest do
       allow(metadata).to receive(:matches?).and_return(true)
       allow(metadata).to receive(:single_logout_services).and_return([])
 
-      subject = builder.build
       expect(subject).to be_invalid
       expect(subject.errors[:single_logout_service]).to be_present
     end
 
     it 'is valid when a single lgout service url is available via the registry' do
-      builder.issuer = FFaker::Internet.http_url
-      allow(registry).to receive(:metadata_for).with(builder.issuer).and_return(metadata)
+      issuer = FFaker::Internet.uri("https")
+      allow(registry).to receive(:metadata_for).with(issuer).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       allow(metadata).to receive(:single_logout_services).and_return([
-        Saml::Kit::Bindings::HttpPost.new(location: FFaker::Internet.http_url)
+        Saml::Kit::Bindings::HttpPost.new(location: FFaker::Internet.uri("https"))
       ])
 
-      expect(builder.build).to be_valid
+      subject = described_class.build(user) do |builder|
+        builder.issuer = issuer
+      end
+      expect(subject).to be_valid
     end
 
     it 'validates the schema of the request' do
