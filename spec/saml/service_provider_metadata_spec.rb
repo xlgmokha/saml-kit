@@ -8,14 +8,14 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
   let(:logout_redirect_url) { FFaker::Internet.uri("https") }
 
   describe described_class do
-    let(:builder) { Saml::Kit::Builders::ServiceProviderMetadata.new }
     subject do
-      builder.entity_id = entity_id
-      builder.add_assertion_consumer_service(acs_post_url, binding: :http_post)
-      builder.add_assertion_consumer_service(acs_redirect_url, binding: :http_redirect)
-      builder.add_single_logout_service(logout_post_url, binding: :http_post)
-      builder.add_single_logout_service(logout_redirect_url, binding: :http_redirect)
-      builder.build
+      described_class.build do |builder|
+        builder.entity_id = entity_id
+        builder.add_assertion_consumer_service(acs_post_url, binding: :http_post)
+        builder.add_assertion_consumer_service(acs_redirect_url, binding: :http_redirect)
+        builder.add_single_logout_service(logout_post_url, binding: :http_post)
+        builder.add_single_logout_service(logout_redirect_url, binding: :http_redirect)
+      end
     end
 
     it 'returns each of the certificates' do
@@ -52,13 +52,13 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
   describe "#validate" do
     let(:service_provider_metadata) do
-      builder = Saml::Kit::Builders::ServiceProviderMetadata.new
-      builder.entity_id = entity_id
-      builder.add_assertion_consumer_service(acs_post_url, binding: :http_post)
-      builder.add_assertion_consumer_service(acs_redirect_url, binding: :http_redirect)
-      builder.add_single_logout_service(logout_post_url, binding: :http_post)
-      builder.add_single_logout_service(logout_redirect_url, binding: :http_redirect)
-      builder.to_xml
+      described_class.build do |builder|
+        builder.entity_id = entity_id
+        builder.add_assertion_consumer_service(acs_post_url, binding: :http_post)
+        builder.add_assertion_consumer_service(acs_redirect_url, binding: :http_redirect)
+        builder.add_single_logout_service(logout_post_url, binding: :http_post)
+        builder.add_single_logout_service(logout_redirect_url, binding: :http_redirect)
+      end.to_xml
     end
 
     it 'valid when given valid service provider metadata' do
@@ -113,7 +113,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
   end
 
   describe "#matches?" do
-    subject { Saml::Kit::Builders::ServiceProviderMetadata.new.build }
+    subject { Saml::Kit::ServiceProviderMetadata.build }
 
     it 'returns true when the fingerprint matches one of the signing certificates' do
       certificate = Hash.from_xml(subject.to_xml)['EntityDescriptor']['Signature']['KeyInfo']['X509Data']['X509Certificate']
