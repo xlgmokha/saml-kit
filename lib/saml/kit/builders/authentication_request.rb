@@ -2,7 +2,7 @@ module Saml
   module Kit
     module Builders
       class AuthenticationRequest
-        attr_accessor :id, :now, :issuer, :acs_url, :name_id_format, :sign, :destination
+        attr_accessor :id, :now, :issuer, :assertion_consumer_service_url, :name_id_format, :sign, :destination
         attr_accessor :version
 
         def initialize(configuration: Saml::Kit.configuration, sign: true)
@@ -39,7 +39,7 @@ module Saml
             IssueInstant: now.utc.iso8601,
             Destination: destination,
           }
-          options[:AssertionConsumerServiceURL] = acs_url if acs_url.present?
+          options[:AssertionConsumerServiceURL] = assertion_consumer_service_url if assertion_consumer_service_url.present?
           options
         end
       end

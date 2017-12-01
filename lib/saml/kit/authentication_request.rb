@@ -7,7 +7,7 @@ module Saml
         super(xml, name: "AuthnRequest")
       end
 
-      def acs_url
+      def assertion_consumer_service_url
         to_h[name]['AssertionConsumerServiceURL']
       end
 

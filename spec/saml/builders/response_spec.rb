@@ -3,9 +3,9 @@ require 'spec_helper'
 RSpec.describe Saml::Kit::Builders::Response do
   subject { described_class.new(user, request) }
   let(:email) { FFaker::Internet.email }
-  let(:acs_url) { FFaker::Internet.uri("https") }
+  let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
   let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
-  let(:request) { double(:request, id: "_#{SecureRandom.uuid}", acs_url: acs_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, trusted?: true, signed?: true) }
+  let(:request) { double(:request, id: "_#{SecureRandom.uuid}", assertion_consumer_service_url: assertion_consumer_service_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, trusted?: true, signed?: true) }
   let(:provider) { double(want_assertions_signed: false, encryption_certificates: [Saml::Kit::Certificate.new(encryption_pem, use: :encryption)]) }
   let(:encryption_pem) { Saml::Kit.configuration.stripped_encryption_certificate }
   let(:issuer) { FFaker::Internet.uri("https") }
@@ -39,7 +39,7 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(hash['Response']['ID']).to be_present
       expect(hash['Response']['Version']).to eql('2.0')
       expect(hash['Response']['IssueInstant']).to eql(Time.now.utc.iso8601)
-      expect(hash['Response']['Destination']).to eql(acs_url)
+      expect(hash['Response']['Destination']).to eql(assertion_consumer_service_url)
       expect(hash['Response']['InResponseTo']).to eql(request.id)
       expect(hash['Response']['Issuer']).to eql(issuer)
       expect(hash['Response']['Status']['StatusCode']['Value']).to eql("urn:oasis:names:tc:SAML:2.0:status:Success")
@@ -52,7 +52,7 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(hash['Response']['Assertion']['Subject']['NameID']).to eql(user.name_id_for)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['Method']).to eql("urn:oasis:names:tc:SAML:2.0:cm:bearer")
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['NotOnOrAfter']).to eql(3.hours.from_now.utc.iso8601)
-      expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['Recipient']).to eql(acs_url)
+      expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['Recipient']).to eql(assertion_consumer_service_url)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['InResponseTo']).to eql(request.id)
 
       expect(hash['Response']['Assertion']['Conditions']['NotBefore']).to eql(0.seconds.ago.utc.iso8601)
@@ -106,21 +106,21 @@ RSpec.describe Saml::Kit::Builders::Response do
   end
 
   describe "#destination" do
-    let(:acs_url) { "https://#{FFaker::Internet.domain_name}/acs" }
+    let(:assertion_consumer_service_url) { "https://#{FFaker::Internet.domain_name}/acs" }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
     subject { described_class.new(user, request).build }
 
     describe "when the request is signed and trusted" do
-      let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil, signed?: true, trusted?: true) }
+      let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, assertion_consumer_service_url: assertion_consumer_service_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: nil, signed?: true, trusted?: true) }
 
       it 'returns the ACS embedded in the request' do
-        expect(subject.destination).to eql(acs_url)
+        expect(subject.destination).to eql(assertion_consumer_service_url)
       end
     end
 
     describe "when the request is not trusted" do
       let(:registered_acs_url) { FFaker::Internet.uri("https") }
-      let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, acs_url: acs_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, signed?: true, trusted?: false) }
+      let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, assertion_consumer_service_url: assertion_consumer_service_url, issuer: FFaker::Movie.title, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, signed?: true, trusted?: false) }
       let(:provider) { instance_double(Saml::Kit::ServiceProviderMetadata, want_assertions_signed: false) }
 
       it 'returns the registered ACS embedded in the metadata' do

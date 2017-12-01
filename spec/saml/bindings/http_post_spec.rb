@@ -76,7 +76,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
 
     it 'deserializes to a Response' do
       user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
-      request = double(:request, id: SecureRandom.uuid, provider: nil, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url, signed?: true, trusted?: true)
+      request = double(:request, id: SecureRandom.uuid, provider: nil, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url, signed?: true, trusted?: true)
       builder = Saml::Kit::Response.builder_class.new(user, request)
       _, params = subject.serialize(builder)
       result = subject.deserialize(params)

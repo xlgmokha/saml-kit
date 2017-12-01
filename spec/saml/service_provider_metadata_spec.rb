@@ -129,17 +129,17 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
   end
 
   describe ".build" do
-    let(:acs_url) { FFaker::Internet.uri("https") }
+    let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
 
     it 'provides a nice API for building metadata' do
       result = described_class.build do |builder|
         builder.entity_id = entity_id
-        builder.add_assertion_consumer_service(acs_url, binding: :http_post)
+        builder.add_assertion_consumer_service(assertion_consumer_service_url, binding: :http_post)
       end
 
       expect(result).to be_instance_of(described_class)
       expect(result.entity_id).to eql(entity_id)
-      expect(result.assertion_consumer_service_for(binding: :http_post).location).to eql(acs_url)
+      expect(result.assertion_consumer_service_for(binding: :http_post).location).to eql(assertion_consumer_service_url)
     end
   end
 

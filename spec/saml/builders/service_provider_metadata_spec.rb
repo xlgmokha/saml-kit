@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Builders::ServiceProviderMetadata do
-  let(:acs_url) { FFaker::Internet.http_url }
+  let(:assertion_consumer_service_url) { FFaker::Internet.http_url }
   let(:entity_id) { FFaker::Internet.uri("https") }
 
   it 'builds the service provider metadata' do
     subject.entity_id = entity_id
-    subject.add_assertion_consumer_service(acs_url, binding: :http_post)
+    subject.add_assertion_consumer_service(assertion_consumer_service_url, binding: :http_post)
     subject.name_id_formats = [
       Saml::Kit::Namespaces::PERSISTENT,
       Saml::Kit::Namespaces::TRANSIENT,
@@ -26,7 +26,7 @@ RSpec.describe Saml::Kit::Builders::ServiceProviderMetadata do
       Saml::Kit::Namespaces::EMAIL_ADDRESS,
     ])
     expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['Binding']).to eql("urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST")
-    expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['Location']).to eql(acs_url)
+    expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['Location']).to eql(assertion_consumer_service_url)
     expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['isDefault']).to eql('true')
     expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['index']).to eql('0')
     expect(result['EntityDescriptor']['Signature']).to be_present

@@ -123,7 +123,7 @@ module Saml
 
         def destination_for(request)
           if request.signed? && request.trusted?
-            request.acs_url || request.provider.assertion_consumer_service_for(binding: :http_post).try(:location)
+            request.assertion_consumer_service_url || request.provider.assertion_consumer_service_for(binding: :http_post).try(:location)
           else
             request.provider.assertion_consumer_service_for(binding: :http_post).try(:location)
           end
@@ -158,7 +158,7 @@ module Saml
           {
             InResponseTo: request.id,
             NotOnOrAfter: 3.hours.since(now).utc.iso8601,
-            Recipient: request.acs_url,
+            Recipient: request.assertion_consumer_service_url,
           }
         end
 

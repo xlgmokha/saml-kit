@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Saml::Kit::Response do
   describe "#valid?" do
-    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, acs_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
@@ -322,7 +322,7 @@ RSpec.describe Saml::Kit::Response do
   describe "encrypted assertion" do
     let(:id) { SecureRandom.uuid }
     let(:now) { Time.now.utc }
-    let(:acs_url) { FFaker::Internet.uri("https") }
+    let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
     let(:password) { FFaker::Movie.title }
     let(:assertion) do
       FFaker::Movie.title
@@ -371,7 +371,7 @@ XML
       encrypted = cipher.update(assertion) + cipher.final
 
       xml = <<-XML
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" xmlns:saml="#{Saml::Kit::Namespaces::ASSERTION}" ID="_#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{acs_url}" InResponseTo="_#{SecureRandom.uuid}">
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" xmlns:saml="#{Saml::Kit::Namespaces::ASSERTION}" ID="_#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{assertion_consumer_service_url}" InResponseTo="_#{SecureRandom.uuid}">
   <saml:Issuer>#{FFaker::Internet.uri("https")}</saml:Issuer>
   <samlp:Status>
     <samlp:StatusCode Value="#{Saml::Kit::Namespaces::SUCCESS}"/>
