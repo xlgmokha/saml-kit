@@ -9,7 +9,6 @@ module Saml
         end
 
         def serialize(builder, relay_state: nil)
-          builder.sign = true
           builder.destination = location
           document = builder.build
           saml_params = {
