@@ -15,8 +15,12 @@ module Saml
         to_h[name]['NameIDPolicy']['Format']
       end
 
-      def response_for(user)
-        Saml::Kit::Builders::Response.new(user, self)
+      def response_for(user, binding:, relay_state: nil)
+        response_binding = provider.assertion_consumer_service_for(binding: binding)
+        builder = Saml::Kit::Response.builder(user, self) do |x|
+          yield x if block_given?
+        end
+        response_binding.serialize(builder, relay_state: relay_state)
       end
 
       Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::AuthenticationRequest::Builder', 'Saml::Kit::Builders::AuthenticationRequest')

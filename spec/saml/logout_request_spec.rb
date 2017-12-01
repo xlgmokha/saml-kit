@@ -121,9 +121,20 @@ RSpec.describe Saml::Kit::LogoutRequest do
   end
 
   describe "#response_for" do
-    it 'returns a logout response for a particular user' do
-      user = double(:user)
-      expect(subject.response_for(user)).to be_instance_of(Saml::Kit::Builders::LogoutResponse)
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid) }
+    let(:provider) do
+      Saml::Kit::IdentityProviderMetadata.build do |builder|
+        builder.add_single_logout_service(FFaker::Internet.uri("https"), binding: :http_post)
+      end
+    end
+
+    it 'serializes a logout response for a particular user' do
+      allow(subject).to receive(:provider).and_return(provider)
+
+      _, saml_params = subject.response_for(user, binding: :http_post)
+      response_binding = provider.single_logout_service_for(binding: :http_post)
+      result = response_binding.deserialize(saml_params)
+      expect(result).to be_instance_of(Saml::Kit::LogoutResponse)
     end
   end
 end
