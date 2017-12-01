@@ -15,6 +15,7 @@ module Saml
 
       def want_assertions_signed
         attribute = document.find_by("/md:EntityDescriptor/md:#{name}").attribute("WantAssertionsSigned")
+        return true if attribute.nil?
         attribute.text.downcase == "true"
       end
 
