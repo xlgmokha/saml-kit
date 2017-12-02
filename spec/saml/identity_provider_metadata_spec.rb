@@ -204,4 +204,15 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       expect(result.single_sign_on_service_for(binding: :http_post).location).to eql(url)
     end
   end
+
+  describe "#login_request_for" do
+    it 'returns a serialized login request' do
+      subject = described_class.build do |x|
+        x.add_single_sign_on_service(FFaker::Internet.uri("https"), binding: :http_post)
+      end
+      url, saml_params = subject.login_request_for(binding: :http_post, relay_state: FFaker::Movie.title)
+      result = subject.single_sign_on_service_for(binding: :http_post).deserialize(saml_params)
+      expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
+    end
+  end
 end
