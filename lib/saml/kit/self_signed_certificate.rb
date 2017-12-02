@@ -22,7 +22,7 @@ module Saml
         certificate.sign(rsa_key, OpenSSL::Digest::SHA256.new)
         [
           certificate.to_pem,
-          rsa_key.to_pem(OpenSSL::Cipher::Cipher.new('AES-256-CBC'), @password)
+          rsa_key.to_pem(OpenSSL::Cipher.new('AES-256-CBC'), @password)
         ]
       end
     end
