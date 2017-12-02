@@ -91,12 +91,12 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
     it 'validates a request without a signature' do
       now = Time.now.utc
-raw_xml = <<-XML
+      raw_xml = <<-XML
 <samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Saml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
   <saml:Issuer>#{issuer}</saml:Issuer>
   <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::EMAIL_ADDRESS}'/>
 </samlp:AuthnRequest>
-XML
+      XML
 
       subject = described_class.new(raw_xml)
       subject.signature_verified!
@@ -137,6 +137,23 @@ XML
       expect(result).to be_instance_of(described_class)
       expect(result.issuer).to eql(entity_id)
       expect(result.assertion_consumer_service_url).to eql(url)
+    end
+  end
+
+  describe "#response_for" do
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
+    let(:provider) do
+      Saml::Kit::ServiceProviderMetadata.build do |x|
+        x.add_assertion_consumer_service(FFaker::Internet.uri("https"), binding: :http_post)
+      end
+    end
+
+    it 'serializes a response' do
+      allow(subject).to receive(:provider).and_return(provider)
+      url, saml_params = subject.response_for(user, binding: :http_post, relay_state: FFaker::Movie.title)
+
+      response = provider.assertion_consumer_service_for(binding: :http_post).deserialize(saml_params)
+      expect(response).to be_instance_of(Saml::Kit::Response)
     end
   end
 end
