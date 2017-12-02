@@ -7,18 +7,12 @@ RSpec.describe Saml::Kit::Builders::LogoutResponse do
   let(:request) { Saml::Kit::Builders::LogoutRequest.new(user).build }
   let(:issuer) { FFaker::Internet.http_url }
   let(:destination) { FFaker::Internet.http_url }
-  let(:registry) { double(:registry) }
-  let(:provider) { double(:provider) }
-  let(:binding) { double(:binding, location: destination) }
 
   describe "#build" do
     it 'builds a logout response' do
-      allow(configuration).to receive(:registry).and_return(registry)
-      allow(registry).to receive(:metadata_for).with(issuer).and_return(provider)
-      allow(provider).to receive(:single_logout_service_for).and_return(binding)
-
       travel_to 1.second.from_now
 
+      subject.destination = destination
       result = subject.build
       expect(result.id).to be_present
       expect(result.issue_instant).to eql(Time.now.utc.iso8601)

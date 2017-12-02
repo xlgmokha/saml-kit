@@ -59,6 +59,10 @@ module Saml
       def logger
         configuration.logger
       end
+
+      def registry
+        configuration.registry
+      end
     end
   end
 end
