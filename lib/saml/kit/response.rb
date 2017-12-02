@@ -20,11 +20,15 @@ module Saml
       end
 
       def attributes
-        @attributes ||= Hash[
-          assertion.fetch('AttributeStatement', {}).fetch('Attribute', []).map do |item|
-            [item['Name'].to_sym, item['AttributeValue']]
+        @attributes ||=
+          begin
+            attrs = assertion.fetch('AttributeStatement', {}).fetch('Attribute', [])
+            if attrs.is_a? Hash
+              { attrs["Name"] => attrs["AttributeValue"] }.with_indifferent_access
+            else
+              Hash[attrs.map { |item| [item['Name'].to_sym, item['AttributeValue']] }].with_indifferent_access
+            end
           end
-        ].with_indifferent_access
       end
 
       def started_at

@@ -400,4 +400,26 @@ XML
       expect(subject.attributes).to be_present
     end
   end
+
+  describe "parsing" do
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: attributes) }
+    let(:request) { double(:request, id: Saml::Kit::Id.generate, signed?: true, trusted?: true, provider: nil, assertion_consumer_service_url: FFaker::Internet.uri("https"), name_id_format: '', issuer: FFaker::Internet.uri("https")) }
+    let(:attributes) { { name: 'mo' } }
+
+    it 'returns the name id' do
+      subject = described_class.build(user, request)
+      expect(subject.name_id).to eql(user.name_id_for)
+    end
+
+    it 'returns the single attributes' do
+      subject = described_class.build(user, request)
+      expect(subject.attributes).to eql('name' => 'mo')
+    end
+
+    it 'returns the multiple attributes' do
+      attributes[:age] = 33
+      subject = described_class.build(user, request)
+      expect(subject.attributes).to eql('name' => 'mo', 'age' => '33')
+    end
+  end
 end
