@@ -34,7 +34,7 @@ module Saml
           xml.SignedInfo do
             xml.CanonicalizationMethod Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
             xml.SignatureMethod Algorithm: SIGNATURE_METHODS[configuration.signature_method]
-            xml.Reference URI: "#_#{reference_id}" do
+            xml.Reference URI: "##{reference_id}" do
               xml.Transforms do
                 xml.Transform Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
                 xml.Transform Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"

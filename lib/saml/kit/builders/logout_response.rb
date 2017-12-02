@@ -9,7 +9,7 @@ module Saml
           @user = user
           @now = Time.now.utc
           @request = request
-          @id = SecureRandom.uuid
+          @id = "_#{SecureRandom.uuid}"
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
           @sign = sign
@@ -37,7 +37,7 @@ module Saml
         def logout_response_options
           {
             xmlns: Namespaces::PROTOCOL,
-            ID: "_#{id}",
+            ID: id,
             Version: version,
             IssueInstant: now.utc.iso8601,
             Destination: destination,

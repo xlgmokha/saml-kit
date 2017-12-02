@@ -10,8 +10,8 @@ module Saml
         def initialize(user, request)
           @user = user
           @request = request
-          @id = SecureRandom.uuid
-          @reference_id = SecureRandom.uuid
+          @id = "_#{SecureRandom.uuid}"
+          @reference_id = "_#{SecureRandom.uuid}"
           @now = Time.now.utc
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
@@ -135,7 +135,7 @@ module Saml
 
         def response_options
           {
-            ID: id.present? ? "_#{id}" : nil,
+            ID: id,
             Version: version,
             IssueInstant: now.iso8601,
             Destination: destination,
@@ -147,7 +147,7 @@ module Saml
 
         def assertion_options
           {
-            ID: "_#{reference_id}",
+            ID: reference_id,
             IssueInstant: now.iso8601,
             Version: "2.0",
             xmlns: Namespaces::ASSERTION,

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Saml::Kit::AuthenticationRequest do
   subject { described_class.new(raw_xml) }
-  let(:id) { SecureRandom.uuid }
+  let(:id) { "_#{SecureRandom.uuid}" }
   let(:assertion_consumer_service_url) { "https://#{FFaker::Internet.domain_name}/acs" }
   let(:issuer) { FFaker::Movie.title }
   let(:destination) { FFaker::Internet.http_url }
@@ -19,7 +19,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   end
 
   it { expect(subject.issuer).to eql(issuer) }
-  it { expect(subject.id).to eql("_#{id}") }
+  it { expect(subject.id).to eql(id) }
   it { expect(subject.assertion_consumer_service_url).to eql(assertion_consumer_service_url) }
   it { expect(subject.name_id_format).to eql(name_id_format) }
   it { expect(subject.destination).to eql(destination) }
@@ -77,9 +77,9 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
 
     it 'validates the schema of the request' do
-      id = SecureRandom.uuid
+      id = "_#{SecureRandom.uuid}"
       signed_xml = Saml::Kit::Signature.sign(sign: true) do |xml, signature|
-        xml.tag!('samlp:AuthnRequest', "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, AssertionConsumerServiceURL: assertion_consumer_service_url, ID: "_#{id}") do
+        xml.tag!('samlp:AuthnRequest', "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, AssertionConsumerServiceURL: assertion_consumer_service_url, ID: id) do
           signature.template(id)
           xml.Fake do
             xml.NotAllowed "Huh?"

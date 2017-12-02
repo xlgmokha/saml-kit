@@ -8,7 +8,7 @@ module Saml
 
         def initialize(user, configuration: Saml::Kit.configuration, sign: true)
           @user = user
-          @id = SecureRandom.uuid
+          @id = "_#{SecureRandom.uuid}"
           @issuer = configuration.issuer
           @name_id_format = Saml::Kit::Namespaces::PERSISTENT
           @now = Time.now.utc
@@ -35,7 +35,7 @@ module Saml
 
         def logout_request_options
           {
-            ID: "_#{id}",
+            ID: id,
             Version: version,
             IssueInstant: now.utc.iso8601,
             Destination: destination,

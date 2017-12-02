@@ -6,7 +6,7 @@ module Saml
         attr_accessor :version
 
         def initialize(configuration: Saml::Kit.configuration, sign: true)
-          @id = SecureRandom.uuid
+          @id = "_#{SecureRandom.uuid}"
           @issuer = configuration.issuer
           @name_id_format = Namespaces::PERSISTENT
           @now = Time.now.utc
@@ -34,7 +34,7 @@ module Saml
           options = {
             "xmlns:samlp" => Namespaces::PROTOCOL,
             "xmlns:saml" => Namespaces::ASSERTION,
-            ID: "_#{id}",
+            ID: id,
             Version: version,
             IssueInstant: now.utc.iso8601,
             Destination: destination,

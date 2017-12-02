@@ -54,9 +54,9 @@ RSpec.describe Saml::Kit::Response do
     it 'validates the schema of the response' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      id = SecureRandom.uuid
+      id = "_#{SecureRandom.uuid}"
       signed_xml = Saml::Kit::Signature.sign(sign: true) do |xml, signature|
-        xml.tag! "samlp:Response", "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, ID: "_#{id}" do
+        xml.tag! "samlp:Response", "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, ID: id do
           signature.template(id)
           xml.Fake do
             xml.NotAllowed "Huh?"

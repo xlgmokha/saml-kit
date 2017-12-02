@@ -7,7 +7,7 @@ module Saml
         attr_reader :logout_urls, :single_sign_on_urls
 
         def initialize(configuration = Saml::Kit.configuration)
-          @id = SecureRandom.uuid
+          @id = "_#{SecureRandom.uuid}"
           @entity_id = configuration.issuer
           @attributes = []
           @name_id_formats = [Namespaces::PERSISTENT]
@@ -86,7 +86,7 @@ module Saml
             'xmlns': Namespaces::METADATA,
             'xmlns:ds': Namespaces::XMLDSIG,
             'xmlns:saml': Namespaces::ASSERTION,
-            ID: "_#{id}",
+            ID: id,
             entityID: entity_id,
           }
         end

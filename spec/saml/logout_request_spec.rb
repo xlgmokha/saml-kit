@@ -107,9 +107,9 @@ RSpec.describe Saml::Kit::LogoutRequest do
     end
 
     it 'validates the schema of the request' do
-      id = SecureRandom.uuid
+      id = "_#{SecureRandom.uuid}"
       signed_xml = Saml::Kit::Signature.sign(sign: true) do |xml, signature|
-        xml.LogoutRequest ID: "_#{id}" do
+        xml.LogoutRequest ID: id do
           signature.template(id)
           xml.Fake do
             xml.NotAllowed "Huh?"

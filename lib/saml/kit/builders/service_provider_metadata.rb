@@ -6,7 +6,7 @@ module Saml
         attr_accessor :want_assertions_signed
 
         def initialize(configuration = Saml::Kit.configuration)
-          @id = SecureRandom.uuid
+          @id = "_#{SecureRandom.uuid}"
           @configuration = configuration
           @entity_id = configuration.issuer
           @acs_urls = []
@@ -71,7 +71,7 @@ module Saml
         def entity_descriptor_options
           {
             'xmlns': Namespaces::METADATA,
-            ID: "_#{id}",
+            ID: id,
             entityID: entity_id,
           }
         end
