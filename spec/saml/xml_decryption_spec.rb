@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Saml::Kit::Cryptography do
+RSpec.describe Saml::Kit::XmlDecryption do
   describe "#decrypt" do
     let(:secret) { FFaker::Movie.title }
     let(:password) { FFaker::Movie.title }

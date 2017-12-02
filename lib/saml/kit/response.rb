@@ -56,7 +56,7 @@ module Saml
         @assertion =
           begin
             if encrypted?
-              decrypted = Cryptography.new.decrypt(to_h.fetch(name, {}).fetch('EncryptedAssertion', {}))
+              decrypted = XmlDecryption.new.decrypt(to_h.fetch(name, {}).fetch('EncryptedAssertion', {}))
               Saml::Kit.logger.debug(decrypted)
               Hash.from_xml(decrypted)['Assertion']
             else

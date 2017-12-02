@@ -1,6 +1,6 @@
 module Saml
   module Kit
-    class Cryptography
+    class XmlDecryption
       attr_reader :private_key
 
       def initialize(private_key = Saml::Kit.configuration.encryption_private_key)
