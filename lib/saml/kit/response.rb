@@ -23,11 +23,12 @@ module Saml
         @attributes ||=
           begin
             attrs = assertion.fetch('AttributeStatement', {}).fetch('Attribute', [])
-            if attrs.is_a? Hash
-              { attrs["Name"] => attrs["AttributeValue"] }.with_indifferent_access
+            items = if attrs.is_a? Hash
+              [[attrs["Name"], attrs["AttributeValue"]]]
             else
-              Hash[attrs.map { |item| [item['Name'].to_sym, item['AttributeValue']] }].with_indifferent_access
+              attrs.map { |item| [item['Name'], item['AttributeValue']] }
             end
+            Hash[items].with_indifferent_access
           end
       end
 
