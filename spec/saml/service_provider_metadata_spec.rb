@@ -101,7 +101,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     it 'is invalid when 0 ACS endpoints are specified' do
       xml = <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
-<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="_#{SecureRandom.uuid}" entityID="#{entity_id}">
+<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{Saml::Kit::Id.generate}" entityID="#{entity_id}">
   <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
     <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
     <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>

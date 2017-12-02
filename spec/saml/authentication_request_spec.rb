@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Saml::Kit::AuthenticationRequest do
   subject { described_class.new(raw_xml) }
-  let(:id) { "_#{SecureRandom.uuid}" }
+  let(:id) { Saml::Kit::Id.generate }
   let(:assertion_consumer_service_url) { "https://#{FFaker::Internet.domain_name}/acs" }
   let(:issuer) { FFaker::Movie.title }
   let(:destination) { FFaker::Internet.http_url }
@@ -77,7 +77,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
 
     it 'validates the schema of the request' do
-      id = "_#{SecureRandom.uuid}"
+      id = Saml::Kit::Id.generate
       signed_xml = Saml::Kit::Signature.sign(sign: true) do |xml, signature|
         xml.tag!('samlp:AuthnRequest', "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, AssertionConsumerServiceURL: assertion_consumer_service_url, ID: id) do
           signature.template(id)
@@ -92,7 +92,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     it 'validates a request without a signature' do
       now = Time.now.utc
 raw_xml = <<-XML
-<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='_#{SecureRandom.uuid}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
+<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Saml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
   <saml:Issuer>#{issuer}</saml:Issuer>
   <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::EMAIL_ADDRESS}'/>
 </samlp:AuthnRequest>

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Saml::Kit::Response do
   describe "#valid?" do
-    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: "_#{SecureRandom.uuid}", issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: Saml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
@@ -54,7 +54,7 @@ RSpec.describe Saml::Kit::Response do
     it 'validates the schema of the response' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      id = "_#{SecureRandom.uuid}"
+      id = Saml::Kit::Id.generate
       signed_xml = Saml::Kit::Signature.sign(sign: true) do |xml, signature|
         xml.tag! "samlp:Response", "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, ID: id do
           signature.template(id)
@@ -144,7 +144,7 @@ RSpec.describe Saml::Kit::Response do
       destination = FFaker::Internet.uri("https")
       raw_xml = <<-XML
 <?xml version="1.0"?>
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="_#{SecureRandom.uuid}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{destination}" Consent="#{Saml::Kit::Namespaces::UNSPECIFIED}" InResponseTo="#{request.id}">
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="#{Saml::Kit::Id.generate}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{destination}" Consent="#{Saml::Kit::Namespaces::UNSPECIFIED}" InResponseTo="#{request.id}">
   <Issuer xmlns="#{Saml::Kit::Namespaces::ASSERTION}">#{request.issuer}</Issuer>
   <samlp:Status>
     <samlp:StatusCode Value="#{Saml::Kit::Namespaces::RESPONDER_ERROR}"/>
@@ -160,19 +160,19 @@ RSpec.describe Saml::Kit::Response do
 
   describe "#signed?" do
     let(:now) { Time.now.utc }
-    let(:id) { SecureRandom.uuid }
+    let(:id) { Saml::Kit::Id.generate }
     let(:url) { FFaker::Internet.uri("https") }
 
     it 'returns true when the Assertion is signed' do
       xml = <<-XML
 <?xml version="1.0"?>
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="_#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
-  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="_#{id}" IssueInstant="#{now.iso8601}" Version="2.0">
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
+  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" IssueInstant="#{now.iso8601}" Version="2.0">
     <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
       <ds:SignedInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
         <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
         <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-        <ds:Reference URI="#_#{id}">
+        <ds:Reference URI="##{id}">
           <ds:Transforms>
             <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
             <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
@@ -198,12 +198,12 @@ RSpec.describe Saml::Kit::Response do
     it 'returns true when the Response is signed' do
       xml = <<-XML
 <?xml version="1.0"?>
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="_#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
   <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
     <ds:SignedInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
       <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
       <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-      <ds:Reference URI="#_#{id}">
+      <ds:Reference URI="##{id}">
         <ds:Transforms>
           <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
           <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
@@ -219,7 +219,7 @@ RSpec.describe Saml::Kit::Response do
       </ds:X509Data>
     </KeyInfo>
   </ds:Signature>
-  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="_#{id}" IssueInstant="#{now.iso8601}" Version="2.0"></Assertion>
+  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" IssueInstant="#{now.iso8601}" Version="2.0"></Assertion>
 </samlp:Response>
       XML
       subject = described_class.new(xml)
@@ -229,8 +229,8 @@ RSpec.describe Saml::Kit::Response do
     it 'returns false when there is no signature' do
       xml = <<-XML
 <?xml version="1.0"?>
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="_#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
-  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="_#{id}" IssueInstant="#{now.iso8601}" Version="2.0"></Assertion>
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
+  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" IssueInstant="#{now.iso8601}" Version="2.0"></Assertion>
 </samlp:Response>
       XML
       subject = described_class.new(xml)
@@ -240,20 +240,20 @@ RSpec.describe Saml::Kit::Response do
 
   describe "#certificate" do
     let(:now) { Time.now.utc }
-    let(:id) { SecureRandom.uuid }
+    let(:id) { Saml::Kit::Id.generate }
     let(:url) { FFaker::Internet.uri("https") }
     let(:certificate) { FFaker::Movie.title }
 
     it 'returns the certificate when the Assertion is signed' do
       xml = <<-XML
 <?xml version="1.0"?>
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="_#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
-  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="_#{id}" IssueInstant="#{now.iso8601}" Version="2.0">
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
+  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" IssueInstant="#{now.iso8601}" Version="2.0">
     <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
       <ds:SignedInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
         <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
         <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-        <ds:Reference URI="#_#{id}">
+        <ds:Reference URI="##{id}">
           <ds:Transforms>
             <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
             <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
@@ -279,12 +279,12 @@ RSpec.describe Saml::Kit::Response do
     it 'returns the certificate when the Response is signed' do
       xml = <<-XML
 <?xml version="1.0"?>
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="_#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
   <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
     <ds:SignedInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
       <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
       <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-      <ds:Reference URI="#_#{id}">
+      <ds:Reference URI="##{id}">
         <ds:Transforms>
           <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
           <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
@@ -300,7 +300,7 @@ RSpec.describe Saml::Kit::Response do
       </ds:X509Data>
     </KeyInfo>
   </ds:Signature>
-  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="_#{id}" IssueInstant="#{now.iso8601}" Version="2.0"></Assertion>
+  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" IssueInstant="#{now.iso8601}" Version="2.0"></Assertion>
 </samlp:Response>
       XML
       subject = described_class.new(xml)
@@ -310,8 +310,8 @@ RSpec.describe Saml::Kit::Response do
     it 'returns nil when there is no signature' do
       xml = <<-XML
 <?xml version="1.0"?>
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="_#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
-  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="_#{id}" IssueInstant="#{now.iso8601}" Version="2.0"></Assertion>
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{url}" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_#{SecureRandom.uuid}">
+  <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" IssueInstant="#{now.iso8601}" Version="2.0"></Assertion>
 </samlp:Response>
       XML
       subject = described_class.new(xml)
@@ -320,14 +320,14 @@ RSpec.describe Saml::Kit::Response do
   end
 
   describe "encrypted assertion" do
-    let(:id) { SecureRandom.uuid }
+    let(:id) { Saml::Kit::Id.generate }
     let(:now) { Time.now.utc }
     let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
     let(:password) { FFaker::Movie.title }
     let(:assertion) do
       FFaker::Movie.title
       <<-XML
-<Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="_11d39a7f-1b86-43ed-90d7-68090a857ca8" IssueInstant="2017-11-23T04:33:58Z" Version="2.0">
+<Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="#{id}" IssueInstant="2017-11-23T04:33:58Z" Version="2.0">
  <Issuer>#{FFaker::Internet.uri("https")}</Issuer>
  <Subject>
    <NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">fdddf7ad-c4a4-443c-b96d-c953913b7b4e</NameID>
@@ -371,7 +371,7 @@ XML
       encrypted = cipher.update(assertion) + cipher.final
 
       xml = <<-XML
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" xmlns:saml="#{Saml::Kit::Namespaces::ASSERTION}" ID="_#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{assertion_consumer_service_url}" InResponseTo="_#{SecureRandom.uuid}">
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" xmlns:saml="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{assertion_consumer_service_url}" InResponseTo="#{Saml::Kit::Id.generate}">
   <saml:Issuer>#{FFaker::Internet.uri("https")}</saml:Issuer>
   <samlp:Status>
     <samlp:StatusCode Value="#{Saml::Kit::Namespaces::SUCCESS}"/>

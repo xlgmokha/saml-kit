@@ -6,7 +6,7 @@ module Saml
         attr_accessor :want_assertions_signed
 
         def initialize(configuration = Saml::Kit.configuration)
-          @id = "_#{SecureRandom.uuid}"
+          @id = Id.generate
           @configuration = configuration
           @entity_id = configuration.issuer
           @acs_urls = []

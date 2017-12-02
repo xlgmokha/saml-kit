@@ -9,7 +9,7 @@ RSpec.describe Saml::Kit::Signature do
     config
   end
 
-  let(:reference_id) { "_#{SecureRandom.uuid}" }
+  let(:reference_id) { Saml::Kit::Id.generate }
   let(:rsa_key) { OpenSSL::PKey::RSA.new(2048) }
   let(:public_key) { rsa_key.public_key }
   let(:certificate) do

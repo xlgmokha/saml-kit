@@ -10,8 +10,8 @@ module Saml
         def initialize(user, request)
           @user = user
           @request = request
-          @id = "_#{SecureRandom.uuid}"
-          @reference_id = "_#{SecureRandom.uuid}"
+          @id = Id.generate
+          @reference_id = Id.generate
           @now = Time.now.utc
           @version = "2.0"
           @status_code = Namespaces::SUCCESS

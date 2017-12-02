@@ -6,7 +6,7 @@ module Saml
         attr_accessor :version
 
         def initialize(configuration: Saml::Kit.configuration, sign: true)
-          @id = "_#{SecureRandom.uuid}"
+          @id = Id.generate
           @issuer = configuration.issuer
           @name_id_format = Namespaces::PERSISTENT
           @now = Time.now.utc

@@ -9,7 +9,7 @@ module Saml
           @user = user
           @now = Time.now.utc
           @request = request
-          @id = "_#{SecureRandom.uuid}"
+          @id = Id.generate
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
           @sign = sign
