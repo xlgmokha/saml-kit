@@ -2,10 +2,16 @@ require 'spec_helper'
 
 RSpec.describe Saml::Kit::Builders::ServiceProviderMetadata do
   let(:assertion_consumer_service_url) { FFaker::Internet.http_url }
+  let(:email) { FFaker::Internet.email }
+  let(:org_name) { FFaker::Movie.title }
+  let(:url) { FFaker::Internet.uri("https") }
   let(:entity_id) { FFaker::Internet.uri("https") }
 
   it 'builds the service provider metadata' do
+    subject.contact_email = email
     subject.entity_id = entity_id
+    subject.organization_name = org_name
+    subject.organization_url = url
     subject.add_assertion_consumer_service(assertion_consumer_service_url, binding: :http_post)
     subject.name_id_formats = [
       Saml::Kit::Namespaces::PERSISTENT,
@@ -35,5 +41,10 @@ RSpec.describe Saml::Kit::Builders::ServiceProviderMetadata do
       Saml::Kit.configuration.stripped_signing_certificate,
       Saml::Kit.configuration.stripped_encryption_certificate,
     ])
+    expect(result['EntityDescriptor']['Organization']['OrganizationName']).to eql(org_name)
+    expect(result['EntityDescriptor']['Organization']['OrganizationDisplayName']).to eql(org_name)
+    expect(result['EntityDescriptor']['Organization']['OrganizationURL']).to eql(url)
+    expect(result['EntityDescriptor']['ContactPerson']['contactType']).to eql("technical")
+    expect(result['EntityDescriptor']['ContactPerson']['Company']).to eql("mailto:#{email}")
   end
 end

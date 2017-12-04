@@ -3,6 +3,7 @@ module Saml
     module Builders
       class ServiceProviderMetadata
         attr_accessor :id, :entity_id, :acs_urls, :logout_urls, :name_id_formats, :sign
+        attr_accessor :organization_name, :organization_url, :contact_email
         attr_accessor :want_assertions_signed
 
         def initialize(configuration = Saml::Kit.configuration)
@@ -57,6 +58,14 @@ module Saml
                 acs_urls.each_with_index do |item, index|
                   xml.AssertionConsumerService Binding: item[:binding], Location: item[:location], index: index, isDefault: index == 0 ? true : false
                 end
+              end
+              xml.Organization do
+                xml.OrganizationName organization_name, 'xml:lang': "en"
+                xml.OrganizationDisplayName organization_name, 'xml:lang': "en"
+                xml.OrganizationURL organization_url, 'xml:lang': "en"
+              end
+              xml.ContactPerson contactType: "technical" do
+                xml.Company "mailto:#{contact_email}"
               end
             end
           end
