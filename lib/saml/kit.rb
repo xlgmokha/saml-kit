@@ -64,6 +64,11 @@ module Saml
       def registry
         configuration.registry
       end
+
+      def deprecate(message)
+        @deprecation ||= ActiveSupport::Deprecation.new('next-release', 'saml-kit')
+        @deprecation.deprecation_warning(message)
+      end
     end
   end
 end

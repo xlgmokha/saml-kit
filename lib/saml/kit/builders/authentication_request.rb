@@ -14,6 +14,16 @@ module Saml
           @sign = sign
         end
 
+        def acs_url
+          Saml::Kit.deprecate("acs_url is deprecated. Use assertion_consumer_service_url instead")
+          self.assertion_consumer_service_url
+        end
+
+        def acs_url=(value)
+          Saml::Kit.deprecate("acs_url= is deprecated. Use assertion_consumer_service_url= instead")
+          self.assertion_consumer_service_url = value
+        end
+
         def to_xml
           Signature.sign(sign: sign) do |xml, signature|
             xml.tag!('samlp:AuthnRequest', request_options) do
