@@ -38,7 +38,12 @@ RSpec.describe Saml::Kit::Metadata do
   </ContactPerson>
 </EntityDescriptor>
       XML
-      expect(subject.from(xml)).to be_present
+      result = subject.from(xml)
+      expect(result).to be_present
+
+      expect(result.single_sign_on_services.count).to eql(2)
+      expect(result.assertion_consumer_services.count).to eql(1)
+      expect(result.single_logout_services.count).to eql(2)
     end
   end
 end
