@@ -43,7 +43,37 @@ RSpec.describe Saml::Kit::DefaultRegistry do
       expect(result).to be_present
       expect(result).to be_instance_of(Saml::Kit::IdentityProviderMetadata)
     end
-  end
 
-  xit 'registers metadata that serves as both an IDP and SP'
+    it 'registers metadata that serves as both an IDP and SP' do
+      xml = <<-XML
+<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{Saml::Kit::Id.generate}" entityID="#{entity_id}">
+  <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
+    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
+    <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
+    <AssertionConsumerService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}" index="0" isDefault="true"/>
+  </SPSSODescriptor>
+  <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
+    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
+    <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
+    <SingleSignOnService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
+    <SingleSignOnService Binding="#{Saml::Kit::Bindings::HTTP_REDIRECT}" Location="#{FFaker::Internet.uri("https")}"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">Acme, Inc</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Acme, Inc</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://localhost:5000/</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>mailto:hi@example.com</Company>
+  </ContactPerson>
+</EntityDescriptor>
+      XML
+      stub_request(:get, url).to_return(status: 200, body: xml)
+      subject.register_url(url)
+
+      result = subject.metadata_for(entity_id)
+      expect(result).to be_present
+      expect(result).to be_instance_of(Saml::Kit::CompositeMetadata)
+    end
+  end
 end

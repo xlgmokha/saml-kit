@@ -9,12 +9,12 @@ module Saml
         @identity_provider = Saml::Kit::IdentityProviderMetadata.new(xml)
       end
 
-      def single_sign_on_services(*args)
-        identity_provider.single_sign_on_services(*args)
+      def single_sign_on_services
+        identity_provider.single_sign_on_services
       end
 
-      def assertion_consumer_services(*args)
-        service_provider.assertion_consumer_services(*args)
+      def assertion_consumer_services
+        service_provider.assertion_consumer_services
       end
 
       def services(type)

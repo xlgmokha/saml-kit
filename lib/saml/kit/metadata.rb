@@ -99,7 +99,7 @@ module Saml
       def self.from(content)
         hash = Hash.from_xml(content)
         entity_descriptor = hash["EntityDescriptor"]
-        if entity_descriptor.key?("SPSSODescriptor") || entity_descriptor.key?("IDPSSODescriptor")
+        if entity_descriptor.key?("SPSSODescriptor") && entity_descriptor.key?("IDPSSODescriptor")
           Saml::Kit::CompositeMetadata.new(content)
         elsif entity_descriptor.keys.include?("SPSSODescriptor")
           Saml::Kit::ServiceProviderMetadata.new(content)
