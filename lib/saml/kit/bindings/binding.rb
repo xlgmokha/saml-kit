@@ -25,6 +25,22 @@ module Saml
           { binding: binding, location: location }
         end
 
+        def ==(other)
+          self.to_s == other.to_s
+        end
+
+        def eql?(other)
+          self == other
+        end
+
+        def hash
+          to_s.hash
+        end
+
+        def to_s
+          "#{location}#{binding}"
+        end
+
         protected
 
         def saml_param_from(params)
