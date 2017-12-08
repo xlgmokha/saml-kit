@@ -39,4 +39,21 @@ RSpec.describe Saml::Kit::CompositeMetadata do
       ])
     end
   end
+
+  describe "#single_sign_on_service_for" do
+    it 'returns the http post binding' do
+      expect(subject.single_sign_on_service_for(binding: :http_post)).to eql(
+        Saml::Kit::Bindings::HttpPost.new(location: sign_on_service)
+      )
+    end
+
+    it 'returns the http redirect binding' do
+      expect(subject.single_sign_on_service_for(binding: :http_redirect)).to eql(
+        Saml::Kit::Bindings::HttpRedirect.new(location: sign_on_service)
+      )
+    end
+  end
+
+  describe "#assertion_consumer_services" do
+  end
 end

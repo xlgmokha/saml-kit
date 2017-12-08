@@ -13,6 +13,10 @@ module Saml
         identity_provider.single_sign_on_services
       end
 
+      def single_sign_on_service_for(*args)
+        identity_provider.single_sign_on_service_for(*args)
+      end
+
       def assertion_consumer_services
         service_provider.assertion_consumer_services
       end
