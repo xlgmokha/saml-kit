@@ -6,8 +6,9 @@ module Saml
         attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code
         attr_accessor :issuer, :sign, :destination, :encrypt
+        attr_reader :configuration
 
-        def initialize(user, request)
+        def initialize(user, request, configuration: Saml::Kit.configuration)
           @user = user
           @request = request
           @id = Id.generate
@@ -19,6 +20,7 @@ module Saml
           @destination = destination_for(request)
           @sign = want_assertions_signed
           @encrypt = false
+          @configuration = configuration
         end
 
         def want_assertions_signed
@@ -129,10 +131,6 @@ module Saml
           end
         end
 
-        def configuration
-          Saml::Kit.configuration
-        end
-
         def response_options
           {
             ID: id,
@@ -165,7 +163,7 @@ module Saml
         def conditions_options
           {
             NotBefore: now.utc.iso8601,
-            NotOnOrAfter: Saml::Kit.configuration.session_timeout.from_now.utc.iso8601,
+            NotOnOrAfter: configuration.session_timeout.from_now.utc.iso8601,
           }
         end
 

@@ -2,18 +2,21 @@ module Saml
   module Kit
     module Builders
       class ServiceProviderMetadata
+        include Saml::Kit::Templatable
         attr_accessor :id, :entity_id, :acs_urls, :logout_urls, :name_id_formats, :sign
         attr_accessor :organization_name, :organization_url, :contact_email
         attr_accessor :want_assertions_signed
+        attr_reader :configuration, :template_name
 
         def initialize(configuration = Saml::Kit.configuration)
-          @id = Id.generate
+          @acs_urls = []
           @configuration = configuration
           @entity_id = configuration.issuer
-          @acs_urls = []
+          @id = Id.generate
           @logout_urls = []
           @name_id_formats = [Namespaces::PERSISTENT]
           @sign = true
+          @template_name = 'service_provider_metadata'
           @want_assertions_signed = true
         end
 
@@ -23,52 +26,6 @@ module Saml
 
         def add_single_logout_service(url, binding: :http_post)
           @logout_urls.push(location: url, binding: Bindings.binding_for(binding))
-        end
-
-        def to_xml
-          Signature.sign(sign: sign) do |xml, signature|
-            xml.instruct!
-            xml.EntityDescriptor entity_descriptor_options do
-              signature.template(id)
-              xml.SPSSODescriptor descriptor_options do
-                if @configuration.signing_certificate_pem.present?
-                  xml.KeyDescriptor use: "signing" do
-                    xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
-                      xml.X509Data do
-                        xml.X509Certificate @configuration.stripped_signing_certificate
-                      end
-                    end
-                  end
-                end
-                if @configuration.encryption_certificate_pem.present?
-                  xml.KeyDescriptor use: "encryption" do
-                    xml.KeyInfo "xmlns": Namespaces::XMLDSIG do
-                      xml.X509Data do
-                        xml.X509Certificate @configuration.stripped_encryption_certificate
-                      end
-                    end
-                  end
-                end
-                logout_urls.each do |item|
-                  xml.SingleLogoutService Binding: item[:binding], Location: item[:location]
-                end
-                name_id_formats.each do |format|
-                  xml.NameIDFormat format
-                end
-                acs_urls.each_with_index do |item, index|
-                  xml.AssertionConsumerService Binding: item[:binding], Location: item[:location], index: index, isDefault: index == 0 ? true : false
-                end
-              end
-              xml.Organization do
-                xml.OrganizationName organization_name, 'xml:lang': "en"
-                xml.OrganizationDisplayName organization_name, 'xml:lang': "en"
-                xml.OrganizationURL organization_url, 'xml:lang': "en"
-              end
-              xml.ContactPerson contactType: "technical" do
-                xml.Company "mailto:#{contact_email}"
-              end
-            end
-          end
         end
 
         def build

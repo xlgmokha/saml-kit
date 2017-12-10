@@ -2,11 +2,13 @@ module Saml
   module Kit
     module Builders
       class LogoutRequest
+        include Saml::Kit::Templatable
         attr_accessor :id, :destination, :issuer, :name_id_format, :now
         attr_accessor :sign, :version
-        attr_reader :user
+        attr_reader :user, :configuration, :template_name
 
         def initialize(user, configuration: Saml::Kit.configuration, sign: true)
+          @configuration = configuration
           @user = user
           @id = "_#{SecureRandom.uuid}"
           @issuer = configuration.issuer
@@ -14,17 +16,7 @@ module Saml
           @now = Time.now.utc
           @version = "2.0"
           @sign = sign
-        end
-
-        def to_xml
-          Signature.sign(sign: sign) do |xml, signature|
-            xml.instruct!
-            xml.LogoutRequest logout_request_options do
-              xml.Issuer({ xmlns: Namespaces::ASSERTION }, issuer)
-              signature.template(id)
-              xml.NameID name_id_options, user.name_id_for(name_id_format)
-            end
-          end
+          @template_name = 'logout_request'
         end
 
         def build
