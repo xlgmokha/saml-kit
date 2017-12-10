@@ -18,6 +18,7 @@ RSpec.describe Saml::Kit::CompositeMetadata do
     <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
     <SingleSignOnService Binding="#{post_binding}" Location="#{sign_on_service}"/>
     <SingleSignOnService Binding="#{redirect_binding}" Location="#{sign_on_service}"/>
+    <Attribute xmlns="#{Saml::Kit::Namespaces::ASSERTION}" Name="id" ></Attribute>
   </IDPSSODescriptor>
   <Organization>
     <OrganizationName xml:lang="en">Acme, Inc</OrganizationName>
@@ -39,4 +40,16 @@ RSpec.describe Saml::Kit::CompositeMetadata do
       ])
     end
   end
+
+  describe "#single_sign_on_service_for" do
+    it 'returns the post binding' do
+      expect(subject.single_sign_on_service_for(binding: :http_post)).to eql(
+        Saml::Kit::Bindings::HttpPost.new(location: sign_on_service)
+      )
+    end
+  end
+
+  it { expect(subject.want_authn_requests_signed).to be_truthy }
+  it { expect(subject.attributes).to match_array([name: 'id', format: nil]) }
+  it { expect(subject.login_request_for(binding: :http_post)).to be_present }
 end

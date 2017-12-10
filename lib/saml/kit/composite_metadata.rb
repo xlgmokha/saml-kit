@@ -9,10 +9,6 @@ module Saml
         @identity_provider = Saml::Kit::IdentityProviderMetadata.new(xml)
       end
 
-      def single_sign_on_services
-        identity_provider.single_sign_on_services
-      end
-
       def assertion_consumer_services
         service_provider.assertion_consumer_services
       end
@@ -23,6 +19,15 @@ module Saml
           binding = item.attribute("Binding").value
           location = item.attribute("Location").value
           Saml::Kit::Bindings.create_for(binding, location)
+        end
+      end
+
+      def method_missing(name, *args)
+        puts [name, args].inspect
+        if identity_provider.respond_to?(name)
+          identity_provider.public_send(name, *args)
+        else
+          super
         end
       end
     end
