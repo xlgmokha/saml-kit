@@ -41,6 +41,10 @@ module Saml
           "#{location}#{binding}"
         end
 
+        def inspect
+          to_h.inspect
+        end
+
         protected
 
         def saml_param_from(params)

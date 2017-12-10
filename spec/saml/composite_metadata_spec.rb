@@ -125,14 +125,29 @@ RSpec.describe Saml::Kit::CompositeMetadata do
     ])
   end
   it do
+    expect(subject.service_for(type: 'SingleLogoutService', binding: :http_post)).to eql(
+      Saml::Kit::Bindings::HttpPost.new(location: sp_logout_service)
+    )
+  end
+  it do
     expect(subject.services('AssertionConsumerService')).to match_array([
       Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service),
     ])
+  end
+  it do
+    expect(subject.service_for(type: 'AssertionConsumerService', binding: :http_post)).to eql(
+      Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service),
+    )
   end
   it do
     expect(subject.services('SingleSignOnService')).to match_array([
       Saml::Kit::Bindings::HttpPost.new(location: sign_on_service),
       Saml::Kit::Bindings::HttpRedirect.new(location: sign_on_service),
     ])
+  end
+  it do
+    expect(subject.service_for(type: 'SingleSignOnService', binding: :http_post)).to eql(
+      Saml::Kit::Bindings::HttpPost.new(location: sign_on_service),
+    )
   end
 end

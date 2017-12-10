@@ -48,6 +48,14 @@ module Saml
         value
       end
 
+      def to_h
+        { use: @use, x509: @value }
+      end
+
+      def inspect
+        to_h.inspect
+      end
+
       def self.to_x509(value)
         OpenSSL::X509::Certificate.new(Base64.decode64(value))
       rescue OpenSSL::X509::CertificateError => error
