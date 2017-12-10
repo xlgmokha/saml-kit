@@ -150,4 +150,22 @@ RSpec.describe Saml::Kit::CompositeMetadata do
       Saml::Kit::Bindings::HttpPost.new(location: sign_on_service),
     )
   end
+
+  it do
+    expect(subject.single_logout_services).to match_array([
+      Saml::Kit::Bindings::HttpPost.new(location: sp_logout_service),
+      Saml::Kit::Bindings::HttpPost.new(location: idp_logout_service),
+    ])
+  end
+
+  it do
+    expect(subject.single_logout_service_for(binding: :http_post)).to eql(
+      Saml::Kit::Bindings::HttpPost.new(location: sp_logout_service)
+    )
+  end
+
+  it do
+    user = double(:user, name_id_for: SecureRandom.uuid)
+    expect(subject.logout_request_for(user)).to be_present
+  end
 end
