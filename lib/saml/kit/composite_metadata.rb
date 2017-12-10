@@ -4,13 +4,9 @@ module Saml
       attr_reader :service_provider, :identity_provider
 
       def initialize(xml)
-        super("", xml)
+        super("IDPSSODescriptor", xml)
         @service_provider = Saml::Kit::ServiceProviderMetadata.new(xml)
         @identity_provider = Saml::Kit::IdentityProviderMetadata.new(xml)
-      end
-
-      def assertion_consumer_services
-        service_provider.assertion_consumer_services
       end
 
       def services(type)
@@ -22,10 +18,15 @@ module Saml
         end
       end
 
+      def certificates
+        identity_provider.certificates + service_provider.certificates
+      end
+
       def method_missing(name, *args)
-        puts [name, args].inspect
         if identity_provider.respond_to?(name)
           identity_provider.public_send(name, *args)
+        elsif service_provider.respond_to?(name)
+          service_provider.public_send(name, *args)
         else
           super
         end
