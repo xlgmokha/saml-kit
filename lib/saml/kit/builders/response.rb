@@ -37,6 +37,10 @@ module Saml
 
         private
 
+        def assertion
+          @assertion ||= Saml::Kit::Builders::Assertion.new(self)
+        end
+
         def encryption_certificate
           request.provider.encryption_certificates.first
         end
@@ -58,38 +62,6 @@ module Saml
             Consent: Namespaces::UNSPECIFIED,
             InResponseTo: request.id,
             xmlns: Namespaces::PROTOCOL,
-          }
-        end
-
-        def assertion_options
-          {
-            ID: reference_id,
-            IssueInstant: now.iso8601,
-            Version: "2.0",
-            xmlns: Namespaces::ASSERTION,
-          }
-        end
-
-        def subject_confirmation_data_options
-          {
-            InResponseTo: request.id,
-            NotOnOrAfter: 3.hours.since(now).utc.iso8601,
-            Recipient: request.assertion_consumer_service_url,
-          }
-        end
-
-        def conditions_options
-          {
-            NotBefore: now.utc.iso8601,
-            NotOnOrAfter: configuration.session_timeout.from_now.utc.iso8601,
-          }
-        end
-
-        def authn_statement_options
-          {
-            AuthnInstant: now.iso8601,
-            SessionIndex: assertion_options[:ID],
-            SessionNotOnOrAfter: 3.hours.since(now).utc.iso8601,
           }
         end
       end
