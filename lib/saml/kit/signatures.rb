@@ -9,7 +9,7 @@ module Saml
       end
 
       def build(reference_id)
-        XmlSignature.new(reference_id, configuration: configuration, sign: sign)
+        Saml::Kit::Builders::XmlSignature.new(reference_id, configuration: configuration, sign: sign)
       end
 
       def complete(raw_xml)

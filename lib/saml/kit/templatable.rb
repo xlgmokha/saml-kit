@@ -18,7 +18,7 @@ module Saml
         if encrypt && encryption_certificate
           temp = ::Builder::XmlMarkup.new
           yield temp
-          xml_encryption = XmlEncryption.new(temp.target!, encryption_certificate.public_key)
+          xml_encryption = Saml::Kit::Builders::XmlEncryption.new(temp.target!, encryption_certificate.public_key)
           Template.new(xml_encryption).to_xml(xml: xml)
         else
           yield xml
