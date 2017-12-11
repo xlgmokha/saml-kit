@@ -3,9 +3,6 @@ module Saml
     module Requestable
       extend ActiveSupport::Concern
 
-      included do
-      end
-
       def query_string_parameter
         'SAMLRequest'
       end
