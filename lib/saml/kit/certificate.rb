@@ -1,6 +1,8 @@
 module Saml
   module Kit
     class Certificate
+      BEGIN_CERT=/-----BEGIN CERTIFICATE-----/
+      END_CERT=/-----END CERTIFICATE-----/
       attr_reader :value, :use
 
       def initialize(value, use:)
@@ -54,6 +56,10 @@ module Saml
 
       def inspect
         to_h.inspect
+      end
+
+      def stripped
+        value.to_s.gsub(BEGIN_CERT, '').gsub(END_CERT, '').gsub(/\n/, '')
       end
 
       def self.to_x509(value)

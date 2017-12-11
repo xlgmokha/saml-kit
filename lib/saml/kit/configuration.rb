@@ -31,6 +31,14 @@ module Saml
         normalize(encryption_certificate_pem)
       end
 
+      def signing_certificate
+        Saml::Kit::Certificate.new(signing_certificate_pem, use: :signing)
+      end
+
+      def encryption_certificate
+        Saml::Kit::Certificate.new(encryption_certificate_pem, use: :encryption)
+      end
+
       def signing_x509
         Certificate.to_x509(signing_certificate_pem)
       end

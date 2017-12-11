@@ -7,8 +7,8 @@ module Saml
         @target = target
       end
 
-      def to_xml(xml: ::Builder::XmlMarkup.new)
-        template.render(target, xml: xml)
+      def to_xml(options)
+        template.render(target, options)
       end
 
       private
