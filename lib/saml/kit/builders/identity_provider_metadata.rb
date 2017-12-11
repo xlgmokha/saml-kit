@@ -6,7 +6,7 @@ module Saml
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats
         attr_accessor :want_authn_requests_signed, :sign
         attr_reader :logout_urls, :single_sign_on_urls
-        attr_reader :template_name, :configuration
+        attr_reader :configuration
 
         def initialize(configuration = Saml::Kit.configuration)
           @attributes = []
@@ -17,7 +17,6 @@ module Saml
           @name_id_formats = [Namespaces::PERSISTENT]
           @sign = true
           @single_sign_on_urls = []
-          @template_name = 'identity_provider_metadata'
           @want_authn_requests_signed = true
         end
 

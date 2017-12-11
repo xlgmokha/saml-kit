@@ -1,8 +1,12 @@
 module Saml
   module Kit
     module Templatable
+      def template_name
+        "#{self.class.name.split("::").last.underscore}.builder"
+      end
+
       def template_path
-        File.join(File.expand_path(File.dirname(__FILE__)), "builders/templates/#{template_name}.builder")
+        File.join(File.expand_path(File.dirname(__FILE__)), "builders/templates/#{template_name}")
       end
 
       def template

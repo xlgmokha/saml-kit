@@ -5,7 +5,7 @@ module Saml
         include Saml::Kit::Templatable
         attr_accessor :id, :now, :issuer, :assertion_consumer_service_url, :name_id_format, :sign, :destination
         attr_accessor :version
-        attr_reader :template_name, :configuration
+        attr_reader :configuration
 
         def initialize(configuration: Saml::Kit.configuration, sign: true)
           @configuration = configuration
@@ -14,7 +14,6 @@ module Saml
           @name_id_format = Namespaces::PERSISTENT
           @now = Time.now.utc
           @sign = sign
-          @template_name = 'authn_request'
           @version = "2.0"
         end
 

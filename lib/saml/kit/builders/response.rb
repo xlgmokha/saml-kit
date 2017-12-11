@@ -38,7 +38,38 @@ module Saml
               xml.Status do
                 xml.StatusCode Value: status_code
               end
-              assertion(xml, signature)
+              with_encryption(xml) do |xml|
+                xml.Assertion(assertion_options) do
+                  xml.Issuer issuer
+                  signature.template(reference_id) unless encrypt
+                  xml.Subject do
+                    xml.NameID user.name_id_for(request.name_id_format), Format: request.name_id_format
+                    xml.SubjectConfirmation Method: Namespaces::BEARER do
+                      xml.SubjectConfirmationData "", subject_confirmation_data_options
+                    end
+                  end
+                  xml.Conditions conditions_options do
+                    xml.AudienceRestriction do
+                      xml.Audience request.issuer
+                    end
+                  end
+                  xml.AuthnStatement authn_statement_options do
+                    xml.AuthnContext do
+                      xml.AuthnContextClassRef Namespaces::PASSWORD
+                    end
+                  end
+                  assertion_attributes = user.assertion_attributes_for(request)
+                  if assertion_attributes.any?
+                    xml.AttributeStatement do
+                      assertion_attributes.each do |key, value|
+                        xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
+                          xml.AttributeValue value.to_s
+                        end
+                      end
+                    end
+                  end
+                end
+              end
             end
           end
         end
@@ -48,41 +79,6 @@ module Saml
         end
 
         private
-
-        def assertion(xml, signature)
-          with_encryption(xml) do |xml|
-            xml.Assertion(assertion_options) do
-              xml.Issuer issuer
-              signature.template(reference_id) unless encrypt
-              xml.Subject do
-                xml.NameID user.name_id_for(request.name_id_format), Format: request.name_id_format
-                xml.SubjectConfirmation Method: Namespaces::BEARER do
-                  xml.SubjectConfirmationData "", subject_confirmation_data_options
-                end
-              end
-              xml.Conditions conditions_options do
-                xml.AudienceRestriction do
-                  xml.Audience request.issuer
-                end
-              end
-              xml.AuthnStatement authn_statement_options do
-                xml.AuthnContext do
-                  xml.AuthnContextClassRef Namespaces::PASSWORD
-                end
-              end
-              assertion_attributes = user.assertion_attributes_for(request)
-              if assertion_attributes.any?
-                xml.AttributeStatement do
-                  assertion_attributes.each do |key, value|
-                    xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
-                      xml.AttributeValue value.to_s
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
 
         def with_encryption(xml)
           if encrypt
@@ -98,9 +94,6 @@ module Saml
             key = cipher.random_key
             iv = cipher.random_iv
             encrypted = cipher.update(raw_xml_to_encrypt) + cipher.final
-
-            Saml::Kit.logger.debug ['+iv', iv].inspect
-            Saml::Kit.logger.debug ['+key', key].inspect
 
             xml.EncryptedAssertion xmlns: Namespaces::ASSERTION do
               xml.EncryptedData xmlns: Namespaces::XMLENC do

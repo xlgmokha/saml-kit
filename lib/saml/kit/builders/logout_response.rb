@@ -5,7 +5,7 @@ module Saml
         include Saml::Kit::Templatable
         attr_accessor :id, :issuer, :version, :status_code, :sign, :now, :destination
         attr_reader :request
-        attr_reader :configuration, :template_name
+        attr_reader :configuration
 
         def initialize(user, request, configuration: Saml::Kit.configuration, sign: true)
           @configuration = configuration
@@ -15,7 +15,6 @@ module Saml
           @request = request
           @sign = sign
           @status_code = Namespaces::SUCCESS
-          @template_name = 'logout_response'
           @user = user
           @version = "2.0"
         end
