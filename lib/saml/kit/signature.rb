@@ -16,40 +16,37 @@ module Saml
         SHA512: "http://www.w3.org/2001/04/xmlenc#sha512",
       }.freeze
 
-      attr_reader :configuration, :sign, :xml
+      attr_reader :sign, :xml
+      attr_reader :stripped_signing_certificate
+      attr_reader :private_key
+      attr_reader :configuration
 
       def initialize(xml, configuration:, sign: true)
-        @xml = xml
         @configuration = configuration
-        @sign = sign
+        @private_key = configuration.signing_private_key
         @reference_ids = []
+        @sign = sign
+        @stripped_signing_certificate = configuration.stripped_signing_certificate
+        @xml = xml
+      end
+
+      def signature_method
+        SIGNATURE_METHODS[configuration.signature_method]
+      end
+
+      def digest_method
+        DIGEST_METHODS[configuration.digest_method]
       end
 
       def template(reference_id)
         return unless sign
         return if reference_id.blank?
         @reference_ids << reference_id
+        Template.new(self).to_xml(xml: xml)
+      end
 
-        xml.Signature "xmlns" => Namespaces::XMLDSIG do
-          xml.SignedInfo do
-            xml.CanonicalizationMethod Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
-            xml.SignatureMethod Algorithm: SIGNATURE_METHODS[configuration.signature_method]
-            xml.Reference URI: "##{reference_id}" do
-              xml.Transforms do
-                xml.Transform Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
-                xml.Transform Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
-              end
-              xml.DigestMethod Algorithm: DIGEST_METHODS[configuration.digest_method]
-              xml.DigestValue ""
-            end
-          end
-          xml.SignatureValue ""
-          xml.KeyInfo do
-            xml.X509Data do
-              xml.X509Certificate configuration.stripped_signing_certificate
-            end
-          end
-        end
+      def reference_id
+        @reference_ids.last
       end
 
       def finalize
@@ -69,12 +66,6 @@ module Saml
         signature = new(xml, sign: sign, configuration: configuration)
         yield xml, signature
         signature.finalize
-      end
-
-      private
-
-      def private_key
-        configuration.signing_private_key
       end
     end
   end
