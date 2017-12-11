@@ -9,6 +9,21 @@ module Saml
         @identity_provider = Saml::Kit::IdentityProviderMetadata.new(xml)
       end
 
+<<<<<<< HEAD
+      def single_sign_on_services
+        identity_provider.single_sign_on_services
+      end
+
+      def single_sign_on_service_for(*args)
+        identity_provider.single_sign_on_service_for(*args)
+      end
+
+      def assertion_consumer_services
+        service_provider.assertion_consumer_services
+      end
+
+=======
+>>>>>>> 14771fc562487f9c80443197a89e776d256f47c2
       def services(type)
         xpath = "//md:EntityDescriptor/md:SPSSODescriptor/md:#{type}|//md:EntityDescriptor/md:IDPSSODescriptor/md:#{type}"
         document.find_all(xpath).map do |item|

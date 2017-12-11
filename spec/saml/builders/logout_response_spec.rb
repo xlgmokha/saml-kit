@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Builders::LogoutResponse do
-  subject { described_class.new(user, request, configuration: configuration) }
-  let(:configuration) { double(issuer: issuer)  }
+  subject { described_class.new(user, request) }
   let(:user) { double(:user, name_id_for: SecureRandom.uuid) }
   let(:request) { Saml::Kit::Builders::LogoutRequest.new(user).build }
   let(:issuer) { FFaker::Internet.http_url }
@@ -12,6 +11,7 @@ RSpec.describe Saml::Kit::Builders::LogoutResponse do
     it 'builds a logout response' do
       travel_to 1.second.from_now
 
+      subject.issuer = issuer
       subject.destination = destination
       result = subject.build
       expect(result.id).to be_present

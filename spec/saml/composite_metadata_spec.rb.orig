@@ -74,11 +74,26 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   end
 
   describe "#single_sign_on_service_for" do
+<<<<<<< HEAD
+    it 'returns the http post binding' do
+=======
     it 'returns the post binding' do
+>>>>>>> 14771fc562487f9c80443197a89e776d256f47c2
       expect(subject.single_sign_on_service_for(binding: :http_post)).to eql(
         Saml::Kit::Bindings::HttpPost.new(location: sign_on_service)
       )
     end
+<<<<<<< HEAD
+
+    it 'returns the http redirect binding' do
+      expect(subject.single_sign_on_service_for(binding: :http_redirect)).to eql(
+        Saml::Kit::Bindings::HttpRedirect.new(location: sign_on_service)
+      )
+    end
+  end
+
+  describe "#assertion_consumer_services" do
+=======
   end
 
   it { expect(subject.want_authn_requests_signed).to be_truthy }
@@ -167,5 +182,6 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   it do
     user = double(:user, name_id_for: SecureRandom.uuid)
     expect(subject.logout_request_for(user)).to be_present
+>>>>>>> 14771fc562487f9c80443197a89e776d256f47c2
   end
 end

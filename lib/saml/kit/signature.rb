@@ -53,9 +53,12 @@ module Saml
       end
 
       def finalize
-        return xml.target! unless sign
+        sign ? apply_to(xml.target!) : xml.target!
+      end
 
-        raw_xml = xml.target!
+      def apply_to(raw_xml)
+        return raw_xml unless sign
+
         @reference_ids.each do |reference_id|
           raw_xml = Xmldsig::SignedDocument.new(raw_xml).sign(private_key)
         end
