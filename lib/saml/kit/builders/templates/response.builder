@@ -4,7 +4,7 @@ xml.Response response_options do
   xml.Status do
     xml.StatusCode Value: status_code
   end
-  with_encryption(xml) do |xml|
+  encryption_for(xml: xml) do |xml|
     xml.Assertion(assertion_options) do
       xml.Issuer issuer
       signature_for(reference_id: reference_id, xml: xml) unless encrypt

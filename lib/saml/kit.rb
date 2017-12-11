@@ -47,6 +47,7 @@ require "saml/kit/signature"
 require "saml/kit/template"
 require "saml/kit/xml"
 require "saml/kit/xml_decryption"
+require "saml/kit/xml_encryption"
 
 I18n.load_path += Dir[File.expand_path("kit/locales/*.yml", File.dirname(__FILE__))]
 

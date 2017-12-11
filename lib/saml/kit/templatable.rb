@@ -74,6 +74,17 @@ module Saml
       def signatures
         @signatures ||= Saml::Kit::Signatures.new(configuration: configuration, sign: sign)
       end
+
+      def encryption_for(xml:)
+        if encrypt && encryption_certificate
+          temp = ::Builder::XmlMarkup.new
+          yield temp
+          xml_encryption = XmlEncryption.new(temp.target!, encryption_certificate.public_key)
+          Template.new(xml_encryption).to_xml(xml: xml)
+        else
+          yield xml
+        end
+      end
     end
   end
 end
