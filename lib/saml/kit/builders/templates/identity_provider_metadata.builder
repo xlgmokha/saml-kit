@@ -1,6 +1,6 @@
 xml.instruct!
 xml.EntityDescriptor entity_descriptor_options do
-  signature.template(id)
+  signature_for(reference_id: id, xml: xml)
   xml.IDPSSODescriptor idp_sso_descriptor_options do
     if configuration.signing_certificate_pem.present?
       xml.KeyDescriptor use: "signing" do

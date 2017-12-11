@@ -8,9 +8,7 @@ module Saml
       end
 
       def to_xml(xml: ::Builder::XmlMarkup.new)
-        with_signature(xml: xml) do |signature|
-          template.render(target, xml: xml, signature: signature)
-        end
+        template.render(target, xml: xml)
       end
 
       private
@@ -25,13 +23,6 @@ module Saml
 
       def template
         Tilt.new(template_path)
-      end
-
-      def with_signature(xml:)
-        return yield target if target.is_a?(Saml::Kit::Signature)
-
-        signature = Saml::Kit::Signature.new(xml, configuration: target.configuration, sign: target.sign)
-        signature.apply_to(yield signature)
       end
     end
   end
