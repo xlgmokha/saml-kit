@@ -20,8 +20,8 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
     it 'returns each of the certificates' do
       expect(subject.certificates).to match_array([
-        Saml::Kit::Certificate.new(Saml::Kit.configuration.stripped_signing_certificate, use: :signing),
-        Saml::Kit::Certificate.new(Saml::Kit.configuration.stripped_encryption_certificate, use: :encryption),
+        Saml::Kit::Certificate.new(Saml::Kit.configuration.signing_certificate.stripped, use: :signing),
+        Saml::Kit::Certificate.new(Saml::Kit.configuration.encryption_certificate.stripped, use: :encryption),
       ])
     end
 

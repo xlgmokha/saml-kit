@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Certificate do
-  subject { described_class.new(Saml::Kit.configuration.stripped_signing_certificate, use: :signing) }
+  subject { Saml::Kit.configuration.signing_certificate }
 
   describe "#fingerprint" do
     it 'returns a fingerprint' do

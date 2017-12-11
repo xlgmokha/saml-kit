@@ -7,7 +7,7 @@ RSpec.describe Saml::Kit::Builders::Response do
   let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
   let(:request) { double(:request, id: Saml::Kit::Id.generate, assertion_consumer_service_url: assertion_consumer_service_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, trusted?: true, signed?: true) }
   let(:provider) { double(want_assertions_signed: false, encryption_certificates: [Saml::Kit::Certificate.new(encryption_pem, use: :encryption)]) }
-  let(:encryption_pem) { Saml::Kit.configuration.stripped_encryption_certificate }
+  let(:encryption_pem) { Saml::Kit.configuration.encryption_certificate.stripped }
   let(:issuer) { FFaker::Internet.uri("https") }
 
   before :each do

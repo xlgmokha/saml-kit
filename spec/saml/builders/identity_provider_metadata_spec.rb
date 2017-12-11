@@ -39,8 +39,8 @@ RSpec.describe Saml::Kit::Builders::IdentityProviderMetadata do
     expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['Name']).to eql("id")
     certificates = result['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor'].map { |x| x['KeyInfo']['X509Data']['X509Certificate'] }
     expect(certificates).to match_array([
-      Saml::Kit.configuration.stripped_signing_certificate,
-      Saml::Kit.configuration.stripped_encryption_certificate,
+      Saml::Kit.configuration.signing_certificate.stripped,
+      Saml::Kit.configuration.encryption_certificate.stripped,
     ])
     expect(result['EntityDescriptor']['Organization']['OrganizationName']).to eql(org_name)
     expect(result['EntityDescriptor']['Organization']['OrganizationDisplayName']).to eql(org_name)

@@ -1,9 +1,6 @@
 module Saml
   module Kit
     class Configuration
-      BEGIN_CERT=/-----BEGIN CERTIFICATE-----/
-      END_CERT=/-----END CERTIFICATE-----/
-
       attr_accessor :issuer
       attr_accessor :signature_method, :digest_method
       attr_accessor :signing_certificate_pem, :signing_private_key_pem, :signing_private_key_password
@@ -23,14 +20,6 @@ module Saml
         @logger = Logger.new(STDOUT)
       end
 
-      def stripped_signing_certificate
-        normalize(signing_certificate_pem)
-      end
-
-      def stripped_encryption_certificate
-        normalize(encryption_certificate_pem)
-      end
-
       def signing_certificate
         Saml::Kit::Certificate.new(signing_certificate_pem, use: :signing)
       end
@@ -40,11 +29,11 @@ module Saml
       end
 
       def signing_x509
-        Certificate.to_x509(signing_certificate_pem)
+        signing_certificate.x509
       end
 
       def encryption_x509
-        Certificate.to_x509(encryption_certificate_pem)
+        encryption_certificate.x509
       end
 
       def signing_private_key
@@ -53,12 +42,6 @@ module Saml
 
       def encryption_private_key
         OpenSSL::PKey::RSA.new(encryption_private_key_pem, encryption_private_key_password)
-      end
-
-      private
-
-      def normalize(certificate)
-        certificate.to_s.gsub(BEGIN_CERT, '').gsub(END_CERT, '').gsub(/\n/, '')
       end
     end
   end
