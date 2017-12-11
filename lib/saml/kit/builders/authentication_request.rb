@@ -42,7 +42,9 @@ module Saml
             IssueInstant: now.utc.iso8601,
             Destination: destination,
           }
-          options[:AssertionConsumerServiceURL] = assertion_consumer_service_url if assertion_consumer_service_url.present?
+          if assertion_consumer_service_url.present?
+            options[:AssertionConsumerServiceURL] = assertion_consumer_service_url
+          end
           options
         end
       end

@@ -44,6 +44,7 @@ require "saml/kit/invalid_document"
 require "saml/kit/self_signed_certificate"
 require "saml/kit/service_provider_metadata"
 require "saml/kit/signature"
+require "saml/kit/template"
 require "saml/kit/xml"
 require "saml/kit/xml_decryption"
 
