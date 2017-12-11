@@ -4,9 +4,8 @@ module Saml
       attr_reader :public_key
       attr_reader :key, :iv, :encrypted
 
-      def initialize(raw_xml, request)
-        encryption_certificate = request.provider.encryption_certificates.first
-        @public_key = encryption_certificate.public_key
+      def initialize(raw_xml, public_key)
+        @public_key = public_key
         cipher = OpenSSL::Cipher.new('AES-256-CBC')
         cipher.encrypt
         @key = cipher.random_key
@@ -17,6 +16,7 @@ module Saml
 
     module Builders
       class Response
+        include Templatable
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code
@@ -45,50 +45,6 @@ module Saml
           true
         end
 
-        def to_xml
-          Signature.sign(sign: sign) do |xml, signature|
-            xml.Response response_options do
-              xml.Issuer(issuer, xmlns: Namespaces::ASSERTION)
-              signature.template(id)
-              xml.Status do
-                xml.StatusCode Value: status_code
-              end
-              with_encryption(xml) do |xml|
-                xml.Assertion(assertion_options) do
-                  xml.Issuer issuer
-                  signature.template(reference_id) unless encrypt
-                  xml.Subject do
-                    xml.NameID user.name_id_for(request.name_id_format), Format: request.name_id_format
-                    xml.SubjectConfirmation Method: Namespaces::BEARER do
-                      xml.SubjectConfirmationData "", subject_confirmation_data_options
-                    end
-                  end
-                  xml.Conditions conditions_options do
-                    xml.AudienceRestriction do
-                      xml.Audience request.issuer
-                    end
-                  end
-                  xml.AuthnStatement authn_statement_options do
-                    xml.AuthnContext do
-                      xml.AuthnContextClassRef Namespaces::PASSWORD
-                    end
-                  end
-                  assertion_attributes = user.assertion_attributes_for(request)
-                  if assertion_attributes.any?
-                    xml.AttributeStatement do
-                      assertion_attributes.each do |key, value|
-                        xml.Attribute Name: key, NameFormat: Namespaces::URI, FriendlyName: key do
-                          xml.AttributeValue value.to_s
-                        end
-                      end
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
-
         def build
           Saml::Kit::Response.new(to_xml, request_id: request.id)
         end
@@ -99,7 +55,9 @@ module Saml
           if encrypt
             temp = ::Builder::XmlMarkup.new
             yield temp
-            xml_encryption = XmlEncryption.new(temp.target!, request)
+
+            encryption_certificate = request.provider.encryption_certificates.first
+            xml_encryption = XmlEncryption.new(temp.target!, encryption_certificate.public_key)
             Template.new(xml_encryption).to_xml(xml: xml)
           else
             yield xml
