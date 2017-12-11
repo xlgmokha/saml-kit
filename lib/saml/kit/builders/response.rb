@@ -1,5 +1,20 @@
 module Saml
   module Kit
+    class XmlEncryption
+      attr_reader :public_key
+      attr_reader :key, :iv, :encrypted
+
+      def initialize(raw_xml, request)
+        encryption_certificate = request.provider.encryption_certificates.first
+        @public_key = encryption_certificate.public_key
+        cipher = OpenSSL::Cipher.new('AES-256-CBC')
+        cipher.encrypt
+        @key = cipher.random_key
+        @iv = cipher.random_iv
+        @encrypted = cipher.update(raw_xml) + cipher.final
+      end
+    end
+
     module Builders
       class Response
         attr_reader :user, :request
@@ -84,33 +99,8 @@ module Saml
           if encrypt
             temp = ::Builder::XmlMarkup.new
             yield temp
-            raw_xml_to_encrypt = temp.target!
-
-            encryption_certificate = request.provider.encryption_certificates.first
-            public_key = encryption_certificate.public_key
-
-            cipher = OpenSSL::Cipher.new('AES-256-CBC')
-            cipher.encrypt
-            key = cipher.random_key
-            iv = cipher.random_iv
-            encrypted = cipher.update(raw_xml_to_encrypt) + cipher.final
-
-            xml.EncryptedAssertion xmlns: Namespaces::ASSERTION do
-              xml.EncryptedData xmlns: Namespaces::XMLENC do
-                xml.EncryptionMethod Algorithm: "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
-                xml.KeyInfo xmlns: Namespaces::XMLDSIG do
-                  xml.EncryptedKey xmlns: Namespaces::XMLENC do
-                    xml.EncryptionMethod Algorithm: "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
-                    xml.CipherData do
-                      xml.CipherValue Base64.encode64(public_key.public_encrypt(key))
-                    end
-                  end
-                end
-                xml.CipherData do
-                  xml.CipherValue Base64.encode64(iv + encrypted)
-                end
-              end
-            end
+            xml_encryption = XmlEncryption.new(temp.target!, request)
+            Template.new(xml_encryption).to_xml(xml: xml)
           else
             yield xml
           end
