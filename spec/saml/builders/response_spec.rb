@@ -103,6 +103,22 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(decrypted_hash['Assertion']['AuthnStatement']['AuthnContext']).to be_present
       expect(decrypted_hash['Assertion']['AuthnStatement']['AuthnContext']['AuthnContextClassRef']).to be_present
     end
+
+    it 'generates a signed response and encrypted assertion' do
+      subject.encrypt = true
+      subject.sign = true
+      result = Hash.from_xml(subject.to_xml)
+      expect(result['Response']['Signature']).to be_present
+      expect(result['Response']['EncryptedAssertion']).to be_present
+    end
+
+    it 'generates a signed response and assertion' do
+      subject.encrypt = false
+      subject.sign = true
+      result = Hash.from_xml(subject.to_xml)
+      expect(result['Response']['Signature']).to be_present
+      expect(result['Response']['Assertion']['Signature']).to be_present
+    end
   end
 
   describe "#destination" do
