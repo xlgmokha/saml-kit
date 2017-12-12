@@ -18,7 +18,8 @@ module Saml
       end
 
       def template_path
-        File.join(File.expand_path(File.dirname(__FILE__)), "builders/templates/#{template_name}")
+        root_path = File.expand_path(File.dirname(__FILE__))
+        File.join(root_path, "builders/templates/", template_name)
       end
 
       def template

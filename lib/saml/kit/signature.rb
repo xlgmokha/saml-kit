@@ -1,35 +1,22 @@
 module Saml
   module Kit
     class Signature
-      attr_reader :sign, :xml
-      attr_reader :configuration
+      attr_reader :signatures
+      attr_reader :xml
 
-      def initialize(xml, configuration:, sign: true)
-        @configuration = configuration
-        @sign = sign
+      def initialize(xml, signatures)
+        @signatures = signatures
         @xml = xml
       end
 
       def template(reference_id)
-        return unless sign
-        signature = signatures.build(reference_id)
-        Template.new(signature).to_xml(xml: xml)
-      end
-
-      def finalize
-        signatures.complete(xml.target!)
+        Template.new(signatures.build(reference_id)).to_xml(xml: xml)
       end
 
       def self.sign(sign: true, xml: ::Builder::XmlMarkup.new, configuration: Saml::Kit.configuration)
-        signature = new(xml, sign: sign, configuration: configuration)
-        yield xml, signature
-        signature.finalize
-      end
-
-      private
-
-      def signatures
-        @signatures ||= Saml::Kit::Signatures.new(configuration: configuration, sign: sign)
+        signatures = Saml::Kit::Signatures.new(configuration: configuration, sign: sign)
+        yield xml, new(xml, signatures)
+        signatures.complete(xml.target!)
       end
     end
   end
