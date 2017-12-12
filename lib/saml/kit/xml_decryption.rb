@@ -8,10 +8,10 @@ module Saml
       end
 
       def decrypt(data)
-        encrypt_data = data['EncryptedData']
-        symmetric_key = symmetric_key_from(encrypt_data)
-        cipher_text = Base64.decode64(encrypt_data["CipherData"]["CipherValue"])
-        to_plaintext(cipher_text, symmetric_key, encrypt_data["EncryptionMethod"]['Algorithm'])
+        encrypted_data = data['EncryptedData']
+        symmetric_key = symmetric_key_from(encrypted_data)
+        cipher_text = Base64.decode64(encrypted_data["CipherData"]["CipherValue"])
+        to_plaintext(cipher_text, symmetric_key, encrypted_data["EncryptionMethod"]['Algorithm'])
       end
 
       private
@@ -23,7 +23,7 @@ module Saml
       end
 
       def to_plaintext(cipher_text, symmetric_key, algorithm)
-        return Crypto.decryptor_for(algorithm, symmetric_key).decrypt(cipher_text)
+        Crypto.decryptor_for(algorithm, symmetric_key).decrypt(cipher_text)
       end
     end
   end
