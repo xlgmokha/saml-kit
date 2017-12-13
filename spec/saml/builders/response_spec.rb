@@ -35,6 +35,7 @@ RSpec.describe Saml::Kit::Builders::Response do
       travel_to 1.second.from_now
       allow(Saml::Kit.configuration).to receive(:issuer).and_return(issuer)
       subject.destination = assertion_consumer_service_url
+      subject.encrypt = false
       hash = Hash.from_xml(subject.to_xml)
 
       expect(hash['Response']['ID']).to be_present

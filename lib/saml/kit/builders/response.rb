@@ -19,7 +19,7 @@ module Saml
           @status_code = Namespaces::SUCCESS
           @issuer = configuration.issuer
           @sign = want_assertions_signed
-          @encrypt = false
+          @encrypt = encryption_certificate.present?
           @configuration = configuration
         end
 
@@ -42,6 +42,9 @@ module Saml
 
         def encryption_certificate
           request.provider.encryption_certificates.first
+        rescue => error
+          Saml::Kit.logger.error(error)
+          nil
         end
 
         def response_options
