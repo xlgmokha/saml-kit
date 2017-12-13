@@ -2,6 +2,9 @@ module Saml
   module Kit
     class Response < Document
       include Respondable
+      extend Forwardable
+
+      def_delegators :assertion, :name_id, :[], :attributes, :started_at, :expired_at, :audiences
 
       validate :must_be_active_session
       validate :must_match_issuer
@@ -9,26 +12,6 @@ module Saml
       def initialize(xml, request_id: nil)
         @request_id = request_id
         super(xml, name: "Response")
-      end
-
-      def name_id
-        assertion.name_id
-      end
-
-      def [](key)
-        attributes[key]
-      end
-
-      def attributes
-        assertion.attributes
-      end
-
-      def started_at
-        assertion.started_at
-      end
-
-      def expired_at
-        assertion.expired_at
       end
 
       def expired?
@@ -66,10 +49,6 @@ module Saml
         unless audiences.include?(Saml::Kit.configuration.issuer)
           errors[:audience] << error_message(:must_match_issuer)
         end
-      end
-
-      def audiences
-        assertion.audiences
       end
 
       Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::Response::Builder', 'Saml::Kit::Builders::Response')
