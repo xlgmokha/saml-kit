@@ -26,6 +26,7 @@ require "saml/kit/requestable"
 require "saml/kit/trustable"
 require "saml/kit/document"
 
+require "saml/kit/assertion"
 require "saml/kit/authentication_request"
 require "saml/kit/bindings"
 require "saml/kit/certificate"

@@ -12,7 +12,7 @@ module Saml
       end
 
       def name_id
-        assertion.fetch('Subject', {}).fetch('NameID', nil)
+        assertion.name_id
       end
 
       def [](key)
@@ -20,24 +20,15 @@ module Saml
       end
 
       def attributes
-        @attributes ||=
-          begin
-            attrs = assertion.fetch('AttributeStatement', {}).fetch('Attribute', [])
-            items = if attrs.is_a? Hash
-              [[attrs["Name"], attrs["AttributeValue"]]]
-            else
-              attrs.map { |item| [item['Name'], item['AttributeValue']] }
-            end
-            Hash[items].with_indifferent_access
-          end
+        assertion.attributes
       end
 
       def started_at
-        parse_date(assertion.fetch('Conditions', {}).fetch('NotBefore', nil))
+        assertion.started_at
       end
 
       def expired_at
-        parse_date(assertion.fetch('Conditions', {}).fetch('NotOnOrAfter', nil))
+        assertion.expired_at
       end
 
       def expired?
@@ -48,29 +39,16 @@ module Saml
         Time.current > started_at && !expired?
       end
 
-      def encrypted?
-        to_h[name]['EncryptedAssertion'].present?
-      end
-
       def assertion
-        @assertion =
-          begin
-            if encrypted?
-              decrypted = XmlDecryption.new.decrypt(to_h.fetch(name, {}).fetch('EncryptedAssertion', {}))
-              Saml::Kit.logger.debug(decrypted)
-              Hash.from_xml(decrypted)['Assertion']
-            else
-              to_h.fetch(name, {}).fetch('Assertion', {})
-            end
-          end
+        @assertion = Saml::Kit::Assertion.new(content)
       end
 
       def signed?
-        super || assertion.fetch('Signature', nil).present?
+        super || assertion.signed?
       end
 
       def certificate
-        super || assertion.fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
+        super || assertion.certificate
       end
 
       private
@@ -91,17 +69,7 @@ module Saml
       end
 
       def audiences
-        Array(assertion['Conditions']['AudienceRestriction']['Audience'])
-      rescue => error
-        Saml::Kit.logger.error(error)
-        []
-      end
-
-      def parse_date(value)
-        DateTime.parse(value)
-      rescue => error
-        Saml::Kit.logger.error(error)
-        Time.at(0).to_datetime
+        assertion.audiences
       end
 
       Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::Response::Builder', 'Saml::Kit::Builders::Response')

@@ -396,8 +396,10 @@ XML
 XML
 
       subject = described_class.new(xml)
-      expect(subject).to be_encrypted
-      expect(subject.attributes).to be_present
+      expect(subject.attributes).to match_array([
+        ["created_at", "2017-11-23T04:33:58Z"],
+        ["email", "sidney_bayer@nienowemmerich.com"]
+      ])
     end
   end
 
