@@ -3,9 +3,7 @@ require "spec_helper"
 RSpec.describe Saml::Kit::Signature do
   let(:configuration) do
     config = Saml::Kit::Configuration.new
-    config.signing_certificate_pem = certificate
-    config.signing_private_key_pem = private_key
-    config.signing_private_key_password = password
+    config.add_key_pair(certificate, private_key, password: password, use: :signing)
     config
   end
 
@@ -20,10 +18,6 @@ RSpec.describe Saml::Kit::Signature do
     x.public_key = public_key
     x.serial = 0x0
     x.version = 2
-    factory = OpenSSL::X509::ExtensionFactory.new
-    factory.subject_certificate = factory.issuer_certificate = x
-    x.extensions = [ factory.create_extension("basicConstraints","CA:TRUE", true), factory.create_extension("subjectKeyIdentifier", "hash"), ]
-    x.add_extension(factory.create_extension("authorityKeyIdentifier", "keyid:always,issuer:always"))
     x.sign(rsa_key, OpenSSL::Digest::SHA256.new)
     x.to_pem
   end

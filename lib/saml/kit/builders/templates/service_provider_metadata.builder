@@ -2,8 +2,8 @@ xml.instruct!
 xml.EntityDescriptor entity_descriptor_options do
   signature_for(reference_id: id, xml: xml)
   xml.SPSSODescriptor descriptor_options do
-    if configuration.signing_certificate_pem.present?
-      render configuration.signing_certificate, xml: xml
+    configuration.certificates(use: :signing).each do |certificate|
+      render certificate, xml: xml
     end
     if configuration.encryption_certificate_pem.present?
       render configuration.encryption_certificate, xml: xml
