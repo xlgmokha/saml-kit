@@ -5,7 +5,7 @@ module Saml
         include Templatable
         extend Forwardable
 
-        def_delegators :@response_builder, :encrypt, :sign, :request, :issuer, :reference_id, :now, :configuration, :user, :version
+        def_delegators :@response_builder, :encrypt, :sign, :request, :issuer, :reference_id, :now, :configuration, :user, :version, :destination
 
         def initialize(response_builder)
           @response_builder = response_builder
@@ -38,7 +38,7 @@ module Saml
           {
             InResponseTo: request.id,
             NotOnOrAfter: 3.hours.since(now).utc.iso8601,
-            Recipient: request.assertion_consumer_service_url,
+            Recipient: destination,
           }
         end
 

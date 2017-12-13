@@ -18,7 +18,6 @@ module Saml
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
           @issuer = configuration.issuer
-          @destination = destination_for(request)
           @sign = want_assertions_signed
           @encrypt = false
           @configuration = configuration
@@ -43,14 +42,6 @@ module Saml
 
         def encryption_certificate
           request.provider.encryption_certificates.first
-        end
-
-        def destination_for(request)
-          if request.signed? && request.trusted?
-            request.assertion_consumer_service_url || request.provider.assertion_consumer_service_for(binding: :http_post).try(:location)
-          else
-            request.provider.assertion_consumer_service_for(binding: :http_post).try(:location)
-          end
         end
 
         def response_options
