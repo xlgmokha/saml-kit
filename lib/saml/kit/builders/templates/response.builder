@@ -5,7 +5,5 @@ xml.Response response_options do
   xml.Status do
     xml.StatusCode Value: status_code
   end
-  encryption_for(xml: xml) do |xml|
-    render assertion, xml: xml
-  end
+  render assertion, xml: xml
 end
