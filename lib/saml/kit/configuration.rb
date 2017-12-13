@@ -24,16 +24,13 @@ module Saml
         })
       end
 
-      def certificates(use: :signing)
-        key_pairs.map { |x| x[:certificate] }.find_all { |x| x.for?(use) }
+      def certificates(use: nil)
+        certificates = key_pairs.map { |x| x[:certificate] }
+        use.present? ? certificates.find_all { |x| x.for?(use) } : certificates
       end
 
       def private_keys(use: :signing)
         key_pairs.find_all { |x| x[:certificate].for?(use) }.map { |x| x[:private_key] }
-      end
-
-      def signing_certificate
-        certificates(use: :signing).last
       end
 
       def encryption_certificate

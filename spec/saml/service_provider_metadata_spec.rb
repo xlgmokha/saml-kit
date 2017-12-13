@@ -19,10 +19,10 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     end
 
     it 'returns each of the certificates' do
-      expect(subject.certificates).to match_array([
-        Saml::Kit::Certificate.new(Saml::Kit.configuration.signing_certificate.stripped, use: :signing),
-        Saml::Kit::Certificate.new(Saml::Kit.configuration.encryption_certificate.stripped, use: :encryption),
-      ])
+      expected_certificates = Saml::Kit.configuration.certificates.map do |x|
+        Saml::Kit::Certificate.new(x.stripped, use: x.use)
+      end
+      expect(subject.certificates).to match_array(expected_certificates)
     end
 
     it 'returns each acs url and binding' do

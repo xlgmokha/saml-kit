@@ -25,7 +25,7 @@ module Saml
           @configuration = configuration
           @reference_id = reference_id
           @sign = sign
-          @x509_certificate = configuration.signing_certificate.stripped
+          @x509_certificate = configuration.certificates(use: :signing).last.stripped
         end
 
         def signature_method

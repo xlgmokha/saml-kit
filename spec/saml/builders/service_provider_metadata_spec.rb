@@ -37,10 +37,8 @@ RSpec.describe Saml::Kit::Builders::ServiceProviderMetadata do
     expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['index']).to eql('0')
     expect(result['EntityDescriptor']['Signature']).to be_present
     expect(result['EntityDescriptor']['SPSSODescriptor']['KeyDescriptor'].map { |x| x['use'] }).to match_array(['signing', 'encryption'])
-    expect(result['EntityDescriptor']['SPSSODescriptor']['KeyDescriptor'].map { |x| x['KeyInfo']['X509Data']['X509Certificate'] }).to match_array([
-      Saml::Kit.configuration.signing_certificate.stripped,
-      Saml::Kit.configuration.encryption_certificate.stripped,
-    ])
+    expected_certificates = Saml::Kit.configuration.certificates.map(&:stripped)
+    expect(result['EntityDescriptor']['SPSSODescriptor']['KeyDescriptor'].map { |x| x['KeyInfo']['X509Data']['X509Certificate'] }).to match_array(expected_certificates)
     expect(result['EntityDescriptor']['Organization']['OrganizationName']).to eql(org_name)
     expect(result['EntityDescriptor']['Organization']['OrganizationDisplayName']).to eql(org_name)
     expect(result['EntityDescriptor']['Organization']['OrganizationURL']).to eql(url)

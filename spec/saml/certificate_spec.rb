@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Certificate do
-  subject { Saml::Kit.configuration.signing_certificate }
+  subject { Saml::Kit.configuration.certificates(use: :signing).last }
 
   describe "#fingerprint" do
     it 'returns a fingerprint' do
