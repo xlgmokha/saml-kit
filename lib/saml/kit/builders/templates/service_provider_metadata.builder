@@ -5,8 +5,8 @@ xml.EntityDescriptor entity_descriptor_options do
     configuration.certificates(use: :signing).each do |certificate|
       render certificate, xml: xml
     end
-    if configuration.encryption_certificate_pem.present?
-      render configuration.encryption_certificate, xml: xml
+    configuration.certificates(use: :encryption).each do |certificate|
+      render certificate, xml: xml
     end
     logout_urls.each do |item|
       xml.SingleLogoutService Binding: item[:binding], Location: item[:location]

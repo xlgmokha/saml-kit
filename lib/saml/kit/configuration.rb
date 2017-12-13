@@ -3,21 +3,18 @@ module Saml
     class Configuration
       attr_accessor :issuer
       attr_accessor :signature_method, :digest_method
-      attr_accessor :encryption_certificate_pem, :encryption_private_key_pem, :encryption_private_key_password
       attr_accessor :registry, :session_timeout
       attr_accessor :logger
 
       def initialize
         @signature_method = :SHA256
         @digest_method = :SHA256
-        signing_private_key_password = SecureRandom.uuid
-        @encryption_private_key_password = SecureRandom.uuid
-        signing_certificate_pem, signing_private_key_pem = SelfSignedCertificate.new(signing_private_key_password).create
-        add_key_pair(signing_certificate_pem, signing_private_key_pem, password: signing_private_key_password, use: :signing)
-        @encryption_certificate_pem, @encryption_private_key_pem = SelfSignedCertificate.new(@encryption_private_key_password).create
         @registry = DefaultRegistry.new
         @session_timeout = 3.hours
         @logger = Logger.new(STDOUT)
+
+        create_default_key_pair_for(use: :signing)
+        create_default_key_pair_for(use: :encryption)
       end
 
       def add_key_pair(certificate, private_key, password:, use: :signing)
@@ -40,7 +37,7 @@ module Saml
       end
 
       def encryption_certificate
-        Saml::Kit::Certificate.new(encryption_certificate_pem, use: :encryption)
+        certificates(use: :encryption).last
       end
 
       def signing_private_key
@@ -48,13 +45,19 @@ module Saml
       end
 
       def encryption_private_key
-        OpenSSL::PKey::RSA.new(encryption_private_key_pem, encryption_private_key_password)
+        private_keys(use: :encryption).last
       end
 
       private
 
       def key_pairs
         @key_pairs ||= []
+      end
+
+      def create_default_key_pair_for(use:)
+        private_key_password = SecureRandom.uuid
+        certificate_pem, private_key_pem = SelfSignedCertificate.new(private_key_password).create
+        add_key_pair(certificate_pem, private_key_pem, password: private_key_password, use: use)
       end
     end
   end
