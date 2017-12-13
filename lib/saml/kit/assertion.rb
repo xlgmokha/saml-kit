@@ -1,9 +1,8 @@
 module Saml
   module Kit
     class Assertion
-      def initialize(xml)
-        @xml = xml
-        @xml_hash = Hash.from_xml(xml) || {}
+      def initialize(xml_hash)
+        @xml_hash = xml_hash
       end
 
       def name_id

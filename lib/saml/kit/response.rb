@@ -23,7 +23,7 @@ module Saml
       end
 
       def assertion
-        @assertion = Saml::Kit::Assertion.new(content)
+        @assertion = Saml::Kit::Assertion.new(to_h)
       end
 
       def signed?
