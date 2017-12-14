@@ -22,10 +22,9 @@ module Saml
         })
       end
 
-      def generate_key_pair_for(use:)
-        private_key_password = SecureRandom.uuid
-        certificate_pem, private_key_pem = SelfSignedCertificate.new(private_key_password).create
-        add_key_pair(certificate_pem, private_key_pem, password: private_key_password, use: use)
+      def generate_key_pair_for(use:, password: SecureRandom.uuid)
+        certificate, private_key = SelfSignedCertificate.new(password).create
+        add_key_pair(certificate, private_key, password: password, use: use)
       end
 
       def certificates(use: nil)
@@ -38,14 +37,17 @@ module Saml
       end
 
       def encryption_certificate
+        Saml::Kit.deprecate("encryption_certificate is deprecated. Use certificates(use: :encryption) instead")
         certificates(use: :encryption).last
       end
 
       def signing_private_key
+        Saml::Kit.deprecate("signing_private_key is deprecated. Use private_keys(use: :signing) instead")
         private_keys(use: :signing).last
       end
 
       def encryption_private_key
+        Saml::Kit.deprecate("encryption_private_key is deprecated. Use private_keys(use: :encryption) instead")
         private_keys(use: :encryption).last
       end
 
