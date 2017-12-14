@@ -34,17 +34,17 @@ module Saml
           Saml::Kit::Response.new(to_xml, request_id: request.id, configuration: configuration)
         end
 
-        private
-
-        def assertion
-          @assertion ||= Saml::Kit::Builders::Assertion.new(self)
-        end
-
         def encryption_certificate
           request.provider.encryption_certificates.first
         rescue => error
           Saml::Kit.logger.error(error)
           nil
+        end
+
+        private
+
+        def assertion
+          @assertion ||= Saml::Kit::Builders::Assertion.new(self)
         end
 
         def response_options

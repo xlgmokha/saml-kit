@@ -21,7 +21,7 @@ RSpec.describe Saml::Kit::Signature do
     x.sign(rsa_key, OpenSSL::Digest::SHA256.new)
     x.to_pem
   end
-  let(:private_key) { rsa_key.to_pem(OpenSSL::Cipher::Cipher.new('des3'), password) }
+  let(:private_key) { rsa_key.to_pem(OpenSSL::Cipher.new('des3'), password) }
   let(:password) { "password" }
 
   it 'generates a signature' do
