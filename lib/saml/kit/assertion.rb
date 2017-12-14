@@ -1,7 +1,7 @@
 module Saml
   module Kit
     class Assertion
-      def initialize(xml_hash, configuration: configuration)
+      def initialize(xml_hash, configuration:)
         @xml_hash = xml_hash
         @configuration = configuration
       end
