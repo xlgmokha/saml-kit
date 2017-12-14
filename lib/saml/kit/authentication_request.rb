@@ -3,8 +3,8 @@ module Saml
     class AuthenticationRequest < Document
       include Requestable
 
-      def initialize(xml)
-        super(xml, name: "AuthnRequest")
+      def initialize(xml, configuration: Saml::Kit.configuration)
+        super(xml, name: "AuthnRequest", configuration: configuration)
       end
 
       def assertion_consumer_service_url

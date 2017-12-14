@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::AuthenticationRequest do
-  subject { described_class.new(raw_xml) }
+  subject { described_class.new(raw_xml, configuration: configuration) }
   let(:id) { Saml::Kit::Id.generate }
   let(:assertion_consumer_service_url) { "https://#{FFaker::Internet.domain_name}/acs" }
   let(:issuer) { FFaker::Movie.title }
@@ -17,6 +17,11 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       builder.destination = destination
     end.to_xml
   end
+  let(:configuration) do
+    Saml::Kit::Configuration.new do |config|
+      config.generate_key_pair_for(use: :signing)
+    end
+  end
 
   it { expect(subject.issuer).to eql(issuer) }
   it { expect(subject.id).to eql(id) }
@@ -29,13 +34,13 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     let(:metadata) { instance_double(Saml::Kit::ServiceProviderMetadata) }
 
     before :each do
-      allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
+      allow(configuration).to receive(:registry).and_return(registry)
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
     end
 
     it 'is valid when left untampered' do
-      subject = described_class.new(raw_xml)
+      subject = described_class.new(raw_xml, configuration: configuration)
       expect(subject).to be_valid
     end
 

@@ -11,8 +11,7 @@ module Saml
 
       def initialize(xml, request_id: nil, configuration: Saml::Kit.configuration)
         @request_id = request_id
-        @configuration = configuration
-        super(xml, name: "Response")
+        super(xml, name: "Response", configuration: configuration)
       end
 
       def expired?
@@ -47,7 +46,7 @@ module Saml
         return unless expected_type?
         return unless success?
 
-        unless audiences.include?(Saml::Kit.configuration.issuer)
+        unless audiences.include?(configuration.issuer)
           errors[:audience] << error_message(:must_match_issuer)
         end
       end

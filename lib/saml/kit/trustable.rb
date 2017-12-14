@@ -30,7 +30,7 @@ module Saml
       end
 
       def provider
-        Saml::Kit.registry.metadata_for(issuer)
+        configuration.registry.metadata_for(issuer)
       end
 
       def signature_verified!

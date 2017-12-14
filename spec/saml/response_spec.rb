@@ -6,11 +6,13 @@ RSpec.describe Saml::Kit::Response do
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
-    subject { described_class.build(user, request) }
-
-    before :each do
-      allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
-      allow(Saml::Kit.configuration).to receive(:issuer).and_return(request.issuer)
+    subject { described_class.build(user, request, configuration: configuration) }
+    let(:configuration) do
+      Saml::Kit::Configuration.new do |config|
+        config.issuer = request.issuer
+        config.registry = registry
+        config.generate_key_pair_for(use: :signing)
+      end
     end
 
     it 'is valid' do

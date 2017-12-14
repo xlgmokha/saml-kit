@@ -12,8 +12,6 @@ module Saml
         @registry = DefaultRegistry.new
         @session_timeout = 3.hours
         @logger = Logger.new(STDOUT)
-        #generate_key_pair_for(use: :signing)
-        #generate_key_pair_for(use: :encryption)
         yield self if block_given?
       end
 

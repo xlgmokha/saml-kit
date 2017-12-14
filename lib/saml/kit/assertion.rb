@@ -49,7 +49,7 @@ module Saml
       private
 
       def encrypted?
-        @xml_hash['Response']['EncryptedAssertion'].present?
+        @xml_hash.fetch('Response', {}).fetch('EncryptedAssertion', nil).present?
       end
 
       def assertion
@@ -58,7 +58,7 @@ module Saml
           Saml::Kit.logger.debug(decrypted)
           Hash.from_xml(decrypted)['Assertion']
         else
-          @xml_hash['Response'].fetch('Assertion', {})
+          @xml_hash.fetch('Response', {}).fetch('Assertion', {})
         end
       end
 

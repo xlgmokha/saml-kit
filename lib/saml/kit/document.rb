@@ -12,9 +12,10 @@ module Saml
       validate :must_be_expected_type
       validate :must_be_valid_version
 
-      attr_reader :content, :name
+      attr_reader :content, :name, :configuration
 
-      def initialize(xml, name:)
+      def initialize(xml, name:, configuration: Saml::Kit.configuration)
+        @configuration = configuration
         @content = xml
         @name = name
         @xml_hash = Hash.from_xml(xml) || {}
