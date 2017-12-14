@@ -52,13 +52,18 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
   describe "#validate" do
     let(:service_provider_metadata) do
-      described_class.build do |builder|
+      described_class.build(configuration: configuration) do |builder|
         builder.entity_id = entity_id
         builder.add_assertion_consumer_service(acs_post_url, binding: :http_post)
         builder.add_assertion_consumer_service(acs_redirect_url, binding: :http_redirect)
         builder.add_single_logout_service(logout_post_url, binding: :http_post)
         builder.add_single_logout_service(logout_redirect_url, binding: :http_redirect)
       end.to_xml
+    end
+    let(:configuration) do
+      Saml::Kit::Configuration.new do |config|
+        config.generate_key_pair_for(use: :signing)
+      end
     end
 
     it 'valid when given valid service provider metadata' do
