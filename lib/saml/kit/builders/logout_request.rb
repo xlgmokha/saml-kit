@@ -4,10 +4,10 @@ module Saml
       class LogoutRequest
         include Saml::Kit::Templatable
         attr_accessor :id, :destination, :issuer, :name_id_format, :now
-        attr_accessor :sign, :version
+        attr_accessor :version
         attr_reader :user, :configuration
 
-        def initialize(user, configuration: Saml::Kit.configuration, sign: true)
+        def initialize(user, configuration: Saml::Kit.configuration)
           @configuration = configuration
           @user = user
           @id = "_#{SecureRandom.uuid}"
@@ -15,7 +15,6 @@ module Saml
           @name_id_format = Saml::Kit::Namespaces::PERSISTENT
           @now = Time.now.utc
           @version = "2.0"
-          @sign = sign
         end
 
         def build

@@ -1,20 +1,19 @@
 module Saml
   module Kit
     class Signatures
-      attr_reader :sign, :configuration
+      attr_reader :configuration
 
-      def initialize(configuration:, sign: true)
+      def initialize(configuration:)
         @configuration = configuration
-        @sign = sign
       end
 
       def build(reference_id)
-        return nil unless sign
-        Saml::Kit::Builders::XmlSignature.new(reference_id, configuration: configuration, sign: sign)
+        return nil unless configuration.sign?
+        Saml::Kit::Builders::XmlSignature.new(reference_id, configuration: configuration)
       end
 
       def complete(raw_xml)
-        return raw_xml unless sign
+        return raw_xml unless configuration.sign?
         private_key = configuration.signing_private_key
         Xmldsig::SignedDocument.new(raw_xml).sign(private_key)
       end

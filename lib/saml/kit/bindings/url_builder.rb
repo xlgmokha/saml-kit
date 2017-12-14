@@ -3,21 +3,25 @@ module Saml
     module Bindings
       class UrlBuilder
         include Serializable
+        attr_reader :configuration
 
-        def initialize(private_key: Saml::Kit.configuration.signing_private_key)
-          @private_key = private_key
+        def initialize(configuration: Saml::Kit.configuration)
+          @configuration = configuration
         end
 
         def build(saml_document, relay_state: nil)
           payload = canonicalize(saml_document, relay_state)
-          "#{saml_document.destination}?#{payload}&Signature=#{signature_for(payload)}"
+          if configuration.sign?
+            "#{saml_document.destination}?#{payload}&Signature=#{signature_for(payload)}"
+          else
+            "#{saml_document.destination}?#{payload}"
+          end
         end
 
         private
 
-        attr_reader :private_key
-
         def signature_for(payload)
+          private_key = configuration.signing_private_key
           encode(private_key.sign(OpenSSL::Digest::SHA256.new, payload))
         end
 

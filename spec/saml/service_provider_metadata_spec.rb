@@ -113,7 +113,12 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
   end
 
   describe "#matches?" do
-    subject { Saml::Kit::ServiceProviderMetadata.build }
+    let(:configuration) do
+      config = Saml::Kit::Configuration.new
+      config.generate_key_pair_for(use: :signing)
+      config
+    end
+    subject { Saml::Kit::ServiceProviderMetadata.build(configuration: configuration) }
 
     it 'returns true when the fingerprint matches one of the signing certificates' do
       certificate = Hash.from_xml(subject.to_xml)['EntityDescriptor']['Signature']['KeyInfo']['X509Data']['X509Certificate']

@@ -4,18 +4,17 @@ module Saml
       class IdentityProviderMetadata
         include Saml::Kit::Templatable
         attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats
-        attr_accessor :want_authn_requests_signed, :sign
+        attr_accessor :want_authn_requests_signed
         attr_reader :logout_urls, :single_sign_on_urls
         attr_reader :configuration
 
-        def initialize(configuration = Saml::Kit.configuration)
+        def initialize(configuration: Saml::Kit.configuration)
           @attributes = []
           @configuration = configuration
           @entity_id = configuration.issuer
           @id = Id.generate
           @logout_urls = []
           @name_id_formats = [Namespaces::PERSISTENT]
-          @sign = true
           @single_sign_on_urls = []
           @want_authn_requests_signed = true
         end

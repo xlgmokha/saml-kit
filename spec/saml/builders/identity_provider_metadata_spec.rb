@@ -1,7 +1,13 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Builders::IdentityProviderMetadata do
-  subject { described_class.new }
+  subject { described_class.new(configuration: configuration) }
+  let(:configuration) do
+    Saml::Kit::Configuration.new do |config|
+      config.generate_key_pair_for(use: :signing)
+      config.generate_key_pair_for(use: :encryption)
+    end
+  end
   let(:email) { FFaker::Internet.email }
   let(:org_name) { FFaker::Movie.title }
   let(:url) { FFaker::Internet.uri("https") }
@@ -38,7 +44,7 @@ RSpec.describe Saml::Kit::Builders::IdentityProviderMetadata do
     expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Location']).to eql("https://www.example.com/logout")
     expect(result['EntityDescriptor']['IDPSSODescriptor']['Attribute']['Name']).to eql("id")
     certificates = result['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor'].map { |x| x['KeyInfo']['X509Data']['X509Certificate'] }
-    expected_certificates = Saml::Kit.configuration.certificates.map(&:stripped)
+    expected_certificates = configuration.certificates.map(&:stripped)
     expect(certificates).to match_array(expected_certificates)
     expect(result['EntityDescriptor']['Organization']['OrganizationName']).to eql(org_name)
     expect(result['EntityDescriptor']['Organization']['OrganizationDisplayName']).to eql(org_name)

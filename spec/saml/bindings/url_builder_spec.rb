@@ -13,6 +13,13 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
       [Saml::Kit::LogoutResponse, 'SAMLResponse'],
     ].each do |(response_type, query_string_parameter)|
       describe response_type.to_s do
+        subject { described_class.new(configuration: configuration) }
+        let(:configuration) do
+          Saml::Kit::Configuration.new do |config|
+            config.generate_key_pair_for(use: :signing)
+          end
+        end
+
         let(:response) { instance_double(response_type, destination: destination, to_xml: xml, query_string_parameter: query_string_parameter) }
 
         def to_query_params(url)
@@ -54,7 +61,7 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
           payload = "#{query_string_parameter}=#{query_params[query_string_parameter]}"
           payload << "&RelayState=#{query_params['RelayState']}"
           payload << "&SigAlg=#{query_params['SigAlg']}"
-          expected_signature = Base64.strict_encode64(Saml::Kit.configuration.signing_private_key.sign(OpenSSL::Digest::SHA256.new, payload))
+          expected_signature = Base64.strict_encode64(configuration.signing_private_key.sign(OpenSSL::Digest::SHA256.new, payload))
           expect(query_params['Signature']).to eql(expected_signature)
         end
 
@@ -65,7 +72,7 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
 
           payload = "#{query_string_parameter}=#{query_params[query_string_parameter]}"
           payload << "&SigAlg=#{query_params['SigAlg']}"
-          expected_signature = Base64.strict_encode64(Saml::Kit.configuration.signing_private_key.sign(OpenSSL::Digest::SHA256.new, payload))
+          expected_signature = Base64.strict_encode64(configuration.signing_private_key.sign(OpenSSL::Digest::SHA256.new, payload))
           expect(query_params['Signature']).to eql(expected_signature)
         end
       end

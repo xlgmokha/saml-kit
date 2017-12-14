@@ -3,8 +3,8 @@ module Saml
     class XmlDecryption
       attr_reader :private_key
 
-      def initialize(private_key = Saml::Kit.configuration.encryption_private_key)
-        @private_key = private_key
+      def initialize(configuration: Saml::Kit.configuration)
+        @private_key = configuration.encryption_private_key
       end
 
       def decrypt(data)

@@ -6,7 +6,7 @@ module Saml
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code
-        attr_accessor :issuer, :sign, :destination, :encrypt
+        attr_accessor :issuer, :destination, :encrypt
         attr_reader :configuration
 
         def initialize(user, request, configuration: Saml::Kit.configuration)
@@ -27,11 +27,11 @@ module Saml
           request.provider.want_assertions_signed
         rescue => error
           Saml::Kit.logger.error(error)
-          true
+          nil
         end
 
         def build
-          Saml::Kit::Response.new(to_xml, request_id: request.id)
+          Saml::Kit::Response.new(to_xml, request_id: request.id, configuration: configuration)
         end
 
         private

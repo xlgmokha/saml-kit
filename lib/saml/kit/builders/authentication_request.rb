@@ -3,17 +3,16 @@ module Saml
     module Builders
       class AuthenticationRequest
         include Saml::Kit::Templatable
-        attr_accessor :id, :now, :issuer, :assertion_consumer_service_url, :name_id_format, :sign, :destination
+        attr_accessor :id, :now, :issuer, :assertion_consumer_service_url, :name_id_format, :destination
         attr_accessor :version
         attr_reader :configuration
 
-        def initialize(configuration: Saml::Kit.configuration, sign: true)
+        def initialize(configuration: Saml::Kit.configuration)
           @configuration = configuration
           @id = Id.generate
           @issuer = configuration.issuer
           @name_id_format = Namespaces::PERSISTENT
           @now = Time.now.utc
-          @sign = sign
           @version = "2.0"
         end
 

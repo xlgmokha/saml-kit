@@ -1,17 +1,23 @@
 module Saml
   module Kit
     module Templatable
+      attr_accessor :sign
+
       def to_xml(xml: ::Builder::XmlMarkup.new)
         signatures.complete(render(self, xml: xml))
       end
 
       def signature_for(reference_id:, xml:)
-        return unless sign
+        return unless sign?
         render(signatures.build(reference_id), xml: xml)
       end
 
+      def sign?
+        sign.nil? ? configuration.sign? : sign && configuration.sign?
+      end
+
       def signatures
-        @signatures ||= Saml::Kit::Signatures.new(configuration: configuration, sign: sign)
+        @signatures ||= Saml::Kit::Signatures.new(configuration: configuration)
       end
 
       def encryption_for(xml:)

@@ -78,7 +78,9 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
     it 'validates the schema of the request' do
       id = Saml::Kit::Id.generate
-      signed_xml = Saml::Kit::Signature.sign(sign: true) do |xml, signature|
+      configuration = Saml::Kit::Configuration.new
+      configuration.generate_key_pair_for(use: :signing)
+      signed_xml = Saml::Kit::Signature.sign(configuration: configuration) do |xml, signature|
         xml.tag!('samlp:AuthnRequest', "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, AssertionConsumerServiceURL: assertion_consumer_service_url, ID: id) do
           signature.template(id)
           xml.Fake do

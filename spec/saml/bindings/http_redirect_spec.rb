@@ -6,9 +6,14 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
   describe "#serialize" do
     let(:relay_state) { "ECHO" }
+    let(:configuration) do
+      Saml::Kit::Configuration.new do |config|
+        config.generate_key_pair_for(use: :signing)
+      end
+    end
 
     it 'encodes the request using the HTTP-Redirect encoding' do
-      builder = Saml::Kit::AuthenticationRequest.builder_class.new
+      builder = Saml::Kit::AuthenticationRequest.builder_class.new(configuration: configuration)
       url, _ = subject.serialize(builder, relay_state: relay_state)
       expect(url).to start_with(location)
       expect(url).to have_query_param('SAMLRequest')

@@ -17,15 +17,6 @@ module Saml
         certificate.public_key = public_key
         certificate.serial = 0x0
         certificate.version = 2
-        factory = OpenSSL::X509::ExtensionFactory.new
-        factory.subject_certificate = factory.issuer_certificate = certificate
-        certificate.extensions = [
-          factory.create_extension("basicConstraints","CA:TRUE", true),
-          factory.create_extension("subjectKeyIdentifier", "hash"),
-        ]
-        certificate.add_extension(
-          factory.create_extension("authorityKeyIdentifier", "keyid:always,issuer:always")
-        )
         certificate.sign(rsa_key, OpenSSL::Digest::SHA256.new)
         [
           certificate.to_pem,

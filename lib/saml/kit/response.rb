@@ -9,8 +9,9 @@ module Saml
       validate :must_be_active_session
       validate :must_match_issuer
 
-      def initialize(xml, request_id: nil)
+      def initialize(xml, request_id: nil, configuration: Saml::Kit.configuration)
         @request_id = request_id
+        @configuration = configuration
         super(xml, name: "Response")
       end
 
@@ -23,7 +24,7 @@ module Saml
       end
 
       def assertion
-        @assertion = Saml::Kit::Assertion.new(to_h)
+        @assertion = Saml::Kit::Assertion.new(to_h, configuration: @configuration)
       end
 
       def signed?

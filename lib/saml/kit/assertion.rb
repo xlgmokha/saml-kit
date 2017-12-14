@@ -1,8 +1,9 @@
 module Saml
   module Kit
     class Assertion
-      def initialize(xml_hash)
+      def initialize(xml_hash, configuration: configuration)
         @xml_hash = xml_hash
+        @configuration = configuration
       end
 
       def name_id
@@ -53,7 +54,7 @@ module Saml
 
       def assertion
         if encrypted?
-          decrypted = XmlDecryption.new.decrypt(@xml_hash['Response']['EncryptedAssertion'])
+          decrypted = XmlDecryption.new(configuration: @configuration).decrypt(@xml_hash['Response']['EncryptedAssertion'])
           Saml::Kit.logger.debug(decrypted)
           Hash.from_xml(decrypted)['Assertion']
         else

@@ -55,7 +55,9 @@ RSpec.describe Saml::Kit::Response do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       id = Saml::Kit::Id.generate
-      signed_xml = Saml::Kit::Signature.sign(sign: true) do |xml, signature|
+      configuration = Saml::Kit::Configuration.new
+      configuration.generate_key_pair_for(use: :signing)
+      signed_xml = Saml::Kit::Signature.sign(configuration: configuration) do |xml, signature|
         xml.tag! "samlp:Response", "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, ID: id do
           signature.template(id)
           xml.Fake do

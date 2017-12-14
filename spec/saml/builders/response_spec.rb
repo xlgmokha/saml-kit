@@ -1,18 +1,20 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Builders::Response do
-  subject { described_class.new(user, request) }
+  subject { described_class.new(user, request, configuration: configuration) }
+  let(:configuration) do
+    Saml::Kit::Configuration.new do |config|
+      config.issuer = issuer
+      config.generate_key_pair_for(use: :signing)
+      config.generate_key_pair_for(use: :encryption)
+    end
+  end
   let(:email) { FFaker::Internet.email }
   let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
   let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
   let(:request) { double(:request, id: Saml::Kit::Id.generate, assertion_consumer_service_url: assertion_consumer_service_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, trusted?: true, signed?: true) }
-  let(:provider) { double(want_assertions_signed: false, encryption_certificates: [Saml::Kit::Certificate.new(encryption_pem, use: :encryption)]) }
-  let(:encryption_pem) { Saml::Kit.configuration.encryption_certificate.stripped }
+  let(:provider) { double(:provider, want_assertions_signed: false, encryption_certificates: [configuration.encryption_certificate] ) }
   let(:issuer) { FFaker::Internet.uri("https") }
-
-  before :each do
-    allow(Saml::Kit.configuration).to receive(:issuer).and_return(issuer)
-  end
 
   describe "#build" do
     it 'builds a response with the request_id' do
@@ -20,7 +22,7 @@ RSpec.describe Saml::Kit::Builders::Response do
     end
 
     it 'builds a valid encrypted assertion' do
-      allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
+      allow(configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
       allow(provider).to receive(:matches?).and_return(true)
 
       subject.sign = true
@@ -83,6 +85,7 @@ RSpec.describe Saml::Kit::Builders::Response do
       metadata = builder.build
       allow(request).to receive(:provider).and_return(metadata)
 
+      subject = described_class.new(user, request)
       hash = Hash.from_xml(subject.to_xml)
       expect(hash['Response']['Signature']).to be_nil
     end
@@ -92,7 +95,7 @@ RSpec.describe Saml::Kit::Builders::Response do
       result = Hash.from_xml(subject.to_xml)
       expect(result['Response']['EncryptedAssertion']).to be_present
       encrypted_assertion = result['Response']['EncryptedAssertion']
-      decrypted_assertion = Saml::Kit::XmlDecryption.new.decrypt(encrypted_assertion)
+      decrypted_assertion = Saml::Kit::XmlDecryption.new(configuration: configuration).decrypt(encrypted_assertion)
       decrypted_hash = Hash.from_xml(decrypted_assertion)
       expect(decrypted_hash['Assertion']).to be_present
       expect(decrypted_hash['Assertion']['Issuer']).to be_present

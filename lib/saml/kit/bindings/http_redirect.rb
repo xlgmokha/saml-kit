@@ -12,7 +12,7 @@ module Saml
           builder.sign = false
           builder.destination = location
           document = builder.build
-          [UrlBuilder.new.build(document, relay_state: relay_state), {}]
+          [UrlBuilder.new(configuration: builder.configuration).build(document, relay_state: relay_state), {}]
         end
 
         def deserialize(params)

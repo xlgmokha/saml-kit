@@ -13,8 +13,8 @@ module Saml
         Template.new(signatures.build(reference_id)).to_xml(xml: xml)
       end
 
-      def self.sign(sign: true, xml: ::Builder::XmlMarkup.new, configuration: Saml::Kit.configuration)
-        signatures = Saml::Kit::Signatures.new(configuration: configuration, sign: sign)
+      def self.sign(xml: ::Builder::XmlMarkup.new, configuration: Saml::Kit.configuration)
+        signatures = Saml::Kit::Signatures.new(configuration: configuration)
         yield xml, new(xml, signatures)
         signatures.complete(xml.target!)
       end

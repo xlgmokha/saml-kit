@@ -21,11 +21,10 @@ module Saml
         attr_reader :reference_id
         attr_reader :x509_certificate
 
-        def initialize(reference_id, configuration:, sign: true)
+        def initialize(reference_id, configuration:)
           @configuration = configuration
           @reference_id = reference_id
-          @sign = sign
-          @x509_certificate = configuration.certificates(use: :signing).last.stripped
+          @x509_certificate = configuration.certificates(use: :signing).sample.stripped
         end
 
         def signature_method

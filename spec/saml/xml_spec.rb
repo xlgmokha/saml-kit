@@ -4,9 +4,14 @@ RSpec.describe Saml::Kit::Xml do
   describe "#valid_signature?" do
     let(:login_url) { "https://#{FFaker::Internet.domain_name}/login" }
     let(:logout_url) { "https://#{FFaker::Internet.domain_name}/logout" }
+    let(:configuration) do
+      configuration = Saml::Kit::Configuration.new
+      configuration.generate_key_pair_for(use: :signing)
+      configuration
+    end
 
     let(:signed_xml) do
-      Saml::Kit::ServiceProviderMetadata.build do |builder|
+      Saml::Kit::ServiceProviderMetadata.build(configuration: configuration) do |builder|
         builder.entity_id = FFaker::Movie.title
         builder.add_assertion_consumer_service(login_url, binding: :http_post)
         builder.add_assertion_consumer_service(login_url, binding: :http_redirect)

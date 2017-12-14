@@ -1,9 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Builders::LogoutRequest do
-  subject { described_class.new(user) }
+  subject { described_class.new(user, configuration: configuration) }
   let(:user) { double(:user, name_id_for: name_id) }
   let(:name_id) { SecureRandom.uuid }
+  let(:configuration) do
+    Saml::Kit::Configuration.new do |config|
+      config.generate_key_pair_for(use: :signing)
+    end
+  end
 
   it 'produces the expected xml' do
     travel_to 1.second.from_now

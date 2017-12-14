@@ -40,7 +40,7 @@ RSpec.describe Saml::Kit::XmlDecryption do
           }
         }
       }
-      subject = described_class.new(private_key)
+      subject = described_class.new(configuration: double(encryption_private_key: private_key))
       decrypted = subject.decrypt(data)
       expect(decrypted.strip).to eql(secret)
     end

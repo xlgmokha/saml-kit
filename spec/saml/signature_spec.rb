@@ -30,7 +30,7 @@ RSpec.describe Saml::Kit::Signature do
       "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion",
       ID: reference_id,
     }
-    signed_xml = described_class.sign(sign: true, configuration: configuration) do |xml, signature|
+    signed_xml = described_class.sign(configuration: configuration) do |xml, signature|
       xml.tag!('samlp:AuthnRequest', options) do
         signature.template(reference_id)
         xml.tag!('saml:Issuer', "MyEntityID")
@@ -57,7 +57,7 @@ RSpec.describe Saml::Kit::Signature do
   end
 
   it 'does not add a signature' do
-    signed_xml = described_class.sign(sign: false, configuration: configuration) do |xml, signature|
+    signed_xml = described_class.sign(configuration: Saml::Kit::Configuration.new) do |xml, signature|
       xml.AuthnRequest do
         signature.template(reference_id)
         xml.Issuer "MyEntityID"
