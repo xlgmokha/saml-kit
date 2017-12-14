@@ -136,7 +136,7 @@ RSpec.describe Saml::Kit::Response do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
 
-      allow(Saml::Kit.configuration).to receive(:issuer).and_return(FFaker::Internet.uri("https"))
+      allow(configuration).to receive(:issuer).and_return(FFaker::Internet.uri("https"))
       allow(request).to receive(:issuer).and_return(FFaker::Internet.uri("https"))
 
       expect(subject).to be_invalid
