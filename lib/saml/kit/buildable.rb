@@ -4,10 +4,8 @@ module Saml
       extend ActiveSupport::Concern
 
       class_methods do
-        def build(*args)
-          builder(*args).tap do |x|
-            yield x if block_given?
-          end.build
+        def build(*args, &block)
+          builder(*args, &block).build
         end
 
         def builder(*args)
