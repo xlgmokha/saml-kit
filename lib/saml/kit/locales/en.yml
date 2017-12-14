@@ -11,6 +11,9 @@ en:
         invalid_signature: "invalid signature."
       InvalidDocument:
         invalid: "must contain valid SAMLRequest"
+      LogoutRequest:
+        invalid_fingerprint: "does not match."
+        unregistered: "is unregistered."
       LogoutResponse:
         unregistered: "is unregistered."
       Response:

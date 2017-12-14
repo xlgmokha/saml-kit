@@ -4,8 +4,8 @@ module Saml
       include Requestable
       validates_presence_of :single_logout_service, if: :expected_type?
 
-      def initialize(xml)
-        super(xml, name: "LogoutRequest")
+      def initialize(xml, configuration: Saml::Kit.configuration)
+        super(xml, name: "LogoutRequest", configuration: configuration)
       end
 
       def name_id

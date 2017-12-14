@@ -18,7 +18,7 @@ module Saml
         end
 
         def build
-          Saml::Kit::LogoutRequest.new(to_xml)
+          Saml::Kit::LogoutRequest.new(to_xml, configuration: configuration)
         end
 
         private

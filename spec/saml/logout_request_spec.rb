@@ -1,13 +1,21 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::LogoutRequest do
-  subject { described_class.build(user) }
+  subject { described_class.build(user, configuration: configuration) }
   let(:user) { double(:user, name_id_for: name_id) }
   let(:name_id) { SecureRandom.uuid }
+  let(:issuer) { FFaker::Internet.uri("https") }
+  let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
+  let(:configuration) do
+    Saml::Kit::Configuration.new do |config|
+      config.issuer = issuer
+      config.registry = registry
+      config.generate_key_pair_for(use: :signing)
+    end
+  end
 
   it 'parses the issuer' do
-    issuer = FFaker::Internet.uri("https")
-    subject = described_class.build(user) do |builder|
+    subject = described_class.build(user, configuration: configuration) do |builder|
       builder.issuer = issuer
     end
     expect(subject.issuer).to eql(issuer)
@@ -24,7 +32,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
 
   it 'parses the destination' do
     destination = FFaker::Internet.uri("https")
-    subject = described_class.build(user) do |builder|
+    subject = described_class.build(user, configuration: configuration) do |builder|
       builder.destination = destination
     end
     expect(subject.destination).to eql(destination)
@@ -35,16 +43,15 @@ RSpec.describe Saml::Kit::LogoutRequest do
   end
 
   describe "#valid?" do
-    let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
-    let(:metadata) { instance_double(Saml::Kit::ServiceProviderMetadata) }
+    let(:metadata) do
+      Saml::Kit::ServiceProviderMetadata.build(configuration: configuration) do |builder|
+        builder.entity_id = issuer
+        builder.add_single_logout_service(FFaker::Internet.uri("https"), binding: :http_post)
+      end
+    end
 
     before :each do
-      allow(Saml::Kit.configuration).to receive(:registry).and_return(registry)
       allow(registry).to receive(:metadata_for).and_return(metadata)
-      allow(metadata).to receive(:matches?).and_return(true)
-      allow(metadata).to receive(:single_logout_services).and_return([
-        Saml::Kit::Bindings::HttpPost.new(location: FFaker::Internet.http_url)
-      ])
     end
 
     it 'is valid when left untampered' do
@@ -53,7 +60,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
 
     it 'is invalid if the document has been tampered with' do
       issuer = FFaker::Internet.uri("https")
-      raw_xml = described_class.build(user) do |builder|
+      raw_xml = described_class.build(user, configuration: configuration) do |builder|
         builder.issuer = issuer
       end.to_xml.gsub(issuer, 'corrupt')
 
@@ -92,7 +99,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
       expect(subject.errors[:single_logout_service]).to be_present
     end
 
-    it 'is valid when a single lgout service url is available via the registry' do
+    it 'is valid when a single logout service url is available via the registry' do
       issuer = FFaker::Internet.uri("https")
       allow(registry).to receive(:metadata_for).with(issuer).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
@@ -100,7 +107,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
         Saml::Kit::Bindings::HttpPost.new(location: FFaker::Internet.uri("https"))
       ])
 
-      subject = described_class.build(user) do |builder|
+      subject = described_class.build(user, configuration: configuration) do |builder|
         builder.issuer = issuer
       end
       expect(subject).to be_valid

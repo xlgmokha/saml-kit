@@ -8,7 +8,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   let(:destination) { FFaker::Internet.http_url }
   let(:name_id_format) { Saml::Kit::Namespaces::EMAIL_ADDRESS }
   let(:raw_xml) do
-    described_class.build do |builder|
+    described_class.build(configuration: configuration) do |builder|
       builder.id = id
       builder.now = Time.now.utc
       builder.issuer = issuer
@@ -31,12 +31,12 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
   describe "#valid?" do
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
-    let(:metadata) { instance_double(Saml::Kit::ServiceProviderMetadata) }
+    let(:metadata) { Saml::Kit::ServiceProviderMetadata.build(configuration: configuration) }
 
     before :each do
       allow(configuration).to receive(:registry).and_return(registry)
       allow(registry).to receive(:metadata_for).and_return(metadata)
-      allow(metadata).to receive(:matches?).and_return(true)
+      #allow(metadata).to receive(:matches?).and_return(true)
     end
 
     it 'is valid when left untampered' do
@@ -105,7 +105,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 </samlp:AuthnRequest>
       XML
 
-      subject = described_class.new(raw_xml)
+      subject = described_class.new(raw_xml, configuration: configuration)
       subject.signature_verified!
       expect(subject).to be_valid
     end
