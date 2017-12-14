@@ -1,16 +1,19 @@
 module Saml
   module Kit
     class CompositeMetadata < Metadata
+      include Enumerable
       attr_reader :service_provider, :identity_provider
 
       def initialize(xml)
         super("IDPSSODescriptor", xml)
-        @service_provider = Saml::Kit::ServiceProviderMetadata.new(xml)
-        @identity_provider = Saml::Kit::IdentityProviderMetadata.new(xml)
+        @metadatum = [
+          Saml::Kit::ServiceProviderMetadata.new(xml),
+          Saml::Kit::IdentityProviderMetadata.new(xml),
+        ]
       end
 
       def services(type)
-        xpath = "//md:EntityDescriptor/md:SPSSODescriptor/md:#{type}|//md:EntityDescriptor/md:IDPSSODescriptor/md:#{type}"
+        xpath = map { |x| "//md:EntityDescriptor/md:#{x.name}/md:#{type}" }.join("|")
         document.find_all(xpath).map do |item|
           binding = item.attribute("Binding").value
           location = item.attribute("Location").value
@@ -19,14 +22,16 @@ module Saml
       end
 
       def certificates
-        identity_provider.certificates + service_provider.certificates
+        flat_map(&:certificates)
+      end
+
+      def each(&block)
+        @metadatum.each(&block)
       end
 
       def method_missing(name, *args)
-        if identity_provider.respond_to?(name)
-          identity_provider.public_send(name, *args)
-        elsif service_provider.respond_to?(name)
-          service_provider.public_send(name, *args)
+        if target = find { |x| x.respond_to?(name) }
+          target.public_send(name, *args)
         else
           super
         end
