@@ -91,8 +91,8 @@ module Saml
       end
 
       def verify(algorithm, signature, data)
-        signing_certificates.find do |cert|
-          cert.public_key.verify(algorithm, signature, data)
+        signing_certificates.find do |certificate|
+          certificate.public_key.verify(algorithm, signature, data)
         end
       end
 
