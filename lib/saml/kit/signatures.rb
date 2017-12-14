@@ -14,7 +14,7 @@ module Saml
 
       def complete(raw_xml)
         return raw_xml unless configuration.sign?
-        private_key = configuration.signing_private_key
+        private_key = configuration.private_keys(use: :signing).sample
         Xmldsig::SignedDocument.new(raw_xml).sign(private_key)
       end
     end

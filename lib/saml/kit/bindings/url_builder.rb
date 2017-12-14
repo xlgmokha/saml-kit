@@ -21,7 +21,7 @@ module Saml
         private
 
         def signature_for(payload)
-          private_key = configuration.signing_private_key
+          private_key = configuration.private_keys(use: :signing).sample
           encode(private_key.sign(OpenSSL::Digest::SHA256.new, payload))
         end
 
