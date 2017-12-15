@@ -15,8 +15,8 @@ module Saml
           [UrlBuilder.new(configuration: builder.configuration).build(document, relay_state: relay_state), {}]
         end
 
-        def deserialize(params)
-          document = deserialize_document_from!(params)
+        def deserialize(params, configuration: Saml::Kit.configuration)
+          document = deserialize_document_from!(params, configuration)
           ensure_valid_signature!(params, document)
           document.signature_verified!
           document
@@ -24,10 +24,10 @@ module Saml
 
         private
 
-        def deserialize_document_from!(params)
+        def deserialize_document_from!(params, configuration)
           xml = inflate(decode(unescape(saml_param_from(params))))
           Saml::Kit.logger.debug(xml)
-          Saml::Kit::Document.to_saml_document(xml)
+          Saml::Kit::Document.to_saml_document(xml, configuration: configuration)
         end
 
         def ensure_valid_signature!(params, document)
