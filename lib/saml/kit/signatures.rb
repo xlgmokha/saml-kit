@@ -20,13 +20,12 @@ module Saml
 
       def self.sign(xml: ::Builder::XmlMarkup.new, configuration: Saml::Kit.configuration)
         signatures = Saml::Kit::Signatures.new(configuration: configuration)
-        yield xml, Signature.new(xml, signatures)
+        yield xml, XmlSignatureTemplate.new(xml, signatures)
         signatures.complete(xml.target!)
       end
 
-      class Signature
-        attr_reader :signatures
-        attr_reader :xml
+      class XmlSignatureTemplate
+        attr_reader :signatures, :xml
 
         def initialize(xml, signatures)
           @signatures = signatures
