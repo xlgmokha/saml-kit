@@ -19,6 +19,14 @@ module Saml
         xml_hash ? Signature.new(xml_hash) : nil
       end
 
+      def expired?
+        Time.current > expired_at
+      end
+
+      def active?
+        Time.current > started_at && !expired?
+      end
+
       def attributes
         @attributes ||=
           begin
@@ -38,15 +46,6 @@ module Saml
 
       def expired_at
         parse_date(assertion.fetch('Conditions', {}).fetch('NotOnOrAfter', nil))
-      end
-
-      def certificate
-        return unless signed?
-
-        Saml::Kit::Certificate.new(
-          assertion.fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil),
-          use: :signing
-        )
       end
 
       def audiences

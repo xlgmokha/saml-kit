@@ -4,7 +4,7 @@ module Saml
       include Respondable
       extend Forwardable
 
-      def_delegators :assertion, :name_id, :[], :attributes, :started_at, :expired_at, :audiences
+      def_delegators :assertion, :name_id, :[], :attributes, :active?, :audiences
 
       validate :must_be_active_session
       validate :must_match_issuer
@@ -12,14 +12,6 @@ module Saml
       def initialize(xml, request_id: nil, configuration: Saml::Kit.configuration)
         @request_id = request_id
         super(xml, name: "Response", configuration: configuration)
-      end
-
-      def expired?
-        Time.current > expired_at
-      end
-
-      def active?
-        Time.current > started_at && !expired?
       end
 
       def assertion
