@@ -4,6 +4,7 @@ en:
     errors:
       Assertion:
         expired: "must not be expired."
+        must_match_issuer: "must match entityId."
       AuthnRequest:
         invalid: "must contain AuthnRequest."
         invalid_fingerprint: "does not match."
@@ -23,7 +24,6 @@ en:
         invalid_fingerprint: "does not match."
         invalid_response_to: "must match request id."
         invalid_version: "must be 2.0."
-        must_match_issuer: "must match entityId."
         unregistered: "must originate from registered identity provider."
       SPSSODescriptor:
         invalid: "must contain SPSSODescriptor."
