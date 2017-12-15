@@ -24,9 +24,8 @@ module Saml
       end
 
       def trusted?
-        return false if provider.nil?
         return false unless signed?
-        provider.matches?(certificate.fingerprint, use: :signing)
+        signature.trusted?(provider)
       end
 
       def provider
