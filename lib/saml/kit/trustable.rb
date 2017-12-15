@@ -17,11 +17,6 @@ module Saml
         Saml::Kit::Certificate.new(value, use: :signing)
       end
 
-      def fingerprint
-        return if certificate.blank?
-        certificate.fingerprint
-      end
-
       def signed?
         to_h.fetch(name, {}).fetch('Signature', nil).present?
       end
@@ -29,7 +24,7 @@ module Saml
       def trusted?
         return false if provider.nil?
         return false unless signed?
-        provider.matches?(fingerprint, use: :signing)
+        provider.matches?(certificate.fingerprint, use: :signing)
       end
 
       def provider
