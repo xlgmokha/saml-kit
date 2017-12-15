@@ -64,16 +64,16 @@ module Saml
       end
 
       class << self
-        def to_saml_document(xml)
+        def to_saml_document(xml, configuration: Saml::Kit.configuration)
           hash = Hash.from_xml(xml)
           if hash['Response'].present?
-            Response.new(xml)
+            Response.new(xml, configuration: configuration)
           elsif hash['LogoutResponse'].present?
-            LogoutResponse.new(xml)
+            LogoutResponse.new(xml, configuration: configuration)
           elsif hash['AuthnRequest'].present?
-            AuthenticationRequest.new(xml)
+            AuthenticationRequest.new(xml, configuration: configuration)
           elsif hash['LogoutRequest'].present?
-            LogoutRequest.new(xml)
+            LogoutRequest.new(xml, configuration: configuration)
           end
         rescue => error
           Saml::Kit.logger.error(error)

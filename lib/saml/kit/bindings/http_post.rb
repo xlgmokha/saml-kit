@@ -18,9 +18,9 @@ module Saml
           [location, saml_params]
         end
 
-        def deserialize(params)
+        def deserialize(params, configuration: Saml::Kit.configuration)
           xml = decode(saml_param_from(params))
-          Saml::Kit::Document.to_saml_document(xml)
+          Saml::Kit::Document.to_saml_document(xml, configuration: configuration)
         end
       end
     end
