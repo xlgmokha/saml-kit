@@ -17,6 +17,26 @@ module Saml
         private_key = configuration.private_keys(use: :signing).last
         Xmldsig::SignedDocument.new(raw_xml).sign(private_key)
       end
+
+      def self.sign(xml: ::Builder::XmlMarkup.new, configuration: Saml::Kit.configuration)
+        signatures = Saml::Kit::Signatures.new(configuration: configuration)
+        yield xml, Signature.new(xml, signatures)
+        signatures.complete(xml.target!)
+      end
+
+      class Signature
+        attr_reader :signatures
+        attr_reader :xml
+
+        def initialize(xml, signatures)
+          @signatures = signatures
+          @xml = xml
+        end
+
+        def template(reference_id)
+          Template.new(signatures.build(reference_id)).to_xml(xml: xml)
+        end
+      end
     end
   end
 end

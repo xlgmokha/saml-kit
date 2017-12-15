@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe Saml::Kit::Signature do
+RSpec.describe Saml::Kit::Signatures do
   let(:configuration) do
     config = Saml::Kit::Configuration.new
     config.add_key_pair(certificate, private_key, password: password, use: :signing)

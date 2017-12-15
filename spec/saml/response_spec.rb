@@ -59,7 +59,7 @@ RSpec.describe Saml::Kit::Response do
       id = Saml::Kit::Id.generate
       configuration = Saml::Kit::Configuration.new
       configuration.generate_key_pair_for(use: :signing)
-      signed_xml = Saml::Kit::Signature.sign(configuration: configuration) do |xml, signature|
+      signed_xml = Saml::Kit::Signatures.sign(configuration: configuration) do |xml, signature|
         xml.tag! "samlp:Response", "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, ID: id do
           signature.template(id)
           xml.Fake do
