@@ -19,11 +19,11 @@ module Saml
       end
 
       def encryption?
-        :encryption == use
+        for?(:encryption)
       end
 
       def signing?
-        :signing == use
+        for?(:signing)
       end
 
       def x509
