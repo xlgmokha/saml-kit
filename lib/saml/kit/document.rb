@@ -2,8 +2,9 @@ module Saml
   module Kit
     class Document
       PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
-      include XsdValidatable
       include ActiveModel::Validations
+      include XsdValidatable
+      include Translatable
       include Trustable
       include Buildable
       validates_presence_of :content

@@ -119,7 +119,7 @@ RSpec.describe Saml::Kit::Response do
       subject = described_class.build(user, request)
       travel_to Saml::Kit.configuration.session_timeout.from_now + 5.seconds
       expect(subject).to_not be_valid
-      expect(subject.errors[:base]).to be_present
+      expect(subject.errors[:assertion]).to be_present
     end
 
     it 'is invalid before the valid session window' do
@@ -129,7 +129,7 @@ RSpec.describe Saml::Kit::Response do
       subject = described_class.build(user, request)
       travel_to 5.seconds.ago
       expect(subject).to be_invalid
-      expect(subject.errors[:base]).to be_present
+      expect(subject.errors[:assertion]).to be_present
     end
 
     it 'is invalid when the audience does not match the expected issuer' do

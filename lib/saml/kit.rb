@@ -24,6 +24,7 @@ require "saml/kit/xsd_validatable"
 require "saml/kit/respondable"
 require "saml/kit/requestable"
 require "saml/kit/trustable"
+require "saml/kit/translatable"
 require "saml/kit/document"
 
 require "saml/kit/assertion"

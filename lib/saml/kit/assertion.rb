@@ -1,7 +1,14 @@
 module Saml
   module Kit
     class Assertion
+      include ActiveModel::Validations
+      include Translatable
+
+      validate :must_be_active_session
+      attr_reader :name
+
       def initialize(xml_hash, configuration:)
+        @name = "Assertion"
         @xml_hash = xml_hash
         @configuration = configuration
       end
@@ -76,6 +83,11 @@ module Saml
       rescue => error
         Saml::Kit.logger.error(error)
         Time.at(0).to_datetime
+      end
+
+      def must_be_active_session
+        return if active?
+        errors[:base] << error_message(:expired)
       end
     end
   end

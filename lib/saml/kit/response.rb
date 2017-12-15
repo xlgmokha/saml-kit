@@ -6,8 +6,8 @@ module Saml
 
       def_delegators :assertion, :name_id, :[], :attributes, :active?, :audiences
 
-      validate :must_be_active_session
       validate :must_match_issuer
+      validate :must_be_valid_assertion
 
       def initialize(xml, request_id: nil, configuration: Saml::Kit.configuration)
         @request_id = request_id
@@ -15,15 +15,16 @@ module Saml
       end
 
       def assertion
-        @assertion = Saml::Kit::Assertion.new(to_h, configuration: @configuration)
+        @assertion ||= Saml::Kit::Assertion.new(to_h, configuration: @configuration)
       end
 
       private
 
-      def must_be_active_session
-        return unless expected_type?
-        return unless success?
-        errors[:base] << error_message(:expired) unless active?
+      def must_be_valid_assertion
+        assertion.valid?
+        assertion.errors.each do |attribute, error|
+          self.errors[:assertion] << error
+        end
       end
 
       def must_match_issuer

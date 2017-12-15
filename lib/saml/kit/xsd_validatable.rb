@@ -10,10 +10,6 @@ module Saml
           end
         end
       end
-
-      def error_message(key)
-        I18n.translate(key, scope: "saml/kit.errors.#{name}")
-      end
     end
   end
 end

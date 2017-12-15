@@ -1,10 +1,11 @@
 module Saml
   module Kit
     class Metadata
+      METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
       include ActiveModel::Validations
       include XsdValidatable
+      include Translatable
       include Buildable
-      METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
 
       validates_presence_of :metadata
       validate :must_contain_descriptor

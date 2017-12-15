@@ -2,6 +2,8 @@
 en:
   saml/kit:
     errors:
+      Assertion:
+        expired: "must not be expired."
       AuthnRequest:
         invalid: "must contain AuthnRequest."
         invalid_fingerprint: "does not match."
@@ -17,7 +19,6 @@ en:
       LogoutResponse:
         unregistered: "is unregistered."
       Response:
-        expired: "must not be expired."
         invalid: "must contain Response."
         invalid_fingerprint: "does not match."
         invalid_response_to: "must match request id."
