@@ -8,14 +8,14 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   let(:destination) { FFaker::Internet.http_url }
   let(:name_id_format) { Saml::Kit::Namespaces::EMAIL_ADDRESS }
   let(:raw_xml) do
-    described_class.build(configuration: configuration) do |builder|
+    described_class.build_xml(configuration: configuration) do |builder|
       builder.id = id
       builder.now = Time.now.utc
       builder.issuer = issuer
       builder.assertion_consumer_service_url = assertion_consumer_service_url
       builder.name_id_format = name_id_format
       builder.destination = destination
-    end.to_xml
+    end
   end
   let(:configuration) do
     Saml::Kit::Configuration.new do |config|
@@ -36,7 +36,6 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     before :each do
       allow(configuration).to receive(:registry).and_return(registry)
       allow(registry).to receive(:metadata_for).and_return(metadata)
-      #allow(metadata).to receive(:matches?).and_return(true)
     end
 
     it 'is valid when left untampered' do

@@ -8,6 +8,10 @@ module Saml
           builder(*args, &block).build
         end
 
+        def build_xml(*args, &block)
+          builder(*args, &block).to_xml
+        end
+
         def builder(*args)
           builder_class.new(*args).tap do |builder|
             yield builder if block_given?
