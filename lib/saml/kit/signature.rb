@@ -12,9 +12,9 @@ module Saml
         Saml::Kit::Certificate.new(value, use: :signing)
       end
 
-      def trusted?(provider)
-        return false if provider.nil?
-        provider.matches?(certificate.fingerprint, use: :signing)
+      def trusted?(metadata)
+        return false if metadata.nil?
+        metadata.matches?(certificate.fingerprint, use: :signing)
       end
 
       def to_h

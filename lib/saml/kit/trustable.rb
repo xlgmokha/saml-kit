@@ -9,11 +9,6 @@ module Saml
         validate :must_be_trusted, unless: :signature_manually_verified
       end
 
-      def certificate
-        return unless signed?
-        signature.certificate
-      end
-
       def signed?
         signature.present?
       end
