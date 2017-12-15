@@ -246,7 +246,12 @@ RSpec.describe Saml::Kit::Response do
     let(:now) { Time.now.utc }
     let(:id) { Saml::Kit::Id.generate }
     let(:url) { FFaker::Internet.uri("https") }
-    let(:certificate) { FFaker::Movie.title }
+    let(:certificate) do
+      Saml::Kit::Certificate.new(
+        Saml::Kit::SelfSignedCertificate.new("password").create[0],
+        use: :signing
+      )
+    end
 
     it 'returns the certificate when the Assertion is signed' do
       xml = <<-XML
@@ -269,7 +274,7 @@ RSpec.describe Saml::Kit::Response do
       <ds:SignatureValue></ds:SignatureValue>
       <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
         <ds:X509Data>
-          <ds:X509Certificate>#{certificate}</ds:X509Certificate>
+          <ds:X509Certificate>#{certificate.stripped}</ds:X509Certificate>
         </ds:X509Data>
       </KeyInfo>
     </ds:Signature>
@@ -277,7 +282,8 @@ RSpec.describe Saml::Kit::Response do
 </samlp:Response>
       XML
       subject = described_class.new(xml)
-      expect(subject.certificate).to eql(certificate)
+      expect(subject.certificate).to be_instance_of(Saml::Kit::Certificate)
+      expect(subject.certificate.stripped).to eql(certificate.stripped)
     end
 
     it 'returns the certificate when the Response is signed' do

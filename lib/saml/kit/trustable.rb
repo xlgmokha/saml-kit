@@ -11,12 +11,15 @@ module Saml
 
       def certificate
         return unless signed?
-        to_h.fetch(name, {}).fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
+
+        value = to_h.fetch(name, {}).fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
+        return if value.nil?
+        Saml::Kit::Certificate.new(value, use: :signing)
       end
 
       def fingerprint
         return if certificate.blank?
-        Fingerprint.new(certificate)
+        certificate.fingerprint
       end
 
       def signed?

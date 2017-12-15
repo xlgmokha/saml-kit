@@ -36,7 +36,12 @@ module Saml
       end
 
       def certificate
-        assertion.fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
+        return unless signed?
+
+        Saml::Kit::Certificate.new(
+          assertion.fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil),
+          use: :signing
+        )
       end
 
       def audiences
