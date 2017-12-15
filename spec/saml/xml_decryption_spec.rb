@@ -45,7 +45,7 @@ RSpec.describe Saml::Kit::XmlDecryption do
       expect(decrypted.strip).to eql(secret)
     end
 
-    it 'returns nil when it cannot decrypt the data' do
+    it 'raise an error when it cannot decrypt the data' do
       certificate_pem, private_key_pem = Saml::Kit::SelfSignedCertificate.new(password).create
       public_key = OpenSSL::X509::Certificate.new(certificate_pem).public_key
       private_key = OpenSSL::PKey::RSA.new(private_key_pem, password)
@@ -84,7 +84,9 @@ RSpec.describe Saml::Kit::XmlDecryption do
       new_private_key_pem = Saml::Kit::SelfSignedCertificate.new(password).create[1]
       new_private_key = OpenSSL::PKey::RSA.new(new_private_key_pem, password)
       subject = described_class.new(configuration: double(private_keys: [new_private_key]))
-      expect(subject.decrypt(data)).to be_nil
+      expect do
+        subject.decrypt(data)
+      end.to raise_error(OpenSSL::PKey::RSAError)
     end
   end
 end

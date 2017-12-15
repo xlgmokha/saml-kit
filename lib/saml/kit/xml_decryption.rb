@@ -12,9 +12,6 @@ module Saml
         symmetric_key = symmetric_key_from(encrypted_data)
         cipher_text = Base64.decode64(encrypted_data["CipherData"]["CipherValue"])
         to_plaintext(cipher_text, symmetric_key, encrypted_data["EncryptionMethod"]['Algorithm'])
-      rescue OpenSSL::PKey::RSAError => error
-        Saml::Kit.logger.error(error)
-        nil
       end
 
       private
