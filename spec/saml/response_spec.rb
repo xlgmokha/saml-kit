@@ -196,7 +196,8 @@ RSpec.describe Saml::Kit::Response do
 </samlp:Response>
       XML
       subject = described_class.new(xml)
-      expect(subject).to be_signed
+      expect(subject).to_not be_signed
+      expect(subject.assertion).to be_signed
     end
 
     it 'returns true when the Response is signed' do
@@ -282,8 +283,9 @@ RSpec.describe Saml::Kit::Response do
 </samlp:Response>
       XML
       subject = described_class.new(xml)
-      expect(subject.certificate).to be_instance_of(Saml::Kit::Certificate)
-      expect(subject.certificate.stripped).to eql(certificate.stripped)
+      expect(subject.certificate).to be_nil
+      expect(subject.assertion.certificate).to be_instance_of(Saml::Kit::Certificate)
+      expect(subject.assertion.certificate.stripped).to eql(certificate.stripped)
     end
 
     it 'returns the certificate when the Response is signed' do

@@ -26,14 +26,6 @@ module Saml
         @assertion = Saml::Kit::Assertion.new(to_h, configuration: @configuration)
       end
 
-      def signed?
-        super || assertion.signed?
-      end
-
-      def certificate
-        super || assertion.certificate
-      end
-
       private
 
       def must_be_active_session

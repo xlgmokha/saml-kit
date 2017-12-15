@@ -11,14 +11,16 @@ module Saml
 
       def certificate
         return unless signed?
-
-        value = to_h.fetch(name, {}).fetch('Signature', {}).fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
-        return if value.nil?
-        Saml::Kit::Certificate.new(value, use: :signing)
+        signature.certificate
       end
 
       def signed?
-        to_h.fetch(name, {}).fetch('Signature', nil).present?
+        signature.present?
+      end
+
+      def signature
+        xml_hash = to_h.fetch(name, {}).fetch('Signature', nil)
+        xml_hash ? Signature.new(xml_hash, configuration: configuration) : nil
       end
 
       def trusted?
