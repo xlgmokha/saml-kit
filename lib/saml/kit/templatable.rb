@@ -21,7 +21,7 @@ module Saml
       end
 
       def encryption_for(xml:)
-        if encrypt && encryption_certificate
+        if encrypt?
           temp = ::Builder::XmlMarkup.new
           yield temp
           xml_encryption = Saml::Kit::Builders::XmlEncryption.new(temp.target!, encryption_certificate.public_key)
@@ -29,6 +29,10 @@ module Saml
         else
           yield xml
         end
+      end
+
+      def encrypt?
+        encrypt && encryption_certificate
       end
 
       def render(model, options)
