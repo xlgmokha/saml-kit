@@ -56,6 +56,10 @@ module Saml
       end
 
       def must_be_trusted
+        if provider.present? && !signed?
+          return
+        end
+
         return if trusted?
         errors[:fingerprint] << error_message(:invalid_fingerprint)
       end
