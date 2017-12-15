@@ -15,7 +15,7 @@ module Saml
 
       def signature
         xml_hash = to_h.fetch(name, {}).fetch('Signature', nil)
-        xml_hash ? Signature.new(xml_hash, configuration: configuration) : nil
+        xml_hash ? Signature.new(xml_hash) : nil
       end
 
       def trusted?

@@ -1,9 +1,8 @@
 module Saml
   module Kit
     class Signature
-      def initialize(xml_hash, configuration:)
+      def initialize(xml_hash)
         @xml_hash = xml_hash
-        @configuration = configuration
       end
 
       def certificate

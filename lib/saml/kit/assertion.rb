@@ -16,7 +16,7 @@ module Saml
 
       def signature
         xml_hash = assertion.fetch('Signature', nil)
-        xml_hash ? Signature.new(xml_hash, configuration: @configuration) : nil
+        xml_hash ? Signature.new(xml_hash) : nil
       end
 
       def attributes
