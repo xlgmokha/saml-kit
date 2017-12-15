@@ -4,6 +4,7 @@ module Saml
       include ActiveModel::Validations
       include Translatable
 
+      validate :must_match_issuer
       validate :must_be_active_session
       attr_reader :name
 
@@ -83,6 +84,12 @@ module Saml
       rescue => error
         Saml::Kit.logger.error(error)
         Time.at(0).to_datetime
+      end
+
+      def must_match_issuer
+        unless audiences.include?(@configuration.issuer)
+          errors[:audience] << error_message(:must_match_issuer)
+        end
       end
 
       def must_be_active_session
