@@ -4,7 +4,7 @@ module Saml
       attr_reader :private_key
 
       def initialize(configuration: Saml::Kit.configuration)
-        @private_key = configuration.private_keys(use: :encryption).sample
+        @private_key = configuration.private_keys(use: :encryption).last
       end
 
       def decrypt(data)

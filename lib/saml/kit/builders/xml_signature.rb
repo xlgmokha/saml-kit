@@ -24,7 +24,7 @@ module Saml
         def initialize(reference_id, configuration:)
           @configuration = configuration
           @reference_id = reference_id
-          @x509_certificate = configuration.certificates(use: :signing).sample.stripped
+          @x509_certificate = configuration.certificates(use: :signing).last.stripped
         end
 
         def signature_method

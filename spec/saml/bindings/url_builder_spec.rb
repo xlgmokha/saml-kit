@@ -61,7 +61,7 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
           payload = "#{query_string_parameter}=#{query_params[query_string_parameter]}"
           payload << "&RelayState=#{query_params['RelayState']}"
           payload << "&SigAlg=#{query_params['SigAlg']}"
-          private_key = configuration.private_keys(use: :signing).sample
+          private_key = configuration.private_keys(use: :signing).last
           expected_signature = Base64.strict_encode64(private_key.sign(OpenSSL::Digest::SHA256.new, payload))
           expect(query_params['Signature']).to eql(expected_signature)
         end
@@ -73,7 +73,7 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
 
           payload = "#{query_string_parameter}=#{query_params[query_string_parameter]}"
           payload << "&SigAlg=#{query_params['SigAlg']}"
-          private_key = configuration.private_keys(use: :signing).sample
+          private_key = configuration.private_keys(use: :signing).last
           expected_signature = Base64.strict_encode64(private_key.sign(OpenSSL::Digest::SHA256.new, payload))
           expect(query_params['Signature']).to eql(expected_signature)
         end
