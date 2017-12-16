@@ -74,7 +74,7 @@ module Saml
       end
 
       def deprecate(message)
-        @deprecation ||= ActiveSupport::Deprecation.new('next-release', 'saml-kit')
+        @deprecation ||= ActiveSupport::Deprecation.new('1.0.0', 'saml-kit')
         @deprecation.deprecation_warning(message)
       end
     end
