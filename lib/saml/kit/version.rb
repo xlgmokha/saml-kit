@@ -1,5 +1,5 @@
 module Saml
   module Kit
-    VERSION = "0.2.#{Time.now.utc.to_i}"
+    VERSION = "0.2.6"
   end
 end
