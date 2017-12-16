@@ -25,7 +25,7 @@ RSpec.describe Saml::Kit::Builders::Response do
       allow(configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
       allow(provider).to receive(:matches?).and_return(true)
 
-      subject.sign = true
+      subject.embed_signature = true
       subject.encrypt = true
       result = subject.build
       expect(result).to be_valid
@@ -111,7 +111,7 @@ RSpec.describe Saml::Kit::Builders::Response do
 
     it 'generates a signed response and encrypted assertion' do
       subject.encrypt = true
-      subject.sign = true
+      subject.embed_signature = true
       result = Hash.from_xml(subject.to_xml)
       expect(result['Response']['Signature']).to be_present
       expect(result['Response']['EncryptedAssertion']).to be_present
@@ -119,7 +119,7 @@ RSpec.describe Saml::Kit::Builders::Response do
 
     it 'generates a signed response and assertion' do
       subject.encrypt = false
-      subject.sign = true
+      subject.embed_signature = true
       result = Hash.from_xml(subject.to_xml)
       expect(result['Response']['Signature']).to be_present
       expect(result['Response']['Assertion']['Signature']).to be_present
@@ -127,7 +127,7 @@ RSpec.describe Saml::Kit::Builders::Response do
 
     it 'generates a signed response and signed and encrypted assertion' do
       subject.encrypt = true
-      subject.sign = true
+      subject.embed_signature = true
 
       result = Saml::Kit::Response.new(subject.to_xml, configuration: configuration)
       expect(result).to be_signed
@@ -137,7 +137,7 @@ RSpec.describe Saml::Kit::Builders::Response do
 
     it 'generates an encrypted assertion' do
       subject.encrypt = true
-      subject.sign = false
+      subject.embed_signature = false
 
       result = Saml::Kit::Response.new(subject.to_xml, configuration: configuration)
       expect(result).to_not be_signed

@@ -9,7 +9,7 @@ module Saml
         end
 
         def serialize(builder, relay_state: nil)
-          builder.sign = false
+          builder.embed_signature = false
           builder.destination = location
           document = builder.build
           [UrlBuilder.new(configuration: builder.configuration).build(document, relay_state: relay_state), {}]

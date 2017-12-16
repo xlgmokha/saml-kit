@@ -18,7 +18,7 @@ module Saml
       def response_for(user, binding:, relay_state: nil)
         response_binding = provider.assertion_consumer_service_for(binding: binding)
         builder = Saml::Kit::Response.builder(user, self) do |x|
-          x.sign = provider.want_assertions_signed
+          x.embed_signature = provider.want_assertions_signed
           yield x if block_given?
         end
         response_binding.serialize(builder, relay_state: relay_state)

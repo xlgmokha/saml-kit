@@ -1,7 +1,12 @@
 module Saml
   module Kit
     module Templatable
-      attr_accessor :sign
+      attr_accessor :embed_signature
+
+      def sign=(value)
+        Saml::Kit.deprecate("sign= is deprecated. Use embed_signature= instead")
+        self.embed_signature = value
+      end
 
       def to_xml(xml: ::Builder::XmlMarkup.new)
         signatures.complete(render(self, xml: xml))
@@ -13,7 +18,7 @@ module Saml
       end
 
       def sign?
-        sign.nil? ? configuration.sign? : sign && configuration.sign?
+        embed_signature.nil? ? configuration.sign? : embed_signature && configuration.sign?
       end
 
       def signatures

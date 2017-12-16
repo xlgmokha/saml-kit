@@ -17,7 +17,7 @@ module Saml
           SHA512: "http://www.w3.org/2001/04/xmlenc#sha512",
         }.freeze
 
-        attr_reader :sign, :configuration
+        attr_reader :embed_signature, :configuration
         attr_reader :reference_id
         attr_reader :x509_certificate
 

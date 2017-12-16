@@ -31,7 +31,7 @@ module Saml
 
       def login_request_for(binding:, relay_state: nil)
         builder = Saml::Kit::AuthenticationRequest.builder do |x|
-          x.sign = want_authn_requests_signed
+          x.embed_signature = want_authn_requests_signed
           yield x if block_given?
         end
         request_binding = single_sign_on_service_for(binding: binding)

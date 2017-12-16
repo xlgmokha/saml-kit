@@ -36,7 +36,7 @@ RSpec.describe Saml::Kit::Builders::LogoutRequest do
   end
 
   it 'excludes a signature' do
-    subject.sign = false
+    subject.embed_signature = false
     xml_hash = Hash.from_xml(subject.to_xml)
     expect(xml_hash['LogoutRequest']['Signature']).to be_nil
   end

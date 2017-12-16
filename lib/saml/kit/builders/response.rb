@@ -18,7 +18,7 @@ module Saml
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
           @issuer = configuration.issuer
-          @sign = want_assertions_signed
+          @embed_signature = want_assertions_signed
           @encrypt = encryption_certificate.present?
           @configuration = configuration
         end
