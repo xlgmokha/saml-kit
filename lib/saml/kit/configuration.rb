@@ -17,7 +17,7 @@ module Saml
       end
 
       def add_key_pair(certificate, private_key, password:, use: :signing)
-        @key_pairs.push(KeyPair.new(certificate, private_key, password, use))
+        @key_pairs.push(KeyPair.new(certificate, private_key, password, use.to_sym))
       end
 
       def generate_key_pair_for(use:, password: SecureRandom.uuid)
