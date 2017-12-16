@@ -109,6 +109,10 @@ module Saml
         end
       end
 
+      def self.builder_class
+        Saml::Kit::Builders::Metadata
+      end
+
       private
 
       def document
