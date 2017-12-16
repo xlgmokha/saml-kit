@@ -6,10 +6,10 @@ module Saml
 
         attr_accessor :entity_id
         attr_accessor :id
+        attr_accessor :identity_provider
         attr_accessor :organization_name, :organization_url, :contact_email
+        attr_accessor :service_provider
         attr_reader :configuration
-        attr_reader :identity_provider
-        attr_reader :service_provider
 
         def initialize(configuration: Saml::Kit.configuration)
           @id = Id.generate

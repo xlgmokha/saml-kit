@@ -3,10 +3,13 @@ module Saml
     module Builders
       class IdentityProviderMetadata
         include Saml::Kit::Templatable
-        attr_accessor :id, :organization_name, :organization_url, :contact_email, :entity_id, :attributes, :name_id_formats
+        extend Forwardable
+        attr_accessor :attributes, :name_id_formats
         attr_accessor :want_authn_requests_signed
         attr_reader :logout_urls, :single_sign_on_urls
         attr_reader :configuration
+        attr_reader :metadata
+        def_delegators :metadata, :id, :id=, :entity_id, :entity_id=, :organization_name, :organization_name=, :organization_url, :organization_url=, :contact_email, :contact_email=, :to_xml
 
         def initialize(configuration: Saml::Kit.configuration)
           @attributes = []
@@ -17,6 +20,8 @@ module Saml
           @name_id_formats = [Namespaces::PERSISTENT]
           @single_sign_on_urls = []
           @want_authn_requests_signed = true
+          @metadata = Saml::Kit::Builders::Metadata.new(configuration: configuration)
+          @metadata.identity_provider = self
         end
 
         def add_single_sign_on_service(url, binding: :http_post)
