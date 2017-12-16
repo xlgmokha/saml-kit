@@ -63,11 +63,11 @@ module Saml
         []
       end
 
-      private
-
       def encrypted?
         @xml_hash.fetch('Response', {}).fetch('EncryptedAssertion', nil).present?
       end
+
+      private
 
       def assertion
         if encrypted?

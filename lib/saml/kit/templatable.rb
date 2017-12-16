@@ -24,7 +24,8 @@ module Saml
         if encrypt?
           temp = ::Builder::XmlMarkup.new
           yield temp
-          xml_encryption = Saml::Kit::Builders::XmlEncryption.new(temp.target!, encryption_certificate.public_key)
+          signed_xml = signatures.complete(temp.target!)
+          xml_encryption = Saml::Kit::Builders::XmlEncryption.new(signed_xml, encryption_certificate.public_key)
           render(xml_encryption, xml: xml)
         else
           yield xml

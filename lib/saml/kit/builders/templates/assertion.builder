@@ -1,7 +1,7 @@
 encryption_for(xml: xml) do |xml|
   xml.Assertion(assertion_options) do
     xml.Issuer issuer
-    signature_for(reference_id: reference_id, xml: xml) unless encrypt
+    signature_for(reference_id: reference_id, xml: xml)
     xml.Subject do
       xml.NameID name_id, Format: name_id_format
       xml.SubjectConfirmation Method: Saml::Kit::Namespaces::BEARER do
