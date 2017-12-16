@@ -4,11 +4,12 @@ module Saml
       class Metadata
         include Templatable
 
-        attr_reader :id
-        attr_reader :entity_id
+        attr_accessor :entity_id
+        attr_accessor :id
+        attr_accessor :organization_name, :organization_url, :contact_email
         attr_reader :configuration
-        attr_reader :service_provider
         attr_reader :identity_provider
+        attr_reader :service_provider
 
         def initialize(configuration: Saml::Kit.configuration)
           @id = Id.generate
