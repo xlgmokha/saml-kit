@@ -8,16 +8,22 @@ module Saml
         attr_reader :entity_id
         attr_reader :configuration
         attr_reader :service_provider
+        attr_reader :identity_provider
 
         def initialize(configuration: Saml::Kit.configuration)
           @id = Id.generate
           @entity_id = configuration.issuer
           @configuration = configuration
-          @service_provder = nil
         end
 
         def build_service_provider
           @service_provider = Saml::Kit::ServiceProviderMetadata.builder(configuration: configuration) do |x|
+            yield x if block_given?
+          end
+        end
+
+        def build_identity_provider
+          @identity_provider = Saml::Kit::IdentityProviderMetadata.builder(configuration: configuration) do |x|
             yield x if block_given?
           end
         end
