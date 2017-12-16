@@ -12,14 +12,12 @@ module Saml
         @registry = DefaultRegistry.new
         @session_timeout = 3.hours
         @logger = Logger.new(STDOUT)
+        @key_pairs = []
         yield self if block_given?
       end
 
       def add_key_pair(certificate, private_key, password:, use: :signing)
-        key_pairs.push({
-          certificate: Saml::Kit::Certificate.new(certificate, use: use),
-          private_key: OpenSSL::PKey::RSA.new(private_key, password)
-        })
+        @key_pairs.push(KeyPair.new(certificate, private_key, password, use))
       end
 
       def generate_key_pair_for(use:, password: SecureRandom.uuid)
@@ -27,13 +25,16 @@ module Saml
         add_key_pair(certificate, private_key, password: password, use: use)
       end
 
+      def key_pairs(use: nil)
+        use.present? ? @key_pairs.find_all { |x| x.for?(use) } : @key_pairs
+      end
+
       def certificates(use: nil)
-        certificates = key_pairs.map { |x| x[:certificate] }
-        use.present? ? certificates.find_all { |x| x.for?(use) } : certificates
+        key_pairs(use: use).flat_map(&:certificate)
       end
 
       def private_keys(use: :signing)
-        key_pairs.find_all { |x| x[:certificate].for?(use) }.map { |x| x[:private_key] }
+        key_pairs(use: use).flat_map(&:private_key)
       end
 
       def encryption_certificate
@@ -54,11 +55,19 @@ module Saml
       def sign?
         certificates(use: :signing).any?
       end
+    end
 
-      private
+    class KeyPair
+      attr_reader :certificate, :private_key
 
-      def key_pairs
-        @key_pairs ||= []
+      def initialize(certificate, private_key, password, use)
+        @use = use
+        @certificate = Saml::Kit::Certificate.new(certificate, use: use)
+        @private_key = OpenSSL::PKey::RSA.new(private_key, password)
+      end
+
+      def for?(use)
+        @use == use
       end
     end
   end
