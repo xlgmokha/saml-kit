@@ -29,8 +29,8 @@ module Saml
         end
       end
 
-      def login_request_for(binding:, relay_state: nil)
-        builder = Saml::Kit::AuthenticationRequest.builder do |x|
+      def login_request_for(binding:, relay_state: nil, configuration: Saml::Kit.configuration)
+        builder = Saml::Kit::AuthenticationRequest.builder(configuration: configuration) do |x|
           x.embed_signature = want_authn_requests_signed
           yield x if block_given?
         end

@@ -37,6 +37,12 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
     end
 
+    it 'deserializes the SAMLRequest to an AuthnRequest with symbols for keys' do
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder_class.new)
+      result = subject.deserialize(query_params_from(url).symbolize_keys)
+      expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
+    end
+
     it 'deserializes the SAMLRequest to a LogoutRequest' do
       user = double(:user, name_id_for: SecureRandom.uuid)
       url, _ = subject.serialize(Saml::Kit::LogoutRequest.builder_class.new(user))

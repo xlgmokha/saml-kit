@@ -48,10 +48,11 @@ module Saml
         protected
 
         def saml_param_from(params)
-          if params['SAMLRequest'].present?
-            params['SAMLRequest']
-          elsif params['SAMLResponse'].present?
-            params['SAMLResponse']
+          parameters = params.with_indifferent_access
+          if parameters[:SAMLRequest].present?
+            parameters[:SAMLRequest]
+          elsif parameters[:SAMLResponse].present?
+            parameters[:SAMLResponse]
           else
             raise ArgumentError.new("SAMLRequest or SAMLResponse parameter is required.")
           end
