@@ -6,11 +6,11 @@ module Saml
       included do
         validate :must_have_valid_signature, unless: :signature_manually_verified
         validate :must_be_registered
-        validate :must_be_trusted, unless: :signature_manually_verified
+        validate :must_be_trusted
       end
 
       def signed?
-        signature.present?
+        signature_manually_verified || signature.present?
       end
 
       def signature
@@ -19,6 +19,7 @@ module Saml
       end
 
       def trusted?
+        return true if signature_manually_verified
         return false unless signed?
         signature.trusted?(provider)
       end

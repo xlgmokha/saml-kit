@@ -87,9 +87,9 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       expect(result).to be_instance_of(Saml::Kit::LogoutResponse)
     end
 
-    it 'raise an error when the content is invalid' do
+    it 'raises an error when the content is invalid' do
       expect do
-        subject.deserialize({ 'SAMLResponse' => "nonsense" })
+        subject.deserialize('SAMLResponse' => "nonsense")
       end.to raise_error(Zlib::DataError)
     end
 
