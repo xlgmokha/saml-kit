@@ -85,7 +85,15 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'raises an error when the signature does not match' do
-      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder_class.new)
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.issuer = issuer
+        config.generate_key_pair_for(use: :signing)
+      end
+      url, _ = subject.serialize(
+        Saml::Kit::AuthenticationRequest.builder(configuration: configuration) do |x|
+          x.embed_signature = true
+        end
+      )
       query_params = query_params_from(url)
       query_params['Signature'] = 'invalid'
       expect do
