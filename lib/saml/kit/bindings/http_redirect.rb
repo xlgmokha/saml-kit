@@ -38,6 +38,7 @@ module Saml
             value.present? ? "#{key}=#{value}" : nil
           end.compact.join('&')
 
+          return if document.provider.nil?
           if document.provider.verify(algorithm_for(params['SigAlg']), signature, canonical_form)
             document.signature_verified!
           else

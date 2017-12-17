@@ -127,5 +127,19 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
       expect(result).to be_valid
     end
+
+    it 'returns an unverfied document when the provider is unknown' do
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.generate_key_pair_for(use: :signing)
+      end
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder(configuration: configuration))
+
+      other_configuration = Saml::Kit::Configuration.new
+      allow(other_configuration.registry).to receive(:metadata_for).and_return(nil)
+
+      result = subject.deserialize(query_params_from(url), configuration: other_configuration)
+      expect(result).to_not be_signed
+      expect(result).to_not be_trusted
+    end
   end
 end
