@@ -43,6 +43,21 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
     end
 
+    it 'deserializes the SAMLRequest to an AuthnRequest when given a custom params object' do
+      class Parameters
+        def initialize(params)
+          @params = params
+        end
+
+        def [](key)
+          @params[key]
+        end
+      end
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder_class.new)
+      result = subject.deserialize(Parameters.new(query_params_from(url)))
+      expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
+    end
+
     it 'deserializes the SAMLRequest to a LogoutRequest' do
       user = double(:user, name_id_for: SecureRandom.uuid)
       url, _ = subject.serialize(Saml::Kit::LogoutRequest.builder_class.new(user))

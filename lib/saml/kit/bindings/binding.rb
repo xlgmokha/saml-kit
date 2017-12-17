@@ -48,7 +48,10 @@ module Saml
         protected
 
         def saml_param_from(params)
-          parameters = params.with_indifferent_access
+          parameters = {
+            SAMLRequest: params[:SAMLRequest] || params['SAMLRequest'],
+            SAMLResponse: params[:SAMLResponse] || params['SAMLResponse'],
+          }
           if parameters[:SAMLRequest].present?
             parameters[:SAMLRequest]
           elsif parameters[:SAMLResponse].present?
