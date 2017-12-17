@@ -18,7 +18,6 @@ module Saml
         def deserialize(params, configuration: Saml::Kit.configuration)
           document = deserialize_document_from!(params, configuration)
           ensure_valid_signature!(params, document)
-          document.signature_verified!
           document
         end
 
@@ -39,8 +38,11 @@ module Saml
             value.present? ? "#{key}=#{value}" : nil
           end.compact.join('&')
 
-          valid = document.provider.verify(algorithm_for(params['SigAlg']), signature, canonical_form)
-          raise ArgumentError.new("Invalid Signature") unless valid
+          if document.provider.verify(algorithm_for(params['SigAlg']), signature, canonical_form)
+            document.signature_verified!
+          else
+            raise ArgumentError.new("Invalid Signature")
+          end
         end
 
         def algorithm_for(algorithm)
