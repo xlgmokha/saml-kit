@@ -13,7 +13,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'encodes the request using the HTTP-Redirect encoding' do
-      builder = Saml::Kit::AuthenticationRequest.builder_class.new(configuration: configuration)
+      builder = Saml::Kit::AuthenticationRequest.builder(configuration: configuration)
       url, _ = subject.serialize(builder, relay_state: relay_state)
       expect(url).to start_with(location)
       expect(url).to have_query_param('SAMLRequest')
@@ -32,13 +32,13 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'deserializes the SAMLRequest to an AuthnRequest' do
-      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder_class.new)
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder)
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
     end
 
     it 'deserializes the SAMLRequest to an AuthnRequest with symbols for keys' do
-      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder_class.new)
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder)
       result = subject.deserialize(query_params_from(url).symbolize_keys)
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
     end
@@ -53,14 +53,14 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
           @params[key]
         end
       end
-      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder_class.new)
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder)
       result = subject.deserialize(Parameters.new(query_params_from(url)))
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
     end
 
     it 'deserializes the SAMLRequest to a LogoutRequest' do
       user = double(:user, name_id_for: SecureRandom.uuid)
-      url, _ = subject.serialize(Saml::Kit::LogoutRequest.builder_class.new(user))
+      url, _ = subject.serialize(Saml::Kit::LogoutRequest.builder(user))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::LogoutRequest)
     end
@@ -74,7 +74,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     it 'deserializes the SAMLResponse to a Response' do
       user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
       request = double(:request, id: SecureRandom.uuid, provider: nil, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: issuer, signed?: true, trusted?: true)
-      url, _ = subject.serialize(Saml::Kit::Response.builder_class.new(user, request))
+      url, _ = subject.serialize(Saml::Kit::Response.builder(user, request))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::Response)
     end
@@ -82,7 +82,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     it 'deserializes the SAMLResponse to a LogoutResponse' do
       user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
       request = double(:request, id: SecureRandom.uuid, provider: provider, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url)
-      url, _ = subject.serialize(Saml::Kit::LogoutResponse.builder_class.new(user, request))
+      url, _ = subject.serialize(Saml::Kit::LogoutResponse.builder(user, request))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::LogoutResponse)
     end
@@ -122,7 +122,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       end
       allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
 
-      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder_class.new)
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder)
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
       expect(result).to be_valid
