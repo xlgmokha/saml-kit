@@ -1,10 +1,10 @@
 module Saml
   module Kit
     class XmlDecryption
-      attr_reader :private_key
+      attr_reader :private_keys
 
       def initialize(configuration: Saml::Kit.configuration)
-        @private_key = configuration.private_keys(use: :encryption).last
+        @private_keys = configuration.private_keys(use: :encryption)
       end
 
       def decrypt(data)
@@ -19,7 +19,16 @@ module Saml
       def symmetric_key_from(encrypted_data)
         encrypted_key = encrypted_data['KeyInfo']['EncryptedKey']
         cipher_text = Base64.decode64(encrypted_key['CipherData']['CipherValue'])
-        to_plaintext(cipher_text, private_key, encrypted_key["EncryptionMethod"]['Algorithm'])
+        attempts = private_keys.count
+        private_keys.each do |private_key|
+          begin
+            attempts -= 1
+            return to_plaintext(cipher_text, private_key, encrypted_key["EncryptionMethod"]['Algorithm'])
+          rescue OpenSSL::PKey::RSAError => error
+            Saml::Kit.logger.error(error)
+            raise if attempts.zero?
+          end
+        end
       end
 
       def to_plaintext(cipher_text, symmetric_key, algorithm)
