@@ -16,8 +16,9 @@ module Saml
         end
 
         def deserialize(params, configuration: Saml::Kit.configuration)
-          document = deserialize_document_from!(params, configuration)
-          ensure_valid_signature!(params, document)
+          parameters = normalize(params)
+          document = deserialize_document_from!(parameters, configuration)
+          ensure_valid_signature!(parameters, document)
           document
         end
 
@@ -25,21 +26,20 @@ module Saml
 
         def deserialize_document_from!(params, configuration)
           xml = inflate(decode(unescape(saml_param_from(params))))
-          Saml::Kit.logger.debug(xml)
           Saml::Kit::Document.to_saml_document(xml, configuration: configuration)
         end
 
         def ensure_valid_signature!(params, document)
-          return if params['Signature'].blank? || params['SigAlg'].blank?
+          return if params[:Signature].blank? || params[:SigAlg].blank?
 
-          signature = decode(params['Signature'])
-          canonical_form = ['SAMLRequest', 'SAMLResponse', 'RelayState', 'SigAlg'].map do |key|
+          signature = decode(params[:Signature])
+          canonical_form = [:SAMLRequest, :SAMLResponse, :RelayState, :SigAlg].map do |key|
             value = params[key]
             value.present? ? "#{key}=#{value}" : nil
           end.compact.join('&')
 
           return if document.provider.nil?
-          if document.provider.verify(algorithm_for(params['SigAlg']), signature, canonical_form)
+          if document.provider.verify(algorithm_for(params[:SigAlg]), signature, canonical_form)
             document.signature_verified!
           else
             raise ArgumentError.new("Invalid Signature")
@@ -56,6 +56,23 @@ module Saml
             OpenSSL::Digest::SHA512.new
           else
             OpenSSL::Digest::SHA1.new
+          end
+        end
+
+        def normalize(params)
+          if params.respond_to? :inject
+            params.inject({}) do |memo, (key, value)|
+              memo[key.to_sym] = value
+              memo
+            end
+          else
+            {
+              SAMLRequest: params['SAMLRequest'] || params[:SAMLRequest],
+              SAMLResponse: params['SAMLResponse'] || params[:SAMLResponse],
+              RelayState: params['RelayState'] || params[:RelayState],
+              Signature: params['Signature'] || params[:Signature],
+              SigAlg: params['SigAlg'] || params[:SigAlg],
+            }
           end
         end
       end

@@ -38,6 +38,21 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'deserializes the SAMLRequest to an AuthnRequest with symbols for keys' do
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.issuer = issuer
+        config.generate_key_pair_for(use: :signing)
+      end
+      provider = Saml::Kit::IdentityProviderMetadata.build(configuration: configuration)
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder(configuration: configuration))
+      allow(configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
+
+      result = subject.deserialize(query_params_from(url).symbolize_keys, configuration: configuration)
+      expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
+      expect(result).to be_signed
+      expect(result).to be_trusted
+    end
+
+    it 'deserializes the SAMLRequest to an AuthnRequest with symbols for keys' do
       url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder)
       result = subject.deserialize(query_params_from(url).symbolize_keys)
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
