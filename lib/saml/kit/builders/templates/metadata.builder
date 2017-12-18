@@ -1,5 +1,6 @@
 xml.instruct!
 xml.EntityDescriptor entity_descriptor_options do
+  signature_for(reference_id: id, xml: xml)
   render identity_provider, xml: xml
   render service_provider, xml: xml
   xml.Organization do

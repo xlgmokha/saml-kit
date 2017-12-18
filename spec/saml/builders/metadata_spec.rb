@@ -52,5 +52,20 @@ RSpec.describe Saml::Kit::Builders::Metadata do
       expect(hash_result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['Location']).to eql(url)
     end
 
+    it 'generates signed idp and sp metadata' do
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.generate_key_pair_for(use: :signing)
+      end
+      metadata = Saml::Kit::Metadata.build(configuration: configuration) do |builder|
+        builder.entity_id = FFaker::Internet.uri("https")
+        builder.build_identity_provider do |x|
+          x.embed_signature = true
+        end
+        builder.build_service_provider do |x|
+          x.embed_signature = true
+        end
+      end
+      expect(metadata).to be_present
+    end
   end
 end

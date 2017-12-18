@@ -1,4 +1,3 @@
-signature_for(reference_id: id, xml: xml)
 xml.SPSSODescriptor descriptor_options do
   configuration.certificates(use: :signing).each do |certificate|
     render certificate, xml: xml
