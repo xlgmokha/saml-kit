@@ -7,7 +7,7 @@ module Saml
         "ds": Namespaces::XMLDSIG,
         "md": Namespaces::METADATA,
         "saml": Namespaces::ASSERTION,
-        "pro": Namespaces::PROTOCOL,
+        "samlp": Namespaces::PROTOCOL,
       }.freeze
 
       attr_reader :raw_xml, :document
