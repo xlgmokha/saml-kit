@@ -29,6 +29,18 @@ module Saml
         document.find_all("/md:EntityDescriptor/md:#{name}/md:NameIDFormat").map(&:text)
       end
 
+      def organization_name
+        document.find_by("/md:EntityDescriptor/md:Organization/md:OrganizationName").try(:text)
+      end
+
+      def organization_url
+        document.find_by("/md:EntityDescriptor/md:Organization/md:OrganizationURL").try(:text)
+      end
+
+      def contact_person_company
+        document.find_by("/md:EntityDescriptor/md:ContactPerson/md:Company").try(:text)
+      end
+
       def certificates
         @certificates ||= document.find_all("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
           cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", Xml::NAMESPACES).text
