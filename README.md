@@ -1,7 +1,10 @@
 # Saml::Kit
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. 
-Put your Ruby code in the file `lib/saml/kit`. To experiment with that code, run `bin/console` for an interactive prompt.
+Saml::Kit is a library with the purpose of creating and consuming SAML
+documents. It supports the HTTP Post and HTTP Redirect bindings. It can
+create Service Provider Metadata, Identity Provider Metadata,
+AuthnRequest, Response, LogoutRequest, LogoutResponse documents.  
+It also supports generating signed and encrypted assertions.
 
 ## Installation
 
@@ -175,7 +178,9 @@ puts [url, saml_params].inspect
 
 ### Response
 
-To generate a response you will need to generate a response from the a request.
+To generate a Response you will need a request object and the desired binding 
+to serialize a response. You will also need to specify a user
+object to create a response for.
 
 ```ruby
 binding = idp.single_sign_on_service_for(binding: :http_post)
@@ -189,9 +194,8 @@ puts [url, saml_params].inspect
 
 ### LogoutRequest
 
-To generate a Response choose the desired binding form the metadata and
-use it to serialize a response. You will also need to specify a user
-object to create a response for.
+To create a logout request you will need to choose the desired binding
+from the metadata then generate a request for a specific user.
 
 ```ruby
 class User
@@ -218,6 +222,22 @@ puts [url, saml_params].inspect
 # ["https://www.example.com/logout", {"SAMLRequest"=>"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48TG9nb3V0UmVxdWVzdCBJRD0iXzg3NjZiNTYyLTc2MzQtNDU4Zi04MzJmLTE4ODkwMjRlZDQ0MyIgVmVyc2lvbj0iMi4wIiBJc3N1ZUluc3RhbnQ9IjIwMTctMTItMTlUMDQ6NTg6MThaIiBEZXN0aW5hdGlvbj0iaHR0cHM6Ly93d3cuZXhhbXBsZS5jb20vbG9nb3V0IiB4bWxucz0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnByb3RvY29sIj48SXNzdWVyIHhtbG5zPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIi8+PE5hbWVJRCBGb3JtYXQ9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpuYW1laWQtZm9ybWF0OnBlcnNpc3RlbnQiIHhtbG5zPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIj5kODc3YWEzZS01YTUyLTRhODAtYTA3ZC1lM2U5YzBjNTA1Nzk8L05hbWVJRD48L0xvZ291dFJlcXVlc3Q+"}]
 ```
 
+### LogoutResponse
+
+To generate a logout response, deserialize the logout request then
+generate a response from the request.
+
+```ruby
+idp = Saml::Kit::IdentityProviderMetadata.new(xml)
+user = User.new(id: SecureRandom.uuid, email: "hello@example.com")
+raw_params = Hash[uri.query.split("&amp;").map { |x| x.split("=", 2) }].symbolize_keys
+
+binding = idp.single_logout_service_for(binding: :http_post)
+saml_request = binding.deserialize(raw_params)
+url, saml_params = saml_request.response_for(user, binding: :http_post)
+puts [url, saml_params].inspect
+# ["https://www.example.com/logout", {"SAMLResponse"=>"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48TG9nb3V0UmVzcG9uc2UgeG1sbnM9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpwcm90b2NvbCIgSUQ9Il9kZDA2YmY5MC04ODI2LTQ5ZTMtYmYxNS1jYzAxMWJkNzU3NGEiIFZlcnNpb249IjIuMCIgSXNzdWVJbnN0YW50PSIyMDE3LTEyLTE5VDA1OjQyOjQyWiIgRGVzdGluYXRpb249Imh0dHBzOi8vd3d3LmV4YW1wbGUuY29tL2xvZ291dCIgSW5SZXNwb25zZVRvPSJfYmVhZjJiN2ItMDlmNC00ZmFkLWJkYmYtOWQ0ZDc1N2I5ZDU0Ij48SXNzdWVyIHhtbG5zPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIi8+PFN0YXR1cz48U3RhdHVzQ29kZSBWYWx1ZT0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnN0YXR1czpTdWNjZXNzIi8+PC9TdGF0dXM+PC9Mb2dvdXRSZXNwb25zZT4="}]
+```
 
 ## Development
 
