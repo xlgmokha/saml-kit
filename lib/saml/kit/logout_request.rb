@@ -1,5 +1,6 @@
 module Saml
   module Kit
+    # This class parses a LogoutRequest SAML document.
     class LogoutRequest < Document
       include Requestable
       validates_presence_of :single_logout_service, if: :expected_type?
@@ -8,25 +9,34 @@ module Saml
         super(xml, name: "LogoutRequest", configuration: configuration)
       end
 
+      # Returns the NameID value.
       def name_id
         to_h[name]['NameID']
       end
 
-      def single_logout_service
-        return if provider.nil?
-        urls = provider.single_logout_services
-        urls.first
-      end
-
-      def response_for(user, binding:, relay_state: nil)
-        builder = Saml::Kit::LogoutResponse.builder(user, self) do |x|
+      # Generates a Serialized LogoutResponse using the encoding rules for the specified binding.
+      #
+      # @param binding [Symbol] The binding to use `:http_redirect` or `:http_post`.
+      # @param relay_state [Object] The RelayState to include in the RelayState param.
+      # @return [Array] Returns an array with a url and Hash of parameters to return to the requestor.
+      def response_for(binding:, relay_state: nil)
+        builder = Saml::Kit::LogoutResponse.builder(self) do |x|
           yield x if block_given?
         end
         response_binding = provider.single_logout_service_for(binding: binding)
         response_binding.serialize(builder, relay_state: relay_state)
       end
 
+      # @deprecated Use {#Saml::Kit::Builders::LogoutRequest} instead of this.
       Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::LogoutRequest::Builder', 'Saml::Kit::Builders::LogoutRequest')
+
+      private
+
+      def single_logout_service
+        return if provider.nil?
+        urls = provider.single_logout_services
+        urls.first
+      end
     end
   end
 end

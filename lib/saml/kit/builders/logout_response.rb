@@ -7,14 +7,13 @@ module Saml
         attr_reader :request
         attr_reader :configuration
 
-        def initialize(user, request, configuration: Saml::Kit.configuration)
+        def initialize(request, configuration: Saml::Kit.configuration)
           @configuration = configuration
           @id = Id.generate
           @issuer = configuration.issuer
           @now = Time.now.utc
           @request = request
           @status_code = Namespaces::SUCCESS
-          @user = user
           @version = "2.0"
         end
 

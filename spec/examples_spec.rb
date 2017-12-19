@@ -191,7 +191,7 @@ RSpec.describe "Examples" do
     saml_request = binding.deserialize(raw_params)
     sp = Saml::Kit::ServiceProviderMetadata.new(xml)
     allow(saml_request).to receive(:provider).and_return(sp)
-    url, saml_params = saml_request.response_for(user, binding: :http_post)
+    url, saml_params = saml_request.response_for(binding: :http_post)
     expect(url).to eql("https://www.example.com/logout")
     expect(saml_params['SAMLResponse']).to be_present
   end

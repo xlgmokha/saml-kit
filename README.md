@@ -229,12 +229,11 @@ generate a response from the request.
 
 ```ruby
 idp = Saml::Kit::IdentityProviderMetadata.new(xml)
-user = User.new(id: SecureRandom.uuid, email: "hello@example.com")
 raw_params = Hash[uri.query.split("&amp;").map { |x| x.split("=", 2) }].symbolize_keys
 
 binding = idp.single_logout_service_for(binding: :http_post)
 saml_request = binding.deserialize(raw_params)
-url, saml_params = saml_request.response_for(user, binding: :http_post)
+url, saml_params = saml_request.response_for(binding: :http_post)
 puts [url, saml_params].inspect
 # ["https://www.example.com/logout", {"SAMLResponse"=>"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48TG9nb3V0UmVzcG9uc2UgeG1sbnM9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpwcm90b2NvbCIgSUQ9Il9kZDA2YmY5MC04ODI2LTQ5ZTMtYmYxNS1jYzAxMWJkNzU3NGEiIFZlcnNpb249IjIuMCIgSXNzdWVJbnN0YW50PSIyMDE3LTEyLTE5VDA1OjQyOjQyWiIgRGVzdGluYXRpb249Imh0dHBzOi8vd3d3LmV4YW1wbGUuY29tL2xvZ291dCIgSW5SZXNwb25zZVRvPSJfYmVhZjJiN2ItMDlmNC00ZmFkLWJkYmYtOWQ0ZDc1N2I5ZDU0Ij48SXNzdWVyIHhtbG5zPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIi8+PFN0YXR1cz48U3RhdHVzQ29kZSBWYWx1ZT0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnN0YXR1czpTdWNjZXNzIi8+PC9TdGF0dXM+PC9Mb2dvdXRSZXNwb25zZT4="}]
 ```
