@@ -24,14 +24,23 @@ module Saml
         super(xml, name: "AuthnRequest", configuration: configuration)
       end
 
+      # Extract the AssertionConsumerServiceURL from the AuthnRequest
+      #    <samlp:AuthnRequest AssertionConsumerServiceURL="https://carroll.com/acs"></samlp:AuthnRequest>
       def assertion_consumer_service_url
         to_h[name]['AssertionConsumerServiceURL']
       end
 
+      # Extract the NameIDPolicy from the AuthnRequest
+      #    <samlp:AuthnRequest>
+      #      <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
+      #    </samlp:AuthnRequest>
       def name_id_format
         to_h[name]['NameIDPolicy']['Format']
       end
 
+      # Generate a Response for a specific user.
+      # @param user [Object] this is a custom user object that can be used for generating a nameid and assertion attributes.
+      # @param binding [Symbol] the SAML binding to use `:http_post` or `:http_redirect`.
       def response_for(user, binding:, relay_state: nil)
         response_binding = provider.assertion_consumer_service_for(binding: binding)
         builder = Saml::Kit::Response.builder(user, self) do |x|
@@ -41,6 +50,7 @@ module Saml
         response_binding.serialize(builder, relay_state: relay_state)
       end
 
+      # @deprecated Use {#Saml::Kit::Builders::AuthenticationRequest} instead of this.
       Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::AuthenticationRequest::Builder', 'Saml::Kit::Builders::AuthenticationRequest')
     end
   end
