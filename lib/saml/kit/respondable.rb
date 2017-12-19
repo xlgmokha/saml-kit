@@ -9,18 +9,22 @@ module Saml
         validate :must_match_request_id
       end
 
+      # @!visibility private
       def query_string_parameter
         'SAMLResponse'
       end
 
+      # Returns the /Status/StatusCode@Value
       def status_code
         to_h.fetch(name, {}).fetch('Status', {}).fetch('StatusCode', {}).fetch('Value', nil)
       end
 
+      # Returns the /InResponseTo attribute.
       def in_response_to
         to_h.fetch(name, {}).fetch('InResponseTo', nil)
       end
 
+      # Returns true if the Status code is #{Saml::Kit::Namespaces::SUCCESS}
       def success?
         Namespaces::SUCCESS == status_code
       end

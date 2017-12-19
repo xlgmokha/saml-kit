@@ -1,5 +1,6 @@
 module Saml
   module Kit
+    # This class is used to parse a LogoutResponse SAML document.
     class LogoutResponse < Document
       include Respondable
 
@@ -8,6 +9,7 @@ module Saml
         super(xml, name: "LogoutResponse", configuration: configuration)
       end
 
+      # @deprecated Use {#Saml::Kit::Builders::LogoutResponse} instead of this.
       Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::LogoutResponse::Builder', 'Saml::Kit::Builders::LogoutResponse')
     end
   end

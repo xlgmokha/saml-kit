@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module XsdValidatable
+      # @!visibility private
       def matches_xsd?(xsd)
         Dir.chdir(File.dirname(xsd)) do
           xsd = Nokogiri::XML::Schema(IO.read(xsd))

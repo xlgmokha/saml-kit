@@ -13,6 +13,7 @@ module Saml
         signature_manually_verified || signature.present?
       end
 
+      # @!visibility private
       def signature
         xml_hash = to_h.fetch(name, {}).fetch('Signature', nil)
         xml_hash ? Signature.new(xml_hash) : nil
@@ -24,10 +25,12 @@ module Saml
         signature.trusted?(provider)
       end
 
+      # @!visibility private
       def provider
         configuration.registry.metadata_for(issuer)
       end
 
+      # @!visibility private
       def signature_verified!
         @signature_manually_verified = true
       end
