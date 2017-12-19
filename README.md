@@ -164,13 +164,44 @@ puts metadata.to_xml(pretty: true)
 ### AuthnRequest
 
 To generate an Authentication Request choose the desired binding from
-the metadata and use it to serialize a response.
+the metadata and use it to serialize a request.
 
 ```ruby
 idp = Saml::Kit::IdentityProviderMetadata.new(raw_xml)
 url, saml_params = idp.login_request_for(binding: :http_post)
 puts [url, saml_params].inspect
 # ["https://www.example.com/login", {"SAMLRequest"=>"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c2FtbHA6QXV0aG5SZXF1ZXN0IHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6cHJvdG9jb2wiIHhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDphc3NlcnRpb24iIElEPSJfN2Y0YjkxZGMtNTMyNi00NjgzLTgyOWItYWViNzlkNjM0ZWYzIiBWZXJzaW9uPSIyLjAiIElzc3VlSW5zdGFudD0iMjAxNy0xMi0xOVQwNDo0ODoxMloiIERlc3RpbmF0aW9uPSJodHRwczovL3d3dy5leGFtcGxlLmNvbS9sb2dpbiI+PHNhbWw6SXNzdWVyLz48c2FtbHA6TmFtZUlEUG9saWN5IEZvcm1hdD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOm5hbWVpZC1mb3JtYXQ6cGVyc2lzdGVudCIvPjwvc2FtbHA6QXV0aG5SZXF1ZXN0Pg=="}]
+```
+
+### LogoutRequest
+
+To generate a Response choose the desired binding form the metadata and
+use it to serialize a response. You will also need to specify a user
+object to create a response for.
+
+```ruby
+class User
+  attr_reader :id, :email
+
+  def initialize(id:, email:)
+    @id = id
+    @email = email
+  end
+
+  def name_id_for(name_id_format)
+    Saml::Kit::Namespaces::PERSISTENT == name_id_format ? id : email
+  end
+
+  def assertion_attributes_for(request)
+    request.trusted? ? { access_token: SecureRandom.uuid } : {}
+  end
+end
+
+user = User.new(id: SecureRandom.uuid, email: "hello@example.com")
+sp = Saml::Kit::IdentityProviderMetadata.new(xml)
+url, saml_params = sp.logout_request_for(user, binding: :http_post)
+puts [url, saml_params].inspect
+# ["https://www.example.com/logout", {"SAMLRequest"=>"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48TG9nb3V0UmVxdWVzdCBJRD0iXzg3NjZiNTYyLTc2MzQtNDU4Zi04MzJmLTE4ODkwMjRlZDQ0MyIgVmVyc2lvbj0iMi4wIiBJc3N1ZUluc3RhbnQ9IjIwMTctMTItMTlUMDQ6NTg6MThaIiBEZXN0aW5hdGlvbj0iaHR0cHM6Ly93d3cuZXhhbXBsZS5jb20vbG9nb3V0IiB4bWxucz0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnByb3RvY29sIj48SXNzdWVyIHhtbG5zPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIi8+PE5hbWVJRCBGb3JtYXQ9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpuYW1laWQtZm9ybWF0OnBlcnNpc3RlbnQiIHhtbG5zPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIj5kODc3YWEzZS01YTUyLTRhODAtYTA3ZC1lM2U5YzBjNTA1Nzk8L05hbWVJRD48L0xvZ291dFJlcXVlc3Q+"}]
 ```
 
 
