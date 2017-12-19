@@ -45,5 +45,16 @@ RSpec.describe Saml::Kit::Xml do
       expect(subject).to_not be_valid
       expect(subject.errors[:signature]).to be_present
     end
+
+    it 'is valid' do
+      configuration = Saml::Kit::Configuration.new do |config|
+        5.times { config.generate_key_pair_for(use: :signing) }
+      end
+      signed_xml = Saml::Kit::Metadata.build_xml(configuration: configuration) do |builder|
+        builder.build_identity_provider
+        builder.build_service_provider
+      end
+      expect(described_class.new(signed_xml)).to be_valid
+    end
   end
 end

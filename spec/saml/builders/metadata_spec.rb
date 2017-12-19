@@ -54,18 +54,21 @@ RSpec.describe Saml::Kit::Builders::Metadata do
 
     it 'generates signed idp and sp metadata' do
       configuration = Saml::Kit::Configuration.new do |config|
-        config.generate_key_pair_for(use: :signing)
+        3.times { config.generate_key_pair_for(use: :signing) }
       end
       metadata = Saml::Kit::Metadata.build(configuration: configuration) do |builder|
         builder.entity_id = FFaker::Internet.uri("https")
         builder.build_identity_provider do |x|
           x.embed_signature = true
+          x.add_single_sign_on_service(url, binding: :http_post)
         end
         builder.build_service_provider do |x|
           x.embed_signature = true
+          x.add_assertion_consumer_service(url, binding: :http_post)
         end
       end
       expect(metadata).to be_present
+      expect(metadata).to be_valid
     end
   end
 end
