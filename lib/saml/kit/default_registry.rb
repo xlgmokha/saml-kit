@@ -1,27 +1,38 @@
 module Saml
   module Kit
+    # The default metadata registry is used to fetch the metadata associated with an issuer or entity id.
+    # The metadata associated with an issuer is used to verify trust for any SAML documents that are received.
     class DefaultRegistry
       def initialize(items = {})
         @items = items
       end
 
+      # Register a metadata document
+      #
+      # @param metadata [Saml::Kit::Metadata] the metadata to register.
       def register(metadata)
         Saml::Kit.logger.debug(metadata.to_xml(pretty: true))
         @items[metadata.entity_id] = metadata
       end
 
+      # Register metadata via a remote URL.
+      # This will attempt to connect to the remove URL to download the metadata and register it in the registry.
+      #
+      # @param url [String] the url to download the metadata from.
+      # @param verify_ssl [Boolean] enable/disable SSL peer verification.
       def register_url(url, verify_ssl: true)
         content = HttpApi.new(url, verify_ssl: verify_ssl).get
         register(Saml::Kit::Metadata.from(content))
       end
 
+      # Returns the metadata document associated with an issuer or entityID.
+      #
+      # @param entity_id [String] the unique entityID/Issuer associated with metadata.
       def metadata_for(entity_id)
         @items[entity_id]
       end
 
-      class HttpApi
-        attr_reader :uri, :verify_ssl
-
+      class HttpApi # :nodoc:
         def initialize(url, verify_ssl: true)
           @uri = URI.parse(url)
           @verify_ssl = verify_ssl
@@ -36,6 +47,8 @@ module Saml
         end
 
         private
+
+        attr_reader :uri, :verify_ssl
 
         def http
           http = Net::HTTP.new(uri.host, uri.port)
