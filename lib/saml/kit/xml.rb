@@ -1,6 +1,6 @@
 module Saml
   module Kit
-    class Xml
+    class Xml # :nodoc:
       include ActiveModel::Validations
       NAMESPACES = {
         "NameFormat": Namespaces::ATTR_SPLAT,

@@ -1,6 +1,6 @@
 module Saml
   module Kit
-    class KeyPair
+    class KeyPair # :nodoc:
       attr_reader :certificate, :private_key, :use
 
       def initialize(certificate, private_key, password, use)

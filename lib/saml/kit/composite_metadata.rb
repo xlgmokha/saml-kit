@@ -1,6 +1,6 @@
 module Saml
   module Kit
-    class CompositeMetadata < Metadata
+    class CompositeMetadata < Metadata # :nodoc:
       include Enumerable
       attr_reader :service_provider, :identity_provider
 

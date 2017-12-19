@@ -1,6 +1,6 @@
 module Saml
   module Kit
-    class Signatures
+    class Signatures # :nodoc:
       attr_reader :configuration
 
       def initialize(configuration:)

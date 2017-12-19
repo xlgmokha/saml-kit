@@ -16,11 +16,13 @@ module Saml
           @version = "2.0"
         end
 
+        # @deprecated Use {#assertion_consumer_service_url} instead of this method.
         def acs_url
           Saml::Kit.deprecate("acs_url is deprecated. Use assertion_consumer_service_url instead")
           self.assertion_consumer_service_url
         end
 
+        # @deprecated Use {#assertion_consumer_service_url=} instead of this method.
         def acs_url=(value)
           Saml::Kit.deprecate("acs_url= is deprecated. Use assertion_consumer_service_url= instead")
           self.assertion_consumer_service_url = value

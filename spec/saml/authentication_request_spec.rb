@@ -40,6 +40,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
     it 'is valid when left untampered' do
       subject = described_class.new(raw_xml, configuration: configuration)
+      puts subject.to_xml(pretty: true)
       expect(subject).to be_valid
     end
 

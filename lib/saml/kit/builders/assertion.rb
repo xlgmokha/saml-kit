@@ -45,7 +45,7 @@ module Saml
         def conditions_options
           {
             NotBefore: now.utc.iso8601,
-            NotOnOrAfter: configuration.session_timeout.from_now.utc.iso8601,
+            NotOnOrAfter: configuration.session_timeout.since(now).utc.iso8601,
           }
         end
 
@@ -53,7 +53,7 @@ module Saml
           {
             AuthnInstant: now.iso8601,
             SessionIndex: reference_id,
-            SessionNotOnOrAfter: 3.hours.since(now).utc.iso8601,
+            SessionNotOnOrAfter: configuration.session_timeout.since(now).utc.iso8601,
           }
         end
       end

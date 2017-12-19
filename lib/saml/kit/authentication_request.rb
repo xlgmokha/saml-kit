@@ -1,8 +1,25 @@
 module Saml
   module Kit
+    # This class can be used to parse a SAML AuthnRequest or generate one.
+    #
+    # To generate an AuthnRequest use the builder API.
+    #
+    #    request = AuthenticationRequest.build do |builder|
+    #      builder.name_id_format = [Saml::Kit::Namespaces::EMAIL_ADDRESS]
+    #    end
+    #
+    #    <?xml version="1.0" encoding="UTF-8"?>
+    #    <samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_ca3a0e72-9530-41f1-9518-c53716de88b2" Version="2.0" IssueInstant="2017-12-19T16:27:44Z" Destination="http://hartmann.info" AssertionConsumerServiceURL="https://carroll.com/acs">
+    #      <saml:Issuer>Day of the Dangerous Cousins</saml:Issuer>
+    #      <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
+    #    </samlp:AuthnRequest>
     class AuthenticationRequest < Document
       include Requestable
 
+      # Create an instance of an AuthnRequest document.
+      #
+      # @param xml [String] the raw xml.
+      # @param configuration [Saml::Kit::Configuration] defaults to the global configuration.
       def initialize(xml, configuration: Saml::Kit.configuration)
         super(xml, name: "AuthnRequest", configuration: configuration)
       end
