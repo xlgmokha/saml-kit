@@ -31,6 +31,8 @@ Saml::Kit.configure do |configuration|
 end
 ```
 
+### Metadata
+
 To generate metadata for an Identity Provider.
 
 ```ruby
@@ -158,6 +160,19 @@ puts metadata.to_xml(pretty: true)
   </ContactPerson>
 </EntityDescriptor>
 ```
+
+### AuthnRequest
+
+To generate an Authentication Request choose the desired binding from
+the metadata and use it to serialize a response.
+
+```ruby
+idp = Saml::Kit::IdentityProviderMetadata.new(raw_xml)
+url, saml_params = idp.login_request_for(binding: :http_post)
+puts [url, saml_params].inspect
+# ["https://www.example.com/login", {"SAMLRequest"=>"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c2FtbHA6QXV0aG5SZXF1ZXN0IHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6cHJvdG9jb2wiIHhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDphc3NlcnRpb24iIElEPSJfN2Y0YjkxZGMtNTMyNi00NjgzLTgyOWItYWViNzlkNjM0ZWYzIiBWZXJzaW9uPSIyLjAiIElzc3VlSW5zdGFudD0iMjAxNy0xMi0xOVQwNDo0ODoxMloiIERlc3RpbmF0aW9uPSJodHRwczovL3d3dy5leGFtcGxlLmNvbS9sb2dpbiI+PHNhbWw6SXNzdWVyLz48c2FtbHA6TmFtZUlEUG9saWN5IEZvcm1hdD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOm5hbWVpZC1mb3JtYXQ6cGVyc2lzdGVudCIvPjwvc2FtbHA6QXV0aG5SZXF1ZXN0Pg=="}]
+```
+
 
 ## Development
 
