@@ -13,8 +13,6 @@ module Saml
       validate :must_be_expected_type
       validate :must_be_valid_version
 
-      attr_reader :content, :name, :configuration
-
       def initialize(xml, name:, configuration: Saml::Kit.configuration)
         @configuration = configuration
         @content = xml
@@ -22,39 +20,45 @@ module Saml
         @xml_hash = Hash.from_xml(xml) || {}
       end
 
+      # Returns the ID for the SAML document.
       def id
         to_h.fetch(name, {}).fetch('ID', nil)
       end
 
+      # Returns the Issuer for the SAML document.
       def issuer
         to_h.fetch(name, {}).fetch('Issuer', nil)
       end
 
+      # Returns the Version of the SAML document.
       def version
         to_h.fetch(name, {}).fetch('Version', {})
       end
 
+      # Returns the Destination of the SAML document.
       def destination
         to_h.fetch(name, {}).fetch('Destination', nil)
       end
 
+      # Returns the Destination of the SAML document.
       def issue_instant
-        to_h[name]['IssueInstant']
+        Time.parse(to_h[name]['IssueInstant'])
       end
 
-      def expected_type?
-        return false if to_xml.blank?
-        to_h[name].present?
-      end
-
+      # Returns the SAML document returned as a Hash.
       def to_h
         @xml_hash
       end
 
+      # Returns the SAML document as an XML string.
+      #
+      # @param pretty [Boolean] formats the xml or returns the raw xml.
       def to_xml(pretty: false)
         pretty ? Nokogiri::XML(content).to_xml(indent: 2) : content
       end
 
+      # Returns the SAML document as an XHTML string. 
+      # This is useful for rendering in a web page.
       def to_xhtml
         Nokogiri::XML(content, &:noblanks).to_xhtml
       end
@@ -64,6 +68,10 @@ module Saml
       end
 
       class << self
+        # Returns the raw xml as a Saml::Kit SAML document.
+        #
+        # @param xml [String] the raw xml string.
+        # @param configuration [Saml::Kit::Configuration] the configuration to use for unpacking the document.
         def to_saml_document(xml, configuration: Saml::Kit.configuration)
           hash = Hash.from_xml(xml)
           if hash['Response'].present?
@@ -80,7 +88,8 @@ module Saml
           InvalidDocument.new(xml)
         end
 
-        def builder_class
+        # @!visibility private
+        def builder_class # :nodoc:
           case name
           when Saml::Kit::Response.to_s
             Saml::Kit::Builders::Response
@@ -98,6 +107,8 @@ module Saml
 
       private
 
+      attr_reader :content, :name, :configuration
+
       def must_match_xsd
         matches_xsd?(PROTOCOL_XSD)
       end
@@ -106,6 +117,11 @@ module Saml
         return if to_h.nil?
 
         errors[:base] << error_message(:invalid) unless expected_type?
+      end
+
+      def expected_type?
+        return false if to_xml.blank?
+        to_h[name].present?
       end
 
       def must_be_valid_version

@@ -1,12 +1,18 @@
 module Saml
   module Kit
+    # This generates a fingerprint for an X509 Certificate.
     class Fingerprint
+      # The OpenSSL::X509::Certificate
       attr_reader :x509
 
       def initialize(raw_certificate)
         @x509 = Certificate.to_x509(raw_certificate)
       end
 
+      # Generates a formatted fingerprint using the specified hash algorithm.
+      #
+      # @param algorithm [OpenSSL::Digest] the openssl algorithm to use `OpenSSL::Digest::SHA256`, `OpenSSL::Digest::SHA1`.
+      # @return [String] in the format of `"BF:ED:C5:F1:6C:AB:F5:B2:15:1F:BF:BD:7D:68:1A:F9:A5:4E:4C:19:30:BC:6D:25:B1:8E:98:D4:23:FD:B4:09"`
       def algorithm(algorithm)
         pretty_fingerprint(algorithm.new.hexdigest(x509.to_der))
       end

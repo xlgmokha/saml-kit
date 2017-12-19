@@ -15,7 +15,7 @@ RSpec.describe Saml::Kit::Builders::LogoutResponse do
       subject.destination = destination
       result = subject.build
       expect(result.id).to be_present
-      expect(result.issue_instant).to eql(Time.now.utc.iso8601)
+      expect(result.issue_instant).to eql(Time.now.utc)
       expect(result.version).to eql("2.0")
       expect(result.issuer).to eql(issuer)
       expect(result.status_code).to eql(Saml::Kit::Namespaces::SUCCESS)

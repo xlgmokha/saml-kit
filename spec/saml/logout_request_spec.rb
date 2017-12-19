@@ -23,7 +23,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
 
   it 'parses the issue instant' do
     travel_to 1.second.from_now
-    expect(subject.issue_instant).to eql(Time.now.utc.iso8601)
+    expect(subject.issue_instant).to eql(Time.now.utc)
   end
 
   it 'parses the version' do
