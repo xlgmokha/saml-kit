@@ -30,7 +30,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/mokhan/saml-kit.
+Bug reports and pull requests are welcome on GitLab at https://gitlab.com/xlgmokha/saml-kit.
 
 ## License
 
