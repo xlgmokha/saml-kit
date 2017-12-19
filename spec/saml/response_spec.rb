@@ -160,6 +160,80 @@ RSpec.describe Saml::Kit::Response do
       subject = described_class.new(raw_xml)
       expect(subject).to be_invalid
     end
+
+    it 'is invalid when there are 2 assertions' do
+      id = Saml::Kit::Id.generate
+      issuer = FFaker::Internet.uri("https")
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.generate_key_pair_for(use: :signing)
+      end
+      response_options = {
+        ID: id,
+        Version: "2.0",
+        IssueInstant: Time.now.iso8601,
+        Consent: Saml::Kit::Namespaces::UNSPECIFIED,
+        InResponseTo: request.id,
+        xmlns: Saml::Kit::Namespaces::PROTOCOL,
+      }
+      assertion_options = {
+        ID: Saml::Kit::Id.generate,
+        IssueInstant: Time.now.iso8601,
+        Version: "2.0",
+        xmlns: Saml::Kit::Namespaces::ASSERTION,
+      }
+      xml = Saml::Kit::Signatures.sign(configuration: configuration) do |xml, signature|
+        xml.instruct!
+        xml.Response response_options do
+          xml.Issuer(issuer, xmlns: Saml::Kit::Namespaces::ASSERTION)
+          xml.Status do
+            xml.StatusCode Value: Saml::Kit::Namespaces::SUCCESS
+          end
+          xml.Assertion(assertion_options) do
+            xml.Issuer issuer
+            signature.template(assertion_options[:ID])
+            xml.Subject do
+              xml.NameID FFaker::Internet.email, Format: Saml::Kit::Namespaces::EMAIL_ADDRESS
+              xml.SubjectConfirmation Method: Saml::Kit::Namespaces::BEARER do
+                xml.SubjectConfirmationData "", InResponseTo: request.id, NotOnOrAfter: 3.hours.from_now.utc.iso8601, Recipient: FFaker::Internet.uri("https")
+              end
+            end
+            xml.Conditions NotBefore: Time.now.utc.iso8601, NotOnOrAfter: 3.hours.from_now.utc.iso8601 do
+              xml.AudienceRestriction do
+                xml.Audience request.issuer
+              end
+            end
+            xml.AuthnStatement AuthnInstant: Time.now.iso8601, SessionIndex: assertion_options[:ID], SessionNotOnOrAfter: 3.hours.from_now.utc.iso8601 do
+              xml.AuthnContext do
+                xml.AuthnContextClassRef Saml::Kit::Namespaces::PASSWORD
+              end
+            end
+          end
+          new_options = assertion_options.merge(ID: Saml::Kit::Id.generate)
+          xml.Assertion(new_options) do
+            xml.Issuer issuer
+            xml.Subject do
+              xml.NameID FFaker::Internet.email, Format: Saml::Kit::Namespaces::EMAIL_ADDRESS
+              xml.SubjectConfirmation Method: Saml::Kit::Namespaces::BEARER do
+                xml.SubjectConfirmationData "", InResponseTo: request.id, NotOnOrAfter: 3.hours.from_now.utc.iso8601, Recipient: FFaker::Internet.uri("https")
+              end
+            end
+            xml.Conditions NotBefore: Time.now.utc.iso8601, NotOnOrAfter: 3.hours.from_now.utc.iso8601 do
+              xml.AudienceRestriction do
+                xml.Audience request.issuer
+              end
+            end
+            xml.AuthnStatement AuthnInstant: Time.now.iso8601, SessionIndex: new_options[:ID], SessionNotOnOrAfter: 3.hours.from_now.utc.iso8601 do
+              xml.AuthnContext do
+                xml.AuthnContextClassRef Saml::Kit::Namespaces::PASSWORD
+              end
+            end
+          end
+        end
+      end
+      subject = described_class.new(xml)
+      expect(subject).to_not be_valid
+      expect(subject.errors[:assertion]).to be_present
+    end
   end
 
   describe "#signed?" do

@@ -5,6 +5,7 @@ en:
       Assertion:
         expired: "must not be expired."
         must_match_issuer: "must match entityId."
+        must_contain_single_assertion: "must contain single Assertion."
       AuthnRequest:
         invalid: "must contain AuthnRequest."
         invalid_fingerprint: "does not match."
