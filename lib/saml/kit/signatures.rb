@@ -1,5 +1,6 @@
 module Saml
   module Kit
+    # @!visibility private
     class Signatures # :nodoc:
       # @!visibility private
       attr_reader :configuration
@@ -10,6 +11,7 @@ module Saml
         @key_pair = configuration.key_pairs(use: :signing).last
       end
 
+      # @!visibility private
       def sign_with(key_pair)
         @key_pair = key_pair
       end

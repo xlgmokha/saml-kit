@@ -1,12 +1,16 @@
 module Saml
   module Kit
     class XmlDecryption
+      # The list of private keys to use to attempt to decrypt the document.
       attr_reader :private_keys
 
       def initialize(configuration: Saml::Kit.configuration)
         @private_keys = configuration.private_keys(use: :encryption)
       end
 
+      # Decrypts an EncryptedData section of an XML document.
+      #
+      # @param data [Hash] the XML document converted to a [Hash] using Hash.from_xml.
       def decrypt(data)
         encrypted_data = data['EncryptedData']
         symmetric_key = symmetric_key_from(encrypted_data)

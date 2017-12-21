@@ -1,6 +1,9 @@
 module Saml
   module Kit
     module Templatable
+      # Can be used to disable embeding a signature.
+      # By default a signature will be embedded if a signing
+      # certificate is available via the configuration.
       attr_accessor :embed_signature
 
       # @deprecated Use {#embed_signature=} instead of this method.
@@ -9,11 +12,12 @@ module Saml
         self.embed_signature = value
       end
 
+      # Returns the generated XML document with an XML Digital Signature and XML Encryption.
       def to_xml(xml: ::Builder::XmlMarkup.new)
         signatures.complete(render(self, xml: xml))
       end
 
-      # @api private
+      # @!visibility private
       def signature_for(reference_id:, xml:)
         return unless sign?
         render(signatures.build(reference_id), xml: xml)
@@ -26,17 +30,17 @@ module Saml
         signatures.sign_with(key_pair)
       end
 
-      # Returns true if an embedded signature is requested and ad least one signing certificate is available via the configuration.
+      # Returns true if an embedded signature is requested and at least one signing certificate is available via the configuration.
       def sign?
         embed_signature.nil? ? configuration.sign? : embed_signature && configuration.sign?
       end
 
-      # @api private
+      # @!visibility private
       def signatures
         @signatures ||= Saml::Kit::Signatures.new(configuration: configuration)
       end
 
-      # @api private
+      # @!visibility private
       def encryption_for(xml:)
         if encrypt?
           temp = ::Builder::XmlMarkup.new
@@ -49,12 +53,12 @@ module Saml
         end
       end
 
-      # @api private
+      # @!visibility private
       def encrypt?
         encrypt && encryption_certificate
       end
 
-      # @api private
+      # @!visibility private
       def render(model, options)
         Saml::Kit::Template.new(model).to_xml(options)
       end

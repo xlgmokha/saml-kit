@@ -10,8 +10,6 @@ module Saml
         "samlp": Namespaces::PROTOCOL,
       }.freeze
 
-      attr_reader :raw_xml, :document
-
       validate :validate_signatures
       validate :validate_certificates
 
@@ -20,26 +18,30 @@ module Saml
         @document = Nokogiri::XML(raw_xml)
       end
 
-      def x509_certificates
-        xpath = "//ds:KeyInfo/ds:X509Data/ds:X509Certificate"
-        document.search(xpath, Xmldsig::NAMESPACES).map do |item|
-          Certificate.to_x509(item.text)
-        end
-      end
-
+      # Returns the first XML node found by searching the document with the provided XPath.
+      #
+      # @param xpath [String] the XPath to use to search the document
       def find_by(xpath)
         document.at_xpath(xpath, NAMESPACES)
       end
 
+      # Returns all XML nodes found by searching the document with the provided XPath.
+      #
+      # @param xpath [String] the XPath to use to search the document
       def find_all(xpath)
         document.search(xpath, NAMESPACES)
       end
 
+      # Return the XML document as a [String].
+      #
+      # @param pretty [Boolean] return the XML string in a human readable format if true.
       def to_xml(pretty: true)
         pretty ? document.to_xml(indent: 2) : raw_xml
       end
 
       private
+
+      attr_reader :raw_xml, :document
 
       def validate_signatures
         invalid_signatures.flat_map(&:errors).uniq.each do |error|
@@ -67,6 +69,13 @@ module Saml
           if now > certificate.not_after
             errors.add(:certificate, "Not valid after #{certificate.not_after}")
           end
+        end
+      end
+
+      def x509_certificates
+        xpath = "//ds:KeyInfo/ds:X509Data/ds:X509Certificate"
+        document.search(xpath, Xmldsig::NAMESPACES).map do |item|
+          Certificate.to_x509(item.text)
         end
       end
     end

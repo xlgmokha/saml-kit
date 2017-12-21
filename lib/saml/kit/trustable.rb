@@ -9,6 +9,7 @@ module Saml
         validate :must_be_trusted
       end
 
+      # Returns true when the document has an embedded XML Signature or has been verified externally.
       def signed?
         signature_manually_verified || signature.present?
       end
@@ -19,6 +20,7 @@ module Saml
         xml_hash ? Signature.new(xml_hash) : nil
       end
 
+      # Returns true when documents is signed and the signing certificate belongs to a known service entity.
       def trusted?
         return true if signature_manually_verified
         return false unless signed?

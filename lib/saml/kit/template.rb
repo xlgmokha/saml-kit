@@ -7,6 +7,9 @@ module Saml
         @target = target
       end
 
+      # Returns the compiled template as a [String].
+      #
+      # @param options [Hash] The options hash to pass to the template engine.
       def to_xml(options)
         template.render(target, options)
       end
