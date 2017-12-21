@@ -18,16 +18,8 @@ module Saml
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
           @issuer = configuration.issuer
-          @embed_signature = want_assertions_signed
           @encrypt = encryption_certificate.present?
           @configuration = configuration
-        end
-
-        def want_assertions_signed
-          request.provider.want_assertions_signed
-        rescue => error
-          Saml::Kit.logger.error(error)
-          nil
         end
 
         def build
