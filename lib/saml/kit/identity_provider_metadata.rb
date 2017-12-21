@@ -2,6 +2,7 @@ module Saml
   module Kit
     # This class is used to parse the IDPSSODescriptor from a SAML metadata document.
     #
+    #  raw_xml = <<-XML
     #  <?xml version="1.0" encoding="UTF-8"?>
     #  <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_cfa24e2f-0ec0-4ee3-abb8-b2fcfe394c1c" entityID="">
     #    <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
@@ -12,6 +13,19 @@ module Saml
     #      <saml:Attribute Name="id"/>
     #    </IDPSSODescriptor>
     #  </EntityDescriptor>
+    #  XML
+    #
+    #  metadata = Saml::Kit::IdentityProviderMetadata.new(raw_xml)
+    #  puts metadata.entity_id
+    #
+    # It can also be used to generate IDP metadata.
+    #
+    #   metadata = Saml::Kit::IdentityProviderMetadata.build do |builder|
+    #     builder.entity_id = "my-entity-id"
+    #   end
+    #   puts metadata.to_xml
+    #
+    # For more details on generating metadata see {Saml::Kit::Metadata}.
     class IdentityProviderMetadata < Metadata
       def initialize(xml)
         super("IDPSSODescriptor", xml)

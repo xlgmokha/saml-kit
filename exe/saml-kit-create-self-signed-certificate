@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 require 'saml/kit'
 
-puts "Enter Password:"
-password = STDIN.read.strip
-certificate, private_key = Saml::Kit::SelfSignedCertificate.new(password).create
+puts "Enter Passphrase:"
+passphrase = STDIN.read.strip
+certificate, private_key = Saml::Kit::SelfSignedCertificate.new(passphrase).create
 
 puts "** BEGIN File Format **"
 print certificate
@@ -18,5 +18,5 @@ puts private_key.inspect
 puts "***********************"
 
 puts
-puts "Private Key Password:"
-puts password.inspect
+puts "Private Key Passphrase:"
+puts passphrase.inspect

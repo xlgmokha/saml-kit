@@ -1,6 +1,8 @@
 module Saml
   module Kit
     # This class is used to parse a LogoutResponse SAML document.
+    #
+    #   document = Saml::Kit::LogoutResponse.new(raw_xml)
     class LogoutResponse < Document
       include Respondable
 

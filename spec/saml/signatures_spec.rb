@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe Saml::Kit::Signatures do
   let(:configuration) do
     config = Saml::Kit::Configuration.new
-    config.add_key_pair(certificate, private_key, password: password, use: :signing)
+    config.add_key_pair(certificate, private_key, passphrase: passphrase, use: :signing)
     config
   end
 
@@ -21,8 +21,8 @@ RSpec.describe Saml::Kit::Signatures do
     x.sign(rsa_key, OpenSSL::Digest::SHA256.new)
     x.to_pem
   end
-  let(:private_key) { rsa_key.to_pem(OpenSSL::Cipher.new('des3'), password) }
-  let(:password) { "password" }
+  let(:private_key) { rsa_key.to_pem(OpenSSL::Cipher.new('des3'), passphrase) }
+  let(:passphrase) { "password" }
 
   it 'generates a signature' do
     options = {

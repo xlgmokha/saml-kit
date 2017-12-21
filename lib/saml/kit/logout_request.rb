@@ -1,10 +1,33 @@
 module Saml
   module Kit
-    # This class parses a LogoutRequest SAML document.
+    # This class can be used to parse a LogoutRequest SAML document.
+    #
+    #   document = Saml::Kit::LogoutRequest.new(raw_xml)
+    #
+    # It can also be used to generate a new LogoutRequest.
+    #
+    #   document = Saml::Kit::LogoutRequest.build do |builder|
+    #     builder.issuer = "issuer"
+    #   end
+    #
+    #   puts document.to_xml(pretty: true)
+    #
+    # See {Saml::Kit::Builders::LogoutRequest} for a list of available settings.
+    #
+    # This class can also be used to generate the correspondong LogoutResponse for a LogoutRequest.
+    #
+    #   document = Saml::Kit::LogoutRequest.new(raw_xml)
+    #   url, saml_params = document.response_for(binding: :http_post)
+    #
+    # See {#response_for} for more information.
     class LogoutRequest < Document
       include Requestable
       validates_presence_of :single_logout_service, if: :expected_type?
 
+      # A new instance of LogoutRequest
+      #
+      # @param xml [String] The raw xml string.
+      # @param configuration [Saml::Kit::Configuration] the configuration to use.
       def initialize(xml, configuration: Saml::Kit.configuration)
         super(xml, name: "LogoutRequest", configuration: configuration)
       end

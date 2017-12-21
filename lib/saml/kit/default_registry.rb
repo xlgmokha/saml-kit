@@ -2,6 +2,31 @@ module Saml
   module Kit
     # The default metadata registry is used to fetch the metadata associated with an issuer or entity id.
     # The metadata associated with an issuer is used to verify trust for any SAML documents that are received.
+    #
+    # You can replace the default registry with your own at startup.
+    #
+    # Example:
+    #
+    #   class OnDemandRegistry
+    #    def initialize(original)
+    #      @original = original
+    #    end
+    #
+    #    def metadata_for(entity_id)
+    #      found = @original.metadata_for(entity_id)
+    #      return found if found
+    #
+    #      @original.register_url(entity_id, verify_ssl: Rails.env.production?)
+    #      @original.metadata_for(entity_id)
+    #    end
+    #   end
+    #
+    #   Saml::Kit.configure do |configuration|
+    #     configuration.issuer = ENV['ISSUER']
+    #     configuration.registry = OnDemandRegistry.new(configuration.registry)
+    #     configuration.logger = Rails.logger
+    #   end
+
     class DefaultRegistry
       def initialize(items = {})
         @items = items

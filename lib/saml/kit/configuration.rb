@@ -11,20 +11,20 @@ module Saml
     #     config.logger = Rails.logger
     #   end
     #
-    #   To specify global configuration it is best to do this in an initialize 
+    #   To specify global configuration it is best to do this in an initializer
     #   that runs at the start of the program.
     #
     #   Saml::Kit.configure do |configuration|
     #     configuration.issuer = "https://www.example.com/saml/metadata"
     #     configuration.generate_key_pair_for(use: :signing)
-    #     configuration.add_key_pair(ENV["X509_CERTIFICATE"], ENV["PRIVATE_KEY"], password: ENV['PRIVATE_KEY_PASSWORD'], use: :encryption)
+    #     configuration.add_key_pair(ENV["X509_CERTIFICATE"], ENV["PRIVATE_KEY"], passphrase: ENV['PRIVATE_KEY_PASSPHRASE'], use: :encryption)
     #   end
     class Configuration
       # The issuer or entity_id to use.
       attr_accessor :issuer
-      # The signature method to use when generating signatures (See {SAML::Kit::Builders::XmlSignature::SIGNATURE_METHODS})
+      # The signature method to use when generating signatures (See {Saml::Kit::Builders::XmlSignature::SIGNATURE_METHODS})
       attr_accessor :signature_method
-      # The digest method to use when generating signatures (See {SAML::Kit::Builders::XmlSignature::DIGEST_METHODS})
+      # The digest method to use when generating signatures (See {Saml::Kit::Builders::XmlSignature::DIGEST_METHODS})
       attr_accessor :digest_method
       # The metadata registry to use for searching for metadata associated with an issuer.
       attr_accessor :registry
@@ -47,19 +47,19 @@ module Saml
       #
       # @param certificate [String] the x509 certificate with public key.
       # @param private_key [String] the plain text private key.
-      # @param password [String] the password to decrypt the private key.
+      # @param passphrase [String] the password to decrypt the private key.
       # @param use [Symbol] the type of key pair, `:signing` or `:encryption`
-      def add_key_pair(certificate, private_key, password: '', use: :signing)
-        @key_pairs.push(KeyPair.new(certificate, private_key, password, use.to_sym))
+      def add_key_pair(certificate, private_key, passphrase: '', use: :signing)
+        @key_pairs.push(KeyPair.new(certificate, private_key, passphrase, use.to_sym))
       end
 
       # Generates a unique key pair that can be used for signing or encryption.
       #
       # @param use [Symbol] the type of key pair, `:signing` or `:encryption`
-      # @param password [String] the private key password to use.
-      def generate_key_pair_for(use:, password: SecureRandom.uuid)
-        certificate, private_key = SelfSignedCertificate.new(password).create
-        add_key_pair(certificate, private_key, password: password, use: use)
+      # @param passphrase [String] the private key passphrase to use.
+      def generate_key_pair_for(use:, passphrase: SecureRandom.uuid)
+        certificate, private_key = SelfSignedCertificate.new(passphrase).create
+        add_key_pair(certificate, private_key, passphrase: passphrase, use: use)
       end
 
       # Return each key pair for a specific use.

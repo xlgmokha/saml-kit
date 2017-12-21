@@ -8,6 +8,7 @@ module Saml
     module Crypto
       DECRYPTORS = [ SimpleCipher, RsaCipher, OaepCipher, UnknownCipher ]
 
+      # @!visibility private
       def self.decryptor_for(algorithm, key)
         DECRYPTORS.find { |x| x.matches?(algorithm) }.new(algorithm, key)
       end

@@ -161,7 +161,7 @@ module Saml
       #
       # @param algorithm [OpenSSL::Digest] the digest algorithm to use. E.g. `OpenSSL::Digest::SHA256`
       # @param signature [String] the signature to verify
-      # @param date [String] the data that is used to produce the signature.
+      # @param data [String] the data that is used to produce the signature.
       # @return [Saml::Kit::Certificate] the certificate that was used to produce the signature.
       def verify(algorithm, signature, data)
         signing_certificates.find do |certificate|
