@@ -3,6 +3,7 @@ module Saml
     module Templatable
       attr_accessor :embed_signature
 
+      # @deprecated Use {#embed_signature=} instead of this method.
       def sign=(value)
         Saml::Kit.deprecate("sign= is deprecated. Use embed_signature= instead")
         self.embed_signature = value
@@ -12,23 +13,30 @@ module Saml
         signatures.complete(render(self, xml: xml))
       end
 
+      # @api private
       def signature_for(reference_id:, xml:)
         return unless sign?
         render(signatures.build(reference_id), xml: xml)
       end
 
+      # Allows you to specify which key pair to use for generating an XML digital signature.
+      #
+      # @param key_pair [Saml::Kit::KeyPair] the key pair to use for signing.
       def sign_with(key_pair)
         signatures.sign_with(key_pair)
       end
 
+      # Returns true if an embedded signature is requested and ad least one signing certificate is available via the configuration.
       def sign?
         embed_signature.nil? ? configuration.sign? : embed_signature && configuration.sign?
       end
 
+      # @api private
       def signatures
         @signatures ||= Saml::Kit::Signatures.new(configuration: configuration)
       end
 
+      # @api private
       def encryption_for(xml:)
         if encrypt?
           temp = ::Builder::XmlMarkup.new
@@ -41,10 +49,12 @@ module Saml
         end
       end
 
+      # @api private
       def encrypt?
         encrypt && encryption_certificate
       end
 
+      # @api private
       def render(model, options)
         Saml::Kit::Template.new(model).to_xml(options)
       end
