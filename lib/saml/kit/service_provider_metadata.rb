@@ -12,7 +12,7 @@ module Saml
 
       # Returns the AssertionConsumerService for the specified binding.
       #
-      # @params binding [Symbol] can be either `:http_post` or `:http_redirect`
+      # @param binding [Symbol] can be either `:http_post` or `:http_redirect`
       def assertion_consumer_service_for(binding:)
         service_for(binding: binding, type: 'AssertionConsumerService')
       end
