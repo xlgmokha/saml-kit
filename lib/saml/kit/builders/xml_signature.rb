@@ -19,12 +19,12 @@ module Saml
 
         attr_reader :embed_signature, :configuration
         attr_reader :reference_id
-        attr_reader :x509_certificate
+        attr_reader :certificate
 
-        def initialize(reference_id, configuration:)
+        def initialize(reference_id, configuration:, certificate: )
           @configuration = configuration
           @reference_id = reference_id
-          @x509_certificate = configuration.certificates(use: :signing).last.stripped
+          @certificate = certificate
         end
 
         def signature_method

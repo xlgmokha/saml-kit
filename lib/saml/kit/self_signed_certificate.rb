@@ -3,8 +3,8 @@ module Saml
     class SelfSignedCertificate
       SUBJECT="/C=CA/ST=Alberta/L=Calgary/O=SamlKit/OU=SamlKit/CN=SamlKit"
 
-      def initialize(password)
-        @password = password
+      def initialize(passphrase)
+        @passphrase = passphrase
       end
 
       def create
@@ -20,7 +20,7 @@ module Saml
         certificate.sign(rsa_key, OpenSSL::Digest::SHA256.new)
         [
           certificate.to_pem,
-          rsa_key.to_pem(OpenSSL::Cipher.new('AES-256-CBC'), @password)
+          rsa_key.to_pem(OpenSSL::Cipher.new('AES-256-CBC'), @passphrase)
         ]
       end
     end

@@ -145,4 +145,26 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(result.assertion).to be_encrypted
     end
   end
+
+  describe ".build" do
+    let(:configuration) do
+      Saml::Kit::Configuration.new do |config|
+        config.issuer = issuer
+        config.generate_key_pair_for(use: :signing)
+        config.generate_key_pair_for(use: :signing)
+        config.generate_key_pair_for(use: :signing)
+      end
+    end
+
+    it 'signs the response with a specific certificate' do
+      key_pair = configuration.key_pairs(use: :signing)[1]
+      subject.embed_signature = true
+      subject.sign_with(key_pair)
+
+      result = subject.build
+
+      expect(result).to be_signed
+      expect(result.signature.certificate).to eql(key_pair.certificate)
+    end
+  end
 end

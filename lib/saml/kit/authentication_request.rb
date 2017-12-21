@@ -41,9 +41,10 @@ module Saml
       # Generate a Response for a specific user.
       # @param user [Object] this is a custom user object that can be used for generating a nameid and assertion attributes.
       # @param binding [Symbol] the SAML binding to use `:http_post` or `:http_redirect`.
-      def response_for(user, binding:, relay_state: nil)
+      # @param configuration [Saml::Kit::Configuration] the configuration to use to build the response.
+      def response_for(user, binding:, relay_state: nil, configuration: Saml::Kit.configuration)
         response_binding = provider.assertion_consumer_service_for(binding: binding)
-        builder = Saml::Kit::Response.builder(user, self) do |x|
+        builder = Saml::Kit::Response.builder(user, self, configuration: configuration) do |x|
           x.embed_signature = provider.want_assertions_signed
           yield x if block_given?
         end

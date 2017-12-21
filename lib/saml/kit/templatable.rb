@@ -17,6 +17,10 @@ module Saml
         render(signatures.build(reference_id), xml: xml)
       end
 
+      def sign_with(key_pair)
+        signatures.sign_with(key_pair)
+      end
+
       def sign?
         embed_signature.nil? ? configuration.sign? : embed_signature && configuration.sign?
       end

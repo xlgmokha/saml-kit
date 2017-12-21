@@ -9,16 +9,22 @@ module Saml
         @configuration = configuration
       end
 
+      def sign_with(key_pair)
+        @certificate = key_pair.certificate
+        @private_key = key_pair.private_key
+      end
+
       # @!visibility private
       def build(reference_id)
         return nil unless configuration.sign?
-        Saml::Kit::Builders::XmlSignature.new(reference_id, configuration: configuration)
+        certificate = @certificate || configuration.certificates(use: :signing).last
+        Saml::Kit::Builders::XmlSignature.new(reference_id, configuration: configuration, certificate: certificate)
       end
 
       # @!visibility private
       def complete(raw_xml)
         return raw_xml unless configuration.sign?
-        private_key = configuration.private_keys(use: :signing).last
+        private_key = @private_key || configuration.private_keys(use: :signing).last
         Xmldsig::SignedDocument.new(raw_xml).sign(private_key)
       end
 

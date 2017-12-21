@@ -189,5 +189,19 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       response = provider.assertion_consumer_service_for(binding: :http_post).deserialize(saml_params)
       expect(response).to be_instance_of(Saml::Kit::Response)
     end
+
+    it 'serializes a response with the specified signing certificate' do
+      allow(subject).to receive(:provider).and_return(provider)
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.generate_key_pair_for(use: :signing)
+      end
+      key_pair = configuration.key_pairs(use: :signing).first
+      url, saml_params = subject.response_for(user, binding: :http_post, configuration: configuration) do |builder|
+        builder.sign_with(key_pair)
+      end
+
+      response = provider.assertion_consumer_service_for(binding: :http_post).deserialize(saml_params)
+      expect(response).to be_instance_of(Saml::Kit::Response)
+    end
   end
 end

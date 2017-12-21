@@ -35,7 +35,7 @@ module Saml
       end
 
       def ==(other)
-        self.to_s == other.to_s
+        self.fingerprint == other.fingerprint
       end
 
       def eql?(other)
@@ -51,7 +51,7 @@ module Saml
       end
 
       def to_h
-        { use: @use, x509: @value }
+        { use: @use, fingerprint: fingerprint.to_s }
       end
 
       def inspect

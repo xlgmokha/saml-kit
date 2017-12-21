@@ -14,7 +14,7 @@ xml.Signature "xmlns" => Saml::Kit::Namespaces::XMLDSIG do
   xml.SignatureValue ""
   xml.KeyInfo do
     xml.X509Data do
-      xml.X509Certificate x509_certificate
+      xml.X509Certificate certificate.stripped
     end
   end
 end

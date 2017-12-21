@@ -9,6 +9,10 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   let(:sp_logout_service) { FFaker::Internet.uri("https") }
   let(:idp_logout_service) { FFaker::Internet.uri("https") }
   let(:entity_id) { FFaker::Internet.uri("https") }
+  let(:sp_signing_certificate) { Saml::Kit::KeyPair.generate(use: :signing).certificate }
+  let(:sp_encryption_certificate) { Saml::Kit::KeyPair.generate(use: :encryption).certificate }
+  let(:idp_signing_certificate) { Saml::Kit::KeyPair.generate(use: :signing).certificate }
+  let(:idp_encryption_certificate) { Saml::Kit::KeyPair.generate(use: :encryption).certificate }
   let(:xml) do
     <<-XML
 <EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{Saml::Kit::Id.generate}" entityID="#{entity_id}">
@@ -16,14 +20,14 @@ RSpec.describe Saml::Kit::CompositeMetadata do
     <KeyDescriptor use="signing">
       <KeyInfo xmlns="#{Saml::Kit::Namespaces::XMLDSIG}">
         <X509Data>
-          <X509Certificate>SP-Signing-Certificate</X509Certificate>
+          <X509Certificate>#{sp_signing_certificate.stripped}</X509Certificate>
         </X509Data>
       </KeyInfo>
     </KeyDescriptor>
     <KeyDescriptor use="encryption">
       <KeyInfo xmlns="#{Saml::Kit::Namespaces::XMLDSIG}">
         <X509Data>
-          <X509Certificate>SP-Encryption-Certificate</X509Certificate>
+          <X509Certificate>#{sp_encryption_certificate.stripped}</X509Certificate>
         </X509Data>
       </KeyInfo>
     </KeyDescriptor>
@@ -35,14 +39,14 @@ RSpec.describe Saml::Kit::CompositeMetadata do
     <KeyDescriptor use="signing">
       <KeyInfo xmlns="#{Saml::Kit::Namespaces::XMLDSIG}">
         <X509Data>
-          <X509Certificate>IDP-Signing-Certificate</X509Certificate>
+          <X509Certificate>#{idp_signing_certificate.stripped}</X509Certificate>
         </X509Data>
       </KeyInfo>
     </KeyDescriptor>
     <KeyDescriptor use="encryption">
       <KeyInfo xmlns="#{Saml::Kit::Namespaces::XMLDSIG}">
         <X509Data>
-          <X509Certificate>IDP-Encryption-Certificate</X509Certificate>
+          <X509Certificate>#{idp_encryption_certificate.stripped}</X509Certificate>
         </X509Data>
       </KeyInfo>
     </KeyDescriptor>
@@ -99,23 +103,23 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   it { expect(subject.name_id_formats).to match_array([Saml::Kit::Namespaces::PERSISTENT]) }
   it do
     expect(subject.certificates).to match_array([
-      Saml::Kit::Certificate.new('SP-Signing-Certificate', use: :signing),
-      Saml::Kit::Certificate.new('SP-Encryption-Certificate', use: :encryption),
-      Saml::Kit::Certificate.new('IDP-Signing-Certificate', use: :signing),
-      Saml::Kit::Certificate.new('IDP-Encryption-Certificate', use: :encryption),
+      sp_signing_certificate,
+      sp_encryption_certificate,
+      idp_signing_certificate,
+      idp_encryption_certificate,
     ])
   end
 
   it do
     expect(subject.encryption_certificates).to match_array([
-      Saml::Kit::Certificate.new('SP-Encryption-Certificate', use: :encryption),
-      Saml::Kit::Certificate.new('IDP-Encryption-Certificate', use: :encryption),
+      sp_encryption_certificate,
+      idp_encryption_certificate,
     ])
   end
   it do
     expect(subject.signing_certificates).to match_array([
-      Saml::Kit::Certificate.new('SP-Signing-Certificate', use: :signing),
-      Saml::Kit::Certificate.new('IDP-Signing-Certificate', use: :signing),
+      sp_signing_certificate,
+      idp_signing_certificate,
     ])
   end
   it do
