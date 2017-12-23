@@ -220,8 +220,8 @@ class User
 end
 
 user = User.new(id: SecureRandom.uuid, email: "hello@example.com")
-sp = Saml::Kit::IdentityProviderMetadata.new(xml)
-url, saml_params = sp.logout_request_for(user, binding: :http_post)
+idp = Saml::Kit::IdentityProviderMetadata.new(xml)
+url, saml_params = idp.logout_request_for(user, binding: :http_post)
 puts [url, saml_params].inspect
 # ["https://www.example.com/logout", {"SAMLRequest"=>"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48TG9nb3V0UmVxdWVzdCBJRD0iXzg3NjZiNTYyLTc2MzQtNDU4Zi04MzJmLTE4ODkwMjRlZDQ0MyIgVmVyc2lvbj0iMi4wIiBJc3N1ZUluc3RhbnQ9IjIwMTctMTItMTlUMDQ6NTg6MThaIiBEZXN0aW5hdGlvbj0iaHR0cHM6Ly93d3cuZXhhbXBsZS5jb20vbG9nb3V0IiB4bWxucz0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnByb3RvY29sIj48SXNzdWVyIHhtbG5zPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIi8+PE5hbWVJRCBGb3JtYXQ9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpuYW1laWQtZm9ybWF0OnBlcnNpc3RlbnQiIHhtbG5zPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIj5kODc3YWEzZS01YTUyLTRhODAtYTA3ZC1lM2U5YzBjNTA1Nzk8L05hbWVJRD48L0xvZ291dFJlcXVlc3Q+"}]
 ```
