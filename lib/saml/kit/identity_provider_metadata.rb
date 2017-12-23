@@ -26,6 +26,10 @@ module Saml
     #   puts metadata.to_xml
     #
     # For more details on generating metadata see {Saml::Kit::Metadata}.
+    #
+    # Example:
+    #
+    # {include:file:spec/examples/identity_provider_metadata_spec.rb}
     class IdentityProviderMetadata < Metadata
       def initialize(xml)
         super("IDPSSODescriptor", xml)

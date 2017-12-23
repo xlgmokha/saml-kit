@@ -1,5 +1,6 @@
 module Saml
   module Kit
+    # {include:file:spec/examples/service_provider_metadata_spec.rb}
     class ServiceProviderMetadata < Metadata
       def initialize(xml)
         super("SPSSODescriptor", xml)

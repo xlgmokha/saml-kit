@@ -13,6 +13,10 @@ module Saml
     #      <saml:Issuer>Day of the Dangerous Cousins</saml:Issuer>
     #      <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
     #    </samlp:AuthnRequest>
+    #
+    # Example:
+    #
+    # {include:file:spec/examples/authentication_request_spec.rb}
     class AuthenticationRequest < Document
       include Requestable
 
