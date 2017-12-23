@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Bindings do
   describe ".to_symbol" do
     subject { described_class }

@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Xml do
   describe "#valid_signature?" do
     let(:login_url) { "https://#{FFaker::Internet.domain_name}/login" }

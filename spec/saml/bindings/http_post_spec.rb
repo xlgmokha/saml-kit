@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Bindings::HttpPost do
   let(:location) { FFaker::Internet.uri("https") }
   subject { described_class.new(location: location) }

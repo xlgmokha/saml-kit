@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Bindings::Binding do
   let(:location) { FFaker::Internet.http_url }
   subject { described_class.new(binding: Saml::Kit::Bindings::HTTP_ARTIFACT, location: location) }

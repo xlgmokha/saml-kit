@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Bindings::UrlBuilder do
   describe "#build" do
     let(:xml) { "<xml></xml>" }

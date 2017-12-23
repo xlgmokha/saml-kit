@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::IdentityProviderMetadata do
   subject { described_class.new(raw_metadata) }
 

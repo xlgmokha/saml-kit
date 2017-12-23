@@ -3,7 +3,7 @@ require_relative './user'
 RSpec.describe "Logout Request" do
   let(:user) { User.new(id: SecureRandom.uuid, email: "hello@example.com") }
 
-  it 'produces a logout request' do
+  it 'produces a SAMLRequest' do
     xml = Saml::Kit::Metadata.build_xml do |builder|
       builder.contact_email = 'hi@example.com'
       builder.organization_name = "Acme, Inc"

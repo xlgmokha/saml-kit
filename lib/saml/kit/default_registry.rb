@@ -26,7 +26,8 @@ module Saml
     #     configuration.registry = OnDemandRegistry.new(configuration.registry)
     #     configuration.logger = Rails.logger
     #   end
-
+    #
+    # {include:file:spec/saml/default_registry.rb}
     class DefaultRegistry
       def initialize(items = {})
         @items = items

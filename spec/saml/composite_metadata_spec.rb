@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::CompositeMetadata do
   subject { described_class.new(xml) }
   let(:post_binding) { Saml::Kit::Bindings::HTTP_POST  }

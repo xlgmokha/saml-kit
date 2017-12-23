@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Bindings::HttpRedirect do
   let(:location) { FFaker::Internet.http_url }
   subject { described_class.new(location: location) }

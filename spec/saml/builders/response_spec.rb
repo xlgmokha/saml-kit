@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Builders::Response do
   subject { described_class.new(user, request, configuration: configuration) }
   let(:configuration) do

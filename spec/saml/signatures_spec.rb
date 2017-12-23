@@ -1,5 +1,3 @@
-require "spec_helper"
-
 RSpec.describe Saml::Kit::Signatures do
   let(:configuration) do
     config = Saml::Kit::Configuration.new

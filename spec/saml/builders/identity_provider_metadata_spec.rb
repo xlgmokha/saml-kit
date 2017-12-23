@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Builders::IdentityProviderMetadata do
   subject { described_class.new(configuration: configuration) }
   let(:configuration) do

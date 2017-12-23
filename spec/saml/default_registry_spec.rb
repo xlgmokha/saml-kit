@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::DefaultRegistry do
   subject { described_class.new }
   let(:entity_id) { FFaker::Internet.http_url }

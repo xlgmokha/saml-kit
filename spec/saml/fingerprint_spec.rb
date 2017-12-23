@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Fingerprint do
   describe "#sha" do
     it 'returns the SHA256' do

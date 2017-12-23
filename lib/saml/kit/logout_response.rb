@@ -3,6 +3,8 @@ module Saml
     # This class is used to parse a LogoutResponse SAML document.
     #
     #   document = Saml::Kit::LogoutResponse.new(raw_xml)
+    #
+    # {include:file:spec/examples/logout_response_spec.rb}
     class LogoutResponse < Document
       include Respondable
 

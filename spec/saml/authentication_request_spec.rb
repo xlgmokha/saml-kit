@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::AuthenticationRequest do
   subject { described_class.new(raw_xml, configuration: configuration) }
   let(:id) { Saml::Kit::Id.generate }

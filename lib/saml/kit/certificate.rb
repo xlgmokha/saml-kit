@@ -1,5 +1,6 @@
 module Saml
   module Kit
+    # {include:file:spec/saml/certificate_spec.rb}
     class Certificate
       BEGIN_CERT=/-----BEGIN CERTIFICATE-----/
       END_CERT=/-----END CERTIFICATE-----/

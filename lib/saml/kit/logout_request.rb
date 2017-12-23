@@ -20,6 +20,8 @@ module Saml
     #   url, saml_params = document.response_for(binding: :http_post)
     #
     # See {#response_for} for more information.
+    #
+    # {include:file:spec/examples/logout_request_spec.rb}
     class LogoutRequest < Document
       include Requestable
       validates_presence_of :single_logout_service, if: :expected_type?

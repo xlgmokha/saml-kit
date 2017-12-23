@@ -1,5 +1,6 @@
 module Saml
   module Kit
+    # {include:file:spec/saml/xml_spec.rb}
     class Xml # :nodoc:
       include ActiveModel::Validations
       NAMESPACES = {

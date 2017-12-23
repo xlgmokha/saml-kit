@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::XmlDecryption do
   describe "#decrypt" do
     let(:secret) { FFaker::Movie.title }

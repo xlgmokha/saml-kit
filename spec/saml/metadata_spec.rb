@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Metadata do
   describe ".from" do
     subject { described_class }

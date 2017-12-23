@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::InvalidDocument do
   subject { described_class.new(xml) }
   let(:xml) { "<xml></xml>" }

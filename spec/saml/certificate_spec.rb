@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::Certificate do
   subject { described_class.new(certificate, use: :signing) }
   let(:certificate) do

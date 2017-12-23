@@ -1,5 +1,6 @@
 module Saml
   module Kit
+    # {include:file:spec/saml/xml_decryption_spec.rb}
     class XmlDecryption
       # The list of private keys to use to attempt to decrypt the document.
       attr_reader :private_keys

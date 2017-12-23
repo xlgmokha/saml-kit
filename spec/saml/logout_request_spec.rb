@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe Saml::Kit::LogoutRequest do
   subject { described_class.build(user, configuration: configuration) }
   let(:user) { double(:user, name_id_for: name_id) }
