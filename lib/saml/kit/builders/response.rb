@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Builders
+      # {include:file:spec/saml/builders/response_spec.rb}
       class Response
         include Templatable
         attr_reader :user, :request

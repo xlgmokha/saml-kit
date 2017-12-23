@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Bindings
+      # {include:file:spec/saml/bindings/http_redirect_spec.rb}
       class HttpRedirect < Binding
         include Serializable
 

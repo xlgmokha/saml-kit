@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Builders
+      # {include:file:spec/saml/builders/identity_provider_metadata_spec.rb}
       class IdentityProviderMetadata
         include Saml::Kit::Templatable
         extend Forwardable

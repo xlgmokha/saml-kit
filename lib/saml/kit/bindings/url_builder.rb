@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Bindings
+      # {include:file:spec/saml/bindings/url_builder_spec.rb}
       class UrlBuilder
         include Serializable
         attr_reader :configuration

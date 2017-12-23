@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Bindings
+      # {include:file:spec/saml/bindings/http_post_spec.rb}
       class HttpPost < Binding
         include Serializable
 

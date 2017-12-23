@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Bindings
+      # {include:file:spec/saml/bindings/binding_spec.rb}
       class Binding
         attr_reader :binding, :location
 
