@@ -1,4 +1,4 @@
-# Saml::Kit
+![SAML-Kit](https://github.com/saml-kit/saml-kit/raw/master/spec/examples/saml-kit.gif)
 
 [![Gem Version](https://badge.fury.io/rb/saml-kit.svg)](https://rubygems.org/gems/saml-kit)
 [![Code Climate](https://codeclimate.com/github/saml-kit/saml-kit.svg)](https://codeclimate.com/github/saml-kit/saml-kit)
