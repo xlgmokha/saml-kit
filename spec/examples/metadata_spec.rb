@@ -1,4 +1,23 @@
 RSpec.describe "Metadata" do
+  it 'consumes metadata' do
+    raw_xml = <<-XML
+<?xml version="1.0" encoding="UTF-8"?>
+<EntityDescriptor entityID="https://www.example.com/metadata" xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_50643868-c737-40c8-a30d-b5dc7f3c69d9">
+  <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:persistent</NameIDFormat>
+    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://www.example.com/login"/>
+  </IDPSSODescriptor>
+  <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://www.example.com/consume" index="0" isDefault="true"/>
+  </SPSSODescriptor>
+</EntityDescriptor>
+    XML
+
+    metadata = Saml::Kit::Metadata.from(raw_xml)
+    expect(metadata.entity_id).to eql('https://www.example.com/metadata')
+  end
+
   it 'produces metadata for a service provider and identity provider' do
     metadata = Saml::Kit::Metadata.build do |builder|
       builder.contact_email = 'hi@example.com'
@@ -17,8 +36,9 @@ RSpec.describe "Metadata" do
         x.add_single_logout_service('https://www.example.com/logout', binding: :http_post)
       end
     end
-    expect(metadata.to_xml(pretty: true)).to be_present
-    expect(metadata.to_xml(pretty: true)).to have_xpath("//md:EntityDescriptor//md:IDPSSODescriptor")
-    expect(metadata.to_xml(pretty: true)).to have_xpath("//md:EntityDescriptor//md:SPSSODescriptor")
+    xml = metadata.to_xml(pretty: true)
+    expect(xml).to be_present
+    expect(xml).to have_xpath("//md:EntityDescriptor//md:IDPSSODescriptor")
+    expect(xml).to have_xpath("//md:EntityDescriptor//md:SPSSODescriptor")
   end
 end

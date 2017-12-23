@@ -21,6 +21,7 @@ module Saml
     #
     # See {Saml::Kit::Builders::ServiceProviderMetadata} and {Saml::Kit::Builders::IdentityProviderMetadata}
     # for a list of options that can be specified.
+    # {include:file:spec/examples/metadata_spec.rb}
     class Metadata
       METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
       include ActiveModel::Validations
