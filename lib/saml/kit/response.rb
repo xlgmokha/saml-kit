@@ -1,5 +1,6 @@
 module Saml
   module Kit
+    # {include:file:spec/examples/response_spec.rb}
     class Response < Document
       include Respondable
       extend Forwardable
