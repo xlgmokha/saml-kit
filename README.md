@@ -34,7 +34,8 @@ To specify a global configuration: (useful for a rails application)
 Saml::Kit.configure do |configuration|
   configuration.issuer = ENV['ISSUER']
   configuration.generate_key_pair_for(use: :signing)
-  configuration.generate_key_pair_for(use: :signing)
+  configuration.add_key_pair(ENV["CERTIFICATE"], ENV["PRIVATE_KEY"], passphrase: ENV['PASSPHRASE'], use: :signing)
+  configuration.generate_key_pair_for(use: :encryption)
 end
 ```
 
