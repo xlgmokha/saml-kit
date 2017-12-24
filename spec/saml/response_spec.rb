@@ -125,7 +125,7 @@ RSpec.describe Saml::Kit::Response do
       allow(metadata).to receive(:matches?).and_return(true)
 
       subject = described_class.build(user, request)
-      travel_to 5.seconds.ago
+      travel_to (Saml::Kit.configuration.clock_drift + 1.second).before(Time.now)
       expect(subject).to be_invalid
       expect(subject.errors[:base]).to be_present
     end

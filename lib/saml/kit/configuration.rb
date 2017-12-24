@@ -32,14 +32,17 @@ module Saml
       attr_accessor :session_timeout
       # The logger to write log messages to.
       attr_accessor :logger
+      # The total allowable clock drift for session timeout validation.
+      attr_accessor :clock_drift
 
       def initialize # :yields configuration
-        @signature_method = :SHA256
+        @clock_drift = 30.seconds
         @digest_method = :SHA256
+        @key_pairs = []
+        @logger = Logger.new(STDOUT)
         @registry = DefaultRegistry.new
         @session_timeout = 3.hours
-        @logger = Logger.new(STDOUT)
-        @key_pairs = []
+        @signature_method = :SHA256
         yield self if block_given?
       end
 

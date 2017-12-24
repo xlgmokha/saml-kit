@@ -32,7 +32,9 @@ module Saml
       end
 
       def active?
-        Time.current > started_at && !expired?
+        clock_drift = configuration.clock_drift
+        start = clock_drift.before(started_at)
+        Time.current > start && !expired?
       end
 
       def attributes
@@ -69,9 +71,11 @@ module Saml
 
       private
 
+      attr_reader :configuration
+
       def assertion
         @assertion ||= if encrypted?
-          decrypted = XmlDecryption.new(configuration: @configuration).decrypt(@xml_hash['Response']['EncryptedAssertion'])
+          decrypted = XmlDecryption.new(configuration: configuration).decrypt(@xml_hash['Response']['EncryptedAssertion'])
           Saml::Kit.logger.debug(decrypted)
           Hash.from_xml(decrypted)['Assertion']
         else
@@ -91,7 +95,7 @@ module Saml
       end
 
       def must_match_issuer
-        unless audiences.include?(@configuration.issuer)
+        unless audiences.include?(configuration.issuer)
           errors[:audience] << error_message(:must_match_issuer)
         end
       end
