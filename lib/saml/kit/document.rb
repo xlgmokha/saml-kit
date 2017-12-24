@@ -117,13 +117,10 @@ module Saml
       end
 
       def must_be_expected_type
-        return if to_h.nil?
-
         errors[:base] << error_message(:invalid) unless expected_type?
       end
 
       def expected_type?
-        return false if to_xml.blank?
         to_h[name].present?
       end
 
