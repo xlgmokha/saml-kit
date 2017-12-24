@@ -17,37 +17,36 @@ module Saml
         @configuration = configuration
         @content = xml
         @name = name
-        @xml_hash = Hash.from_xml(xml) || {}
       end
 
       # Returns the ID for the SAML document.
       def id
-        to_h.fetch(name, {}).fetch('ID', nil)
+        root.fetch('ID', nil)
       end
 
       # Returns the Issuer for the SAML document.
       def issuer
-        to_h.fetch(name, {}).fetch('Issuer', nil)
+        root.fetch('Issuer', nil)
       end
 
       # Returns the Version of the SAML document.
       def version
-        to_h.fetch(name, {}).fetch('Version', {})
+        root.fetch('Version', {})
       end
 
       # Returns the Destination of the SAML document.
       def destination
-        to_h.fetch(name, {}).fetch('Destination', nil)
+        root.fetch('Destination', nil)
       end
 
       # Returns the Destination of the SAML document.
       def issue_instant
-        Time.parse(to_h[name]['IssueInstant'])
+        Time.parse(root['IssueInstant'])
       end
 
       # Returns the SAML document returned as a Hash.
       def to_h
-        @xml_hash
+        @xml_hash ||= Hash.from_xml(content) || {}
       end
 
       # Returns the SAML document as an XML string.
@@ -108,6 +107,10 @@ module Saml
       private
 
       attr_reader :content, :name, :configuration
+
+      def root
+        to_h.fetch(name, {})
+      end
 
       def must_match_xsd
         matches_xsd?(PROTOCOL_XSD)
