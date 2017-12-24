@@ -81,6 +81,8 @@ module Saml
             AuthenticationRequest.new(xml, configuration: configuration)
           elsif hash['LogoutRequest'].present?
             LogoutRequest.new(xml, configuration: configuration)
+          else
+            InvalidDocument.new(xml)
           end
         rescue => error
           Saml::Kit.logger.error(error)

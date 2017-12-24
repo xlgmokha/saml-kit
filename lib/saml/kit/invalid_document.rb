@@ -9,6 +9,12 @@ module Saml
       def initialize(xml)
         super(xml, name: "InvalidDocument")
       end
+
+      def to_h
+        super
+      rescue
+        {}
+      end
     end
   end
 end
