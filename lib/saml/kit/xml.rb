@@ -60,7 +60,7 @@ module Saml
       end
 
       def validate_certificates(now = Time.current)
-        return unless find_by('//ds:Signature').present?
+        return if find_by('//ds:Signature').nil?
 
         x509_certificates.each do |certificate|
           inactive = now < certificate.not_before

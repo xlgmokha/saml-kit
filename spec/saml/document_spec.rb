@@ -43,5 +43,10 @@ RSpec.describe Saml::Kit::Document do
       result = subject.to_saml_document("NOT XML")
       expect(result).to be_instance_of(Saml::Kit::InvalidDocument)
     end
+
+    it 'returns an invalid document when given nil' do
+      result = subject.to_saml_document(nil)
+      expect(result).to be_instance_of(Saml::Kit::InvalidDocument)
+    end
   end
 end

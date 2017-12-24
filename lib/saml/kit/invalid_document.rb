@@ -6,7 +6,7 @@ module Saml
         model.errors[:base] << model.error_message(:invalid)
       end
 
-      def initialize(xml)
+      def initialize(xml, configuration: nil)
         super(xml, name: "InvalidDocument")
       end
 

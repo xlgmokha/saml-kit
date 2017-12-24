@@ -67,26 +67,28 @@ module Saml
       end
 
       class << self
+        XPATH = [
+          "/samlp:AuthnRequest",
+          "/samlp:LogoutRequest",
+          "/samlp:LogoutResponse",
+          "/samlp:Response",
+        ].join("|")
+
         # Returns the raw xml as a Saml::Kit SAML document.
         #
         # @param xml [String] the raw xml string.
         # @param configuration [Saml::Kit::Configuration] the configuration to use for unpacking the document.
         def to_saml_document(xml, configuration: Saml::Kit.configuration)
-          hash = Hash.from_xml(xml)
-          if hash['Response'].present?
-            Response.new(xml, configuration: configuration)
-          elsif hash['LogoutResponse'].present?
-            LogoutResponse.new(xml, configuration: configuration)
-          elsif hash['AuthnRequest'].present?
-            AuthenticationRequest.new(xml, configuration: configuration)
-          elsif hash['LogoutRequest'].present?
-            LogoutRequest.new(xml, configuration: configuration)
-          else
-            InvalidDocument.new(xml)
-          end
+          constructor = {
+            "AuthnRequest" => Saml::Kit::AuthenticationRequest,
+            "LogoutRequest" => Saml::Kit::LogoutRequest,
+            "LogoutResponse" => Saml::Kit::LogoutResponse,
+            "Response" => Saml::Kit::Response,
+          }[Saml::Kit::Xml.new(xml).find_by(XPATH).name] || InvalidDocument
+          constructor.new(xml, configuration: configuration)
         rescue => error
           Saml::Kit.logger.error(error)
-          InvalidDocument.new(xml)
+          InvalidDocument.new(xml, configuration: configuration)
         end
 
         # @!visibility private
