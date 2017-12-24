@@ -66,20 +66,13 @@ module Saml
         end
 
         def normalize(params)
-          if params.respond_to? :inject
-            params.inject({}) do |memo, (key, value)|
-              memo[key.to_sym] = value
-              memo
-            end
-          else
-            {
-              SAMLRequest: params['SAMLRequest'] || params[:SAMLRequest],
-              SAMLResponse: params['SAMLResponse'] || params[:SAMLResponse],
-              RelayState: params['RelayState'] || params[:RelayState],
-              Signature: params['Signature'] || params[:Signature],
-              SigAlg: params['SigAlg'] || params[:SigAlg],
-            }
-          end
+          {
+            SAMLRequest: params['SAMLRequest'] || params[:SAMLRequest],
+            SAMLResponse: params['SAMLResponse'] || params[:SAMLResponse],
+            RelayState: params['RelayState'] || params[:RelayState],
+            Signature: params['Signature'] || params[:Signature],
+            SigAlg: params['SigAlg'] || params[:SigAlg],
+          }
         end
       end
     end
