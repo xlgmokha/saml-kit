@@ -29,6 +29,8 @@ module Saml
     #
     # {include:file:spec/saml/default_registry_spec.rb}
     class DefaultRegistry
+      include Enumerable
+
       def initialize(items = {})
         @items = items
       end
@@ -56,6 +58,13 @@ module Saml
       # @param entity_id [String] the unique entityID/Issuer associated with metadata.
       def metadata_for(entity_id)
         @items[entity_id]
+      end
+
+      # Yields each registered [Saml::Kit::Metadata] to the block.
+      def each
+        @items.each do |key, value|
+          yield value
+        end
       end
 
       class HttpApi # :nodoc:

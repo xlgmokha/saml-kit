@@ -74,4 +74,20 @@ RSpec.describe Saml::Kit::DefaultRegistry do
       expect(result).to be_instance_of(Saml::Kit::CompositeMetadata)
     end
   end
+
+  describe "#each" do
+    it 'yields each registered metadata' do
+      idp = Saml::Kit::IdentityProviderMetadata.build do |config|
+        config.entity_id = "idp"
+      end
+      sp = Saml::Kit::ServiceProviderMetadata.build do |config|
+        config.entity_id = "sp"
+      end
+
+      subject.register(idp)
+      subject.register(sp)
+
+      expect(subject.map(&:to_xml)).to match_array([idp.to_xml, sp.to_xml])
+    end
+  end
 end
