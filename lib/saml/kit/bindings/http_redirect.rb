@@ -32,19 +32,24 @@ module Saml
 
         def ensure_valid_signature!(params, document)
           return if params[:Signature].blank? || params[:SigAlg].blank?
-
-          signature = decode(params[:Signature])
-          canonical_form = [:SAMLRequest, :SAMLResponse, :RelayState, :SigAlg].map do |key|
-            value = params[key]
-            value.present? ? "#{key}=#{value}" : nil
-          end.compact.join('&')
-
           return if document.provider.nil?
-          if document.provider.verify(algorithm_for(params[:SigAlg]), signature, canonical_form)
+
+          if document.provider.verify(
+              algorithm_for(params[:SigAlg]),
+              decode(params[:Signature]),
+              canonicalize(params)
+          )
             document.signature_verified!
           else
             raise ArgumentError.new("Invalid Signature")
           end
+        end
+
+        def canonicalize(params)
+          [:SAMLRequest, :SAMLResponse, :RelayState, :SigAlg].map do |key|
+            value = params[key]
+            value.present? ? "#{key}=#{value}" : nil
+          end.compact.join('&')
         end
 
         def algorithm_for(algorithm)
