@@ -27,14 +27,12 @@ module Saml
         xml_hash ? Signature.new(xml_hash) : nil
       end
 
-      def expired?
-        Time.current > expired_at
+      def expired?(now = Time.current)
+        now > expired_at
       end
 
-      def active?
-        clock_drift = configuration.clock_drift
-        start = clock_drift.before(started_at)
-        Time.current > start && !expired?
+      def active?(now = Time.current)
+        now > configuration.clock_drift.before(started_at) && !expired?
       end
 
       def attributes

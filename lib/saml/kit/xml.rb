@@ -60,24 +60,20 @@ module Saml
       end
 
       def validate_certificates(now = Time.current)
-        return unless document.at_xpath('//ds:Signature', Xmldsig::NAMESPACES).present?
+        return unless find_by('//ds:Signature').present?
 
         x509_certificates.each do |certificate|
-          if now < certificate.not_before
-            errors.add(:certificate, "Not valid before #{certificate.not_before}")
-          end
+          inactive = now < certificate.not_before
+          errors.add(:certificate, "Not valid before #{certificate.not_before}") if inactive
 
-          if now > certificate.not_after
-            errors.add(:certificate, "Not valid after #{certificate.not_after}")
-          end
+          expired = now > certificate.not_after
+          errors.add(:certificate, "Not valid after #{certificate.not_after}") if expired
         end
       end
 
       def x509_certificates
         xpath = "//ds:KeyInfo/ds:X509Data/ds:X509Certificate"
-        document.search(xpath, Xmldsig::NAMESPACES).map do |item|
-          Certificate.to_x509(item.text)
-        end
+        find_all(xpath).map { |item| Certificate.to_x509(item.text) }
       end
     end
   end
