@@ -1,4 +1,4 @@
-module Saml
+module Xml
   module Kit
     module Crypto
       class UnknownCipher

@@ -1,4 +1,4 @@
-module Saml
+module Xml
   module Kit
     # {include:file:spec/saml/xml_decryption_spec.rb}
     class XmlDecryption

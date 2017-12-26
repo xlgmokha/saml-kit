@@ -1,9 +1,9 @@
-require 'saml/kit/crypto/oaep_cipher'
-require 'saml/kit/crypto/rsa_cipher'
-require 'saml/kit/crypto/simple_cipher'
-require 'saml/kit/crypto/unknown_cipher'
+require 'xml/kit/crypto/oaep_cipher'
+require 'xml/kit/crypto/rsa_cipher'
+require 'xml/kit/crypto/simple_cipher'
+require 'xml/kit/crypto/unknown_cipher'
 
-module Saml
+module Xml
   module Kit
     module Crypto
       DECRYPTORS = [ SimpleCipher, RsaCipher, OaepCipher, UnknownCipher ]

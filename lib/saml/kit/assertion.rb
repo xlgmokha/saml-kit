@@ -72,17 +72,19 @@ module Saml
       attr_reader :configuration
 
       def assertion
-        @assertion ||= if encrypted?
-          decrypted = XmlDecryption.new(configuration: configuration).decrypt(@xml_hash['Response']['EncryptedAssertion'])
-          Saml::Kit.logger.debug(decrypted)
-          Hash.from_xml(decrypted)['Assertion']
-        else
-          result = @xml_hash.fetch('Response', {}).fetch('Assertion', {})
-          return result if result.is_a?(Hash)
+        @assertion ||=
+          if encrypted?
+            decryptor = ::Xml::Kit::XmlDecryption.new(configuration: configuration)
+            decrypted = decryptor.decrypt(@xml_hash['Response']['EncryptedAssertion'])
+            Saml::Kit.logger.debug(decrypted)
+            Hash.from_xml(decrypted)['Assertion']
+          else
+            result = @xml_hash.fetch('Response', {}).fetch('Assertion', {})
+            return result if result.is_a?(Hash)
 
-          errors[:assertion] << error_message(:must_contain_single_assertion)
-          {}
-        end
+            errors[:assertion] << error_message(:must_contain_single_assertion)
+            {}
+          end
       end
 
       def parse_date(value)

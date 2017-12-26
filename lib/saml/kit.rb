@@ -33,7 +33,6 @@ require "saml/kit/authentication_request"
 require "saml/kit/bindings"
 require "saml/kit/certificate"
 require "saml/kit/configuration"
-require "saml/kit/crypto"
 require "saml/kit/default_registry"
 require "saml/kit/fingerprint"
 require "saml/kit/key_pair"
@@ -51,7 +50,6 @@ require "saml/kit/signature"
 require "saml/kit/signatures"
 require "saml/kit/template"
 require "saml/kit/xml"
-require "saml/kit/xml_decryption"
 
 I18n.load_path += Dir[File.expand_path("kit/locales/*.yml", File.dirname(__FILE__))]
 

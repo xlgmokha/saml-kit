@@ -1,10 +1,11 @@
-module Saml
+module Xml
   module Kit
     module Crypto
-      class OaepCipher
+      class RsaCipher
         ALGORITHMS = {
-          'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p' => true,
+          'http://www.w3.org/2001/04/xmlenc#rsa-1_5' => true,
         }
+
         def initialize(algorithm, key)
           @key = key
         end
@@ -14,7 +15,7 @@ module Saml
         end
 
         def decrypt(cipher_text)
-          @key.private_decrypt(cipher_text, OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING)
+          @key.private_decrypt(cipher_text)
         end
       end
     end
