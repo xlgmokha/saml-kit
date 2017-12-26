@@ -26,10 +26,6 @@ module Xml
           #cipher.padding = 0
           cipher.key = @private_key
           cipher.iv = iv
-
-          Saml::Kit.logger.debug ['-key', @private_key].inspect
-          Saml::Kit.logger.debug ['-iv', iv].inspect
-
           cipher.update(data) + cipher.final
         end
       end

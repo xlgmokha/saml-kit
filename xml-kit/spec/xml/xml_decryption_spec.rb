@@ -4,7 +4,8 @@ RSpec.describe Xml::Kit::XmlDecryption do
     let(:password) { FFaker::Movie.title }
 
     it 'decrypts the data' do
-      certificate_pem, private_key_pem = Saml::Kit::SelfSignedCertificate.new(password).create
+      certificate_pem, private_key_pem = generate_key_pair(password)
+
       public_key = OpenSSL::X509::Certificate.new(certificate_pem).public_key
       private_key = OpenSSL::PKey::RSA.new(private_key_pem, password)
 
@@ -44,7 +45,7 @@ RSpec.describe Xml::Kit::XmlDecryption do
     end
 
     it 'attemps to decrypt with each encryption keypair' do
-      certificate_pem, private_key_pem = Saml::Kit::SelfSignedCertificate.new(password).create
+      certificate_pem, private_key_pem = generate_key_pair(password)
       public_key = OpenSSL::X509::Certificate.new(certificate_pem).public_key
       private_key = OpenSSL::PKey::RSA.new(private_key_pem, password)
 
@@ -79,7 +80,7 @@ RSpec.describe Xml::Kit::XmlDecryption do
         }
       }
 
-      _, other_private_key_pem = Saml::Kit::SelfSignedCertificate.new(password).create
+      _, other_private_key_pem = generate_key_pair(password)
       other_private_key = OpenSSL::PKey::RSA.new(other_private_key_pem, password)
 
       subject = described_class.new(configuration: double(private_keys: [other_private_key, private_key]))
@@ -88,7 +89,7 @@ RSpec.describe Xml::Kit::XmlDecryption do
     end
 
     it 'raise an error when it cannot decrypt the data' do
-      certificate_pem, _ = Saml::Kit::SelfSignedCertificate.new(password).create
+      certificate_pem, _ = generate_key_pair(password)
       public_key = OpenSSL::X509::Certificate.new(certificate_pem).public_key
 
       cipher = OpenSSL::Cipher.new('AES-128-CBC')
@@ -122,7 +123,7 @@ RSpec.describe Xml::Kit::XmlDecryption do
         }
       }
 
-      new_private_key_pem = Saml::Kit::SelfSignedCertificate.new(password).create[1]
+      new_private_key_pem = generate_key_pair(password)[1]
       new_private_key = OpenSSL::PKey::RSA.new(new_private_key_pem, password)
       subject = described_class.new(configuration: double(private_keys: [new_private_key]))
       expect do
