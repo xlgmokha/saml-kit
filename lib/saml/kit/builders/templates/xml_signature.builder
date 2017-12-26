@@ -1,4 +1,4 @@
-xml.Signature "xmlns" => Saml::Kit::Namespaces::XMLDSIG do
+xml.Signature "xmlns" => ::Xml::Kit::Namespaces::XMLDSIG do
   xml.SignedInfo do
     xml.CanonicalizationMethod Algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#"
     xml.SignatureMethod Algorithm: signature_method

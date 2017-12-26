@@ -54,7 +54,7 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
         it 'includes a signature' do
           result = subject.build(response, relay_state: relay_state)
           query_params = to_query_params(result)
-          expect(query_params['SigAlg']).to eql(CGI.escape(Saml::Kit::Namespaces::SHA256))
+          expect(query_params['SigAlg']).to eql(CGI.escape(::Xml::Kit::Namespaces::SHA256))
 
           payload = "#{query_string_parameter}=#{query_params[query_string_parameter]}"
           payload << "&RelayState=#{query_params['RelayState']}"
@@ -67,7 +67,7 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
         it 'generates the signature correctly when the relay state is absent' do
           result = subject.build(response)
           query_params = to_query_params(result)
-          expect(query_params['SigAlg']).to eql(CGI.escape(Saml::Kit::Namespaces::SHA256))
+          expect(query_params['SigAlg']).to eql(CGI.escape(::Xml::Kit::Namespaces::SHA256))
 
           payload = "#{query_string_parameter}=#{query_params[query_string_parameter]}"
           payload << "&SigAlg=#{query_params['SigAlg']}"

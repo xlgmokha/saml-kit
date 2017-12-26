@@ -13,17 +13,17 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   let(:idp_encryption_certificate) { Saml::Kit::KeyPair.generate(use: :encryption).certificate }
   let(:xml) do
     <<-XML
-<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{Xml::Kit::Id.generate}" entityID="#{entity_id}">
+<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{::Xml::Kit::Id.generate}" entityID="#{entity_id}">
   <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
     <KeyDescriptor use="signing">
-      <KeyInfo xmlns="#{Saml::Kit::Namespaces::XMLDSIG}">
+      <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
         <X509Data>
           <X509Certificate>#{sp_signing_certificate.stripped}</X509Certificate>
         </X509Data>
       </KeyInfo>
     </KeyDescriptor>
     <KeyDescriptor use="encryption">
-      <KeyInfo xmlns="#{Saml::Kit::Namespaces::XMLDSIG}">
+      <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
         <X509Data>
           <X509Certificate>#{sp_encryption_certificate.stripped}</X509Certificate>
         </X509Data>
@@ -35,14 +35,14 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   </SPSSODescriptor>
   <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
     <KeyDescriptor use="signing">
-      <KeyInfo xmlns="#{Saml::Kit::Namespaces::XMLDSIG}">
+      <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
         <X509Data>
           <X509Certificate>#{idp_signing_certificate.stripped}</X509Certificate>
         </X509Data>
       </KeyInfo>
     </KeyDescriptor>
     <KeyDescriptor use="encryption">
-      <KeyInfo xmlns="#{Saml::Kit::Namespaces::XMLDSIG}">
+      <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
         <X509Data>
           <X509Certificate>#{idp_encryption_certificate.stripped}</X509Certificate>
         </X509Data>

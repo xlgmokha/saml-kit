@@ -34,7 +34,7 @@ module Saml
           to_query_string(
             saml_document.query_string_parameter => serialize(saml_document.to_xml),
             'RelayState' => relay_state,
-            'SigAlg' => Saml::Kit::Namespaces::SHA256,
+            'SigAlg' => ::Xml::Kit::Namespaces::SHA256,
           )
         end
 

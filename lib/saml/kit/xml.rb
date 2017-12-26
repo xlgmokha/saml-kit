@@ -5,7 +5,7 @@ module Saml
       include ActiveModel::Validations
       NAMESPACES = {
         "NameFormat": Namespaces::ATTR_SPLAT,
-        "ds": Namespaces::XMLDSIG,
+        "ds": ::Xml::Kit::Namespaces::XMLDSIG,
         "md": Namespaces::METADATA,
         "saml": Namespaces::ASSERTION,
         "samlp": Namespaces::PROTOCOL,

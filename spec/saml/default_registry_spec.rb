@@ -44,7 +44,7 @@ RSpec.describe Saml::Kit::DefaultRegistry do
 
     it 'registers metadata that serves as both an IDP and SP' do
       xml = <<-XML
-<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{Xml::Kit::Id.generate}" entityID="#{entity_id}">
+<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{::Xml::Kit::Id.generate}" entityID="#{entity_id}">
   <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
     <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
     <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>

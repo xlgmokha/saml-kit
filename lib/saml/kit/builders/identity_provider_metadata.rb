@@ -42,7 +42,7 @@ module Saml
         def entity_descriptor_options
           {
             'xmlns': Namespaces::METADATA,
-            'xmlns:ds': Namespaces::XMLDSIG,
+            'xmlns:ds': ::Xml::Kit::Namespaces::XMLDSIG,
             'xmlns:saml': Namespaces::ASSERTION,
             ID: id,
             entityID: entity_id,
