@@ -62,6 +62,8 @@ module Saml
 
       def configure
         yield configuration
+      ensure
+        Xml::Kit.logger = configuration.logger
       end
 
       def logger
