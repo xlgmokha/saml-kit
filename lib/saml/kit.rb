@@ -14,6 +14,7 @@ require "nokogiri"
 require "securerandom"
 require "tilt"
 require "xmldsig"
+require "xml/kit"
 
 require "saml/kit/buildable"
 require "saml/kit/templatable"
