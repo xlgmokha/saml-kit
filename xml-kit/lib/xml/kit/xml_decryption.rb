@@ -30,7 +30,7 @@ module Xml
             attempts -= 1
             return to_plaintext(cipher_text, private_key, encrypted_key["EncryptionMethod"]['Algorithm'])
           rescue OpenSSL::PKey::RSAError => error
-            Xml::Kit.logger.error(error)
+            ::Xml::Kit.logger.error(error)
             raise if attempts.zero?
           end
         end

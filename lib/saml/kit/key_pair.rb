@@ -5,7 +5,7 @@ module Saml
 
       def initialize(certificate, private_key, passphrase, use)
         @use = use
-        @certificate = Saml::Kit::Certificate.new(certificate, use: use)
+        @certificate = Xml::Kit::Certificate.new(certificate, use: use)
         @private_key = OpenSSL::PKey::RSA.new(private_key, passphrase)
       end
 

@@ -1,7 +1,7 @@
-RSpec.describe Saml::Kit::Fingerprint do
+RSpec.describe Xml::Kit::Fingerprint do
   describe "#sha" do
     it 'returns the SHA256' do
-      certificate, _ = Saml::Kit::SelfSignedCertificate.new("password").create
+      certificate, _ = generate_key_pair("password")
       x509 = OpenSSL::X509::Certificate.new(certificate)
       sha256 = OpenSSL::Digest::SHA256.new.hexdigest(x509.to_der).upcase.scan(/../).join(":")
 
@@ -9,7 +9,7 @@ RSpec.describe Saml::Kit::Fingerprint do
     end
 
     it 'returns the SHA1' do
-      certificate, _ = Saml::Kit::SelfSignedCertificate.new("password").create
+      certificate, _ = generate_key_pair("password")
       x509 = OpenSSL::X509::Certificate.new(certificate)
       sha1 = OpenSSL::Digest::SHA1.new.hexdigest(x509.to_der).upcase.scan(/../).join(":")
 
@@ -18,7 +18,7 @@ RSpec.describe Saml::Kit::Fingerprint do
   end
 
   it 'produces correct hash keys' do
-    certificate, _ = Saml::Kit::SelfSignedCertificate.new("password").create
+    certificate, _ = generate_key_pair("password")
     items = { }
     items[described_class.new(certificate)] = "HI"
     items[described_class.new(certificate)] = "BYE"

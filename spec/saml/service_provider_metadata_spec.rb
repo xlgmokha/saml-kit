@@ -18,7 +18,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
     it 'returns each of the certificates' do
       expected_certificates = Saml::Kit.configuration.certificates.map do |x|
-        Saml::Kit::Certificate.new(x.stripped, use: x.use)
+        ::Xml::Kit::Certificate.new(x.stripped, use: x.use)
       end
       expect(subject.certificates).to match_array(expected_certificates)
     end
@@ -125,13 +125,13 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
     it 'returns true when the fingerprint matches one of the signing certificates' do
       certificate = Hash.from_xml(subject.to_xml)['EntityDescriptor']['Signature']['KeyInfo']['X509Data']['X509Certificate']
-      fingerprint = Saml::Kit::Fingerprint.new(certificate)
+      fingerprint = ::Xml::Kit::Fingerprint.new(certificate)
       expect(subject.matches?(fingerprint)).to be_truthy
     end
 
     it 'returns false when the fingerprint does not match one of the signing certificates' do
       certificate, _ = Saml::Kit::SelfSignedCertificate.new('password').create
-      fingerprint = Saml::Kit::Fingerprint.new(certificate)
+      fingerprint = ::Xml::Kit::Fingerprint.new(certificate)
       expect(subject.matches?(fingerprint)).to be_falsey
     end
   end

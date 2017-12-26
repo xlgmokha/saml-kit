@@ -320,7 +320,7 @@ RSpec.describe Saml::Kit::Response do
     let(:id) { Xml::Kit::Id.generate }
     let(:url) { FFaker::Internet.uri("https") }
     let(:certificate) do
-      Saml::Kit::Certificate.new(
+      ::Xml::Kit::Certificate.new(
         Saml::Kit::SelfSignedCertificate.new("password").create[0],
         use: :signing
       )

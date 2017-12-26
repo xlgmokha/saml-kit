@@ -24,6 +24,13 @@ module Saml
     # {include:file:spec/examples/metadata_spec.rb}
     class Metadata
       METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
+      NAMESPACES = {
+        "NameFormat": Namespaces::ATTR_SPLAT,
+        "ds": ::Xml::Kit::Namespaces::XMLDSIG,
+        "md": Namespaces::METADATA,
+        "saml": Namespaces::ASSERTION,
+        "samlp": Namespaces::PROTOCOL,
+      }.freeze
       include ActiveModel::Validations
       include XsdValidatable
       include Translatable
@@ -69,8 +76,8 @@ module Saml
       # Returns each of the X509 certificates.
       def certificates
         @certificates ||= document.find_all("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
-          cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", Xml::NAMESPACES).text
-          Certificate.new(cert, use: item.attribute('use').value.to_sym)
+          cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", NAMESPACES).text
+          ::Xml::Kit::Certificate.new(cert, use: item.attribute('use').value.to_sym)
         end
       end
 
@@ -134,7 +141,7 @@ module Saml
       #
       # @param fingerprint [Saml::Kit::Fingerprint] the fingerprint to search for.
       # @param use [Symbol] the type of certificates to look at. Can be `:signing` or `:encryption`.
-      # @return [Saml::Kit::Certificate] returns the matching `{Saml::Kit::Certificate}`
+      # @return [Xml::Kit::Certificate] returns the matching `{Xml::Kit::Certificate}`
       def matches?(fingerprint, use: :signing)
         certificates.find do |certificate|
           certificate.for?(use) && certificate.fingerprint == fingerprint
@@ -163,7 +170,7 @@ module Saml
       # @param algorithm [OpenSSL::Digest] the digest algorithm to use. E.g. `OpenSSL::Digest::SHA256`
       # @param signature [String] the signature to verify
       # @param data [String] the data that is used to produce the signature.
-      # @return [Saml::Kit::Certificate] the certificate that was used to produce the signature.
+      # @return [Xml::Kit::Certificate] the certificate that was used to produce the signature.
       def verify(algorithm, signature, data)
         signing_certificates.find do |certificate|
           certificate.public_key.verify(algorithm, signature, data)
@@ -196,7 +203,7 @@ module Saml
       attr_reader :xml
 
       def document
-        @document ||= Xml.new(xml)
+        @document ||= ::Xml::Kit::Xml.new(xml, namespaces: NAMESPACES)
       end
 
       def metadata
@@ -220,7 +227,7 @@ module Saml
       end
 
       def valid_signature?
-        xml = Saml::Kit::Xml.new(to_xml)
+        xml = ::Xml::Kit::Xml.new(to_xml)
         result = xml.valid?
         xml.errors.each do |error|
           errors[:base] << error

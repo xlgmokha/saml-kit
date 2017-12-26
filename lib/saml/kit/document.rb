@@ -2,6 +2,13 @@ module Saml
   module Kit
     class Document
       PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
+      NAMESPACES = {
+        "NameFormat": ::Saml::Kit::Namespaces::ATTR_SPLAT,
+        "ds": ::Xml::Kit::Namespaces::XMLDSIG,
+        "md": ::Saml::Kit::Namespaces::METADATA,
+        "saml": ::Saml::Kit::Namespaces::ASSERTION,
+        "samlp": ::Saml::Kit::Namespaces::PROTOCOL,
+      }.freeze
       include ActiveModel::Validations
       include XsdValidatable
       include Translatable
@@ -84,7 +91,7 @@ module Saml
             "LogoutRequest" => Saml::Kit::LogoutRequest,
             "LogoutResponse" => Saml::Kit::LogoutResponse,
             "Response" => Saml::Kit::Response,
-          }[Saml::Kit::Xml.new(xml).find_by(XPATH).name] || InvalidDocument
+          }[::Xml::Kit::Xml.new(xml, namespaces: { "samlp": ::Saml::Kit::Namespaces::PROTOCOL }).find_by(XPATH).name] || InvalidDocument
           constructor.new(xml, configuration: configuration)
         rescue => error
           Saml::Kit.logger.error(error)

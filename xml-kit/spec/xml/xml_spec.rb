@@ -1,4 +1,4 @@
-RSpec.describe Saml::Kit::Xml do
+RSpec.describe Xml::Kit::Xml do
   describe "#valid_signature?" do
     let(:login_url) { "https://#{FFaker::Internet.domain_name}/login" }
     let(:logout_url) { "https://#{FFaker::Internet.domain_name}/logout" }

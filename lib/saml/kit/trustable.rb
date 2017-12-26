@@ -44,7 +44,13 @@ module Saml
       def must_have_valid_signature
         return if to_xml.blank?
 
-        xml = Saml::Kit::Xml.new(to_xml)
+        xml = ::Xml::Kit::Xml.new(to_xml, namespaces: {
+          "NameFormat": Namespaces::ATTR_SPLAT,
+          "ds": ::Xml::Kit::Namespaces::XMLDSIG,
+          "md": Namespaces::METADATA,
+          "saml": Namespaces::ASSERTION,
+          "samlp": Namespaces::PROTOCOL,
+        })
         xml.valid?
         xml.errors.each do |error|
           errors[:base] << error

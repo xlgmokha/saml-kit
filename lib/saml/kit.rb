@@ -31,10 +31,8 @@ require "saml/kit/document"
 require "saml/kit/assertion"
 require "saml/kit/authentication_request"
 require "saml/kit/bindings"
-require "saml/kit/certificate"
 require "saml/kit/configuration"
 require "saml/kit/default_registry"
-require "saml/kit/fingerprint"
 require "saml/kit/key_pair"
 require "saml/kit/logout_response"
 require "saml/kit/logout_request"
@@ -48,7 +46,6 @@ require "saml/kit/service_provider_metadata"
 require "saml/kit/signature"
 require "saml/kit/signatures"
 require "saml/kit/template"
-require "saml/kit/xml"
 
 I18n.load_path += Dir[File.expand_path("kit/locales/*.yml", File.dirname(__FILE__))]
 
@@ -61,8 +58,6 @@ module Saml
 
       def configure
         yield configuration
-      ensure
-        Xml::Kit.logger = configuration.logger
       end
 
       def logger

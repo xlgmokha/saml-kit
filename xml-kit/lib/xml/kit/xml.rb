@@ -1,14 +1,14 @@
-module Saml
+module Xml
   module Kit
     # {include:file:spec/saml/xml_spec.rb}
     class Xml # :nodoc:
       include ActiveModel::Validations
       NAMESPACES = {
-        "NameFormat": Namespaces::ATTR_SPLAT,
+        #"NameFormat": Namespaces::ATTR_SPLAT,
         "ds": ::Xml::Kit::Namespaces::XMLDSIG,
-        "md": Namespaces::METADATA,
-        "saml": Namespaces::ASSERTION,
-        "samlp": Namespaces::PROTOCOL,
+        #"md": Namespaces::METADATA,
+        #"saml": Namespaces::ASSERTION,
+        #"samlp": Namespaces::PROTOCOL,
       }.freeze
 
       validate :validate_signatures

@@ -1,6 +1,6 @@
-module Saml
+module Xml
   module Kit
-    # {include:file:spec/saml/certificate_spec.rb}
+    # {include:file:spec/xml/certificate_spec.rb}
     class Certificate
       BEGIN_CERT=/-----BEGIN CERTIFICATE-----/
       END_CERT=/-----END CERTIFICATE-----/
@@ -12,7 +12,7 @@ module Saml
         @use = use.downcase.to_sym
       end
 
-      # @return [Saml::Kit::Fingerprint] the certificate fingerprint.
+      # @return [Xml::Kit::Fingerprint] the certificate fingerprint.
       def fingerprint
         Fingerprint.new(value)
       end
@@ -84,7 +84,7 @@ module Saml
       def self.to_x509(value)
         OpenSSL::X509::Certificate.new(Base64.decode64(value))
       rescue OpenSSL::X509::CertificateError => error
-        Saml::Kit.logger.warn(error)
+        ::Xml::Kit.logger.warn(error)
         OpenSSL::X509::Certificate.new(value)
       end
 
