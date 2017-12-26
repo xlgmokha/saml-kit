@@ -1,4 +1,4 @@
-module Saml
+module XML
   module Kit
     module Namespaces
       ASSERTION = "urn:oasis:names:tc:SAML:2.0:assertion"
