@@ -1,7 +1,6 @@
 require "bundler/setup"
 require "xml/kit"
 require "ffaker"
-#require "active_support/testing/time_helpers"
 
 Dir[File.join(Dir.pwd, 'spec/support/**/*.rb')].each { |f| require f }
 RSpec.configure do |config|
