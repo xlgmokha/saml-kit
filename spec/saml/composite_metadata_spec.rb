@@ -13,7 +13,7 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   let(:idp_encryption_certificate) { Saml::Kit::KeyPair.generate(use: :encryption).certificate }
   let(:xml) do
     <<-XML
-<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{Saml::Kit::Id.generate}" entityID="#{entity_id}">
+<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{Xml::Kit::Id.generate}" entityID="#{entity_id}">
   <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
     <KeyDescriptor use="signing">
       <KeyInfo xmlns="#{Saml::Kit::Namespaces::XMLDSIG}">

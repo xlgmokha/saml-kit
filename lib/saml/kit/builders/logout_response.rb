@@ -10,7 +10,7 @@ module Saml
 
         def initialize(request, configuration: Saml::Kit.configuration)
           @configuration = configuration
-          @id = Id.generate
+          @id = ::Xml::Kit::Id.generate
           @issuer = configuration.issuer
           @now = Time.now.utc
           @request = request

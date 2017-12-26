@@ -10,7 +10,7 @@ RSpec.describe Saml::Kit::Builders::LogoutRequest do
 
   it 'produces the expected xml' do
     travel_to 1.second.from_now
-    subject.id = Saml::Kit::Id.generate
+    subject.id = Xml::Kit::Id.generate
     subject.destination = FFaker::Internet.http_url
     subject.issuer = FFaker::Internet.http_url
     subject.name_id_format = Saml::Kit::Namespaces::TRANSIENT

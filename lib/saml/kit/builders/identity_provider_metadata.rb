@@ -16,7 +16,7 @@ module Saml
           @attributes = []
           @configuration = configuration
           @entity_id = configuration.issuer
-          @id = Id.generate
+          @id = ::Xml::Kit::Id.generate
           @logout_urls = []
           @name_id_formats = [Namespaces::PERSISTENT]
           @single_sign_on_urls = []

@@ -112,7 +112,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
     end
 
     it 'validates the schema of the request' do
-      id = Saml::Kit::Id.generate
+      id = Xml::Kit::Id.generate
       configuration = Saml::Kit::Configuration.new
       configuration.generate_key_pair_for(use: :signing)
       signed_xml = Saml::Kit::Signatures.sign(configuration: configuration) do |xml, signature|

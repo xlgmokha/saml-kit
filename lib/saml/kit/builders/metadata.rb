@@ -13,7 +13,7 @@ module Saml
         attr_reader :configuration
 
         def initialize(configuration: Saml::Kit.configuration)
-          @id = Id.generate
+          @id = ::Xml::Kit::Id.generate
           @entity_id = configuration.issuer
           @configuration = configuration
         end

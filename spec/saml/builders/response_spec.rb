@@ -10,7 +10,7 @@ RSpec.describe Saml::Kit::Builders::Response do
   let(:email) { FFaker::Internet.email }
   let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
   let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
-  let(:request) { double(:request, id: Saml::Kit::Id.generate, assertion_consumer_service_url: assertion_consumer_service_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, trusted?: true, signed?: true) }
+  let(:request) { double(:request, id: Xml::Kit::Id.generate, assertion_consumer_service_url: assertion_consumer_service_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, trusted?: true, signed?: true) }
   let(:provider) { double(:provider, want_assertions_signed: false, encryption_certificates: [configuration.certificates(use: :encryption).last] ) }
   let(:issuer) { FFaker::Internet.uri("https") }
 

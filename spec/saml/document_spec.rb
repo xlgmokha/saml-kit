@@ -2,7 +2,7 @@ RSpec.describe Saml::Kit::Document do
   describe ".to_saml_document" do
     subject { described_class }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
-    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: Saml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
 
     it 'returns a Response' do
       xml = Saml::Kit::Response.build_xml(user, request)

@@ -1,6 +1,6 @@
 RSpec.describe Saml::Kit::Response do
   describe "#valid?" do
-    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: Saml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
@@ -54,7 +54,7 @@ RSpec.describe Saml::Kit::Response do
     it 'validates the schema of the response' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
-      id = Saml::Kit::Id.generate
+      id = Xml::Kit::Id.generate
       configuration = Saml::Kit::Configuration.new
       configuration.generate_key_pair_for(use: :signing)
       signed_xml = Saml::Kit::Signatures.sign(configuration: configuration) do |xml, signature|
@@ -146,7 +146,7 @@ RSpec.describe Saml::Kit::Response do
       destination = FFaker::Internet.uri("https")
       raw_xml = <<-XML
 <?xml version="1.0"?>
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="#{Saml::Kit::Id.generate}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{destination}" Consent="#{Saml::Kit::Namespaces::UNSPECIFIED}" InResponseTo="#{request.id}">
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="#{Xml::Kit::Id.generate}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{destination}" Consent="#{Saml::Kit::Namespaces::UNSPECIFIED}" InResponseTo="#{request.id}">
   <Issuer xmlns="#{Saml::Kit::Namespaces::ASSERTION}">#{request.issuer}</Issuer>
   <samlp:Status>
     <samlp:StatusCode Value="#{Saml::Kit::Namespaces::RESPONDER_ERROR}"/>
@@ -160,7 +160,7 @@ RSpec.describe Saml::Kit::Response do
     end
 
     it 'is invalid when there are 2 assertions' do
-      id = Saml::Kit::Id.generate
+      id = Xml::Kit::Id.generate
       issuer = FFaker::Internet.uri("https")
       configuration = Saml::Kit::Configuration.new do |config|
         config.generate_key_pair_for(use: :signing)
@@ -174,7 +174,7 @@ RSpec.describe Saml::Kit::Response do
         xmlns: Saml::Kit::Namespaces::PROTOCOL,
       }
       assertion_options = {
-        ID: Saml::Kit::Id.generate,
+        ID: Xml::Kit::Id.generate,
         IssueInstant: Time.now.iso8601,
         Version: "2.0",
         xmlns: Saml::Kit::Namespaces::ASSERTION,
@@ -206,7 +206,7 @@ RSpec.describe Saml::Kit::Response do
               end
             end
           end
-          new_options = assertion_options.merge(ID: Saml::Kit::Id.generate)
+          new_options = assertion_options.merge(ID: Xml::Kit::Id.generate)
           xml.Assertion(new_options) do
             xml.Issuer issuer
             xml.Subject do
@@ -236,7 +236,7 @@ RSpec.describe Saml::Kit::Response do
 
   describe "#signed?" do
     let(:now) { Time.now.utc }
-    let(:id) { Saml::Kit::Id.generate }
+    let(:id) { Xml::Kit::Id.generate }
     let(:url) { FFaker::Internet.uri("https") }
 
     it 'returns true when the Assertion is signed' do
@@ -317,7 +317,7 @@ RSpec.describe Saml::Kit::Response do
 
   describe "#certificate" do
     let(:now) { Time.now.utc }
-    let(:id) { Saml::Kit::Id.generate }
+    let(:id) { Xml::Kit::Id.generate }
     let(:url) { FFaker::Internet.uri("https") }
     let(:certificate) do
       Saml::Kit::Certificate.new(
@@ -404,7 +404,7 @@ RSpec.describe Saml::Kit::Response do
   end
 
   describe "encrypted assertion" do
-    let(:id) { Saml::Kit::Id.generate }
+    let(:id) { Xml::Kit::Id.generate }
     let(:now) { Time.now.utc }
     let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
     let(:password) { FFaker::Movie.title }
@@ -455,7 +455,7 @@ XML
       encrypted = cipher.update(assertion) + cipher.final
 
       xml = <<-XML
-<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" xmlns:saml="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{assertion_consumer_service_url}" InResponseTo="#{Saml::Kit::Id.generate}">
+<samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" xmlns:saml="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{assertion_consumer_service_url}" InResponseTo="#{Xml::Kit::Id.generate}">
   <saml:Issuer>#{FFaker::Internet.uri("https")}</saml:Issuer>
   <samlp:Status>
     <samlp:StatusCode Value="#{Saml::Kit::Namespaces::SUCCESS}"/>
@@ -489,7 +489,7 @@ XML
 
   describe "parsing" do
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: attributes) }
-    let(:request) { double(:request, id: Saml::Kit::Id.generate, signed?: true, trusted?: true, provider: nil, assertion_consumer_service_url: FFaker::Internet.uri("https"), name_id_format: '', issuer: FFaker::Internet.uri("https")) }
+    let(:request) { double(:request, id: Xml::Kit::Id.generate, signed?: true, trusted?: true, provider: nil, assertion_consumer_service_url: FFaker::Internet.uri("https"), name_id_format: '', issuer: FFaker::Internet.uri("https")) }
     let(:attributes) { { name: 'mo' } }
 
     it 'returns the name id' do

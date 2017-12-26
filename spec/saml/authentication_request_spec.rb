@@ -1,6 +1,6 @@
 RSpec.describe Saml::Kit::AuthenticationRequest do
   subject { described_class.new(raw_xml, configuration: configuration) }
-  let(:id) { Saml::Kit::Id.generate }
+  let(:id) { Xml::Kit::Id.generate }
   let(:assertion_consumer_service_url) { "https://#{FFaker::Internet.domain_name}/acs" }
   let(:issuer) { FFaker::Movie.title }
   let(:destination) { FFaker::Internet.http_url }
@@ -79,7 +79,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
 
     it 'validates the schema of the request' do
-      id = Saml::Kit::Id.generate
+      id = Xml::Kit::Id.generate
       configuration = Saml::Kit::Configuration.new
       configuration.generate_key_pair_for(use: :signing)
       signed_xml = Saml::Kit::Signatures.sign(configuration: configuration) do |xml, signature|
@@ -96,7 +96,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     it 'validates a request without a signature' do
       now = Time.now.utc
       raw_xml = <<-XML
-<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Saml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
+<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Xml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
   <saml:Issuer>#{issuer}</saml:Issuer>
   <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::EMAIL_ADDRESS}'/>
 </samlp:AuthnRequest>
@@ -110,7 +110,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     it 'is valid when there is no signature, and the issuer is registered' do
       now = Time.now.utc
       raw_xml = <<-XML
-<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Saml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
+<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Xml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
   <saml:Issuer>#{issuer}</saml:Issuer>
   <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::PERSISTENT}'/>
 </samlp:AuthnRequest>
@@ -124,7 +124,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     it 'is invalid when there is no signature, and the issuer is not registered' do
       now = Time.now.utc
       raw_xml = <<-XML
-<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Saml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
+<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Xml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
   <saml:Issuer>#{issuer}</saml:Issuer>
   <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::PERSISTENT}'/>
 </samlp:AuthnRequest>

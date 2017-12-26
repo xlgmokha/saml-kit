@@ -13,8 +13,8 @@ module Saml
         def initialize(user, request, configuration: Saml::Kit.configuration)
           @user = user
           @request = request
-          @id = Id.generate
-          @reference_id = Id.generate
+          @id = ::Xml::Kit::Id.generate
+          @reference_id = ::Xml::Kit::Id.generate
           @now = Time.now.utc
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
