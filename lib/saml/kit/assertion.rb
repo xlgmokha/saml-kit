@@ -74,7 +74,8 @@ module Saml
       def assertion
         @assertion ||=
           if encrypted?
-            decryptor = ::Xml::Kit::XmlDecryption.new(configuration: configuration)
+            private_keys = configuration.private_keys(use: :encryption)
+            decryptor = ::Xml::Kit::XmlDecryption.new(private_keys: private_keys)
             decrypted = decryptor.decrypt(@xml_hash['Response']['EncryptedAssertion'])
             Saml::Kit.logger.debug(decrypted)
             Hash.from_xml(decrypted)['Assertion']

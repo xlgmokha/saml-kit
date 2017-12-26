@@ -39,7 +39,7 @@ RSpec.describe Xml::Kit::XmlDecryption do
           }
         }
       }
-      subject = described_class.new(configuration: double(private_keys: [private_key]))
+      subject = described_class.new(private_keys: [private_key])
       decrypted = subject.decrypt(data)
       expect(decrypted.strip).to eql(secret)
     end
@@ -83,7 +83,7 @@ RSpec.describe Xml::Kit::XmlDecryption do
       _, other_private_key_pem = generate_key_pair(password)
       other_private_key = OpenSSL::PKey::RSA.new(other_private_key_pem, password)
 
-      subject = described_class.new(configuration: double(private_keys: [other_private_key, private_key]))
+      subject = described_class.new(private_keys: [other_private_key, private_key])
       decrypted = subject.decrypt(data)
       expect(decrypted.strip).to eql(secret)
     end
@@ -125,7 +125,7 @@ RSpec.describe Xml::Kit::XmlDecryption do
 
       new_private_key_pem = generate_key_pair(password)[1]
       new_private_key = OpenSSL::PKey::RSA.new(new_private_key_pem, password)
-      subject = described_class.new(configuration: double(private_keys: [new_private_key]))
+      subject = described_class.new(private_keys: [new_private_key])
       expect do
         subject.decrypt(data)
       end.to raise_error(OpenSSL::PKey::RSAError)

@@ -5,8 +5,8 @@ module Xml
       # The list of private keys to use to attempt to decrypt the document.
       attr_reader :private_keys
 
-      def initialize(configuration: Saml::Kit.configuration)
-        @private_keys = configuration.private_keys(use: :encryption)
+      def initialize(private_keys:)
+        @private_keys = private_keys
       end
 
       # Decrypts an EncryptedData section of an XML document.
