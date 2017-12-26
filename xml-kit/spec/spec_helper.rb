@@ -1,6 +1,7 @@
 require "bundler/setup"
 require "xml/kit"
 require "ffaker"
+require "saml/kit"
 
 Xml::Kit.logger.level = Logger::FATAL
 
