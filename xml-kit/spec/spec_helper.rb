@@ -2,6 +2,8 @@ require "bundler/setup"
 require "xml/kit"
 require "ffaker"
 
+Xml::Kit.logger.level = Logger::FATAL
+
 Dir[File.join(Dir.pwd, 'spec/support/**/*.rb')].each { |f| require f }
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
