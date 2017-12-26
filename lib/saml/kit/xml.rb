@@ -14,8 +14,9 @@ module Saml
       validate :validate_signatures
       validate :validate_certificates
 
-      def initialize(raw_xml)
+      def initialize(raw_xml, namespaces: NAMESPACES)
         @raw_xml = raw_xml
+        @namespaces = namespaces
         @document = Nokogiri::XML(raw_xml)
       end
 
@@ -23,14 +24,14 @@ module Saml
       #
       # @param xpath [String] the XPath to use to search the document
       def find_by(xpath)
-        document.at_xpath(xpath, NAMESPACES)
+        document.at_xpath(xpath, namespaces)
       end
 
       # Returns all XML nodes found by searching the document with the provided XPath.
       #
       # @param xpath [String] the XPath to use to search the document
       def find_all(xpath)
-        document.search(xpath, NAMESPACES)
+        document.search(xpath, namespaces)
       end
 
       # Return the XML document as a [String].
@@ -42,7 +43,7 @@ module Saml
 
       private
 
-      attr_reader :raw_xml, :document
+      attr_reader :raw_xml, :document, :namespaces
 
       def validate_signatures
         invalid_signatures.flat_map(&:errors).uniq.each do |error|
