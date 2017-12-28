@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Builders
+      # {include:file:lib/saml/kit/builders/templates/assertion.builder}
       class Assertion
         include XmlTemplatable
         extend Forwardable

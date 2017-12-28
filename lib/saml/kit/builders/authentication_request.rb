@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Builders
+      # {include:file:lib/saml/kit/builders/templates/authentication_request.builder}
       # {include:file:spec/saml/builders/authentication_request_spec.rb}
       class AuthenticationRequest
         include XmlTemplatable

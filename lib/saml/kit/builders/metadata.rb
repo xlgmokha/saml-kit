@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Builders
+      # {include:file:lib/saml/kit/builders/templates/metadata.builder}
       # {include:file:spec/saml/builders/metadata_spec.rb}
       class Metadata
         include XmlTemplatable

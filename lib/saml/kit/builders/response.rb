@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Builders
+      # {include:file:lib/saml/kit/builders/templates/response.builder}
       # {include:file:spec/saml/builders/response_spec.rb}
       class Response
         include XmlTemplatable

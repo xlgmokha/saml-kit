@@ -1,6 +1,7 @@
 module Saml
   module Kit
     module Builders
+      # {include:file:lib/saml/kit/builders/templates/service_provider_metadata.builder}
       # {include:file:spec/saml/builders/service_provider_metadata_spec.rb}
       class ServiceProviderMetadata
         include XmlTemplatable
