@@ -1,4 +1,4 @@
-
+# coding: utf-8
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "xml/kit/version"
@@ -7,16 +7,18 @@ Gem::Specification.new do |spec|
   spec.name          = "xml-kit"
   spec.version       = Xml::Kit::VERSION
   spec.authors       = ["mo khan"]
-  spec.email         = ["mo.khan@gmail.com"]
+  spec.email         = ["mo@mokhan.ca"]
 
   spec.summary       = %q{A simple toolkit for working with XML.}
   spec.description   = %q{A simple toolkit for working with XML.}
   spec.homepage      = "http://www.mokhan.ca"
   spec.license       = "MIT"
+  spec.required_ruby_version = '>= 2.2.0'
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
   end
+  spec.metadata["yard.run"] = "yri"
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]

@@ -24,10 +24,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "activemodel", ">= 4.2.0"
-  spec.add_dependency "builder", "~> 3.2"
   spec.add_dependency "nokogiri", "~> 1.8"
-  spec.add_dependency "tilt", "~> 2.0"
-  spec.add_dependency "xmldsig", "~> 0.6"
   spec.add_dependency "xml-kit", "0.1.0"
   spec.add_development_dependency "bundler", "~> 1.15"
   spec.add_development_dependency "ffaker", "~> 2.7"
