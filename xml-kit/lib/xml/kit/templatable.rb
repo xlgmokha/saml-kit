@@ -3,18 +3,36 @@ module Xml
     module Templatable
       # Can be used to disable embeding a signature.
       # By default a signature will be embedded if a signing
-      # certificate is available via the configuration.
+      # certificate is available.
       attr_accessor :embed_signature
 
-      # @deprecated Use {#embed_signature=} instead of this method.
-      def sign=(value)
-        Xml::Kit.deprecate("sign= is deprecated. Use embed_signature= instead")
-        self.embed_signature = value
-      end
+      # Used to enable/disable encrypting the document.
+      attr_accessor :encrypt
 
       # Returns the generated XML document with an XML Digital Signature and XML Encryption.
       def to_xml(xml: ::Builder::XmlMarkup.new)
         signatures.complete(render(self, xml: xml))
+      end
+
+      # @!visibility private
+      def encryption_for(xml:)
+        if encrypt?
+          temp = ::Builder::XmlMarkup.new
+          yield temp
+          signed_xml = signatures.complete(temp.target!)
+          xml_encryption = ::Xml::Kit::Builders::XmlEncryption.new(
+            signed_xml,
+            encryption_certificate.public_key
+          )
+          render(xml_encryption, xml: xml)
+        else
+          yield xml
+        end
+      end
+
+      # @!visibility private
+      def render(model, options)
+        ::Xml::Kit::Template.new(model).to_xml(options)
       end
 
       # @!visibility private
@@ -30,32 +48,27 @@ module Xml
         signatures.sign_with(key_pair)
       end
 
-      # Returns true if an embedded signature is requested and at least one signing certificate is available via the configuration.
+      private
+
       def sign?
-        return configuration.sign? if embed_signature.nil?
-        embed_signature && configuration.sign?
+        embed_signature
       end
 
       # @!visibility private
       def signatures
         @signatures ||= ::Xml::Kit::Signatures.new(
-          key_pair: configuration.key_pairs(use: :signing).last,
-          digest_method: configuration.digest_method,
-          signature_method: configuration.signature_method,
+          key_pair: signing_key_pair,
+          digest_method: digest_method,
+          signature_method: signature_method,
         )
       end
 
-      # @!visibility private
-      def encryption_for(xml:)
-        if encrypt?
-          temp = ::Builder::XmlMarkup.new
-          yield temp
-          signed_xml = signatures.complete(temp.target!)
-          xml_encryption = ::Xml::Kit::Builders::XmlEncryption.new(signed_xml, encryption_certificate.public_key)
-          render(xml_encryption, xml: xml)
-        else
-          yield xml
-        end
+      def digest_method
+        :SHA256
+      end
+
+      def signature_method
+        :SHA256
       end
 
       # @!visibility private
@@ -63,9 +76,12 @@ module Xml
         encrypt && encryption_certificate
       end
 
-      # @!visibility private
-      def render(model, options)
-        ::Xml::Kit::Template.new(model).to_xml(options)
+      def signing_key_pair
+        raise NotImplementedError
+      end
+
+      def encryption_certificate
+        raise NotImplementedError
       end
     end
   end

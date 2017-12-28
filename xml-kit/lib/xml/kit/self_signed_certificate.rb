@@ -1,7 +1,7 @@
 module Xml
   module Kit
     class SelfSignedCertificate
-      SUBJECT="/C=CA/ST=Alberta/L=Calgary/O=SamlKit/OU=SamlKit/CN=SamlKit"
+      SUBJECT="/C=CA/ST=Alberta/L=Calgary/O=XmlKit/OU=XmlKit/CN=XmlKit"
 
       def initialize(passphrase)
         @passphrase = passphrase

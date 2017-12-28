@@ -7,7 +7,7 @@ module Saml
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code
-        attr_accessor :issuer, :destination, :encrypt
+        attr_accessor :issuer, :destination
         attr_reader :configuration
 
         def initialize(user, request, configuration: Saml::Kit.configuration)

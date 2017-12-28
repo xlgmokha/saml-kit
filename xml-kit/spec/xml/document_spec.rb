@@ -2,11 +2,12 @@ RSpec.describe Xml::Kit::Document do
   class Item
     include ::Xml::Kit::Templatable
 
-    attr_reader :id, :configuration
+    attr_reader :id, :signing_key_pair
 
-    def initialize(configuration)
+    def initialize
       @id = ::Xml::Kit::Id.generate
-      @configuration = configuration
+      @signing_key_pair = ::Xml::Kit::KeyPair.generate(use: :signing)
+      @embed_signature = true
     end
 
     def template_path
@@ -18,20 +19,10 @@ RSpec.describe Xml::Kit::Document do
   describe "#valid_signature?" do
     let(:login_url) { "https://#{FFaker::Internet.domain_name}/login" }
     let(:logout_url) { "https://#{FFaker::Internet.domain_name}/logout" }
-    let(:configuration) do
-      double(
-        :configuration,
-        sign?: true,
-        key_pairs: [::Xml::Kit::KeyPair.generate(use: :signing)],
-        signature_method: :SHA256,
-        digest_method: :SHA256,
-      )
-    end
-    let(:signed_xml) { Item.new(configuration).to_xml }
+    let(:signed_xml) { Item.new.to_xml }
 
     it 'returns true, when the digest and signature is valid' do
-      subject = described_class.new(signed_xml)
-      expect(subject).to be_valid
+      expect(described_class.new(signed_xml)).to be_valid
     end
 
     it 'returns false, when the SHA1 digest is not valid' do
