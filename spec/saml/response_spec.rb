@@ -55,9 +55,8 @@ RSpec.describe Saml::Kit::Response do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       id = Xml::Kit::Id.generate
-      configuration = Saml::Kit::Configuration.new
-      configuration.generate_key_pair_for(use: :signing)
-      signed_xml = Saml::Kit::Signatures.sign(configuration: configuration) do |xml, signature|
+      key_pair = ::Xml::Kit::KeyPair.generate(use: :signing)
+      signed_xml = ::Xml::Kit::Signatures.sign(key_pair: key_pair) do |xml, signature|
         xml.tag! "samlp:Response", "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, ID: id do
           signature.template(id)
           xml.Fake do
@@ -162,9 +161,7 @@ RSpec.describe Saml::Kit::Response do
     it 'is invalid when there are 2 assertions' do
       id = Xml::Kit::Id.generate
       issuer = FFaker::Internet.uri("https")
-      configuration = Saml::Kit::Configuration.new do |config|
-        config.generate_key_pair_for(use: :signing)
-      end
+      key_pair = ::Xml::Kit::KeyPair.generate(use: :signing)
       response_options = {
         ID: id,
         Version: "2.0",
@@ -179,7 +176,7 @@ RSpec.describe Saml::Kit::Response do
         Version: "2.0",
         xmlns: Saml::Kit::Namespaces::ASSERTION,
       }
-      xml = Saml::Kit::Signatures.sign(configuration: configuration) do |xml, signature|
+      xml = ::Xml::Kit::Signatures.sign(key_pair: key_pair) do |xml, signature|
         xml.instruct!
         xml.Response response_options do
           xml.Issuer(issuer, xmlns: Saml::Kit::Namespaces::ASSERTION)
@@ -321,7 +318,7 @@ RSpec.describe Saml::Kit::Response do
     let(:url) { FFaker::Internet.uri("https") }
     let(:certificate) do
       ::Xml::Kit::Certificate.new(
-        Saml::Kit::SelfSignedCertificate.new("password").create[0],
+        ::Xml::Kit::SelfSignedCertificate.new("password").create[0],
         use: :signing
       )
     end
@@ -442,7 +439,7 @@ XML
     end
 
     it 'parses the encrypted assertion' do
-      certificate_pem, private_key_pem = Saml::Kit::SelfSignedCertificate.new(password).create
+      certificate_pem, private_key_pem = ::Xml::Kit::SelfSignedCertificate.new(password).create
       public_key = OpenSSL::X509::Certificate.new(certificate_pem).public_key
       private_key = OpenSSL::PKey::RSA.new(private_key_pem, password)
 

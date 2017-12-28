@@ -3,7 +3,7 @@ module Saml
     module Builders
       # {include:file:spec/saml/builders/metadata_spec.rb}
       class Metadata
-        include Templatable
+        include XmlTemplatable
 
         attr_accessor :entity_id
         attr_accessor :id

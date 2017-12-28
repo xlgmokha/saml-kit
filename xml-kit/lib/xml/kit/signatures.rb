@@ -1,14 +1,14 @@
-module Saml
+module Xml
   module Kit
     # @!visibility private
     class Signatures # :nodoc:
-      # @!visibility private
-      attr_reader :configuration
+      attr_reader :key_pair, :signature_method, :digest_method
 
       # @!visibility private
-      def initialize(configuration:)
-        @configuration = configuration
-        @key_pair = configuration.key_pairs(use: :signing).last
+      def initialize(key_pair:, signature_method:, digest_method:)
+        @digest_method = digest_method
+        @key_pair = key_pair
+        @signature_method = signature_method
       end
 
       # @!visibility private
@@ -18,21 +18,31 @@ module Saml
 
       # @!visibility private
       def build(reference_id)
-        return nil unless configuration.sign?
-        certificate = @key_pair.certificate
-        Saml::Kit::Builders::XmlSignature.new(reference_id, configuration: configuration, certificate: certificate)
+        return nil if key_pair.nil?
+
+        ::Xml::Kit::Builders::XmlSignature.new(
+          reference_id,
+          certificate: key_pair.certificate,
+          signature_method: signature_method,
+          digest_method: digest_method
+        )
       end
 
       # @!visibility private
       def complete(raw_xml)
-        return raw_xml unless configuration.sign?
-        private_key = @key_pair.private_key
+        return raw_xml if key_pair.nil?
+
+        private_key = key_pair.private_key
         Xmldsig::SignedDocument.new(raw_xml).sign(private_key)
       end
 
       # @!visibility private
-      def self.sign(xml: ::Builder::XmlMarkup.new, configuration: Saml::Kit.configuration)
-        signatures = Saml::Kit::Signatures.new(configuration: configuration)
+      def self.sign(xml: ::Builder::XmlMarkup.new, key_pair:, signature_method: :SHA256, digest_method: :SHA256)
+        signatures = new(
+          key_pair: key_pair,
+          signature_method: signature_method,
+          digest_method: digest_method,
+        )
         yield xml, XmlSignatureTemplate.new(xml, signatures)
         signatures.complete(xml.target!)
       end

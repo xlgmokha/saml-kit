@@ -3,7 +3,7 @@ module Saml
     module Builders
       # {include:file:spec/saml/builders/response_spec.rb}
       class Response
-        include Templatable
+        include XmlTemplatable
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now
         attr_accessor :version, :status_code

@@ -1,7 +1,7 @@
 require "bundler/setup"
 require "xml/kit"
 require "ffaker"
-require "saml/kit"
+require "active_support/core_ext/hash/conversions"
 
 Xml::Kit.logger.level = Logger::FATAL
 

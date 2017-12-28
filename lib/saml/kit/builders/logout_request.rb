@@ -3,7 +3,7 @@ module Saml
     module Builders
       # {include:file:spec/saml/builders/logout_request_spec.rb}
       class LogoutRequest
-        include Saml::Kit::Templatable
+        include XmlTemplatable
         attr_accessor :id, :destination, :issuer, :name_id_format, :now
         attr_accessor :version
         attr_reader :user, :configuration

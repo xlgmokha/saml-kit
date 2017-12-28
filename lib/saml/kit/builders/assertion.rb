@@ -2,7 +2,7 @@ module Saml
   module Kit
     module Builders
       class Assertion
-        include Templatable
+        include XmlTemplatable
         extend Forwardable
 
         def_delegators :@response_builder, :encrypt, :embed_signature, :request, :issuer, :reference_id, :now, :configuration, :user, :version, :destination, :encryption_certificate

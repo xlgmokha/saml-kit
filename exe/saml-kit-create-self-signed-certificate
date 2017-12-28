@@ -3,7 +3,7 @@ require 'saml/kit'
 
 puts "Enter Passphrase:"
 passphrase = STDIN.read.strip
-certificate, private_key = Saml::Kit::SelfSignedCertificate.new(passphrase).create
+certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new(passphrase).create
 
 puts "** BEGIN File Format **"
 print certificate

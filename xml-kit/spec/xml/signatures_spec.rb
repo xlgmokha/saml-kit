@@ -1,26 +1,5 @@
-RSpec.describe Saml::Kit::Signatures do
-  let(:configuration) do
-    config = Saml::Kit::Configuration.new
-    config.add_key_pair(certificate, private_key, passphrase: passphrase, use: :signing)
-    config
-  end
-
+RSpec.describe ::Xml::Kit::Signatures do
   let(:reference_id) { Xml::Kit::Id.generate }
-  let(:rsa_key) { OpenSSL::PKey::RSA.new(2048) }
-  let(:public_key) { rsa_key.public_key }
-  let(:certificate) do
-    x = OpenSSL::X509::Certificate.new
-    x.subject = x.issuer = OpenSSL::X509::Name.parse("/C=CA/ST=Alberta/L=Calgary/O=Xsig/OU=Xsig/CN=Xsig")
-    x.not_before = Time.now
-    x.not_after = Time.now + 365 * 24 * 60 * 60
-    x.public_key = public_key
-    x.serial = 0x0
-    x.version = 2
-    x.sign(rsa_key, OpenSSL::Digest::SHA256.new)
-    x.to_pem
-  end
-  let(:private_key) { rsa_key.to_pem(OpenSSL::Cipher.new('des3'), passphrase) }
-  let(:passphrase) { "password" }
 
   it 'generates a signature' do
     options = {
@@ -28,7 +7,8 @@ RSpec.describe Saml::Kit::Signatures do
       "xmlns:saml" => "urn:oasis:names:tc:SAML:2.0:assertion",
       ID: reference_id,
     }
-    signed_xml = described_class.sign(configuration: configuration) do |xml, signature|
+    key_pair = ::Xml::Kit::KeyPair.generate(use: :signing)
+    signed_xml = described_class.sign(key_pair: key_pair) do |xml, signature|
       xml.tag!('samlp:AuthnRequest', options) do
         signature.template(reference_id)
         xml.tag!('saml:Issuer', "MyEntityID")
@@ -47,7 +27,7 @@ RSpec.describe Saml::Kit::Signatures do
       { "Algorithm" => "http://www.w3.org/2001/10/xml-exc-c14n#" }
     ])
     expect(signature['SignedInfo']['Reference']['DigestMethod']['Algorithm']).to eql("http://www.w3.org/2001/04/xmlenc#sha256")
-    expected_certificate = certificate.gsub(/\n/, '').gsub(/-----BEGIN CERTIFICATE-----/, '').gsub(/-----END CERTIFICATE-----/, '')
+    expected_certificate = key_pair.certificate.stripped
     expect(signature['KeyInfo']['X509Data']['X509Certificate']).to eql(expected_certificate)
     expect(signature['SignedInfo']['Reference']['DigestValue']).to be_present
     expect(signature['SignatureValue']).to be_present
@@ -55,7 +35,7 @@ RSpec.describe Saml::Kit::Signatures do
   end
 
   it 'does not add a signature' do
-    signed_xml = described_class.sign(configuration: Saml::Kit::Configuration.new) do |xml, signature|
+    signed_xml = described_class.sign(key_pair: nil) do |xml, signature|
       xml.AuthnRequest do
         signature.template(reference_id)
         xml.Issuer "MyEntityID"

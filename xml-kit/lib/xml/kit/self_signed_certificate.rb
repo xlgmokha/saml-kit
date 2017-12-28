@@ -1,4 +1,4 @@
-module Saml
+module Xml
   module Kit
     class SelfSignedCertificate
       SUBJECT="/C=CA/ST=Alberta/L=Calgary/O=SamlKit/OU=SamlKit/CN=SamlKit"
@@ -12,8 +12,8 @@ module Saml
         public_key = rsa_key.public_key
         certificate = OpenSSL::X509::Certificate.new
         certificate.subject = certificate.issuer = OpenSSL::X509::Name.parse(SUBJECT)
-        certificate.not_before = DateTime.now.beginning_of_day
-        certificate.not_after = 30.days.from_now
+        certificate.not_before = Time.now.to_i
+        certificate.not_after = (Date.today + 30).to_time.to_i
         certificate.public_key = public_key
         certificate.serial = 0x0
         certificate.version = 2

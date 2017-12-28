@@ -7,10 +7,10 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   let(:sp_logout_service) { FFaker::Internet.uri("https") }
   let(:idp_logout_service) { FFaker::Internet.uri("https") }
   let(:entity_id) { FFaker::Internet.uri("https") }
-  let(:sp_signing_certificate) { Saml::Kit::KeyPair.generate(use: :signing).certificate }
-  let(:sp_encryption_certificate) { Saml::Kit::KeyPair.generate(use: :encryption).certificate }
-  let(:idp_signing_certificate) { Saml::Kit::KeyPair.generate(use: :signing).certificate }
-  let(:idp_encryption_certificate) { Saml::Kit::KeyPair.generate(use: :encryption).certificate }
+  let(:sp_signing_certificate) { ::Xml::Kit::KeyPair.generate(use: :signing).certificate }
+  let(:sp_encryption_certificate) { ::Xml::Kit::KeyPair.generate(use: :encryption).certificate }
+  let(:idp_signing_certificate) { ::Xml::Kit::KeyPair.generate(use: :signing).certificate }
+  let(:idp_encryption_certificate) { ::Xml::Kit::KeyPair.generate(use: :encryption).certificate }
   let(:xml) do
     <<-XML
 <EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{::Xml::Kit::Id.generate}" entityID="#{entity_id}">

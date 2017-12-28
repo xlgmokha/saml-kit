@@ -1,11 +1,11 @@
-module Saml
+module Xml
   module Kit
     class KeyPair # :nodoc:
       attr_reader :certificate, :private_key, :use
 
       def initialize(certificate, private_key, passphrase, use)
         @use = use
-        @certificate = Xml::Kit::Certificate.new(certificate, use: use)
+        @certificate = ::Xml::Kit::Certificate.new(certificate, use: use)
         @private_key = OpenSSL::PKey::RSA.new(private_key, passphrase)
       end
 
@@ -21,7 +21,7 @@ module Saml
       # @param use [Symbol] Can be either `:signing` or `:encryption`.
       # @param passphrase [String] the passphrase to use to encrypt the private key.
       def self.generate(use:, passphrase: SecureRandom.uuid)
-        certificate, private_key = SelfSignedCertificate.new(passphrase).create
+        certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new(passphrase).create
         new(certificate, private_key, passphrase, use)
       end
     end

@@ -3,7 +3,7 @@ module Saml
     module Builders
       # {include:file:spec/saml/builders/identity_provider_metadata_spec.rb}
       class IdentityProviderMetadata
-        include Saml::Kit::Templatable
+        include XmlTemplatable
         extend Forwardable
         attr_accessor :attributes, :name_id_formats
         attr_accessor :want_authn_requests_signed

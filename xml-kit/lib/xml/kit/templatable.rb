@@ -1,4 +1,4 @@
-module Saml
+module Xml
   module Kit
     module Templatable
       # Can be used to disable embeding a signature.
@@ -8,7 +8,7 @@ module Saml
 
       # @deprecated Use {#embed_signature=} instead of this method.
       def sign=(value)
-        Saml::Kit.deprecate("sign= is deprecated. Use embed_signature= instead")
+        Xml::Kit.deprecate("sign= is deprecated. Use embed_signature= instead")
         self.embed_signature = value
       end
 
@@ -25,19 +25,24 @@ module Saml
 
       # Allows you to specify which key pair to use for generating an XML digital signature.
       #
-      # @param key_pair [Saml::Kit::KeyPair] the key pair to use for signing.
+      # @param key_pair [Xml::Kit::KeyPair] the key pair to use for signing.
       def sign_with(key_pair)
         signatures.sign_with(key_pair)
       end
 
       # Returns true if an embedded signature is requested and at least one signing certificate is available via the configuration.
       def sign?
-        embed_signature.nil? ? configuration.sign? : embed_signature && configuration.sign?
+        return configuration.sign? if embed_signature.nil?
+        embed_signature && configuration.sign?
       end
 
       # @!visibility private
       def signatures
-        @signatures ||= Saml::Kit::Signatures.new(configuration: configuration)
+        @signatures ||= ::Xml::Kit::Signatures.new(
+          key_pair: configuration.key_pairs(use: :signing).last,
+          digest_method: configuration.digest_method,
+          signature_method: configuration.signature_method,
+        )
       end
 
       # @!visibility private
@@ -46,7 +51,7 @@ module Saml
           temp = ::Builder::XmlMarkup.new
           yield temp
           signed_xml = signatures.complete(temp.target!)
-          xml_encryption = Saml::Kit::Builders::XmlEncryption.new(signed_xml, encryption_certificate.public_key)
+          xml_encryption = ::Xml::Kit::Builders::XmlEncryption.new(signed_xml, encryption_certificate.public_key)
           render(xml_encryption, xml: xml)
         else
           yield xml
@@ -60,7 +65,7 @@ module Saml
 
       # @!visibility private
       def render(model, options)
-        Saml::Kit::Template.new(model).to_xml(options)
+        ::Xml::Kit::Template.new(model).to_xml(options)
       end
     end
   end

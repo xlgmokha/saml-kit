@@ -1,4 +1,4 @@
-module Saml
+module Xml
   module Kit
     module Builders
       class XmlSignature
@@ -17,22 +17,16 @@ module Saml
           SHA512: "http://www.w3.org/2001/04/xmlenc#sha512",
         }.freeze
 
-        attr_reader :embed_signature, :configuration
-        attr_reader :reference_id
         attr_reader :certificate
+        attr_reader :digest_method
+        attr_reader :reference_id
+        attr_reader :signature_method
 
-        def initialize(reference_id, configuration:, certificate: )
-          @configuration = configuration
-          @reference_id = reference_id
+        def initialize(reference_id, signature_method: :SH256, digest_method: :SHA256, certificate:)
           @certificate = certificate
-        end
-
-        def signature_method
-          SIGNATURE_METHODS[configuration.signature_method]
-        end
-
-        def digest_method
-          DIGEST_METHODS[configuration.digest_method]
+          @digest_method = DIGEST_METHODS[digest_method]
+          @reference_id = reference_id
+          @signature_method = SIGNATURE_METHODS[signature_method]
         end
       end
     end

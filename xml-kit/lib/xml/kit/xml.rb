@@ -11,7 +11,7 @@ module Xml
       def initialize(raw_xml, namespaces: NAMESPACES)
         @raw_xml = raw_xml
         @namespaces = namespaces
-        @document = Nokogiri::XML(raw_xml)
+        @document = ::Nokogiri::XML(raw_xml)
       end
 
       # Returns the first XML node found by searching the document with the provided XPath.

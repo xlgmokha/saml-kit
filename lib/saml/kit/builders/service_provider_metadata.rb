@@ -3,7 +3,7 @@ module Saml
     module Builders
       # {include:file:spec/saml/builders/service_provider_metadata_spec.rb}
       class ServiceProviderMetadata
-        include Saml::Kit::Templatable
+        include XmlTemplatable
         extend Forwardable
         attr_accessor :acs_urls, :logout_urls, :name_id_formats
         attr_accessor :want_assertions_signed
