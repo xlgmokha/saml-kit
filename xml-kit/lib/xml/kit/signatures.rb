@@ -20,7 +20,7 @@ module Xml
       def build(reference_id)
         return nil if key_pair.nil?
 
-        ::Xml::Kit::Builders::XmlSignature.new(
+        ::Xml::Kit::Builders::Signature.new(
           reference_id,
           certificate: key_pair.certificate,
           signature_method: signature_method,

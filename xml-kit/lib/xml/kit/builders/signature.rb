@@ -1,7 +1,7 @@
 module Xml
   module Kit
     module Builders
-      class XmlSignature
+      class Signature
         SIGNATURE_METHODS = {
           SHA1: "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
           SHA224: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224",

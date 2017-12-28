@@ -1,7 +1,7 @@
 module Xml
   module Kit
     module Builders
-      class XmlEncryption
+      class Encryption
         attr_reader :public_key
         attr_reader :key, :iv, :encrypted
 

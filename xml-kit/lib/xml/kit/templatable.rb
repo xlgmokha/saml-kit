@@ -25,7 +25,7 @@ module Xml
           temp = ::Builder::XmlMarkup.new
           yield temp
           signed_xml = signatures.complete(temp.target!)
-          xml_encryption = ::Xml::Kit::Builders::XmlEncryption.new(
+          xml_encryption = ::Xml::Kit::Builders::Encryption.new(
             signed_xml,
             encryption_certificate.public_key
           )

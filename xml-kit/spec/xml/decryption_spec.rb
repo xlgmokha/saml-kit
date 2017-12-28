@@ -1,4 +1,4 @@
-RSpec.describe Xml::Kit::XmlDecryption do
+RSpec.describe Xml::Kit::Decryption do
   describe "#decrypt" do
     let(:secret) { FFaker::Movie.title }
     let(:password) { FFaker::Movie.title }
