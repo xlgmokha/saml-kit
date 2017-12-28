@@ -203,7 +203,7 @@ module Saml
       attr_reader :xml
 
       def document
-        @document ||= ::Xml::Kit::Xml.new(xml, namespaces: NAMESPACES)
+        @document ||= ::Xml::Kit::Document.new(xml, namespaces: NAMESPACES)
       end
 
       def metadata
@@ -227,7 +227,7 @@ module Saml
       end
 
       def valid_signature?
-        xml = ::Xml::Kit::Xml.new(to_xml)
+        xml = document
         result = xml.valid?
         xml.errors.each do |error|
           errors[:base] << error

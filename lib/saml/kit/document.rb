@@ -86,7 +86,7 @@ module Saml
         # @param xml [String] the raw xml string.
         # @param configuration [Saml::Kit::Configuration] the configuration to use for unpacking the document.
         def to_saml_document(xml, configuration: Saml::Kit.configuration)
-          xml_document = ::Xml::Kit::Xml.new(xml, namespaces: {
+          xml_document = ::Xml::Kit::Document.new(xml, namespaces: {
             "samlp": ::Saml::Kit::Namespaces::PROTOCOL
           })
           constructor = {

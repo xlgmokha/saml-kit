@@ -1,4 +1,4 @@
-RSpec.describe Xml::Kit::Xml do
+RSpec.describe Xml::Kit::Document do
   class Item
     include ::Xml::Kit::Templatable
 

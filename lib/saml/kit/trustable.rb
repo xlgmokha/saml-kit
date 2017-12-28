@@ -44,7 +44,7 @@ module Saml
       def must_have_valid_signature
         return if to_xml.blank?
 
-        xml = ::Xml::Kit::Xml.new(to_xml, namespaces: {
+        xml = ::Xml::Kit::Document.new(to_xml, namespaces: {
           "NameFormat": Namespaces::ATTR_SPLAT,
           "ds": ::Xml::Kit::Namespaces::XMLDSIG,
           "md": Namespaces::METADATA,
