@@ -9,12 +9,17 @@ module Xml
       # Used to enable/disable encrypting the document.
       attr_accessor :encrypt
 
+      # The [Xml::Kit::KeyPair] to use for generating a signature.
+      attr_accessor :signing_key_pair
+
+      # The [Xml::Kit::Certificate] that contains the public key to use for encrypting the document.
+      attr_accessor :encryption_certificate
+
       # Returns the generated XML document with an XML Digital Signature and XML Encryption.
       def to_xml(xml: ::Builder::XmlMarkup.new)
         signatures.complete(render(self, xml: xml))
       end
 
-      # @!visibility private
       def encryption_for(xml:)
         if encrypt?
           temp = ::Builder::XmlMarkup.new
@@ -30,12 +35,10 @@ module Xml
         end
       end
 
-      # @!visibility private
       def render(model, options)
         ::Xml::Kit::Template.new(model).to_xml(options)
       end
 
-      # @!visibility private
       def signature_for(reference_id:, xml:)
         return unless sign?
         render(signatures.build(reference_id), xml: xml)
@@ -74,14 +77,6 @@ module Xml
       # @!visibility private
       def encrypt?
         encrypt && encryption_certificate
-      end
-
-      def signing_key_pair
-        raise NotImplementedError
-      end
-
-      def encryption_certificate
-        raise NotImplementedError
       end
     end
   end
