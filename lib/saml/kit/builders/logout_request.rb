@@ -11,7 +11,7 @@ module Saml
         def initialize(user, configuration: Saml::Kit.configuration)
           @configuration = configuration
           @user = user
-          @id = "_#{SecureRandom.uuid}"
+          @id = ::Xml::Kit::Id.generate
           @issuer = configuration.issuer
           @name_id_format = Saml::Kit::Namespaces::PERSISTENT
           @now = Time.now.utc
