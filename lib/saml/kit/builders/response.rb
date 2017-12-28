@@ -38,6 +38,11 @@ module Saml
 
         def assertion
           @assertion ||= Saml::Kit::Builders::Assertion.new(self)
+          if encrypt
+            Saml::Kit::Builders::EncryptedAssertion.new(self, @assertion)
+          else
+            @assertion
+          end
         end
 
         def response_options
