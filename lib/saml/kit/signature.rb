@@ -9,7 +9,7 @@ module Saml
       def certificate
         value = to_h.fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
         return if value.nil?
-        Xml::Kit::Certificate.new(value, use: :signing)
+        ::Xml::Kit::Certificate.new(value, use: :signing)
       end
 
       # Returns true when the fingerprint of the certificate matches one of the certificates registered in the metadata.

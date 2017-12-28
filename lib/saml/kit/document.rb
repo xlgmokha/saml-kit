@@ -86,12 +86,15 @@ module Saml
         # @param xml [String] the raw xml string.
         # @param configuration [Saml::Kit::Configuration] the configuration to use for unpacking the document.
         def to_saml_document(xml, configuration: Saml::Kit.configuration)
+          xml_document = ::Xml::Kit::Xml.new(xml, namespaces: {
+            "samlp": ::Saml::Kit::Namespaces::PROTOCOL
+          })
           constructor = {
             "AuthnRequest" => Saml::Kit::AuthenticationRequest,
             "LogoutRequest" => Saml::Kit::LogoutRequest,
             "LogoutResponse" => Saml::Kit::LogoutResponse,
             "Response" => Saml::Kit::Response,
-          }[::Xml::Kit::Xml.new(xml, namespaces: { "samlp": ::Saml::Kit::Namespaces::PROTOCOL }).find_by(XPATH).name] || InvalidDocument
+          }[xml_document.find_by(XPATH).name] || InvalidDocument
           constructor.new(xml, configuration: configuration)
         rescue => error
           Saml::Kit.logger.error(error)
