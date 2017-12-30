@@ -76,7 +76,7 @@ module Saml
           if encrypted?
             private_keys = configuration.private_keys(use: :encryption)
             decryptor = ::Xml::Kit::Decryption.new(private_keys: private_keys)
-            decrypted = decryptor.decrypt(@xml_hash['Response']['EncryptedAssertion'])
+            decrypted = decryptor.decrypt_hash(@xml_hash['Response']['EncryptedAssertion'])
             Saml::Kit.logger.debug(decrypted)
             Hash.from_xml(decrypted)['Assertion']
           else
