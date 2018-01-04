@@ -3,6 +3,7 @@
 [![Gem Version](https://badge.fury.io/rb/saml-kit.svg)](https://rubygems.org/gems/saml-kit)
 [![Code Climate](https://codeclimate.com/github/saml-kit/saml-kit.svg)](https://codeclimate.com/github/saml-kit/saml-kit)
 [![Build Status](https://travis-ci.org/saml-kit/saml-kit.svg)](https://travis-ci.org/saml-kit/saml-kit)
+[![Security](https://hakiri.io/github/saml-kit/saml-kit/master.svg)](https://hakiri.io/github/saml-kit/saml-kit/master)
 
 Saml::Kit is a library with the purpose of creating and consuming SAML
 documents. It supports the HTTP Post and HTTP Redirect bindings. It can
