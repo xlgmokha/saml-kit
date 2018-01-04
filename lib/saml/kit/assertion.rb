@@ -14,6 +14,10 @@ module Saml
         @configuration = configuration
       end
 
+      def issuer
+        assertion.fetch('Issuer')
+      end
+
       def name_id
         assertion.fetch('Subject', {}).fetch('NameID', nil)
       end

@@ -28,6 +28,13 @@ RSpec.describe Saml::Kit::Builders::Response do
       result = subject.build
       expect(result).to be_valid
     end
+
+    it 'includes the issuer' do
+      subject.encrypt = false
+      result = subject.build
+      expect(result.issuer).to eql(issuer)
+      expect(result.assertion.issuer).to eql(issuer)
+    end
   end
 
   describe "#to_xml" do
