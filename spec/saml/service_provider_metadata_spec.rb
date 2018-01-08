@@ -130,7 +130,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     end
 
     it 'returns false when the fingerprint does not match one of the signing certificates' do
-      certificate, _ = ::Xml::Kit::SelfSignedCertificate.new('password').create
+      certificate, _ = ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: 'password')
       fingerprint = ::Xml::Kit::Fingerprint.new(certificate)
       expect(subject.matches?(fingerprint)).to be_falsey
     end

@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activemodel", ">= 4.2.0"
   spec.add_dependency "nokogiri", "~> 1.8"
-  spec.add_dependency "xml-kit", ">= 0.1.1"
+  spec.add_dependency "xml-kit", "~> 0.1"
   spec.add_development_dependency "bundler", "~> 1.15"
   spec.add_development_dependency "ffaker", "~> 2.7"
   spec.add_development_dependency "rake", "~> 10.0"

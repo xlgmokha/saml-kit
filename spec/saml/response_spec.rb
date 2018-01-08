@@ -318,7 +318,7 @@ RSpec.describe Saml::Kit::Response do
     let(:url) { FFaker::Internet.uri("https") }
     let(:certificate) do
       ::Xml::Kit::Certificate.new(
-        ::Xml::Kit::SelfSignedCertificate.new("password").create[0],
+        ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: "password")[0],
         use: :signing
       )
     end
@@ -439,7 +439,7 @@ XML
     end
 
     it 'parses the encrypted assertion' do
-      certificate_pem, private_key_pem = ::Xml::Kit::SelfSignedCertificate.new(password).create
+      certificate_pem, private_key_pem = ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: password)
       public_key = OpenSSL::X509::Certificate.new(certificate_pem).public_key
       private_key = OpenSSL::PKey::RSA.new(private_key_pem, password)
 

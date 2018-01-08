@@ -61,7 +61,7 @@ module Saml
       # @param use [Symbol] the type of key pair, `:signing` or `:encryption`
       # @param passphrase [String] the private key passphrase to use.
       def generate_key_pair_for(use:, passphrase: SecureRandom.uuid)
-        certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new(passphrase).create
+        certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: passphrase)
         add_key_pair(certificate, private_key, passphrase: passphrase, use: use)
       end
 
