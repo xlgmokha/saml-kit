@@ -20,6 +20,7 @@ module Saml
     #     configuration.add_key_pair(ENV["X509_CERTIFICATE"], ENV["PRIVATE_KEY"], passphrase: ENV['PRIVATE_KEY_PASSPHRASE'], use: :encryption)
     #   end
     class Configuration
+      USES = [:signing, :encryption]
       # The issuer or entity_id to use.
       attr_accessor :issuer
       # The signature method to use when generating signatures (See {Saml::Kit::Builders::XmlSignature::SIGNATURE_METHODS})
@@ -53,6 +54,7 @@ module Saml
       # @param passphrase [String] the password to decrypt the private key.
       # @param use [Symbol] the type of key pair, `:signing` or `:encryption`
       def add_key_pair(certificate, private_key, passphrase: '', use: :signing)
+        ensure_proper_use!(use)
         @key_pairs.push(::Xml::Kit::KeyPair.new(certificate, private_key, passphrase, use.to_sym))
       end
 
@@ -61,6 +63,7 @@ module Saml
       # @param use [Symbol] the type of key pair, `:signing` or `:encryption`
       # @param passphrase [String] the private key passphrase to use.
       def generate_key_pair_for(use:, passphrase: SecureRandom.uuid)
+        ensure_proper_use!(use)
         certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: passphrase)
         add_key_pair(certificate, private_key, passphrase: passphrase, use: use)
       end
@@ -107,6 +110,15 @@ module Saml
       # Returns true if there is at least one signing certificate registered.
       def sign?
         certificates(use: :signing).any?
+      end
+
+      private
+
+      def ensure_proper_use!(use)
+        unless USES.include?(use)
+          error_message = "Use must be either :signing or :encryption"
+          raise ArgumentError.new(error_message)
+        end
       end
     end
   end
