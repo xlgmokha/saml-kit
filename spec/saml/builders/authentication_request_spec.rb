@@ -2,7 +2,7 @@ RSpec.describe Saml::Kit::Builders::AuthenticationRequest do
   subject { described_class.new(configuration: configuration) }
   let(:configuration) do
     config = Saml::Kit::Configuration.new
-    config.issuer = issuer
+    config.entity_id = issuer
     config
   end
 

@@ -13,7 +13,7 @@ module Saml
           @configuration = configuration
           @user = user
           @id = ::Xml::Kit::Id.generate
-          @issuer = configuration.issuer
+          @issuer = configuration.entity_id
           @name_id_format = Saml::Kit::Namespaces::PERSISTENT
           @now = Time.now.utc
           @version = "2.0"

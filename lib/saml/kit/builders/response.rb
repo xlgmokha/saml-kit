@@ -19,7 +19,7 @@ module Saml
           @now = Time.now.utc
           @version = "2.0"
           @status_code = Namespaces::SUCCESS
-          @issuer = configuration.issuer
+          @issuer = configuration.entity_id
           @encrypt = encryption_certificate.present?
           @configuration = configuration
         end

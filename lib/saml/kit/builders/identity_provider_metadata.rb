@@ -16,7 +16,7 @@ module Saml
         def initialize(configuration: Saml::Kit.configuration)
           @attributes = []
           @configuration = configuration
-          @entity_id = configuration.issuer
+          @entity_id = configuration.entity_id
           @id = ::Xml::Kit::Id.generate
           @logout_urls = []
           @name_id_formats = [Namespaces::PERSISTENT]

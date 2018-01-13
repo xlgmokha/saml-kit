@@ -100,7 +100,7 @@ module Saml
       end
 
       def must_match_issuer
-        unless audiences.include?(configuration.issuer)
+        unless audiences.include?(configuration.entity_id)
           errors[:audience] << error_message(:must_match_issuer)
         end
       end

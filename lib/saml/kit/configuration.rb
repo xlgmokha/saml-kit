@@ -3,7 +3,7 @@ module Saml
     # This class represents the main configuration that is use for generating SAML documents.
     #
     #   Saml::Kit::Configuration.new do |config|
-    #     config.issuer = "com:saml:kit"
+    #     config.entity_id = "com:saml:kit"
     #     config.signature_method = :SHA256
     #     config.digest_method = :SHA256
     #     config.registry = Saml::Kit::DefaultRegistry.new
@@ -15,7 +15,7 @@ module Saml
     #   that runs at the start of the program.
     #
     #   Saml::Kit.configure do |configuration|
-    #     configuration.issuer = "https://www.example.com/saml/metadata"
+    #     configuration.entity_id = "https://www.example.com/saml/metadata"
     #     configuration.generate_key_pair_for(use: :signing)
     #     configuration.add_key_pair(ENV["X509_CERTIFICATE"], ENV["PRIVATE_KEY"], passphrase: ENV['PRIVATE_KEY_PASSPHRASE'], use: :encryption)
     #   end

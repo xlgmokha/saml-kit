@@ -2,7 +2,7 @@ RSpec.describe Saml::Kit::Builders::Response do
   subject { described_class.new(user, request, configuration: configuration) }
   let(:configuration) do
     Saml::Kit::Configuration.new do |config|
-      config.issuer = issuer
+      config.entity_id = issuer
       config.generate_key_pair_for(use: :signing)
       config.generate_key_pair_for(use: :encryption)
     end
@@ -40,7 +40,7 @@ RSpec.describe Saml::Kit::Builders::Response do
   describe "#to_xml" do
     it 'returns a proper response for the user' do
       travel_to 1.second.from_now
-      allow(Saml::Kit.configuration).to receive(:issuer).and_return(issuer)
+      allow(Saml::Kit.configuration).to receive(:entity_id).and_return(issuer)
       subject.destination = assertion_consumer_service_url
       subject.encrypt = false
       hash = Hash.from_xml(subject.to_xml)
@@ -154,7 +154,7 @@ RSpec.describe Saml::Kit::Builders::Response do
   describe ".build" do
     let(:configuration) do
       Saml::Kit::Configuration.new do |config|
-        config.issuer = issuer
+        config.entity_id = issuer
         config.generate_key_pair_for(use: :signing)
         config.generate_key_pair_for(use: :signing)
         config.generate_key_pair_for(use: :signing)

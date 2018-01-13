@@ -12,7 +12,7 @@ module Saml
         def initialize(request, configuration: Saml::Kit.configuration)
           @configuration = configuration
           @id = ::Xml::Kit::Id.generate
-          @issuer = configuration.issuer
+          @issuer = configuration.entity_id
           @now = Time.now.utc
           @request = request
           @status_code = Namespaces::SUCCESS

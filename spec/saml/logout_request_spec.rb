@@ -2,11 +2,11 @@ RSpec.describe Saml::Kit::LogoutRequest do
   subject { described_class.build(user, configuration: configuration) }
   let(:user) { double(:user, name_id_for: name_id) }
   let(:name_id) { SecureRandom.uuid }
-  let(:issuer) { FFaker::Internet.uri("https") }
+  let(:entity_id) { FFaker::Internet.uri("https") }
   let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
   let(:configuration) do
     Saml::Kit::Configuration.new do |config|
-      config.issuer = issuer
+      config.entity_id = entity_id
       config.registry = registry
       config.generate_key_pair_for(use: :signing)
     end
@@ -14,9 +14,9 @@ RSpec.describe Saml::Kit::LogoutRequest do
 
   it 'parses the issuer' do
     subject = described_class.build(user, configuration: configuration) do |builder|
-      builder.issuer = issuer
+      builder.issuer = entity_id
     end
-    expect(subject.issuer).to eql(issuer)
+    expect(subject.issuer).to eql(entity_id)
   end
 
   it 'parses the issue instant' do
@@ -43,7 +43,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
   describe "#valid?" do
     let(:metadata) do
       Saml::Kit::ServiceProviderMetadata.build(configuration: configuration) do |builder|
-        builder.entity_id = issuer
+        builder.entity_id = entity_id
         builder.add_single_logout_service(FFaker::Internet.uri("https"), binding: :http_post)
       end
     end

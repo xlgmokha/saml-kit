@@ -15,7 +15,7 @@ module Saml
 
         def initialize(configuration: Saml::Kit.configuration)
           @id = ::Xml::Kit::Id.generate
-          @entity_id = configuration.issuer
+          @entity_id = configuration.entity_id
           @configuration = configuration
         end
 

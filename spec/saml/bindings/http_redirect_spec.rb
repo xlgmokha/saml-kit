@@ -21,12 +21,12 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
   end
 
   describe "#deserialize" do
-    let(:issuer) { FFaker::Internet.http_url }
+    let(:entity_id) { FFaker::Internet.http_url }
     let(:provider) { Saml::Kit::IdentityProviderMetadata.build }
 
     before :each do
-      allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
-      allow(Saml::Kit.configuration).to receive(:issuer).and_return(issuer)
+      allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(entity_id).and_return(provider)
+      allow(Saml::Kit.configuration).to receive(:entity_id).and_return(entity_id)
     end
 
     it 'deserializes the SAMLRequest to an AuthnRequest' do
@@ -37,12 +37,12 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
     it 'deserializes the SAMLRequest to an AuthnRequest with symbols for keys' do
       configuration = Saml::Kit::Configuration.new do |config|
-        config.issuer = issuer
+        config.entity_id = entity_id
         config.generate_key_pair_for(use: :signing)
       end
       provider = Saml::Kit::IdentityProviderMetadata.build(configuration: configuration)
       url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder(configuration: configuration))
-      allow(configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
+      allow(configuration.registry).to receive(:metadata_for).with(entity_id).and_return(provider)
 
       result = subject.deserialize(query_params_from(url).symbolize_keys, configuration: configuration)
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
@@ -86,7 +86,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
     it 'deserializes the SAMLResponse to a Response' do
       user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
-      request = double(:request, id: SecureRandom.uuid, provider: nil, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: issuer, signed?: true, trusted?: true)
+      request = double(:request, id: SecureRandom.uuid, provider: nil, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: entity_id, signed?: true, trusted?: true)
       url, _ = subject.serialize(Saml::Kit::Response.builder(user, request))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::Response)
@@ -113,7 +113,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
     it 'raises an error when the signature does not match' do
       configuration = Saml::Kit::Configuration.new do |config|
-        config.issuer = issuer
+        config.entity_id = entity_id
         config.generate_key_pair_for(use: :signing)
       end
       url, _ = subject.serialize(
@@ -132,7 +132,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       provider = Saml::Kit::ServiceProviderMetadata.build do |builder|
         builder.add_assertion_consumer_service(FFaker::Internet.http_url, binding: :http_post)
       end
-      allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
+      allow(Saml::Kit.configuration.registry).to receive(:metadata_for).with(entity_id).and_return(provider)
 
       url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder)
       result = subject.deserialize(query_params_from(url))
