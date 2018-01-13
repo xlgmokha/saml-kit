@@ -21,8 +21,8 @@ module Saml
     #   end
     class Configuration
       USES = [:signing, :encryption]
-      # The issuer or entity_id to use.
-      attr_accessor :issuer
+      # The issuer to use in requests or responses from this entity to use.
+      attr_accessor :entity_id
       # The signature method to use when generating signatures (See {Saml::Kit::Builders::XmlSignature::SIGNATURE_METHODS})
       attr_accessor :signature_method
       # The digest method to use when generating signatures (See {Saml::Kit::Builders::XmlSignature::DIGEST_METHODS})
@@ -110,6 +110,18 @@ module Saml
       # Returns true if there is at least one signing certificate registered.
       def sign?
         certificates(use: :signing).any?
+      end
+
+      # @deprecated Use {#entity_id} instead of this method.
+      def issuer
+        Saml::Kit.deprecate("issuer is deprecated. Use entity_id instead")
+        self.entity_id
+      end
+
+      # @deprecated Use {#entity_id=} instead of this method.
+      def issuer=(value)
+        Saml::Kit.deprecate("issuer= is deprecated. Use entity_id= instead")
+        self.entity_id = value
       end
 
       private
