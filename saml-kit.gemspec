@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{A simple toolkit for working with SAML.}
   spec.description   = %q{A simple toolkit for working with SAML.}
-  spec.homepage      = "http://www.mokhan.ca"
+  spec.homepage      = "https://github.com/saml-kit/saml-kit"
   spec.license       = "MIT"
   spec.required_ruby_version = '>= 2.2.0'
 

@@ -1,5 +1,7 @@
 ![SAML-Kit](https://github.com/saml-kit/saml-kit/raw/master/spec/examples/saml-kit.gif)
 
+*Logo courtesy of [@speasley](https://github.com/speasley)*
+
 [![Gem Version](https://badge.fury.io/rb/saml-kit.svg)](https://rubygems.org/gems/saml-kit)
 [![Code Climate](https://codeclimate.com/github/saml-kit/saml-kit.svg)](https://codeclimate.com/github/saml-kit/saml-kit)
 [![Build Status](https://travis-ci.org/saml-kit/saml-kit.svg)](https://travis-ci.org/saml-kit/saml-kit)
