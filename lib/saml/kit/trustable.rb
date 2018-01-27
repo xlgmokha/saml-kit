@@ -52,8 +52,8 @@ module Saml
           "samlp": Namespaces::PROTOCOL,
         })
         xml.valid?
-        xml.errors.each do |error|
-          errors[:base] << error
+        xml.errors.each do |attribute, error|
+          errors[attribute] << error
         end
       end
 

@@ -133,6 +133,28 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       subject = described_class.new(raw_xml, configuration: configuration)
       expect(subject).to be_invalid
     end
+
+    context "when the certificate is expired" do
+      let(:expired_certificate) do
+        certificate = OpenSSL::X509::Certificate.new
+        certificate.public_key = private_key.public_key
+        certificate.not_before = 1.day.ago
+        certificate.not_after = 1.second.ago
+        certificate
+      end
+      let(:private_key) { OpenSSL::PKey::RSA.new(2048) }
+      let(:configuration) do
+        Saml::Kit::Configuration.new do |config|
+          config.add_key_pair(expired_certificate, private_key, passphrase: nil, use: :signing)
+        end
+      end
+
+      it 'is invalid' do
+        subject = described_class.new(raw_xml, configuration: configuration)
+        expect(subject).to be_invalid
+        expect(subject.errors[:certificate]).to be_present
+      end
+    end
   end
 
   describe "#assertion_consumer_service_url" do
