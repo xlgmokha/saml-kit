@@ -19,9 +19,6 @@ module Saml
       UNSPECIFIED_NAMEID = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
       URI = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
       VERSION_MISMATCH_ERROR = "urn:oasis:names:tc:SAML:2.0:status:VersionMismatch"
-
-      # @deprecated Use {#::Xml::Kit::Namespace::XMLDSIG} instead of this.
-      XMLDSIG = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::Namespaces::XMLDSIG', '::Xml::Kit::Namespaces::XMLDSIG')
     end
   end
 end

@@ -22,10 +22,5 @@ RSpec.describe Saml::Kit::Builders::AuthenticationRequest do
       expect(result['AuthnRequest']['Issuer']).to eql(issuer)
       expect(result['AuthnRequest']['NameIDPolicy']['Format']).to eql(Saml::Kit::Namespaces::PERSISTENT)
     end
-
-    it 'marks acs_url as deprecated' do
-      subject.acs_url = FFaker::Internet.uri('https')
-      expect(subject.assertion_consumer_service_url).to eql(subject.acs_url)
-    end
   end
 end

@@ -84,9 +84,6 @@ module Saml
       def self.builder_class
         Saml::Kit::Builders::IdentityProviderMetadata
       end
-
-      # @deprecated Use {#Saml::Kit::Builders::IdentityProviderMetadata} instead of this.
-      Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::IdentityProviderMetadata::Builder', 'Saml::Kit::Builders::IdentityProviderMetadata')
     end
   end
 end

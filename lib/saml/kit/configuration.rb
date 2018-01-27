@@ -89,39 +89,9 @@ module Saml
         key_pairs(use: use).flat_map(&:private_key)
       end
 
-      # @deprecated Use {#certificates} instead of this method.
-      def encryption_certificate
-        Saml::Kit.deprecate("encryption_certificate is deprecated. Use certificates(use: :encryption) instead")
-        certificates(use: :encryption).last
-      end
-
-      # @deprecated Use {#private_keys} instead of this method.
-      def signing_private_key
-        Saml::Kit.deprecate("signing_private_key is deprecated. Use private_keys(use: :signing) instead")
-        private_keys(use: :signing).last
-      end
-
-      # @deprecated Use {#private_keys} instead of this method.
-      def encryption_private_key
-        Saml::Kit.deprecate("encryption_private_key is deprecated. Use private_keys(use: :encryption) instead")
-        private_keys(use: :encryption).last
-      end
-
       # Returns true if there is at least one signing certificate registered.
       def sign?
         certificates(use: :signing).any?
-      end
-
-      # @deprecated Use {#entity_id} instead of this method.
-      def issuer
-        Saml::Kit.deprecate("issuer is deprecated. Use entity_id instead")
-        self.entity_id
-      end
-
-      # @deprecated Use {#entity_id=} instead of this method.
-      def issuer=(value)
-        Saml::Kit.deprecate("issuer= is deprecated. Use entity_id= instead")
-        self.entity_id = value
       end
 
       private

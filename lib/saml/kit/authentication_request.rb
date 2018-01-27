@@ -54,9 +54,6 @@ module Saml
         end
         response_binding.serialize(builder, relay_state: relay_state)
       end
-
-      # @deprecated Use {#Saml::Kit::Builders::AuthenticationRequest} instead of this.
-      Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::AuthenticationRequest::Builder', 'Saml::Kit::Builders::AuthenticationRequest')
     end
   end
 end

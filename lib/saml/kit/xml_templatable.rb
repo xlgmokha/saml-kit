@@ -15,12 +15,6 @@ module Saml
         embed_signature && configuration.sign?
       end
 
-      # @deprecated Use {#embed_signature=} instead of this method.
-      def sign=(value)
-        Saml::Kit.deprecate("sign= is deprecated. Use embed_signature= instead.")
-        self.embed_signature = value
-      end
-
       def digest_method
         configuration.digest_method
       end

@@ -62,14 +62,9 @@ module Saml
       end
 
       def deprecate(message)
-        @deprecation ||= ActiveSupport::Deprecation.new('1.0.0', 'saml-kit')
+        @deprecation ||= ActiveSupport::Deprecation.new('2.0.0', 'saml-kit')
         @deprecation.deprecation_warning(message)
       end
     end
-
-    # @deprecated Use {#::Xml::Kit::Id} instead of this.
-    Id = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::Id', '::Xml::Kit::Id')
-    # @deprecated Use {#::Xml::Kit::Fingerprint} instead of this.
-    Fingerprint = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::Fingerprint', '::Xml::Kit::Fingerprint')
   end
 end

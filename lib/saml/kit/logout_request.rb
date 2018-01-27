@@ -52,9 +52,6 @@ module Saml
         response_binding.serialize(builder, relay_state: relay_state)
       end
 
-      # @deprecated Use {#Saml::Kit::Builders::LogoutRequest} instead of this.
-      Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::LogoutRequest::Builder', 'Saml::Kit::Builders::LogoutRequest')
-
       private
 
       def single_logout_service
