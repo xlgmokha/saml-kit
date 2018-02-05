@@ -26,8 +26,6 @@ module Saml
           self.errors[attribute] << error
         end
       end
-
-      Builder = ActiveSupport::Deprecation::DeprecatedConstantProxy.new('Saml::Kit::Response::Builder', 'Saml::Kit::Builders::Response')
     end
   end
 end
