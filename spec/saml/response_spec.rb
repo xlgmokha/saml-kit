@@ -231,8 +231,7 @@ RSpec.describe Saml::Kit::Response do
     end
 
     it 'is invalid when the assertion has a signature and has been tampered with' do
-      token = SecureRandom.uuid
-      user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { token: token })
+      user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { token: SecureRandom.uuid })
       request = Saml::Kit::AuthenticationRequest.build
       document = described_class.build(user, request, configuration: configuration) do |x|
         x.embed_signature = false
