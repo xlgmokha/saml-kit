@@ -242,8 +242,7 @@ RSpec.describe Saml::Kit::Response do
       altered_xml = document.to_xml.gsub(/token/, 'heck')
       subject = described_class.new(altered_xml)
       expect(subject).to_not be_valid
-      puts subject.errors.full_messages.inspect
-      expect(subject.errors[:assertion]).to be_present
+      expect(subject.errors[:digest_value]).to be_present
     end
   end
 
