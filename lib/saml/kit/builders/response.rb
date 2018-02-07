@@ -35,12 +35,10 @@ module Saml
           nil
         end
 
-        private
-
         def assertion
           @assertion ||=
             begin
-              assertion = Saml::Kit::Builders::Assertion.new(self)
+              assertion = Saml::Kit::Builders::Assertion.new(self, embed_signature)
               if encrypt
                 Saml::Kit::Builders::EncryptedAssertion.new(self, assertion)
               else
@@ -48,6 +46,8 @@ module Saml
               end
             end
         end
+
+        private
 
         def response_options
           {

@@ -6,10 +6,11 @@ module Saml
         include XmlTemplatable
         extend Forwardable
 
-        def_delegators :@response_builder, :embed_signature, :request, :issuer, :reference_id, :now, :configuration, :user, :version, :destination
+        def_delegators :@response_builder, :request, :issuer, :reference_id, :now, :configuration, :user, :version, :destination
 
-        def initialize(response_builder)
+        def initialize(response_builder, embed_signature)
           @response_builder = response_builder
+          self.embed_signature = embed_signature
         end
 
         def name_id_format

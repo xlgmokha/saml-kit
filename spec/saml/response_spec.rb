@@ -229,6 +229,22 @@ RSpec.describe Saml::Kit::Response do
       expect(subject).to_not be_valid
       expect(subject.errors[:assertion]).to be_present
     end
+
+    it 'is invalid when the assertion has a signature and has been tampered with' do
+      token = SecureRandom.uuid
+      user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { token: token })
+      request = Saml::Kit::AuthenticationRequest.build
+      document = described_class.build(user, request, configuration: configuration) do |x|
+        x.embed_signature = false
+        x.assertion.embed_signature = true
+      end
+
+      altered_xml = document.to_xml.gsub(/token/, 'heck')
+      subject = described_class.new(altered_xml)
+      expect(subject).to_not be_valid
+      puts subject.errors.full_messages.inspect
+      expect(subject.errors[:assertion]).to be_present
+    end
   end
 
   describe "#signed?" do
