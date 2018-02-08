@@ -143,14 +143,19 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
         certificate
       end
       let(:private_key) { OpenSSL::PKey::RSA.new(2048) }
-      let(:configuration) do
-        Saml::Kit::Configuration.new do |config|
-          config.add_key_pair(expired_certificate, private_key, passphrase: nil, use: :signing)
-        end
+      let(:digest_algorithm) { OpenSSL::Digest::SHA256.new }
+
+      before :each do
+        expired_certificate.sign(private_key, digest_algorithm)
       end
 
       it 'is invalid' do
-        subject = described_class.new(raw_xml, configuration: configuration)
+        document = described_class.build do |x|
+          x.embed_signature = true
+          certificate = ::Xml::Kit::Certificate.new(expired_certificate)
+          x.sign_with(certificate.to_key_pair(private_key))
+        end
+        subject = described_class.new(document.to_xml)
         expect(subject).to be_invalid
         expect(subject.errors[:certificate]).to be_present
       end
