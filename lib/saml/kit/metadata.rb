@@ -77,7 +77,9 @@ module Saml
       def certificates
         @certificates ||= document.find_all("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
           cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", NAMESPACES).text
-          ::Xml::Kit::Certificate.new(cert, use: item.attribute('use').value.to_sym)
+          attribute = item.attribute('use')
+          use = attribute.nil? ? nil : item.attribute('use').value
+          ::Xml::Kit::Certificate.new(cert, use: use)
         end
       end
 

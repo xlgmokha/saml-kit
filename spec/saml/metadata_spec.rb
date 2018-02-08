@@ -47,4 +47,19 @@ RSpec.describe Saml::Kit::Metadata do
       expect(result.contact_person_company).to eql("mailto:hi@example.com")
     end
   end
+
+  describe "#certificates" do
+    it 'returns each certificate when missing a "use"' do
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.generate_key_pair_for(use: :signing)
+      end
+      xml = Saml::Kit::Metadata.build_xml(configuration: configuration) do |x|
+        x.embed_signature = false
+        x.build_identity_provider
+      end
+      modified_xml = xml.gsub(/use/, 'misuse')
+      subject = described_class.from(modified_xml)
+      expect(subject.certificates.count).to eql(1)
+    end
+  end
 end
