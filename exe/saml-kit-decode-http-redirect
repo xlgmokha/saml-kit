@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 require 'saml/kit'
 
+Saml::Kit.deprecate("Use the 'saml-kit-cli' gem instead. saml-kit-decode-http-redirect*")
+
 input = STDIN.read
 binding = Saml::Kit::Bindings::HttpRedirect.new(location: '')
 

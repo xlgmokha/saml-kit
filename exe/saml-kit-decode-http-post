@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 require 'saml/kit'
 
+Saml::Kit.deprecate("Use the 'saml-kit-cli' gem instead. saml-kit-decode-http-post")
+
 saml = STDIN.read
 binding = Saml::Kit::Bindings::HttpPost.new(location: '')
 puts binding.deserialize('SAMLRequest' => saml).to_xml(pretty: true)

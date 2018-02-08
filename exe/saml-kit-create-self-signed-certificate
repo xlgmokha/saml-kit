@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 require 'saml/kit'
 
+Saml::Kit.deprecate("Use the 'saml-kit-cli' gem instead. saml-kit-create-self-signed-certificate")
+
 puts "Enter Passphrase:"
 passphrase = STDIN.read.strip
 certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: passphrase)
