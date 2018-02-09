@@ -25,5 +25,25 @@ RSpec.describe Saml::Kit::Assertion do
       expect(subject).to be_active
       expect(subject).to_not be_expired
     end
+
+    it 'interprets integers correctly' do
+      configuration.clock_drift = 30
+      now = Time.current
+      travel_to now
+      xml_hash = {
+        'Response' => {
+          'Assertion' => {
+            'Conditions' => {
+              'NotBefore' => now.utc.iso8601,
+              'NotOnOrAfter' => configuration.session_timeout.since(now).iso8601,
+            }
+          }
+        }
+      }
+
+      subject = described_class.new(xml_hash, configuration: configuration)
+      expect(subject).to be_active
+      expect(subject).to_not be_expired
+    end
   end
 end
