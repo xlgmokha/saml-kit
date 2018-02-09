@@ -46,4 +46,18 @@ RSpec.describe Saml::Kit::Assertion do
       expect(subject).to_not be_expired
     end
   end
+
+  describe "#present?" do
+    it 'returns false when the assertion is empty' do
+      xml_hash = { 'Response' => { } }
+      subject = described_class.new(xml_hash)
+      expect(subject).to_not be_present
+    end
+
+    it 'returns true when the assertion is present' do
+      xml_hash = { 'Response' => { 'Assertion' => { 'Conditions' => { } } } }
+      subject = described_class.new(xml_hash)
+      expect(subject).to be_present
+    end
+  end
 end

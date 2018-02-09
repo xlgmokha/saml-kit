@@ -8,7 +8,7 @@ module Saml
       validate :must_be_active_session
       attr_reader :name
 
-      def initialize(xml_hash, configuration:)
+      def initialize(xml_hash, configuration: Saml::Kit.configuration)
         @name = "Assertion"
         @xml_hash = xml_hash
         @configuration = configuration
@@ -69,6 +69,10 @@ module Saml
 
       def encrypted?
         @xml_hash.fetch('Response', {}).fetch('EncryptedAssertion', nil).present?
+      end
+
+      def present?
+        assertion.present?
       end
 
       private
