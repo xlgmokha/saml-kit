@@ -6,6 +6,7 @@ module Saml
       BASIC = "urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
       BEARER = "urn:oasis:names:tc:SAML:2.0:cm:bearer"
       EMAIL_ADDRESS = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+      INVALID_NAME_ID_POLICY = "urn:oasis:names:tc:SAML:2.0:status:InvalidNameIDPolicy"
       METADATA = "urn:oasis:names:tc:SAML:2.0:metadata"
       PASSWORD = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password"
       PASSWORD_PROTECTED = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
