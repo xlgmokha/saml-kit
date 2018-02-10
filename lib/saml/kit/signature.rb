@@ -1,6 +1,8 @@
 module Saml
   module Kit
     class Signature
+      include ActiveModel::Validations
+
       def initialize(xml_hash)
         @xml_hash = xml_hash
       end
