@@ -419,8 +419,8 @@ RSpec.describe Saml::Kit::Response do
     let(:now) { Time.now.utc }
     let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
     let(:password) { FFaker::Movie.title }
+    let(:email) { FFaker::Internet.email }
     let(:assertion) do
-      FFaker::Movie.title
       <<-XML
 <Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="#{id}" IssueInstant="2017-11-23T04:33:58Z" Version="2.0">
  <Issuer>#{FFaker::Internet.uri("https")}</Issuer>
@@ -442,7 +442,7 @@ RSpec.describe Saml::Kit::Response do
  </AuthnStatement>
  <AttributeStatement>
    <Attribute Name="email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="email">
-     <AttributeValue>sidney_bayer@nienowemmerich.com</AttributeValue>
+     <AttributeValue>#{email}</AttributeValue>
    </Attribute>
    <Attribute Name="created_at" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="created_at">
      <AttributeValue>2017-11-23T04:33:58Z</AttributeValue>
@@ -493,7 +493,7 @@ XML
       subject = described_class.new(xml)
       expect(subject.attributes).to match_array([
         ["created_at", "2017-11-23T04:33:58Z"],
-        ["email", "sidney_bayer@nienowemmerich.com"]
+        ["email", email]
       ])
     end
   end
