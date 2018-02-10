@@ -420,14 +420,15 @@ RSpec.describe Saml::Kit::Response do
     let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
     let(:password) { FFaker::Movie.title }
     let(:email) { FFaker::Internet.email }
+    let(:created_at) { DateTime.now }
     let(:assertion) do
       <<-XML
 <Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="#{id}" IssueInstant="2017-11-23T04:33:58Z" Version="2.0">
  <Issuer>#{FFaker::Internet.uri("https")}</Issuer>
  <Subject>
-   <NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">fdddf7ad-c4a4-443c-b96d-c953913b7b4e</NameID>
+   <NameID Format="#{Saml::Kit::Namespaces::PERSISTENT}">#{SecureRandom.uuid}</NameID>
    <SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
-     <SubjectConfirmationData InResponseTo="cc8c4131-9336-4d1a-82f2-4ad92abeee22" NotOnOrAfter="2017-11-23T07:33:58Z" Recipient="https://westyundt.ca/acs"/>
+     <SubjectConfirmationData InResponseTo="#{SecureRandom.uuid}" NotOnOrAfter="2017-11-23T07:33:58Z" Recipient="https://westyundt.ca/acs"/>
    </SubjectConfirmation>
  </Subject>
  <Conditions NotBefore="2017-11-23T04:33:58Z" NotOnOrAfter="2017-11-23T07:33:58Z">
@@ -437,15 +438,15 @@ RSpec.describe Saml::Kit::Response do
  </Conditions>
  <AuthnStatement AuthnInstant="2017-11-23T04:33:58Z" SessionIndex="_11d39a7f-1b86-43ed-90d7-68090a857ca8" SessionNotOnOrAfter="2017-11-23T07:33:58Z">
    <AuthnContext>
-     <AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</AuthnContextClassRef>
+     <AuthnContextClassRef>#{Saml::Kit::Namespaces::PASSWORD}</AuthnContextClassRef>
    </AuthnContext>
  </AuthnStatement>
  <AttributeStatement>
-   <Attribute Name="email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="email">
+   <Attribute Name="email" NameFormat="#{Saml::Kit::Namespaces::URI}">
      <AttributeValue>#{email}</AttributeValue>
    </Attribute>
-   <Attribute Name="created_at" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="created_at">
-     <AttributeValue>2017-11-23T04:33:58Z</AttributeValue>
+   <Attribute Name="created_at" NameFormat="#{Saml::Kit::Namespaces::URI}">
+     <AttributeValue>#{created_at.iso8601}</AttributeValue>
    </Attribute>
  </AttributeStatement>
 </Assertion>
@@ -492,7 +493,7 @@ XML
 
       subject = described_class.new(xml)
       expect(subject.attributes).to match_array([
-        ["created_at", "2017-11-23T04:33:58Z"],
+        ["created_at", created_at.iso8601],
         ["email", email]
       ])
     end
