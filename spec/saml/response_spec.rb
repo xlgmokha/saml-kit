@@ -423,11 +423,11 @@ RSpec.describe Saml::Kit::Response do
     let(:created_at) { DateTime.now }
     let(:assertion) do
       <<-XML
-<Assertion xmlns="#{SAML::Kit::Namespaces::ASSERTION}" ID="#{id}" IssueInstant="2017-11-23T04:33:58Z" Version="2.0">
+<Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" IssueInstant="2017-11-23T04:33:58Z" Version="2.0">
  <Issuer>#{FFaker::Internet.uri("https")}</Issuer>
  <Subject>
    <NameID Format="#{Saml::Kit::Namespaces::PERSISTENT}">#{SecureRandom.uuid}</NameID>
-   <SubjectConfirmation Method="#{SAML::Kit::BEARER}">
+   <SubjectConfirmation Method="#{Saml::Kit::Namespaces::BEARER}">
      <SubjectConfirmationData InResponseTo="#{SecureRandom.uuid}" NotOnOrAfter="2017-11-23T07:33:58Z" Recipient="https://westyundt.ca/acs"/>
    </SubjectConfirmation>
  </Subject>
