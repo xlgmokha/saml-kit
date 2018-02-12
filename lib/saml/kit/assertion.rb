@@ -7,11 +7,13 @@ module Saml
       validate :must_match_issuer
       validate :must_be_active_session
       attr_reader :name
+      attr_accessor :occurred_at
 
       def initialize(xml_hash, configuration: Saml::Kit.configuration)
         @name = "Assertion"
         @xml_hash = xml_hash
         @configuration = configuration
+        @occurred_at = Time.current
       end
 
       def issuer
@@ -31,11 +33,11 @@ module Saml
         xml_hash ? Signature.new(xml_hash) : nil
       end
 
-      def expired?(now = Time.current)
+      def expired?(now = occurred_at)
         now > expired_at
       end
 
-      def active?(now = Time.current)
+      def active?(now = occurred_at)
         drifted_started_at = started_at - configuration.clock_drift.to_i.seconds
         now > drifted_started_at && !expired?
       end
