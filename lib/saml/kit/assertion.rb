@@ -36,7 +36,8 @@ module Saml
       end
 
       def active?(now = Time.current)
-        now > configuration.clock_drift.seconds.before(started_at) && !expired?
+        drifted_started_at = started_at - configuration.clock_drift.to_i.seconds
+        now > drifted_started_at && !expired?
       end
 
       def attributes
