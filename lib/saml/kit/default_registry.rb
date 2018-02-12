@@ -90,6 +90,7 @@ module Saml
           http.read_timeout = 30
           http.use_ssl = uri.is_a?(URI::HTTPS)
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE unless verify_ssl
+          http.set_debug_output(Saml::Kit.logger)
           http
         end
       end
