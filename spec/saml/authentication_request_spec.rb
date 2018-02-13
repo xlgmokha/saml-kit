@@ -228,4 +228,16 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       expect(response).to be_instance_of(Saml::Kit::Response)
     end
   end
+
+  describe "#signature.valid?" do
+    it 'returns true when the signature is valid' do
+      expect(subject.signature).to be_valid
+    end
+
+    it 'returns false when the signature does not match' do
+      raw_xml.gsub!(issuer, 'corrupt')
+      subject = described_class.new(raw_xml, configuration: configuration)
+      expect(subject.signature).to_not be_valid
+    end
+  end
 end

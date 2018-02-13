@@ -17,8 +17,9 @@ module Saml
       # @!visibility private
       def signature
         xml_hash = to_h.fetch(name, {}).fetch('Signature', nil)
-        xml_hash ? Signature.new(xml_hash) : nil
+        xml_hash ? Signature.new(to_nokogiri.at_xpath('//ds:Signature', 'ds' => Xml::Kit::Namespaces::XMLDSIG)) : nil
       end
+
 
       # Returns true when documents is signed and the signing certificate belongs to a known service entity.
       def trusted?

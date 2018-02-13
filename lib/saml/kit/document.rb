@@ -60,13 +60,17 @@ module Saml
       #
       # @param pretty [Boolean] formats the xml or returns the raw xml.
       def to_xml(pretty: false)
-        pretty ? Nokogiri::XML(content).to_xml(indent: 2) : content
+        pretty ? to_nokogiri.to_xml(indent: 2) : content
       end
 
       # Returns the SAML document as an XHTML string. 
       # This is useful for rendering in a web page.
       def to_xhtml
         Nokogiri::XML(content, &:noblanks).to_xhtml
+      end
+
+      def to_nokogiri
+        @nokogiri ||= Nokogiri::XML(content)
       end
 
       def to_s
