@@ -223,18 +223,10 @@ module Saml
       def must_have_valid_signature
         return if to_xml.blank?
 
-        unless valid_signature?
-          errors[:base] << error_message(:invalid_signature)
+        document.valid?
+        document.errors.each do |attribute, message|
+          errors[attribute] << message
         end
-      end
-
-      def valid_signature?
-        xml = document
-        result = xml.valid?
-        xml.errors.each do |error|
-          errors[:base] << error
-        end
-        result
       end
     end
   end

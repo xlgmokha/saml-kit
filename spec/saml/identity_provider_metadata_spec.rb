@@ -111,7 +111,9 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
 
       subject = described_class.new(metadata_xml)
       expect(subject).to be_invalid
-      expect(subject.errors[:base]).to include("invalid signature.")
+      expect(subject.errors[:base]).to be_empty
+      expect(subject.errors[:digest_value]).to match_array(["is invalid"])
+      expect(subject.errors[:signature]).to match_array(["is invalid"])
     end
   end
 
