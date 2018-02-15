@@ -26,6 +26,8 @@ en:
         invalid_response_to: "must match request id."
         invalid_version: "must be 2.0."
         unregistered: "must originate from registered identity provider."
+      Signature:
+        digest_value: "is invalid."
       SPSSODescriptor:
         invalid: "must contain SPSSODescriptor."
         invalid_signature: "invalid signature."

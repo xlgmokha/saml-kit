@@ -2,11 +2,15 @@ module Saml
   module Kit
     class Signature
       include ActiveModel::Validations
+      include Translatable
 
       validate :validate_signature
       validate :validate_certificate
 
+      attr_reader :name
+
       def initialize(xml_hash)
+        @name = "Signature"
         if xml_hash.is_a?(Hash)
           @xml_hash = xml_hash
         else
@@ -44,7 +48,9 @@ module Saml
 
         signature = Xmldsig::Signature.new(@document, 'ID=$uri or @Id')
         unless signature.valid?(certificate.x509)
-          signature.errors.each { |error| errors.add(error, "is invalid") }
+          signature.errors.each do |attribute|
+            errors.add(attribute, error_message(attribute))
+          end
         end
       end
 

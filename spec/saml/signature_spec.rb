@@ -15,6 +15,7 @@ RSpec.describe Saml::Kit::Signature do
     it 'is invalid when the xml has been tampered' do
       signed_document.at_xpath('//saml:Issuer').content = "INVALID"
       expect(subject).to_not be_valid
+      expect(subject.errors[:digest_value]).to be_present
     end
 
     it 'is invalid when the signature is missing' do
