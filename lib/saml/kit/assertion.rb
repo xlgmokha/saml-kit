@@ -34,7 +34,7 @@ module Saml
         @xml_hash = hash_from(node)['Response'] || {}
         @configuration = configuration
         @occurred_at = Time.current
-        @private_keys = configuration.private_keys(use: :encryption) + private_keys
+        @private_keys = (configuration.private_keys(use: :encryption) + private_keys).uniq
         decrypt!
       end
 
