@@ -25,6 +25,10 @@ module Saml
           user.assertion_attributes_for(request)
         end
 
+        def signing_key_pair
+          super || @response_builder.signing_key_pair
+        end
+
         private
 
         def assertion_options

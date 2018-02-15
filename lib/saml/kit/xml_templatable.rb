@@ -13,7 +13,7 @@ module Saml
       def sign?
         return configuration.sign? if embed_signature.nil?
         (embed_signature && configuration.sign?) ||
-          (embed_signature && @signing_key_pair.present?)
+          (embed_signature && signing_key_pair.present?)
       end
 
       def encrypt_with(key_pair)
@@ -30,7 +30,7 @@ module Saml
       end
 
       def signing_key_pair
-        configuration.key_pairs(use: :signing).last
+        @signing_key_pair || configuration.key_pairs(use: :signing).last
       end
     end
   end

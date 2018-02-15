@@ -122,8 +122,9 @@ XML
         x.sign_with(Xml::Kit::KeyPair.generate(use: :signing))
         x.encrypt_with(encryption_key_pair)
       end
-      subject = response.assertion([encryption_key_pair.private_key])
-      expect(subject).to be_signed
+      assertion = response.assertion([encryption_key_pair.private_key])
+      expect(response).to be_signed
+      expect(assertion).to be_signed
     end
   end
 end

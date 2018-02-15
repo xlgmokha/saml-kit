@@ -93,9 +93,15 @@ module Saml
         @assertion ||=
           if encrypted?
             decryptor = ::Xml::Kit::Decryption.new(private_keys: private_keys)
-            decrypted = decryptor.decrypt_hash(@xml_hash['EncryptedAssertion'])
-            Saml::Kit.logger.debug(decrypted)
-            Hash.from_xml(decrypted)['Assertion']
+            encrypted_assertion = @node.document.at_xpath(
+              '/samlp:Response/saml:EncryptedAssertion/xmlenc:EncryptedData',
+              'xmlenc' => ::Xml::Kit::Namespaces::XMLENC,
+              "saml": ::Saml::Kit::Namespaces::ASSERTION,
+              "samlp": ::Saml::Kit::Namespaces::PROTOCOL
+            )
+            @node = decryptor.decrypt_node(encrypted_assertion)
+            @xml_hash = hash_from(@node)['Response'] || {}
+            @xml_hash['Assertion']
           else
             result = @xml_hash.fetch('Assertion', {})
             return result if result.is_a?(Hash)
