@@ -18,7 +18,7 @@ module Saml
       def assertion(private_keys = configuration.private_keys(use: :encryption))
         @assertion ||=
           begin
-            node = at_xpath(Saml::Kit::Assertion::XPATH)
+            node = assertion_nodes.last
             if node.nil?
               Saml::Kit::NullAssertion.new
             else
