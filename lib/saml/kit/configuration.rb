@@ -85,7 +85,7 @@ module Saml
       # Return each private for a specific use.
       #
       # @param use [Symbol] the type of key pair to return `nil`, `:signing` or `:encryption`
-      def private_keys(use: :signing)
+      def private_keys(use: nil)
         key_pairs(use: use).flat_map(&:private_key)
       end
 

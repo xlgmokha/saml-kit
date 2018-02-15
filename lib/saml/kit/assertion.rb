@@ -9,12 +9,13 @@ module Saml
       attr_reader :name
       attr_accessor :occurred_at
 
-      def initialize(node, configuration: Saml::Kit.configuration)
+      def initialize(node, configuration: Saml::Kit.configuration, private_keys: [])
         @name = "Assertion"
         @node = node
         @xml_hash = hash_from(node)['Response'] || {}
         @configuration = configuration
         @occurred_at = Time.current
+        @private_keys = configuration.private_keys(use: :encryption) + private_keys
       end
 
       def issuer
@@ -79,14 +80,18 @@ module Saml
         assertion.present?
       end
 
+      def to_xml(pretty: false)
+        pretty ? @node.to_xml(indent: 2) : @node.to_s
+      end
+
       private
 
       attr_reader :configuration
+      attr_reader :private_keys
 
       def assertion
         @assertion ||=
           if encrypted?
-            private_keys = configuration.private_keys(use: :encryption)
             decryptor = ::Xml::Kit::Decryption.new(private_keys: private_keys)
             decrypted = decryptor.decrypt_hash(@xml_hash['EncryptedAssertion'])
             Saml::Kit.logger.debug(decrypted)

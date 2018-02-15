@@ -15,16 +15,14 @@ module Saml
         super(xml, name: "Response", configuration: configuration)
       end
 
-      def assertion
-        @assertion ||= 
+      def assertion(private_keys = configuration.private_keys(use: :encryption))
+        @assertion ||=
           begin
-            node = at_xpath(
-              [
-                '/samlp:Response/saml:Assertion',
-                '/samlp:Response/saml:EncryptedAssertion'
-              ].join('|')
-            )
-            Saml::Kit::Assertion.new(node, configuration: @configuration)
+            node = at_xpath([
+              '/samlp:Response/saml:Assertion',
+              '/samlp:Response/saml:EncryptedAssertion'
+            ].join('|'))
+            Saml::Kit::Assertion.new(node, configuration: @configuration, private_keys: private_keys)
           end
       end
 
