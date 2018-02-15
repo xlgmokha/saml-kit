@@ -24,6 +24,7 @@ RSpec.describe Saml::Kit::Response do
       subject = described_class.new("")
       expect(subject).to be_invalid
       expect(subject.errors[:content]).to be_present
+      expect(subject.errors[:assertion]).to match_array(["is missing."])
     end
 
     it 'is invalid if the document has been tampered with' do

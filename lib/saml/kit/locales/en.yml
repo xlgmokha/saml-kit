@@ -20,6 +20,8 @@ en:
         unregistered: "is unregistered."
       LogoutResponse:
         unregistered: "is unregistered."
+      NullAssertion:
+        invalid: "is missing."
       Response:
         invalid: "must contain Response."
         invalid_fingerprint: "does not match."
