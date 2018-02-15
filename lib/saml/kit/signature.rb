@@ -11,12 +11,8 @@ module Saml
 
       def initialize(item)
         @name = "Signature"
-        if item.is_a?(Hash)
-          @xml_hash = item
-        else
-          @node = item
-          @xml_hash = @node ? Hash.from_xml(@node.to_s)["Signature"] : {}
-        end
+        @node = item
+        @xml_hash = @node ? Hash.from_xml(@node.to_s)["Signature"] : {}
       end
 
       # Returns the embedded X509 Certificate
@@ -52,8 +48,10 @@ module Saml
 
       def validate_certificate(now = Time.now.utc)
         if certificate.present? && !certificate.active?(now)
-          message = error_message(:certificate, not_before: certificate.not_before, not_after: certificate.not_after)
-          errors.add(:certificate, message)
+          errors.add(:certificate, error_message(:certificate,
+            not_before: certificate.not_before,
+            not_after: certificate.not_after
+          ))
         end
       end
     end

@@ -17,7 +17,7 @@ module Saml
       # @!visibility private
       def signature
         xml_hash = to_h.fetch(name, {}).fetch('Signature', nil)
-        xml_hash ? Signature.new(to_nokogiri.at_xpath('//ds:Signature', 'ds' => Xml::Kit::Namespaces::XMLDSIG)) : nil
+        xml_hash ? Signature.new(at_xpath('//ds:Signature')) : nil
       end
 
 

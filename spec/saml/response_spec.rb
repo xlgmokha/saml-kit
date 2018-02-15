@@ -227,7 +227,7 @@ RSpec.describe Saml::Kit::Response do
       end
       subject = described_class.new(xml)
       expect(subject).to_not be_valid
-      expect(subject.errors[:assertion]).to be_present
+      expect(subject.errors.full_messages).to include("must contain a single Assertion.")
     end
 
     it 'is invalid when the assertion has a signature and has been tampered with' do

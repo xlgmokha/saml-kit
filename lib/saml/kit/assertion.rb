@@ -9,9 +9,10 @@ module Saml
       attr_reader :name
       attr_accessor :occurred_at
 
-      def initialize(xml_hash, configuration: Saml::Kit.configuration)
+      def initialize(node, configuration: Saml::Kit.configuration)
         @name = "Assertion"
-        @xml_hash = xml_hash
+        @node = node
+        @xml_hash = hash_from(node)['Response'] || {}
         @configuration = configuration
         @occurred_at = Time.current
       end
@@ -30,7 +31,7 @@ module Saml
 
       def signature
         xml_hash = assertion.fetch('Signature', nil)
-        xml_hash ? Signature.new(xml_hash) : nil
+        xml_hash ? Signature.new(at_xpath('//ds:Signature')) : nil
       end
 
       def expired?(now = occurred_at)
@@ -39,6 +40,7 @@ module Saml
 
       def active?(now = occurred_at)
         drifted_started_at = started_at - configuration.clock_drift.to_i.seconds
+        puts [now.iso8601, drifted_started_at.iso8601, expired?(now)].inspect
         now > drifted_started_at && !expired?(now)
       end
 
@@ -71,7 +73,7 @@ module Saml
       end
 
       def encrypted?
-        @xml_hash.fetch('Response', {}).fetch('EncryptedAssertion', nil).present?
+        @xml_hash.fetch('EncryptedAssertion', nil).present?
       end
 
       def present?
@@ -87,11 +89,11 @@ module Saml
           if encrypted?
             private_keys = configuration.private_keys(use: :encryption)
             decryptor = ::Xml::Kit::Decryption.new(private_keys: private_keys)
-            decrypted = decryptor.decrypt_hash(@xml_hash['Response']['EncryptedAssertion'])
+            decrypted = decryptor.decrypt_hash(@xml_hash['EncryptedAssertion'])
             Saml::Kit.logger.debug(decrypted)
             Hash.from_xml(decrypted)['Assertion']
           else
-            result = @xml_hash.fetch('Response', {}).fetch('Assertion', {})
+            result = @xml_hash.fetch('Assertion', {})
             return result if result.is_a?(Hash)
 
             errors[:assertion] << error_message(:must_contain_single_assertion)
@@ -115,6 +117,15 @@ module Saml
       def must_be_active_session
         return if active?
         errors[:base] << error_message(:expired)
+      end
+
+      def at_xpath(xpath)
+        @node.at_xpath(xpath, Saml::Kit::Document::NAMESPACES)
+      end
+
+      def hash_from(node)
+        return {} if node.nil?
+        Hash.from_xml(node.document.root.to_s) || {}
       end
     end
   end

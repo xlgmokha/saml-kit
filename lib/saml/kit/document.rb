@@ -79,6 +79,11 @@ module Saml
         to_nokogiri.at_xpath(xpath, NAMESPACES)
       end
 
+      # @!visibility private
+      def search(xpath)
+        to_nokogiri.search(xpath, NAMESPACES)
+      end
+
       def to_s
         to_xml
       end
