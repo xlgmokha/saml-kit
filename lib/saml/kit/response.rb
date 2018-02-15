@@ -20,7 +20,7 @@ module Saml
           begin
             node = at_xpath(Saml::Kit::Assertion::XPATH)
             if node.nil?
-              Saml::Kit::Assertion::NULL
+              Saml::Kit::NullAssertion.new
             else
               Saml::Kit::Assertion.new(node, configuration: @configuration, private_keys: private_keys)
             end
