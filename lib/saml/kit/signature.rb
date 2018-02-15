@@ -15,20 +15,15 @@ module Saml
           @xml_hash = item
         else
           @node = item
+          @xml_hash = @node ? Hash.from_xml(@node.to_s)["Signature"] : {}
         end
       end
 
       # Returns the embedded X509 Certificate
       def certificate
-        if @xml_hash
-          value = to_h.fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
-          return if value.nil?
-          ::Xml::Kit::Certificate.new(value, use: :signing)
-        else
-          return if @node.nil?
-          item = @node.at_xpath("//ds:KeyInfo/ds:X509Data/ds:X509Certificate", "ds": ::Xml::Kit::Namespaces::XMLDSIG)
-          ::Xml::Kit::Certificate.new(item.text, use: :signing)
-        end
+        value = to_h.fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
+        return if value.nil?
+        ::Xml::Kit::Certificate.new(value, use: :signing)
       end
 
       # Returns true when the fingerprint of the certificate matches one of the certificates registered in the metadata.

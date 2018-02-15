@@ -60,5 +60,12 @@ RSpec.describe Saml::Kit::Signature do
         end
       end
     end
+
+    describe "#to_h" do
+      it 'returns a hash representation of the signature' do
+        expected = Hash.from_xml(signed_document.to_s)['AuthnRequest']['Signature']
+        expect(subject.to_h).to eql(expected)
+      end
+    end
   end
 end
