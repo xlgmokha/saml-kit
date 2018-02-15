@@ -40,7 +40,6 @@ module Saml
 
       def active?(now = occurred_at)
         drifted_started_at = started_at - configuration.clock_drift.to_i.seconds
-        puts [now.iso8601, drifted_started_at.iso8601, expired?(now)].inspect
         now > drifted_started_at && !expired?(now)
       end
 
