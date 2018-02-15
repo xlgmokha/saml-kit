@@ -66,11 +66,15 @@ module Saml
       # Returns the SAML document as an XHTML string. 
       # This is useful for rendering in a web page.
       def to_xhtml
-        Nokogiri::XML(content, &:noblanks).to_xhtml
+        Nokogiri::XML(to_xml, &:noblanks).to_xhtml
       end
 
       def to_nokogiri
         @nokogiri ||= Nokogiri::XML(content)
+      end
+
+      def at_xpath(xpath)
+        to_nokogiri.at_xpath(xpath, NAMESPACES)
       end
 
       def to_s

@@ -48,8 +48,8 @@ module Saml
         end
       end
 
-      def validate_certificate(now = Time.current)
-        if certificate.present? && certificate.expired?(now)
+      def validate_certificate(now = Time.now.utc)
+        if certificate.present? && !certificate.active?(now)
           error_message = "Not valid before #{certificate.not_before}. Not valid after #{certificate.not_after}."
           errors.add(:certificate, error_message)
         end
