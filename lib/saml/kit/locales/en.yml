@@ -27,6 +27,7 @@ en:
         invalid_version: "must be 2.0."
         unregistered: "must originate from registered identity provider."
       Signature:
+        certificate: "Not valid before %{not_before}. Not valid after %{not_after}."
         digest_value: "is invalid."
         empty: "is missing."
       SPSSODescriptor:

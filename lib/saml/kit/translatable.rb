@@ -2,8 +2,9 @@ module Saml
   module Kit
     module Translatable
       # @!visibility private
-      def error_message(attribute, type: :invalid)
-        I18n.translate(attribute, scope: "saml/kit.errors.#{name}")
+      def error_message(attribute, options = {})
+        default_options = { scope: "saml/kit.errors.#{name}" }
+        I18n.translate(attribute, default_options.merge(options))
       end
     end
   end
