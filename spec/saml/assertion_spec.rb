@@ -127,4 +127,20 @@ XML
       expect(assertion).to be_signed
     end
   end
+
+  describe "#to_xml" do
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
+
+    it 'returns the decrypted xml' do
+      encryption_key_pair = Xml::Kit::KeyPair.generate(use: :encryption)
+      response = Saml::Kit::Response.build(user, request) do |x|
+        x.sign_with(Xml::Kit::KeyPair.generate(use: :signing))
+        x.encrypt_with(encryption_key_pair)
+      end
+      assertion = response.assertion([encryption_key_pair.private_key])
+      expect(assertion.to_xml).to_not include("EncryptedAssertion")
+      expect(assertion.to_xml).to include("Assertion")
+    end
+  end
 end

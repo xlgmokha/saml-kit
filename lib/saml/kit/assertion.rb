@@ -16,6 +16,7 @@ module Saml
         @configuration = configuration
         @occurred_at = Time.current
         @private_keys = configuration.private_keys(use: :encryption) + private_keys
+        decrypt!
       end
 
       def issuer
@@ -92,14 +93,6 @@ module Saml
       def assertion
         @assertion ||=
           if encrypted?
-            decryptor = ::Xml::Kit::Decryption.new(private_keys: private_keys)
-            encrypted_assertion = @node.document.at_xpath(
-              '/samlp:Response/saml:EncryptedAssertion/xmlenc:EncryptedData',
-              'xmlenc' => ::Xml::Kit::Namespaces::XMLENC,
-              "saml": ::Saml::Kit::Namespaces::ASSERTION,
-              "samlp": ::Saml::Kit::Namespaces::PROTOCOL
-            )
-            @node = decryptor.decrypt_node(encrypted_assertion)
             (hash_from(@node)['Response'] || {})['Assertion']
           else
             result = @xml_hash.fetch('Assertion', {})
@@ -108,6 +101,19 @@ module Saml
             errors[:assertion] << error_message(:must_contain_single_assertion)
             {}
           end
+      end
+
+      def decrypt!
+        return unless encrypted?
+        decryptor = ::Xml::Kit::Decryption.new(private_keys: private_keys)
+        encrypted_assertion = @node.document.at_xpath(
+          '/samlp:Response/saml:EncryptedAssertion/xmlenc:EncryptedData',
+          'xmlenc' => ::Xml::Kit::Namespaces::XMLENC,
+          "saml": ::Saml::Kit::Namespaces::ASSERTION,
+          "samlp": ::Saml::Kit::Namespaces::PROTOCOL
+        )
+        @node = decryptor.decrypt_node(encrypted_assertion)
+        #(hash_from(@node)['Response'] || {})['Assertion']
       end
 
       def parse_date(value)
