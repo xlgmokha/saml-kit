@@ -28,6 +28,7 @@ en:
         unregistered: "must originate from registered identity provider."
       Signature:
         digest_value: "is invalid."
+        empty: "is missing."
       SPSSODescriptor:
         invalid: "must contain SPSSODescriptor."
         invalid_signature: "invalid signature."

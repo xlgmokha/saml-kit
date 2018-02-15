@@ -9,24 +9,25 @@ module Saml
 
       attr_reader :name
 
-      def initialize(xml_hash)
+      def initialize(item)
         @name = "Signature"
-        if xml_hash.is_a?(Hash)
-          @xml_hash = xml_hash
+        if item.is_a?(Hash)
+          @xml_hash = item
         else
-          @document = xml_hash
+          @node = item
         end
       end
 
       # Returns the embedded X509 Certificate
       def certificate
-        if @document
-          item = @document.at_xpath("//ds:KeyInfo/ds:X509Data/ds:X509Certificate", "ds": ::Xml::Kit::Namespaces::XMLDSIG)
-          ::Xml::Kit::Certificate.new(item.text, use: :signing)
-        else
+        if @xml_hash
           value = to_h.fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
           return if value.nil?
           ::Xml::Kit::Certificate.new(value, use: :signing)
+        else
+          return if @node.nil?
+          item = @node.at_xpath("//ds:KeyInfo/ds:X509Data/ds:X509Certificate", "ds": ::Xml::Kit::Namespaces::XMLDSIG)
+          ::Xml::Kit::Certificate.new(item.text, use: :signing)
         end
       end
 
@@ -44,9 +45,9 @@ module Saml
       private
 
       def validate_signature
-        return errors[:base].push("is missing") if certificate.nil?
+        return errors[:base].push(error_message(:empty)) if certificate.nil?
 
-        signature = Xmldsig::Signature.new(@document, 'ID=$uri or @Id')
+        signature = Xmldsig::Signature.new(@node, 'ID=$uri or @Id')
         unless signature.valid?(certificate.x509)
           signature.errors.each do |attribute|
             errors.add(attribute, error_message(attribute))

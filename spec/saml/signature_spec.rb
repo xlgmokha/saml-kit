@@ -19,10 +19,46 @@ RSpec.describe Saml::Kit::Signature do
     end
 
     it 'is invalid when the signature is missing' do
-      unsigned_document = Saml::Kit::AuthenticationRequest.build
-      subject = described_class.new(Hash.from_xml(unsigned_document.to_xml))
+      subject = described_class.new(nil)
       expect(subject).to_not be_valid
-      expect(subject.errors[:base]).to be_present
+      expect(subject.errors[:base]).to match_array(['is missing.'])
+    end
+
+    describe "certificate validation" do
+      let(:key_pair) { ::Xml::Kit::KeyPair.new(expired_certificate, private_key, nil, :signing) }
+      let(:private_key) { OpenSSL::PKey::RSA.new(2048) }
+      let(:expired_certificate) do
+        certificate = OpenSSL::X509::Certificate.new
+        certificate.not_before = not_before
+        certificate.not_after = not_after
+        certificate.public_key = private_key.public_key
+        certificate.sign(private_key, OpenSSL::Digest::SHA256.new)
+        certificate
+      end
+
+      context "when the certificate is expired" do
+        let(:not_before) { 10.minutes.ago }
+        let(:not_after) { 1.minute.ago }
+
+        it 'is invalid' do
+          expect(subject).to be_invalid
+          expect(subject.errors[:certificate]).to match_array([
+            "Not valid before #{expired_certificate.not_before}. Not valid after #{expired_certificate.not_after}."
+          ])
+        end
+      end
+
+      context "when the certificate is not active yet" do
+        let(:not_before) { 10.minutes.from_now }
+        let(:not_after) { 20.minute.from_now }
+
+        it 'it invalid' do
+          expect(subject).to be_invalid
+          expect(subject.errors[:certificate]).to match_array([
+            "Not valid before #{expired_certificate.not_before}. Not valid after #{expired_certificate.not_after}."
+          ])
+        end
+      end
     end
   end
 end
