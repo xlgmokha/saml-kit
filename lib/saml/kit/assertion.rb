@@ -100,8 +100,7 @@ module Saml
               "samlp": ::Saml::Kit::Namespaces::PROTOCOL
             )
             @node = decryptor.decrypt_node(encrypted_assertion)
-            @xml_hash = hash_from(@node)['Response'] || {}
-            @xml_hash['Assertion']
+            (hash_from(@node)['Response'] || {})['Assertion']
           else
             result = @xml_hash.fetch('Assertion', {})
             return result if result.is_a?(Hash)
