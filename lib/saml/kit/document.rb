@@ -69,10 +69,12 @@ module Saml
         Nokogiri::XML(to_xml, &:noblanks).to_xhtml
       end
 
+      # @!visibility private
       def to_nokogiri
         @nokogiri ||= Nokogiri::XML(content)
       end
 
+      # @!visibility private
       def at_xpath(xpath)
         to_nokogiri.at_xpath(xpath, NAMESPACES)
       end
