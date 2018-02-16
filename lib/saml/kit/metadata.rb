@@ -179,25 +179,31 @@ module Saml
         end
       end
 
-      # Creates a `{Saml::Kit::Metadata}` object from a raw XML [String].
-      #
-      # @param content [String] the raw metadata XML.
-      # @return [Saml::Kit::Metadata] the metadata document or subclass.
-      def self.from(content)
-        hash = Hash.from_xml(content)
-        entity_descriptor = hash["EntityDescriptor"]
-        if entity_descriptor.key?("SPSSODescriptor") && entity_descriptor.key?("IDPSSODescriptor")
-          Saml::Kit::CompositeMetadata.new(content)
-        elsif entity_descriptor.keys.include?("SPSSODescriptor")
-          Saml::Kit::ServiceProviderMetadata.new(content)
-        elsif entity_descriptor.keys.include?("IDPSSODescriptor")
-          Saml::Kit::IdentityProviderMetadata.new(content)
-        end
+      def signature
+        @signature ||= Signature.new(at_xpath("/md:EntityDescriptor/ds:Signature"))
       end
 
-      # @!visibility private
-      def self.builder_class
-        Saml::Kit::Builders::Metadata
+      class << self
+        # Creates a `{Saml::Kit::Metadata}` object from a raw XML [String].
+        #
+        # @param content [String] the raw metadata XML.
+        # @return [Saml::Kit::Metadata] the metadata document or subclass.
+        def from(content)
+          hash = Hash.from_xml(content)
+          entity_descriptor = hash["EntityDescriptor"]
+          if entity_descriptor.key?("SPSSODescriptor") && entity_descriptor.key?("IDPSSODescriptor")
+            Saml::Kit::CompositeMetadata.new(content)
+          elsif entity_descriptor.keys.include?("SPSSODescriptor")
+            Saml::Kit::ServiceProviderMetadata.new(content)
+          elsif entity_descriptor.keys.include?("IDPSSODescriptor")
+            Saml::Kit::IdentityProviderMetadata.new(content)
+          end
+        end
+
+        # @!visibility private
+        def builder_class
+          Saml::Kit::Builders::Metadata
+        end
       end
 
       private
@@ -206,6 +212,10 @@ module Saml
 
       def document
         @document ||= ::Xml::Kit::Document.new(xml, namespaces: NAMESPACES)
+      end
+
+      def at_xpath(xpath)
+        document.find_by(xpath)
       end
 
       def metadata
@@ -221,11 +231,11 @@ module Saml
       end
 
       def must_have_valid_signature
-        return if to_xml.blank?
+        return unless signature.present?
 
-        document.valid?
-        document.errors.each do |attribute, message|
-          errors[attribute] << message
+        signature.valid?
+        signature.errors.each do |attribute, error|
+          errors[attribute] << error
         end
       end
     end

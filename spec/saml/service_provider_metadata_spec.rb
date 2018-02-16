@@ -98,7 +98,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       metadata_xml = service_provider_metadata.gsub(acs_post_url, new_url)
       subject = described_class.new(metadata_xml)
       expect(subject).to be_invalid
-      expect(subject.errors[:digest_value]).to include("is invalid")
+      expect(subject.errors[:digest_value]).to include("is invalid.")
     end
 
     it 'is invalid when 0 ACS endpoints are specified' do

@@ -62,4 +62,15 @@ RSpec.describe Saml::Kit::Metadata do
       expect(subject.certificates.count).to eql(1)
     end
   end
+
+  describe "#signature" do
+    it 'returns the signature' do
+      subject = Saml::Kit::Metadata.build do |x|
+        x.sign_with(::Xml::Kit::KeyPair.generate(use: :signing))
+        x.build_identity_provider
+      end
+
+      expect(subject.signature).to be_present
+    end
+  end
 end
