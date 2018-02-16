@@ -8,6 +8,7 @@ module Saml
         "md": ::Saml::Kit::Namespaces::METADATA,
         "saml": ::Saml::Kit::Namespaces::ASSERTION,
         "samlp": ::Saml::Kit::Namespaces::PROTOCOL,
+        "xmlenc" => ::Xml::Kit::Namespaces::XMLENC,
       }.freeze
       include ActiveModel::Validations
       include XsdValidatable

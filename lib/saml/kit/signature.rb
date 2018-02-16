@@ -33,6 +33,10 @@ module Saml
         @xml_hash
       end
 
+      def present?
+        @node
+      end
+
       private
 
       def validate_signature

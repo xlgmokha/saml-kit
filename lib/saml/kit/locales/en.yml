@@ -33,6 +33,7 @@ en:
         certificate: "Not valid before %{not_before}. Not valid after %{not_after}."
         digest_value: "is invalid."
         empty: "is missing."
+        signature: "is invalid."
       SPSSODescriptor:
         invalid: "must contain SPSSODescriptor."
         invalid_signature: "invalid signature."

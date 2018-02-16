@@ -10,6 +10,7 @@ module Saml
 
       validate :must_match_issuer
       validate :must_be_active_session
+      validate :must_have_valid_signature
       attr_reader :name
       attr_accessor :occurred_at
 
@@ -19,8 +20,11 @@ module Saml
         @xml_hash = hash_from(node)['Response'] || {}
         @configuration = configuration
         @occurred_at = Time.current
-        @private_keys = (configuration.private_keys(use: :encryption) + private_keys).uniq
-        decrypt!
+        decrypt!(::Xml::Kit::Decryption.new(
+          private_keys: (
+            configuration.private_keys(use: :encryption) + private_keys
+          ).uniq
+        ))
       end
 
       def issuer
@@ -36,8 +40,7 @@ module Saml
       end
 
       def signature
-        xml_hash = assertion.fetch('Signature', nil)
-        xml_hash ? Signature.new(at_xpath('//ds:Signature')) : nil
+        @signature ||= Signature.new(at_xpath('./ds:Signature'))
       end
 
       def expired?(now = occurred_at)
@@ -92,7 +95,6 @@ module Saml
       private
 
       attr_reader :configuration
-      attr_reader :private_keys
 
       def assertion
         @assertion ||=
@@ -103,17 +105,11 @@ module Saml
           end
       end
 
-      def decrypt!
+      def decrypt!(decryptor)
         return unless encrypted?
-        decryptor = ::Xml::Kit::Decryption.new(private_keys: private_keys)
-        encrypted_assertion = @node.document.at_xpath(
-          '/samlp:Response/saml:EncryptedAssertion/xmlenc:EncryptedData',
-          'xmlenc' => ::Xml::Kit::Namespaces::XMLENC,
-          "saml": ::Saml::Kit::Namespaces::ASSERTION,
-          "samlp": ::Saml::Kit::Namespaces::PROTOCOL
-        )
+
+        encrypted_assertion = @node.at_xpath('./xmlenc:EncryptedData', Saml::Kit::Document::NAMESPACES)
         @node = decryptor.decrypt_node(encrypted_assertion)
-        #(hash_from(@node)['Response'] || {})['Assertion']
       end
 
       def parse_date(value)
@@ -132,6 +128,14 @@ module Saml
       def must_be_active_session
         return if active?
         errors[:base] << error_message(:expired)
+      end
+
+      def must_have_valid_signature
+        if signed? && signature.invalid?
+          signature.errors.each do |attribute, message|
+            errors.add(attribute, message)
+          end
+        end
       end
 
       def at_xpath(xpath)

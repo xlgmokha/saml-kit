@@ -1,13 +1,13 @@
 RSpec.describe Saml::Kit::Signature do
-  describe "#valid?" do
-    let(:key_pair) { ::Xml::Kit::KeyPair.generate(use: :signing) }
-    let(:signed_document) do
-      Saml::Kit::AuthenticationRequest.build do |x|
-        x.sign_with(key_pair)
-      end
+  let(:key_pair) { ::Xml::Kit::KeyPair.generate(use: :signing) }
+  let(:signed_document) do
+    Saml::Kit::AuthenticationRequest.build do |x|
+      x.sign_with(key_pair)
     end
-    subject { described_class.new(signed_document.at_xpath('//ds:Signature')) }
+  end
+  subject { described_class.new(signed_document.at_xpath('//ds:Signature')) }
 
+  describe "#valid?" do
     it 'returns true when the signature is valid' do
       expect(subject).to be_valid
     end
@@ -60,11 +60,25 @@ RSpec.describe Saml::Kit::Signature do
         end
       end
     end
+  end
 
-    describe "#to_h" do
-      it 'returns a hash representation of the signature' do
-        expected = Hash.from_xml(signed_document.to_s)['AuthnRequest']['Signature']
-        expect(subject.to_h).to eql(expected)
+  describe "#to_h" do
+    it 'returns a hash representation of the signature' do
+      expected = Hash.from_xml(signed_document.to_s)['AuthnRequest']['Signature']
+      expect(subject.to_h).to eql(expected)
+    end
+  end
+
+  describe "#present?" do
+    context "when a signature is not present" do
+      it 'return false' do
+        expect(described_class.new(nil)).to_not be_present
+      end
+    end
+
+    context "when a signature is present" do
+      it 'returns true' do
+        expect(subject).to be_present
       end
     end
   end

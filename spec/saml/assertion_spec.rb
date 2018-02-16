@@ -147,7 +147,8 @@ XML
   describe "#valid?" do
     let(:entity_id) { FFaker::Internet.uri("https") }
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: entity_id, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
-    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
+    let(:name_id) { SecureRandom.uuid }
+    let(:user) { double(:user, name_id_for: name_id, assertion_attributes_for: { id: SecureRandom.uuid }) }
     let(:registry) { double(:registry, metadata_for: idp) }
     let(:idp) { Saml::Kit::IdentityProviderMetadata.build(configuration: configuration) }
     let(:configuration) do
@@ -162,19 +163,41 @@ XML
     end
 
     it 'is invalid when the encrypted signature is invalid' do
+      xml = Saml::Kit::Response.build_xml(user, request, configuration: configuration)
+      altered = xml.gsub(name_id, 'altered')
+      document = Nokogiri::XML(altered)
+      assertion = document.at_xpath("/samlp:Response/saml:Assertion", Saml::Kit::Document::NAMESPACES)
+      key_pair = Xml::Kit::KeyPair.generate(use: :encryption)
+      encrypted = Xml::Kit::Encryption.new(assertion.to_xml, key_pair.public_key).to_xml
+      response = Saml::Kit::Response.new(encrypted, configuration: configuration)
+      expect(response.assertion([key_pair.private_key])).to be_invalid
     end
 
-    it 'is invalid when the signature is invalid' do
+    it 'is valid when the encrypted signature is valid' do
+      key_pair = Xml::Kit::KeyPair.generate(use: :encryption)
+      response = Saml::Kit::Response.build(user, request, configuration: configuration) do |x|
+        x.encrypt_with(key_pair)
+      end
+      expect(response.assertion([key_pair.private_key])).to be_valid
+    end
+
+    it 'is invalid when the assertion signature is invalid' do
       xml = Saml::Kit::Response.build_xml(user, request, configuration: configuration)
-      altered = xml.gsub(entity_id, 'altered')
+      altered = xml.gsub(name_id, 'altered')
       response = Saml::Kit::Response.new(altered, configuration: configuration)
       expect(response.assertion).to be_invalid
+      expect(response.assertion.errors[:digest_value]).to match_array(['is invalid.'])
+    end
+
+    it 'is invalid when the response signature is invalid' do
+      xml = Saml::Kit::Response.build_xml(user, request, configuration: configuration)
+      altered = xml.gsub('StatusCode', 'ALTERED')
+      response = Saml::Kit::Response.new(altered, configuration: configuration)
+      expect(response).to be_invalid
     end
 
     it 'is valid' do
-      response = Saml::Kit::Response.build(user, request, configuration: configuration) do |x|
-        x.sign_with(Xml::Kit::KeyPair.generate(use: :signing))
-      end
+      response = Saml::Kit::Response.build(user, request, configuration: configuration)
       expect(response.assertion).to be_valid
     end
   end
