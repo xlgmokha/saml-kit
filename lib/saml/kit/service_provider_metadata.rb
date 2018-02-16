@@ -3,7 +3,7 @@ module Saml
     # {include:file:spec/examples/service_provider_metadata_spec.rb}
     class ServiceProviderMetadata < Metadata
       def initialize(xml)
-        super("SPSSODescriptor", xml)
+        super('SPSSODescriptor', xml)
       end
 
       # Returns each of the AssertionConsumerService bindings.
@@ -20,9 +20,9 @@ module Saml
 
       # Returns true when the metadata demands that Assertions must be signed.
       def want_assertions_signed
-        attribute = document.find_by("/md:EntityDescriptor/md:#{name}").attribute("WantAssertionsSigned")
+        attribute = document.find_by("/md:EntityDescriptor/md:#{name}").attribute('WantAssertionsSigned')
         return true if attribute.nil?
-        attribute.text.downcase == "true"
+        attribute.text.casecmp('true').zero?
       end
 
       # @!visibility private

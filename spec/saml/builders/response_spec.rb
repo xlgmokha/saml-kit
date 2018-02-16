@@ -1,5 +1,6 @@
 RSpec.describe Saml::Kit::Builders::Response do
   subject { described_class.new(user, request, configuration: configuration) }
+
   let(:configuration) do
     Saml::Kit::Configuration.new do |config|
       config.entity_id = issuer
@@ -8,13 +9,13 @@ RSpec.describe Saml::Kit::Builders::Response do
     end
   end
   let(:email) { FFaker::Internet.email }
-  let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
+  let(:assertion_consumer_service_url) { FFaker::Internet.uri('https') }
   let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
   let(:request) { double(:request, id: Xml::Kit::Id.generate, assertion_consumer_service_url: assertion_consumer_service_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, trusted?: true, signed?: true) }
-  let(:provider) { double(:provider, want_assertions_signed: false, encryption_certificates: [configuration.certificates(use: :encryption).last] ) }
-  let(:issuer) { FFaker::Internet.uri("https") }
+  let(:provider) { double(:provider, want_assertions_signed: false, encryption_certificates: [configuration.certificates(use: :encryption).last]) }
+  let(:issuer) { FFaker::Internet.uri('https') }
 
-  describe "#build" do
+  describe '#build' do
     it 'builds a response with the request_id' do
       expect(subject.build.request_id).to eql(request.id)
     end
@@ -37,7 +38,7 @@ RSpec.describe Saml::Kit::Builders::Response do
     end
   end
 
-  describe "#to_xml" do
+  describe '#to_xml' do
     it 'returns a proper response for the user' do
       travel_to 1.second.from_now
       allow(Saml::Kit.configuration).to receive(:entity_id).and_return(issuer)
@@ -51,15 +52,15 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(hash['Response']['Destination']).to eql(assertion_consumer_service_url)
       expect(hash['Response']['InResponseTo']).to eql(request.id)
       expect(hash['Response']['Issuer']).to eql(issuer)
-      expect(hash['Response']['Status']['StatusCode']['Value']).to eql("urn:oasis:names:tc:SAML:2.0:status:Success")
+      expect(hash['Response']['Status']['StatusCode']['Value']).to eql('urn:oasis:names:tc:SAML:2.0:status:Success')
 
       expect(hash['Response']['Assertion']['ID']).to be_present
       expect(hash['Response']['Assertion']['IssueInstant']).to eql(Time.now.utc.iso8601)
-      expect(hash['Response']['Assertion']['Version']).to eql("2.0")
+      expect(hash['Response']['Assertion']['Version']).to eql('2.0')
       expect(hash['Response']['Assertion']['Issuer']).to eql(issuer)
 
       expect(hash['Response']['Assertion']['Subject']['NameID']).to eql(user.name_id_for)
-      expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['Method']).to eql("urn:oasis:names:tc:SAML:2.0:cm:bearer")
+      expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['Method']).to eql('urn:oasis:names:tc:SAML:2.0:cm:bearer')
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['NotOnOrAfter']).to eql(3.hours.from_now.utc.iso8601)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['Recipient']).to eql(assertion_consumer_service_url)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['InResponseTo']).to eql(request.id)
@@ -145,13 +146,13 @@ RSpec.describe Saml::Kit::Builders::Response do
       subject.embed_signature = false
 
       result = Saml::Kit::Response.new(subject.to_xml, configuration: configuration)
-      expect(result).to_not be_signed
-      expect(result.assertion).to_not be_signed
+      expect(result).not_to be_signed
+      expect(result.assertion).not_to be_signed
       expect(result.assertion).to be_encrypted
     end
   end
 
-  describe ".build" do
+  describe '.build' do
     let(:configuration) do
       Saml::Kit::Configuration.new do |config|
         config.entity_id = issuer

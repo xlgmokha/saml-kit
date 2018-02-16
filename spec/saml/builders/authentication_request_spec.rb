@@ -1,14 +1,15 @@
 RSpec.describe Saml::Kit::Builders::AuthenticationRequest do
   subject { described_class.new(configuration: configuration) }
+
   let(:configuration) do
     config = Saml::Kit::Configuration.new
     config.entity_id = issuer
     config
   end
 
-  describe "#to_xml" do
+  describe '#to_xml' do
     let(:issuer) { FFaker::Movie.title }
-    let(:assertion_consumer_service_url) { "https://airport.dev/session/acs" }
+    let(:assertion_consumer_service_url) { 'https://airport.dev/session/acs' }
 
     it 'returns a valid authentication request' do
       travel_to 1.second.from_now

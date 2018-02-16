@@ -31,7 +31,7 @@ module Saml
       # @param xml [String] The raw xml string.
       # @param configuration [Saml::Kit::Configuration] the configuration to use.
       def initialize(xml, configuration: Saml::Kit.configuration)
-        super(xml, name: "LogoutRequest", configuration: configuration)
+        super(xml, name: 'LogoutRequest', configuration: configuration)
       end
 
       # Returns the NameID value.

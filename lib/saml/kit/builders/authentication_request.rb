@@ -15,7 +15,7 @@ module Saml
           @issuer = configuration.entity_id
           @name_id_format = Namespaces::PERSISTENT
           @now = Time.now.utc
-          @version = "2.0"
+          @version = '2.0'
         end
 
         def build
@@ -26,8 +26,8 @@ module Saml
 
         def request_options
           options = {
-            "xmlns:samlp" => Namespaces::PROTOCOL,
-            "xmlns:saml" => Namespaces::ASSERTION,
+            'xmlns:samlp' => Namespaces::PROTOCOL,
+            'xmlns:saml' => Namespaces::ASSERTION,
             ID: id,
             Version: version,
             IssueInstant: now.utc.iso8601,

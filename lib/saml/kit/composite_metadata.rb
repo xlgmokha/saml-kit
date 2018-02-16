@@ -5,7 +5,7 @@ module Saml
       attr_reader :service_provider, :identity_provider
 
       def initialize(xml)
-        super("IDPSSODescriptor", xml)
+        super('IDPSSODescriptor', xml)
         @metadatum = [
           Saml::Kit::ServiceProviderMetadata.new(xml),
           Saml::Kit::IdentityProviderMetadata.new(xml),
@@ -13,10 +13,10 @@ module Saml
       end
 
       def services(type)
-        xpath = map { |x| "//md:EntityDescriptor/md:#{x.name}/md:#{type}" }.join("|")
+        xpath = map { |x| "//md:EntityDescriptor/md:#{x.name}/md:#{type}" }.join('|')
         document.find_all(xpath).map do |item|
-          binding = item.attribute("Binding").value
-          location = item.attribute("Location").value
+          binding = item.attribute('Binding').value
+          location = item.attribute('Location').value
           Saml::Kit::Bindings.create_for(binding, location)
         end
       end

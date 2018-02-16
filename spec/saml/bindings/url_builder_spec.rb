@@ -1,6 +1,6 @@
 RSpec.describe Saml::Kit::Bindings::UrlBuilder do
-  describe "#build" do
-    let(:xml) { "<xml></xml>" }
+  describe '#build' do
+    let(:xml) { '<xml></xml>' }
     let(:destination) { FFaker::Internet.http_url }
     let(:relay_state) { FFaker::Movie.title }
 
@@ -12,6 +12,7 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
     ].each do |(response_type, query_string_parameter)|
       describe response_type.to_s do
         subject { described_class.new(configuration: configuration) }
+
         let(:configuration) do
           Saml::Kit::Configuration.new do |config|
             config.generate_key_pair_for(use: :signing)
@@ -21,12 +22,12 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
         let(:response) { instance_double(response_type, destination: destination, to_xml: xml, query_string_parameter: query_string_parameter) }
 
         def to_query_params(url)
-          Hash[URI.parse(url).query.split("&").map { |x| x.split('=', 2) }]
+          Hash[URI.parse(url).query.split('&').map { |x| x.split('=', 2) }]
         end
 
         it 'returns a url containing the target location' do
           result_uri = URI.parse(subject.build(response))
-          expect(result_uri.scheme).to eql("http")
+          expect(result_uri.scheme).to eql('http')
           expect(result_uri.host).to eql(URI.parse(destination).host)
         end
 
@@ -34,7 +35,7 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
           result = subject.build(response, relay_state: relay_state)
           query_params = to_query_params(result)
           level = Zlib::BEST_COMPRESSION
-          expected = CGI.escape(Base64.encode64(Zlib::Deflate.deflate(xml, level)[2..-5]).gsub(/\n/, ''))
+          expected = CGI.escape(Base64.encode64(Zlib::Deflate.deflate(xml, level)[2..-5]).delete("\n"))
           expect(result).to include("#{query_string_parameter}=#{expected}")
           expect(query_params[query_string_parameter]).to eql(expected)
         end

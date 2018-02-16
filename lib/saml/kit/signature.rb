@@ -10,7 +10,7 @@ module Saml
       attr_reader :name
 
       def initialize(node)
-        @name = "Signature"
+        @name = 'Signature'
         @node = node
       end
 
@@ -28,32 +28,32 @@ module Saml
       end
 
       def digest_value
-        at_xpath("./ds:SignedInfo/ds:Reference/ds:DigestValue").try(:text)
+        at_xpath('./ds:SignedInfo/ds:Reference/ds:DigestValue').try(:text)
       end
 
       def digest_method
-        at_xpath("./ds:SignedInfo/ds:Reference/ds:DigestMethod/@Algorithm").try(:value)
+        at_xpath('./ds:SignedInfo/ds:Reference/ds:DigestMethod/@Algorithm').try(:value)
       end
 
       def signature_value
-        at_xpath("./ds:SignatureValue").try(:text)
+        at_xpath('./ds:SignatureValue').try(:text)
       end
 
       def signature_method
-        at_xpath("./ds:SignedInfo/ds:SignatureMethod/@Algorithm").try(:value)
+        at_xpath('./ds:SignedInfo/ds:SignatureMethod/@Algorithm').try(:value)
       end
 
       def canonicalization_method
-        at_xpath("./ds:SignedInfo/ds:CanonicalizationMethod/@Algorithm").try(:value)
+        at_xpath('./ds:SignedInfo/ds:CanonicalizationMethod/@Algorithm').try(:value)
       end
 
       def transforms
-        node.search("./ds:SignedInfo/ds:Reference/ds:Transforms/ds:Transform/@Algorithm", Saml::Kit::Document::NAMESPACES).try(:map, &:value)
+        node.search('./ds:SignedInfo/ds:Reference/ds:Transforms/ds:Transform/@Algorithm', Saml::Kit::Document::NAMESPACES).try(:map, &:value)
       end
 
       # Returns the XML Hash.
       def to_h
-        @xml_hash ||= present? ? Hash.from_xml(to_xml)["Signature"] : {}
+        @xml_hash ||= present? ? Hash.from_xml(to_xml)['Signature'] : {}
       end
 
       def present?
@@ -82,9 +82,8 @@ module Saml
       def validate_certificate(now = Time.now.utc)
         if certificate.present? && !certificate.active?(now)
           errors.add(:certificate, error_message(:certificate,
-            not_before: certificate.not_before,
-            not_after: certificate.not_after
-          ))
+                                                 not_before: certificate.not_before,
+                                                 not_after: certificate.not_after))
         end
       end
 

@@ -14,12 +14,12 @@ module Saml
           binding == other
         end
 
-        def serialize(builder, relay_state: nil)
+        def serialize(_builder, relay_state: nil)
           []
         end
 
-        def deserialize(params)
-          raise ArgumentError.new("Unsupported binding")
+        def deserialize(_params)
+          raise ArgumentError, 'Unsupported binding'
         end
 
         def to_h
@@ -27,7 +27,7 @@ module Saml
         end
 
         def ==(other)
-          self.to_s == other.to_s
+          to_s == other.to_s
         end
 
         def eql?(other)
@@ -58,7 +58,7 @@ module Saml
           elsif parameters[:SAMLResponse].present?
             parameters[:SAMLResponse]
           else
-            raise ArgumentError.new("SAMLRequest or SAMLResponse parameter is required.")
+            raise ArgumentError, 'SAMLRequest or SAMLResponse parameter is required.'
           end
         end
       end

@@ -1,9 +1,9 @@
 RSpec.describe Saml::Kit::ServiceProviderMetadata do
-  let(:entity_id) { FFaker::Internet.uri("https") }
-  let(:acs_post_url) { FFaker::Internet.uri("https") }
-  let(:acs_redirect_url) { FFaker::Internet.uri("https") }
-  let(:logout_post_url) { FFaker::Internet.uri("https") }
-  let(:logout_redirect_url) { FFaker::Internet.uri("https") }
+  let(:entity_id) { FFaker::Internet.uri('https') }
+  let(:acs_post_url) { FFaker::Internet.uri('https') }
+  let(:acs_redirect_url) { FFaker::Internet.uri('https') }
+  let(:logout_post_url) { FFaker::Internet.uri('https') }
+  let(:logout_redirect_url) { FFaker::Internet.uri('https') }
 
   describe described_class do
     subject do
@@ -25,22 +25,22 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
     it 'returns each acs url and binding' do
       expect(subject.assertion_consumer_services.map(&:to_h)).to match_array([
-        { location: acs_post_url, binding: Saml::Kit::Bindings::HTTP_POST },
-        { location: acs_redirect_url, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
-      ])
+                                                                               { location: acs_post_url, binding: Saml::Kit::Bindings::HTTP_POST },
+                                                                               { location: acs_redirect_url, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
+                                                                             ])
     end
 
     it 'returns each logout url and binding' do
       expect(subject.single_logout_services.map(&:to_h)).to match_array([
-        { location: logout_post_url, binding: Saml::Kit::Bindings::HTTP_POST },
-        { location: logout_redirect_url, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
-      ])
+                                                                          { location: logout_post_url, binding: Saml::Kit::Bindings::HTTP_POST },
+                                                                          { location: logout_redirect_url, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
+                                                                        ])
     end
 
     it 'returns each of the nameid formats' do
       expect(subject.name_id_formats).to match_array([
-        Saml::Kit::Namespaces::PERSISTENT
-      ])
+                                                       Saml::Kit::Namespaces::PERSISTENT
+                                                     ])
     end
 
     it 'returns the entity id' do
@@ -48,7 +48,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     end
   end
 
-  describe "#validate" do
+  describe '#validate' do
     let(:service_provider_metadata) do
       described_class.build(configuration: configuration) do |builder|
         builder.entity_id = entity_id
@@ -69,9 +69,9 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     end
 
     it 'is invalid, when given identity provider metadata' do
-      subject = described_class.new(IO.read("spec/fixtures/metadata/okta.xml"))
+      subject = described_class.new(IO.read('spec/fixtures/metadata/okta.xml'))
       expect(subject).to be_invalid
-      expect(subject.errors[:base]).to include(I18n.translate("saml/kit.errors.SPSSODescriptor.invalid"))
+      expect(subject.errors[:base]).to include(I18n.translate('saml/kit.errors.SPSSODescriptor.invalid'))
     end
 
     it 'is invalid, when the metadata is nil' do
@@ -89,7 +89,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
         end
       end
       subject = described_class.new(xml.target!)
-      expect(subject).to_not be_valid
+      expect(subject).not_to be_valid
       expect(subject.errors[:base][0]).to include("1:0: ERROR: Element '{urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor'")
     end
 
@@ -98,7 +98,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
       metadata_xml = service_provider_metadata.gsub(acs_post_url, new_url)
       subject = described_class.new(metadata_xml)
       expect(subject).to be_invalid
-      expect(subject.errors[:digest_value]).to include("is invalid.")
+      expect(subject.errors[:digest_value]).to include('is invalid.')
     end
 
     it 'is invalid when 0 ACS endpoints are specified' do
@@ -106,7 +106,7 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 <?xml version="1.0" encoding="UTF-8"?>
 <EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{::Xml::Kit::Id.generate}" entityID="#{entity_id}">
   <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
-    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
+    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
     <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
   </SPSSODescriptor>
 </EntityDescriptor>
@@ -115,29 +115,30 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     end
   end
 
-  describe "#matches?" do
+  describe '#matches?' do
+    subject { described_class.build(configuration: configuration) }
+
     let(:configuration) do
       config = Saml::Kit::Configuration.new
       config.generate_key_pair_for(use: :signing)
       config
     end
-    subject { Saml::Kit::ServiceProviderMetadata.build(configuration: configuration) }
 
     it 'returns true when the fingerprint matches one of the signing certificates' do
       certificate = Hash.from_xml(subject.to_xml)['EntityDescriptor']['Signature']['KeyInfo']['X509Data']['X509Certificate']
       fingerprint = ::Xml::Kit::Fingerprint.new(certificate)
-      expect(subject.matches?(fingerprint)).to be_truthy
+      expect(subject).to be_matches(fingerprint)
     end
 
     it 'returns false when the fingerprint does not match one of the signing certificates' do
-      certificate, _ = ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: 'password')
+      certificate, = ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: 'password')
       fingerprint = ::Xml::Kit::Fingerprint.new(certificate)
-      expect(subject.matches?(fingerprint)).to be_falsey
+      expect(subject).not_to be_matches(fingerprint)
     end
   end
 
-  describe ".build" do
-    let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
+  describe '.build' do
+    let(:assertion_consumer_service_url) { FFaker::Internet.uri('https') }
 
     it 'provides a nice API for building metadata' do
       result = described_class.build do |builder|

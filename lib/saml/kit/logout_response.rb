@@ -10,7 +10,7 @@ module Saml
 
       def initialize(xml, request_id: nil, configuration: Saml::Kit.configuration)
         @request_id = request_id
-        super(xml, name: "LogoutResponse", configuration: configuration)
+        super(xml, name: 'LogoutResponse', configuration: configuration)
       end
     end
   end

@@ -1,12 +1,12 @@
 module Saml
   module Kit
     class Assertion
-      XPATH=[
+      include ActiveModel::Validations
+      include Translatable
+      XPATH = [
         '/samlp:Response/saml:Assertion',
         '/samlp:Response/saml:EncryptedAssertion'
       ].join('|')
-      include ActiveModel::Validations
-      include Translatable
 
       validate :must_be_decryptable
       validate :must_match_issuer, if: :decryptable?
@@ -16,15 +16,15 @@ module Saml
       attr_accessor :occurred_at
 
       def initialize(node, configuration: Saml::Kit.configuration, private_keys: [])
-        @name = "Assertion"
+        @name = 'Assertion'
         @node = node
         @xml_hash = hash_from(node)['Response'] || {}
         @configuration = configuration
         @occurred_at = Time.current
         decrypt!(::Xml::Kit::Decryption.new(
-          private_keys: (
-            configuration.private_keys(use: :encryption) + private_keys
-          ).uniq
+                   private_keys: (
+                     configuration.private_keys(use: :encryption) + private_keys
+                   ).uniq
         ))
       end
 
@@ -58,7 +58,7 @@ module Saml
           begin
             attrs = assertion.fetch('AttributeStatement', {}).fetch('Attribute', [])
             items = if attrs.is_a? Hash
-                      [[attrs["Name"], attrs["AttributeValue"]]]
+                      [[attrs['Name'], attrs['AttributeValue']]]
                     else
                       attrs.map { |item| [item['Name'], item['AttributeValue']] }
                     end
@@ -76,7 +76,7 @@ module Saml
 
       def audiences
         Array(assertion['Conditions']['AudienceRestriction']['Audience'])
-      rescue => error
+      rescue StandardError => error
         Saml::Kit.logger.error(error)
         []
       end
@@ -123,7 +123,7 @@ module Saml
 
       def parse_date(value)
         DateTime.parse(value)
-      rescue => error
+      rescue StandardError => error
         Saml::Kit.logger.error(error)
         Time.at(0).to_datetime
       end

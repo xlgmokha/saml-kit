@@ -6,9 +6,13 @@ Saml::Kit.deprecate("Use the 'saml-kit-cli' gem instead. saml-kit-decode-http-re
 input = STDIN.read
 binding = Saml::Kit::Bindings::HttpRedirect.new(location: '')
 
-uri = URI.parse(input) rescue nil
+uri = begin
+        URI.parse(input)
+      rescue StandardError
+        nil
+      end
 if uri
-  query_params =  Hash[uri.query.split('&').map { |x| x.split('=', 2) }]
+  query_params = Hash[uri.query.split('&').map { |x| x.split('=', 2) }]
   puts binding.deserialize(query_params).to_xml(pretty: true)
 else
   puts binding.deserialize('SAMLRequest' => input).to_xml(pretty: true)

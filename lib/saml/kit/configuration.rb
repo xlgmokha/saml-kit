@@ -20,7 +20,7 @@ module Saml
     #     configuration.add_key_pair(ENV["X509_CERTIFICATE"], ENV["PRIVATE_KEY"], passphrase: ENV['PRIVATE_KEY_PASSPHRASE'], use: :encryption)
     #   end
     class Configuration
-      USES = [:signing, :encryption]
+      USES = %i[signing encryption].freeze
       # The issuer to use in requests or responses from this entity to use.
       attr_accessor :entity_id
       # The signature method to use when generating signatures (See {Saml::Kit::Builders::XmlSignature::SIGNATURE_METHODS})
@@ -98,8 +98,8 @@ module Saml
 
       def ensure_proper_use!(use)
         unless USES.include?(use)
-          error_message = "Use must be either :signing or :encryption"
-          raise ArgumentError.new(error_message)
+          error_message = 'Use must be either :signing or :encryption'
+          raise ArgumentError, error_message
         end
       end
     end

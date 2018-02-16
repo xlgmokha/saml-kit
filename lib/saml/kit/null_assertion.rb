@@ -10,7 +10,7 @@ module Saml
       end
 
       def name
-        "NullAssertion"
+        'NullAssertion'
       end
     end
   end

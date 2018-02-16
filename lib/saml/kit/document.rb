@@ -1,20 +1,20 @@
 module Saml
   module Kit
     class Document
-      PROTOCOL_XSD = File.expand_path("./xsd/saml-schema-protocol-2.0.xsd", File.dirname(__FILE__)).freeze
+      include ActiveModel::Validations
+      include XsdValidatable
+      include Translatable
+      include Trustable
+      include Buildable
+      PROTOCOL_XSD = File.expand_path('./xsd/saml-schema-protocol-2.0.xsd', File.dirname(__FILE__)).freeze
       NAMESPACES = {
         "NameFormat": ::Saml::Kit::Namespaces::ATTR_SPLAT,
         "ds": ::Xml::Kit::Namespaces::XMLDSIG,
         "md": ::Saml::Kit::Namespaces::METADATA,
         "saml": ::Saml::Kit::Namespaces::ASSERTION,
         "samlp": ::Saml::Kit::Namespaces::PROTOCOL,
-        "xmlenc" => ::Xml::Kit::Namespaces::XMLENC,
+        'xmlenc' => ::Xml::Kit::Namespaces::XMLENC,
       }.freeze
-      include ActiveModel::Validations
-      include XsdValidatable
-      include Translatable
-      include Trustable
-      include Buildable
       validates_presence_of :content
       validates_presence_of :id
       validate :must_match_xsd
@@ -64,7 +64,7 @@ module Saml
         pretty ? to_nokogiri.to_xml(indent: 2) : content
       end
 
-      # Returns the SAML document as an XHTML string. 
+      # Returns the SAML document as an XHTML string.
       # This is useful for rendering in a web page.
       def to_xhtml
         Nokogiri::XML(to_xml, &:noblanks).to_xhtml
@@ -91,11 +91,11 @@ module Saml
 
       class << self
         XPATH = [
-          "/samlp:AuthnRequest",
-          "/samlp:LogoutRequest",
-          "/samlp:LogoutResponse",
-          "/samlp:Response",
-        ].join("|")
+          '/samlp:AuthnRequest',
+          '/samlp:LogoutRequest',
+          '/samlp:LogoutResponse',
+          '/samlp:Response',
+        ].join('|')
 
         # Returns the raw xml as a Saml::Kit SAML document.
         #
@@ -103,16 +103,16 @@ module Saml
         # @param configuration [Saml::Kit::Configuration] the configuration to use for unpacking the document.
         def to_saml_document(xml, configuration: Saml::Kit.configuration)
           xml_document = ::Xml::Kit::Document.new(xml, namespaces: {
-            "samlp": ::Saml::Kit::Namespaces::PROTOCOL
-          })
+                                                    "samlp": ::Saml::Kit::Namespaces::PROTOCOL
+                                                  })
           constructor = {
-            "AuthnRequest" => Saml::Kit::AuthenticationRequest,
-            "LogoutRequest" => Saml::Kit::LogoutRequest,
-            "LogoutResponse" => Saml::Kit::LogoutResponse,
-            "Response" => Saml::Kit::Response,
+            'AuthnRequest' => Saml::Kit::AuthenticationRequest,
+            'LogoutRequest' => Saml::Kit::LogoutRequest,
+            'LogoutResponse' => Saml::Kit::LogoutResponse,
+            'Response' => Saml::Kit::Response,
           }[xml_document.find_by(XPATH).name] || InvalidDocument
           constructor.new(xml, configuration: configuration)
-        rescue => error
+        rescue StandardError => error
           Saml::Kit.logger.error(error)
           InvalidDocument.new(xml, configuration: configuration)
         end
@@ -129,7 +129,7 @@ module Saml
           when Saml::Kit::LogoutRequest.to_s
             Saml::Kit::Builders::LogoutRequest
           else
-            raise ArgumentError.new("Unknown SAML Document #{name}")
+            raise ArgumentError, "Unknown SAML Document #{name}"
           end
         end
       end
@@ -156,7 +156,7 @@ module Saml
 
       def must_be_valid_version
         return unless expected_type?
-        return if "2.0" == version
+        return if version == '2.0'
         errors[:version] << error_message(:invalid_version)
       end
     end

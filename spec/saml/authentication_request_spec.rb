@@ -1,5 +1,6 @@
 RSpec.describe Saml::Kit::AuthenticationRequest do
   subject { described_class.new(raw_xml, configuration: configuration) }
+
   let(:id) { Xml::Kit::Id.generate }
   let(:assertion_consumer_service_url) { "https://#{FFaker::Internet.domain_name}/acs" }
   let(:issuer) { FFaker::Movie.title }
@@ -27,11 +28,11 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   it { expect(subject.name_id_format).to eql(name_id_format) }
   it { expect(subject.destination).to eql(destination) }
 
-  describe "#valid?" do
+  describe '#valid?' do
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { Saml::Kit::ServiceProviderMetadata.build(configuration: configuration) }
 
-    before :each do
+    before do
       allow(configuration).to receive(:registry).and_return(registry)
       allow(registry).to receive(:metadata_for).and_return(metadata)
     end
@@ -82,10 +83,10 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       id = Xml::Kit::Id.generate
       key_pair = ::Xml::Kit::KeyPair.generate(use: :signing)
       signed_xml = ::Xml::Kit::Signatures.sign(key_pair: key_pair) do |xml, signature|
-        xml.tag!('samlp:AuthnRequest', "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, AssertionConsumerServiceURL: assertion_consumer_service_url, ID: id) do
+        xml.tag!('samlp:AuthnRequest', 'xmlns:samlp' => Saml::Kit::Namespaces::PROTOCOL, AssertionConsumerServiceURL: assertion_consumer_service_url, ID: id) do
           signature.template(id)
           xml.Fake do
-            xml.NotAllowed "Huh?"
+            xml.NotAllowed 'Huh?'
           end
         end
       end
@@ -134,7 +135,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       expect(subject).to be_invalid
     end
 
-    context "when the certificate is expired" do
+    context 'when the certificate is expired' do
       let(:expired_certificate) do
         certificate = OpenSSL::X509::Certificate.new
         certificate.public_key = private_key.public_key
@@ -145,7 +146,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       let(:private_key) { OpenSSL::PKey::RSA.new(2048) }
       let(:digest_algorithm) { OpenSSL::Digest::SHA256.new }
 
-      before :each do
+      before do
         expired_certificate.sign(private_key, digest_algorithm)
       end
 
@@ -162,7 +163,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
   end
 
-  describe "#assertion_consumer_service_url" do
+  describe '#assertion_consumer_service_url' do
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::ServiceProviderMetadata) }
 
@@ -182,9 +183,9 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
   end
 
-  describe ".build" do
-    let(:url) { FFaker::Internet.uri("https") }
-    let(:entity_id) { FFaker::Internet.uri("https") }
+  describe '.build' do
+    let(:url) { FFaker::Internet.uri('https') }
+    let(:entity_id) { FFaker::Internet.uri('https') }
 
     it 'provides a nice API for building metadata' do
       result = described_class.build do |builder|
@@ -198,11 +199,11 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
   end
 
-  describe "#response_for" do
+  describe '#response_for' do
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
     let(:provider) do
       Saml::Kit::ServiceProviderMetadata.build do |x|
-        x.add_assertion_consumer_service(FFaker::Internet.uri("https"), binding: :http_post)
+        x.add_assertion_consumer_service(FFaker::Internet.uri('https'), binding: :http_post)
       end
     end
 
@@ -229,7 +230,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
   end
 
-  describe "#signature.valid?" do
+  describe '#signature.valid?' do
     it 'returns true when the signature is valid' do
       expect(subject.signature).to be_valid
     end
@@ -237,7 +238,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     it 'returns false when the signature does not match' do
       raw_xml.gsub!(issuer, 'corrupt')
       subject = described_class.new(raw_xml, configuration: configuration)
-      expect(subject.signature).to_not be_valid
+      expect(subject.signature).not_to be_valid
     end
   end
 end

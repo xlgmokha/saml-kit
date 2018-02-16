@@ -12,7 +12,7 @@ module Saml
 
       def initialize(xml, request_id: nil, configuration: Saml::Kit.configuration)
         @request_id = request_id
-        super(xml, name: "Response", configuration: configuration)
+        super(xml, name: 'Response', configuration: configuration)
       end
 
       def assertion(private_keys = configuration.private_keys(use: :encryption))
@@ -32,8 +32,8 @@ module Saml
       def must_be_valid_assertion
         assertion.valid?
         assertion.errors.each do |attribute, error|
-          attribute = :assertion if :base == attribute
-          self.errors[attribute] << error
+          attribute = :assertion if attribute == :base
+          errors[attribute] << error
         end
       end
 

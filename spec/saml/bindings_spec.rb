@@ -1,15 +1,16 @@
 RSpec.describe Saml::Kit::Bindings do
-  describe ".to_symbol" do
+  describe '.to_symbol' do
     subject { described_class }
 
-    it { expect(subject.to_symbol(Saml::Kit::Bindings::HTTP_POST)).to eql(:http_post) }
-    it { expect(subject.to_symbol(Saml::Kit::Bindings::HTTP_REDIRECT)).to eql(:http_redirect) }
+    it { expect(subject.to_symbol(Saml::Kit::Bindings::HTTP_POST)).to be(:http_post) }
+    it { expect(subject.to_symbol(Saml::Kit::Bindings::HTTP_REDIRECT)).to be(:http_redirect) }
     it { expect(subject.to_symbol('unknown')).to eql('unknown') }
   end
 
-  describe ".create_for" do
+  describe '.create_for' do
     subject { described_class }
-    let(:location) { FFaker::Internet.uri("https") }
+
+    let(:location) { FFaker::Internet.uri('https') }
 
     it 'returns an HTTP redirect binding' do
       expect(

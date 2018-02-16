@@ -4,7 +4,7 @@ xml.Assertion(assertion_options) do
   xml.Subject do
     xml.NameID name_id, Format: name_id_format
     xml.SubjectConfirmation Method: Saml::Kit::Namespaces::BEARER do
-      xml.SubjectConfirmationData "", subject_confirmation_data_options
+      xml.SubjectConfirmationData '', subject_confirmation_data_options
     end
   end
   xml.Conditions conditions_options do

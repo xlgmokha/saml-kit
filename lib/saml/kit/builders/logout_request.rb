@@ -16,7 +16,7 @@ module Saml
           @issuer = configuration.entity_id
           @name_id_format = Saml::Kit::Namespaces::PERSISTENT
           @now = Time.now.utc
-          @version = "2.0"
+          @version = '2.0'
         end
 
         def build

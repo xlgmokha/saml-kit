@@ -1,10 +1,12 @@
 RSpec.describe Saml::Kit::Response do
-  describe "#valid?" do
+  describe '#valid?' do
+    subject { described_class.build(user, request, configuration: configuration) }
+
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
-    subject { described_class.build(user, request, configuration: configuration) }
+
     let(:configuration) do
       Saml::Kit::Configuration.new do |config|
         config.entity_id = request.issuer
@@ -21,10 +23,10 @@ RSpec.describe Saml::Kit::Response do
 
     it 'is invalid when blank' do
       allow(registry).to receive(:metadata_for).and_return(nil)
-      subject = described_class.new("")
+      subject = described_class.new('')
       expect(subject).to be_invalid
       expect(subject.errors[:content]).to be_present
-      expect(subject.errors[:assertion]).to match_array(["is missing."])
+      expect(subject.errors[:assertion]).to match_array(['is missing.'])
     end
 
     it 'is invalid if the document has been tampered with' do
@@ -33,7 +35,7 @@ RSpec.describe Saml::Kit::Response do
       status_code = FFaker::Movie.title
       xml = described_class.build(user, request) do |builder|
         builder.status_code = status_code
-      end.to_xml.gsub(status_code, "TAMPERED")
+      end.to_xml.gsub(status_code, 'TAMPERED')
       subject = described_class.new(xml)
       expect(subject).to be_invalid
     end
@@ -58,10 +60,10 @@ RSpec.describe Saml::Kit::Response do
       id = Xml::Kit::Id.generate
       key_pair = ::Xml::Kit::KeyPair.generate(use: :signing)
       signed_xml = ::Xml::Kit::Signatures.sign(key_pair: key_pair) do |xml, signature|
-        xml.tag! "samlp:Response", "xmlns:samlp" => Saml::Kit::Namespaces::PROTOCOL, ID: id do
+        xml.tag! 'samlp:Response', 'xmlns:samlp' => Saml::Kit::Namespaces::PROTOCOL, ID: id do
           signature.template(id)
           xml.Fake do
-            xml.NotAllowed "Huh?"
+            xml.NotAllowed 'Huh?'
           end
         end
       end
@@ -74,7 +76,7 @@ RSpec.describe Saml::Kit::Response do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       subject = described_class.build(user, request) do |builder|
-        builder.version = "1.1"
+        builder.version = '1.1'
       end
       expect(subject).to be_invalid
       expect(subject.errors[:version]).to be_present
@@ -116,8 +118,8 @@ RSpec.describe Saml::Kit::Response do
 
       subject = described_class.build(user, request)
       travel_to Saml::Kit.configuration.session_timeout.from_now + 5.seconds
-      expect(subject).to_not be_valid
-      expect(subject.errors[:assertion]).to match_array(["must not be expired."])
+      expect(subject).not_to be_valid
+      expect(subject.errors[:assertion]).to match_array(['must not be expired.'])
     end
 
     it 'is invalid before the valid session window' do
@@ -127,15 +129,15 @@ RSpec.describe Saml::Kit::Response do
       subject = described_class.build(user, request)
       travel_to (Saml::Kit.configuration.clock_drift + 1.second).before(Time.now)
       expect(subject).to be_invalid
-      expect(subject.errors[:assertion]).to match_array(["must not be expired."])
+      expect(subject.errors[:assertion]).to match_array(['must not be expired.'])
     end
 
     it 'is invalid when the audience does not match the expected issuer' do
       allow(registry).to receive(:metadata_for).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
 
-      allow(configuration).to receive(:issuer).and_return(FFaker::Internet.uri("https"))
-      allow(request).to receive(:issuer).and_return(FFaker::Internet.uri("https"))
+      allow(configuration).to receive(:issuer).and_return(FFaker::Internet.uri('https'))
+      allow(request).to receive(:issuer).and_return(FFaker::Internet.uri('https'))
 
       expect(subject).to be_invalid
       expect(subject.errors[:audience]).to be_present
@@ -143,7 +145,7 @@ RSpec.describe Saml::Kit::Response do
 
     it 'is invalid' do
       now = Time.now.utc
-      destination = FFaker::Internet.uri("https")
+      destination = FFaker::Internet.uri('https')
       raw_xml = <<-XML
 <?xml version="1.0"?>
 <samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" ID="#{Xml::Kit::Id.generate}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{destination}" Consent="#{Saml::Kit::Namespaces::UNSPECIFIED}" InResponseTo="#{request.id}">
@@ -161,11 +163,11 @@ RSpec.describe Saml::Kit::Response do
 
     it 'is invalid when there are 2 assertions' do
       id = Xml::Kit::Id.generate
-      issuer = FFaker::Internet.uri("https")
+      issuer = FFaker::Internet.uri('https')
       key_pair = ::Xml::Kit::KeyPair.generate(use: :signing)
       response_options = {
         ID: id,
-        Version: "2.0",
+        Version: '2.0',
         IssueInstant: Time.now.iso8601,
         Consent: Saml::Kit::Namespaces::UNSPECIFIED,
         InResponseTo: request.id,
@@ -174,7 +176,7 @@ RSpec.describe Saml::Kit::Response do
       assertion_options = {
         ID: Xml::Kit::Id.generate,
         IssueInstant: Time.now.iso8601,
-        Version: "2.0",
+        Version: '2.0',
         xmlns: Saml::Kit::Namespaces::ASSERTION,
       }
       xml = ::Xml::Kit::Signatures.sign(key_pair: key_pair) do |xml, signature|
@@ -190,7 +192,7 @@ RSpec.describe Saml::Kit::Response do
             xml.Subject do
               xml.NameID FFaker::Internet.email, Format: Saml::Kit::Namespaces::EMAIL_ADDRESS
               xml.SubjectConfirmation Method: Saml::Kit::Namespaces::BEARER do
-                xml.SubjectConfirmationData "", InResponseTo: request.id, NotOnOrAfter: 3.hours.from_now.utc.iso8601, Recipient: FFaker::Internet.uri("https")
+                xml.SubjectConfirmationData '', InResponseTo: request.id, NotOnOrAfter: 3.hours.from_now.utc.iso8601, Recipient: FFaker::Internet.uri('https')
               end
             end
             xml.Conditions NotBefore: Time.now.utc.iso8601, NotOnOrAfter: 3.hours.from_now.utc.iso8601 do
@@ -210,7 +212,7 @@ RSpec.describe Saml::Kit::Response do
             xml.Subject do
               xml.NameID FFaker::Internet.email, Format: Saml::Kit::Namespaces::EMAIL_ADDRESS
               xml.SubjectConfirmation Method: Saml::Kit::Namespaces::BEARER do
-                xml.SubjectConfirmationData "", InResponseTo: request.id, NotOnOrAfter: 3.hours.from_now.utc.iso8601, Recipient: FFaker::Internet.uri("https")
+                xml.SubjectConfirmationData '', InResponseTo: request.id, NotOnOrAfter: 3.hours.from_now.utc.iso8601, Recipient: FFaker::Internet.uri('https')
               end
             end
             xml.Conditions NotBefore: Time.now.utc.iso8601, NotOnOrAfter: 3.hours.from_now.utc.iso8601 do
@@ -227,8 +229,8 @@ RSpec.describe Saml::Kit::Response do
         end
       end
       subject = described_class.new(xml)
-      expect(subject).to_not be_valid
-      expect(subject.errors.full_messages).to include("must contain a single Assertion.")
+      expect(subject).not_to be_valid
+      expect(subject.errors.full_messages).to include('must contain a single Assertion.')
     end
 
     it 'is invalid when the assertion has a signature and has been tampered with' do
@@ -241,7 +243,7 @@ RSpec.describe Saml::Kit::Response do
 
       altered_xml = document.to_xml.gsub(/token/, 'heck')
       subject = described_class.new(altered_xml)
-      expect(subject).to_not be_valid
+      expect(subject).not_to be_valid
       expect(subject.errors[:digest_value]).to be_present
     end
 
@@ -252,14 +254,14 @@ RSpec.describe Saml::Kit::Response do
 
       subject = described_class.new(xml)
       expect(subject).to be_invalid
-      expect(subject.errors[:assertion]).to match_array(["cannot be decrypted."])
+      expect(subject.errors[:assertion]).to match_array(['cannot be decrypted.'])
     end
   end
 
-  describe "#signed?" do
+  describe '#signed?' do
     let(:now) { Time.now.utc }
     let(:id) { Xml::Kit::Id.generate }
-    let(:url) { FFaker::Internet.uri("https") }
+    let(:url) { FFaker::Internet.uri('https') }
 
     it 'returns true when the Assertion is signed' do
       xml = <<-XML
@@ -290,7 +292,7 @@ RSpec.describe Saml::Kit::Response do
 </samlp:Response>
       XML
       subject = described_class.new(xml)
-      expect(subject).to_not be_signed
+      expect(subject).not_to be_signed
       expect(subject.assertion).to be_signed
     end
 
@@ -333,17 +335,17 @@ RSpec.describe Saml::Kit::Response do
 </samlp:Response>
       XML
       subject = described_class.new(xml)
-      expect(subject).to_not be_signed
+      expect(subject).not_to be_signed
     end
   end
 
-  describe "#certificate" do
+  describe '#certificate' do
     let(:now) { Time.now.utc }
     let(:id) { Xml::Kit::Id.generate }
-    let(:url) { FFaker::Internet.uri("https") }
+    let(:url) { FFaker::Internet.uri('https') }
     let(:certificate) do
       ::Xml::Kit::Certificate.new(
-        ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: "password")[0],
+        ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: 'password')[0],
         use: :signing
       )
     end
@@ -377,7 +379,7 @@ RSpec.describe Saml::Kit::Response do
 </samlp:Response>
       XML
       subject = described_class.new(xml)
-      expect(subject.signature).to_not be_present
+      expect(subject.signature).not_to be_present
       expect(subject.assertion.signature).to be_present
       expect(subject.assertion.signature.certificate.stripped).to eql(certificate.stripped)
     end
@@ -421,21 +423,21 @@ RSpec.describe Saml::Kit::Response do
 </samlp:Response>
       XML
       subject = described_class.new(xml)
-      expect(subject.signature).to_not be_present
+      expect(subject.signature).not_to be_present
     end
   end
 
-  describe "encrypted assertion" do
+  describe 'encrypted assertion' do
     let(:id) { Xml::Kit::Id.generate }
     let(:now) { Time.now.utc }
-    let(:assertion_consumer_service_url) { FFaker::Internet.uri("https") }
+    let(:assertion_consumer_service_url) { FFaker::Internet.uri('https') }
     let(:password) { FFaker::Movie.title }
     let(:email) { FFaker::Internet.email }
     let(:created_at) { DateTime.now }
     let(:assertion) do
       <<-XML
 <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" IssueInstant="2017-11-23T04:33:58Z" Version="2.0">
- <Issuer>#{FFaker::Internet.uri("https")}</Issuer>
+ <Issuer>#{FFaker::Internet.uri('https')}</Issuer>
  <Subject>
    <NameID Format="#{Saml::Kit::Namespaces::PERSISTENT}">#{SecureRandom.uuid}</NameID>
    <SubjectConfirmation Method="#{Saml::Kit::Namespaces::BEARER}">
@@ -479,7 +481,7 @@ XML
 
       xml = <<-XML
 <samlp:Response xmlns:samlp="#{Saml::Kit::Namespaces::PROTOCOL}" xmlns:saml="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" Version="2.0" IssueInstant="#{now.iso8601}" Destination="#{assertion_consumer_service_url}" InResponseTo="#{Xml::Kit::Id.generate}">
-  <saml:Issuer>#{FFaker::Internet.uri("https")}</saml:Issuer>
+  <saml:Issuer>#{FFaker::Internet.uri('https')}</saml:Issuer>
   <samlp:Status>
     <samlp:StatusCode Value="#{Saml::Kit::Namespaces::SUCCESS}"/>
   </samlp:Status>
@@ -504,15 +506,15 @@ XML
 
       subject = described_class.new(xml)
       expect(subject.attributes).to match_array([
-        ["created_at", created_at.iso8601],
-        ["email", email]
-      ])
+                                                  ['created_at', created_at.iso8601],
+                                                  ['email', email]
+                                                ])
     end
   end
 
-  describe "parsing" do
+  describe 'parsing' do
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: attributes) }
-    let(:request) { double(:request, id: Xml::Kit::Id.generate, signed?: true, trusted?: true, provider: nil, assertion_consumer_service_url: FFaker::Internet.uri("https"), name_id_format: '', issuer: FFaker::Internet.uri("https")) }
+    let(:request) { double(:request, id: Xml::Kit::Id.generate, signed?: true, trusted?: true, provider: nil, assertion_consumer_service_url: FFaker::Internet.uri('https'), name_id_format: '', issuer: FFaker::Internet.uri('https')) }
     let(:attributes) { { name: 'mo' } }
 
     it 'returns the name id' do

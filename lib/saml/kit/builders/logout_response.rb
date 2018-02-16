@@ -16,7 +16,7 @@ module Saml
           @now = Time.now.utc
           @request = request
           @status_code = Namespaces::SUCCESS
-          @version = "2.0"
+          @version = '2.0'
         end
 
         def build

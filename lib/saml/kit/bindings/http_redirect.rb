@@ -35,25 +35,25 @@ module Saml
           return if document.provider.nil?
 
           if document.provider.verify(
-              algorithm_for(params[:SigAlg]),
-              decode(params[:Signature]),
-              canonicalize(params)
+            algorithm_for(params[:SigAlg]),
+            decode(params[:Signature]),
+            canonicalize(params)
           )
             document.signature_verified!
           else
-            raise ArgumentError.new("Invalid Signature")
+            raise ArgumentError, 'Invalid Signature'
           end
         end
 
         def canonicalize(params)
-          [:SAMLRequest, :SAMLResponse, :RelayState, :SigAlg].map do |key|
+          %i[SAMLRequest SAMLResponse RelayState SigAlg].map do |key|
             value = params[key]
             value.present? ? "#{key}=#{value}" : nil
           end.compact.join('&')
         end
 
         def algorithm_for(algorithm)
-          case algorithm =~ /(rsa-)?sha(.*?)$/i && $2.to_i
+          case algorithm =~ /(rsa-)?sha(.*?)$/i && Regexp.last_match(2).to_i
           when 256
             OpenSSL::Digest::SHA256.new
           when 384

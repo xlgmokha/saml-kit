@@ -17,7 +17,7 @@ module Saml
           @id = ::Xml::Kit::Id.generate
           @reference_id = ::Xml::Kit::Id.generate
           @now = Time.now.utc
-          @version = "2.0"
+          @version = '2.0'
           @status_code = Namespaces::SUCCESS
           @issuer = configuration.entity_id
           @encryption_certificate = request.try(:provider).try(:encryption_certificates).try(:last)

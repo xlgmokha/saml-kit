@@ -54,7 +54,7 @@ Metrics/LineLength:
     - 'spec/**/*.rb'
 
 Style/StringLiterals:
-  EnforcedStyle: 'double_quotes'
+  EnforcedStyle: 'single_quotes'
 
 Style/TrailingCommaInLiteral:
   Enabled: false

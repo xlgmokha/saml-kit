@@ -1,7 +1,8 @@
 RSpec.describe Saml::Kit::Builders::Metadata do
-  describe ".build" do
+  describe '.build' do
     subject { Saml::Kit::Metadata }
-    let(:url) { FFaker::Internet.uri("https") }
+
+    let(:url) { FFaker::Internet.uri('https') }
 
     it 'builds metadata for a service provider' do
       result = subject.build do |builder|
@@ -57,7 +58,7 @@ RSpec.describe Saml::Kit::Builders::Metadata do
         3.times { config.generate_key_pair_for(use: :signing) }
       end
       metadata = Saml::Kit::Metadata.build(configuration: configuration) do |builder|
-        builder.entity_id = FFaker::Internet.uri("https")
+        builder.entity_id = FFaker::Internet.uri('https')
         builder.build_identity_provider do |x|
           x.embed_signature = true
           x.add_single_sign_on_service(url, binding: :http_post)

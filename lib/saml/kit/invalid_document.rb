@@ -7,12 +7,12 @@ module Saml
       end
 
       def initialize(xml, configuration: nil)
-        super(xml, name: "InvalidDocument")
+        super(xml, name: 'InvalidDocument')
       end
 
       def to_h
         super
-      rescue
+      rescue StandardError
         {}
       end
     end

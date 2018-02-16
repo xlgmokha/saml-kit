@@ -1,27 +1,28 @@
 RSpec.describe Saml::Kit::Bindings::HttpPost do
-  let(:location) { FFaker::Internet.uri("https") }
   subject { described_class.new(location: location) }
 
-  describe "equality" do
+  let(:location) { FFaker::Internet.uri('https') }
+
+  describe 'equality' do
     it 'is referentially equal' do
       expect(subject).to eql(subject)
     end
 
     it 'is equal by value' do
       expect(subject).to eql(
-        Saml::Kit::Bindings::HttpPost.new(location: location)
+        described_class.new(location: location)
       )
     end
 
     it 'is not equal' do
-      expect(subject).to_not eql(
-        described_class.new(location: FFaker::Internet.uri("https"))
+      expect(subject).not_to eql(
+        described_class.new(location: FFaker::Internet.uri('https'))
       )
     end
   end
 
-  describe "#serialize" do
-    let(:relay_state) { "ECHO" }
+  describe '#serialize' do
+    let(:relay_state) { 'ECHO' }
     let(:configuration) do
       Saml::Kit::Configuration.new do |config|
         config.generate_key_pair_for(use: :signing)
@@ -74,11 +75,11 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
       url, saml_params = subject.serialize(builder)
 
       expect(url).to eql(location)
-      expect(saml_params.keys).to_not include('RelayState')
+      expect(saml_params.keys).not_to include('RelayState')
     end
   end
 
-  describe "#deserialize" do
+  describe '#deserialize' do
     it 'deserializes to an AuthnRequest' do
       builder = Saml::Kit::AuthenticationRequest.builder_class.new
       _, params = subject.serialize(builder)

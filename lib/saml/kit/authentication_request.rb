@@ -25,7 +25,7 @@ module Saml
       # @param xml [String] the raw xml.
       # @param configuration [Saml::Kit::Configuration] defaults to the global configuration.
       def initialize(xml, configuration: Saml::Kit.configuration)
-        super(xml, name: "AuthnRequest", configuration: configuration)
+        super(xml, name: 'AuthnRequest', configuration: configuration)
       end
 
       # Extract the AssertionConsumerServiceURL from the AuthnRequest

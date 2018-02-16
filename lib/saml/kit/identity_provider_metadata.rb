@@ -32,15 +32,15 @@ module Saml
     # {include:file:spec/examples/identity_provider_metadata_spec.rb}
     class IdentityProviderMetadata < Metadata
       def initialize(xml)
-        super("IDPSSODescriptor", xml)
+        super('IDPSSODescriptor', xml)
       end
 
       # Returns the IDPSSODescriptor/@WantAuthnRequestsSigned attribute.
       def want_authn_requests_signed
         xpath = "/md:EntityDescriptor/md:#{name}"
-        attribute = document.find_by(xpath).attribute("WantAuthnRequestsSigned")
+        attribute = document.find_by(xpath).attribute('WantAuthnRequestsSigned')
         return true if attribute.nil?
-        attribute.text.downcase == "true"
+        attribute.text.casecmp('true').zero?
       end
 
       # Returns each of the SingleSignOnService elements.
@@ -59,8 +59,8 @@ module Saml
       def attributes
         document.find_all("/md:EntityDescriptor/md:#{name}/saml:Attribute").map do |item|
           {
-            format: item.attribute("NameFormat").try(:value),
-            name: item.attribute("Name").value,
+            format: item.attribute('NameFormat').try(:value),
+            name: item.attribute('Name').value,
           }
         end
       end

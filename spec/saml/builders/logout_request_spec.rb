@@ -1,5 +1,6 @@
 RSpec.describe Saml::Kit::Builders::LogoutRequest do
   subject { described_class.new(user, configuration: configuration) }
+
   let(:user) { double(:user, name_id_for: name_id) }
   let(:name_id) { SecureRandom.uuid }
   let(:configuration) do
@@ -19,7 +20,7 @@ RSpec.describe Saml::Kit::Builders::LogoutRequest do
     xml_hash = Hash.from_xml(result)
 
     expect(xml_hash['LogoutRequest']['ID']).to eql(subject.id)
-    expect(xml_hash['LogoutRequest']['Version']).to eql("2.0")
+    expect(xml_hash['LogoutRequest']['Version']).to eql('2.0')
     expect(xml_hash['LogoutRequest']['IssueInstant']).to eql(Time.now.utc.iso8601)
     expect(xml_hash['LogoutRequest']['Destination']).to eql(subject.destination)
 

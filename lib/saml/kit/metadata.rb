@@ -23,7 +23,11 @@ module Saml
     # for a list of options that can be specified.
     # {include:file:spec/examples/metadata_spec.rb}
     class Metadata
-      METADATA_XSD = File.expand_path("./xsd/saml-schema-metadata-2.0.xsd", File.dirname(__FILE__)).freeze
+      include ActiveModel::Validations
+      include XsdValidatable
+      include Translatable
+      include Buildable
+      METADATA_XSD = File.expand_path('./xsd/saml-schema-metadata-2.0.xsd', File.dirname(__FILE__)).freeze
       NAMESPACES = {
         "NameFormat": Namespaces::ATTR_SPLAT,
         "ds": ::Xml::Kit::Namespaces::XMLDSIG,
@@ -31,10 +35,6 @@ module Saml
         "saml": Namespaces::ASSERTION,
         "samlp": Namespaces::PROTOCOL,
       }.freeze
-      include ActiveModel::Validations
-      include XsdValidatable
-      include Translatable
-      include Buildable
 
       validates_presence_of :metadata
       validate :must_contain_descriptor
@@ -50,7 +50,7 @@ module Saml
 
       # Returns the /EntityDescriptor/@entityID
       def entity_id
-        document.find_by("/md:EntityDescriptor/@entityID").value
+        document.find_by('/md:EntityDescriptor/@entityID').value
       end
 
       # Returns the supported NameIDFormats.
@@ -60,23 +60,23 @@ module Saml
 
       # Returns the Organization Name
       def organization_name
-        document.find_by("/md:EntityDescriptor/md:Organization/md:OrganizationName").try(:text)
+        document.find_by('/md:EntityDescriptor/md:Organization/md:OrganizationName').try(:text)
       end
 
       # Returns the Organization URL
       def organization_url
-        document.find_by("/md:EntityDescriptor/md:Organization/md:OrganizationURL").try(:text)
+        document.find_by('/md:EntityDescriptor/md:Organization/md:OrganizationURL').try(:text)
       end
 
       # Returns the Company
       def contact_person_company
-        document.find_by("/md:EntityDescriptor/md:ContactPerson/md:Company").try(:text)
+        document.find_by('/md:EntityDescriptor/md:ContactPerson/md:Company').try(:text)
       end
 
       # Returns each of the X509 certificates.
       def certificates
         @certificates ||= document.find_all("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
-          cert = item.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", NAMESPACES).text
+          cert = item.at_xpath('./ds:KeyInfo/ds:X509Data/ds:X509Certificate', NAMESPACES).text
           attribute = item.attribute('use')
           use = attribute.nil? ? nil : item.attribute('use').value
           ::Xml::Kit::Certificate.new(cert, use: use)
@@ -98,8 +98,8 @@ module Saml
       # @param type [String] the type of service. .E.g. `AssertionConsumerServiceURL`
       def services(type)
         document.find_all("/md:EntityDescriptor/md:#{name}/md:#{type}").map do |item|
-          binding = item.attribute("Binding").value
-          location = item.attribute("Location").value
+          binding = item.attribute('Binding').value
+          location = item.attribute('Location').value
           Saml::Kit::Bindings.create_for(binding, location)
         end
       end
@@ -180,7 +180,7 @@ module Saml
       end
 
       def signature
-        @signature ||= Signature.new(at_xpath("/md:EntityDescriptor/ds:Signature"))
+        @signature ||= Signature.new(at_xpath('/md:EntityDescriptor/ds:Signature'))
       end
 
       class << self
@@ -190,12 +190,12 @@ module Saml
         # @return [Saml::Kit::Metadata] the metadata document or subclass.
         def from(content)
           hash = Hash.from_xml(content)
-          entity_descriptor = hash["EntityDescriptor"]
-          if entity_descriptor.key?("SPSSODescriptor") && entity_descriptor.key?("IDPSSODescriptor")
+          entity_descriptor = hash['EntityDescriptor']
+          if entity_descriptor.key?('SPSSODescriptor') && entity_descriptor.key?('IDPSSODescriptor')
             Saml::Kit::CompositeMetadata.new(content)
-          elsif entity_descriptor.keys.include?("SPSSODescriptor")
+          elsif entity_descriptor.keys.include?('SPSSODescriptor')
             Saml::Kit::ServiceProviderMetadata.new(content)
-          elsif entity_descriptor.keys.include?("IDPSSODescriptor")
+          elsif entity_descriptor.keys.include?('IDPSSODescriptor')
             Saml::Kit::IdentityProviderMetadata.new(content)
           end
         end

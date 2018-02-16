@@ -1,5 +1,5 @@
 RSpec.describe Saml::Kit::Assertion do
-  describe "#active?" do
+  describe '#active?' do
     let(:configuration) do
       Saml::Kit::Configuration.new do |config|
         config.session_timeout = 30.minutes
@@ -14,16 +14,16 @@ RSpec.describe Saml::Kit::Assertion do
       xml = <<-XML
 <Response>
 <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{Xml::Kit::Id.generate}" IssueInstant="#{now.iso8601}" Version="2.0">
- <Issuer>#{FFaker::Internet.uri("https")}</Issuer>
+ <Issuer>#{FFaker::Internet.uri('https')}</Issuer>
  <Subject>
    <NameID Format="#{Saml::Kit::Namespaces::PERSISTENT}">#{SecureRandom.uuid}</NameID>
    <SubjectConfirmation Method="#{Saml::Kit::Namespaces::BEARER}">
-     <SubjectConfirmationData InResponseTo="#{SecureRandom.uuid}" NotOnOrAfter="#{not_on_or_after}" Recipient="#{FFaker::Internet.uri("https")}"/>
+     <SubjectConfirmationData InResponseTo="#{SecureRandom.uuid}" NotOnOrAfter="#{not_on_or_after}" Recipient="#{FFaker::Internet.uri('https')}"/>
    </SubjectConfirmation>
  </Subject>
  <Conditions NotBefore="#{now.utc.iso8601}" NotOnOrAfter="#{not_on_or_after}">
    <AudienceRestriction>
-     <Audience>#{FFaker::Internet.uri("https")}</Audience>
+     <Audience>#{FFaker::Internet.uri('https')}</Audience>
    </AudienceRestriction>
  </Conditions>
  <AuthnStatement AuthnInstant="#{now.utc.iso8601}" SessionIndex="#{Xml::Kit::Id.generate}" SessionNotOnOrAfter="#{not_on_or_after}">
@@ -37,7 +37,7 @@ XML
       subject = described_class.new(Nokogiri::XML(xml), configuration: configuration)
       travel_to (configuration.clock_drift - 1.second).before(now)
       expect(subject).to be_active
-      expect(subject).to_not be_expired
+      expect(subject).not_to be_expired
     end
 
     it 'interprets integers correctly' do
@@ -49,16 +49,16 @@ XML
       xml = <<-XML
 <Response>
 <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{Xml::Kit::Id.generate}" IssueInstant="#{now.iso8601}" Version="2.0">
- <Issuer>#{FFaker::Internet.uri("https")}</Issuer>
+ <Issuer>#{FFaker::Internet.uri('https')}</Issuer>
  <Subject>
    <NameID Format="#{Saml::Kit::Namespaces::PERSISTENT}">#{SecureRandom.uuid}</NameID>
    <SubjectConfirmation Method="#{Saml::Kit::Namespaces::BEARER}">
-     <SubjectConfirmationData InResponseTo="#{SecureRandom.uuid}" NotOnOrAfter="#{not_after}" Recipient="#{FFaker::Internet.uri("https")}"/>
+     <SubjectConfirmationData InResponseTo="#{SecureRandom.uuid}" NotOnOrAfter="#{not_after}" Recipient="#{FFaker::Internet.uri('https')}"/>
    </SubjectConfirmation>
  </Subject>
  <Conditions NotBefore="#{not_before}" NotOnOrAfter="#{not_after}">
    <AudienceRestriction>
-     <Audience>#{FFaker::Internet.uri("https")}</Audience>
+     <Audience>#{FFaker::Internet.uri('https')}</Audience>
    </AudienceRestriction>
  </Conditions>
  <AuthnStatement AuthnInstant="#{now.utc.iso8601}" SessionIndex="#{Xml::Kit::Id.generate}" SessionNotOnOrAfter="#{not_after}">
@@ -71,14 +71,14 @@ XML
 XML
       subject = described_class.new(Nokogiri::XML(xml), configuration: configuration)
       expect(subject).to be_active
-      expect(subject).to_not be_expired
+      expect(subject).not_to be_expired
     end
   end
 
-  describe "#present?" do
+  describe '#present?' do
     it 'returns false when the assertion is empty' do
       subject = described_class.new(nil)
-      expect(subject).to_not be_present
+      expect(subject).not_to be_present
     end
 
     it 'returns true when the assertion is present' do
@@ -87,16 +87,16 @@ XML
       xml = <<-XML
 <Response>
 <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{Xml::Kit::Id.generate}" IssueInstant="#{Time.now.iso8601}" Version="2.0">
- <Issuer>#{FFaker::Internet.uri("https")}</Issuer>
+ <Issuer>#{FFaker::Internet.uri('https')}</Issuer>
  <Subject>
    <NameID Format="#{Saml::Kit::Namespaces::PERSISTENT}">#{SecureRandom.uuid}</NameID>
    <SubjectConfirmation Method="#{Saml::Kit::Namespaces::BEARER}">
-     <SubjectConfirmationData InResponseTo="#{SecureRandom.uuid}" NotOnOrAfter="#{not_after}" Recipient="#{FFaker::Internet.uri("https")}"/>
+     <SubjectConfirmationData InResponseTo="#{SecureRandom.uuid}" NotOnOrAfter="#{not_after}" Recipient="#{FFaker::Internet.uri('https')}"/>
    </SubjectConfirmation>
  </Subject>
  <Conditions NotBefore="#{not_before}" NotOnOrAfter="#{not_after}">
    <AudienceRestriction>
-     <Audience>#{FFaker::Internet.uri("https")}</Audience>
+     <Audience>#{FFaker::Internet.uri('https')}</Audience>
    </AudienceRestriction>
  </Conditions>
  <AuthnStatement AuthnInstant="#{Time.now.utc.iso8601}" SessionIndex="#{Xml::Kit::Id.generate}" SessionNotOnOrAfter="#{not_after}">
@@ -112,7 +112,7 @@ XML
     end
   end
 
-  describe "#signed?" do
+  describe '#signed?' do
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
 
@@ -128,7 +128,7 @@ XML
     end
   end
 
-  describe "#to_xml" do
+  describe '#to_xml' do
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
 
@@ -139,13 +139,13 @@ XML
         x.encrypt_with(encryption_key_pair)
       end
       assertion = response.assertion([encryption_key_pair.private_key])
-      expect(assertion.to_xml).to_not include("EncryptedAssertion")
-      expect(assertion.to_xml).to include("Assertion")
+      expect(assertion.to_xml).not_to include('EncryptedAssertion')
+      expect(assertion.to_xml).to include('Assertion')
     end
   end
 
-  describe "#valid?" do
-    let(:entity_id) { FFaker::Internet.uri("https") }
+  describe '#valid?' do
+    let(:entity_id) { FFaker::Internet.uri('https') }
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: entity_id, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:name_id) { SecureRandom.uuid }
     let(:user) { double(:user, name_id_for: name_id, assertion_attributes_for: { id: SecureRandom.uuid }) }
@@ -158,7 +158,7 @@ XML
       end
     end
 
-    before :each do
+    before do
       allow(configuration.registry).to receive(:metadata_for).with(entity_id).and_return(idp)
     end
 
@@ -166,7 +166,7 @@ XML
       xml = Saml::Kit::Response.build_xml(user, request, configuration: configuration)
       altered = xml.gsub(name_id, 'altered')
       document = Nokogiri::XML(altered)
-      assertion = document.at_xpath("/samlp:Response/saml:Assertion", Saml::Kit::Document::NAMESPACES)
+      assertion = document.at_xpath('/samlp:Response/saml:Assertion', Saml::Kit::Document::NAMESPACES)
       key_pair = Xml::Kit::KeyPair.generate(use: :encryption)
       encrypted = Xml::Kit::Encryption.new(assertion.to_xml, key_pair.public_key).to_xml
       response = Saml::Kit::Response.new(encrypted, configuration: configuration)

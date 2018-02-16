@@ -1,5 +1,6 @@
 RSpec.describe Saml::Kit::DefaultRegistry do
   subject { described_class.new }
+
   let(:entity_id) { FFaker::Internet.http_url }
   let(:service_provider_metadata) do
     Saml::Kit::ServiceProviderMetadata.build do |builder|
@@ -12,19 +13,19 @@ RSpec.describe Saml::Kit::DefaultRegistry do
     end
   end
 
-  describe "#metadata_for" do
+  describe '#metadata_for' do
     it 'returns the metadata for the entity_id' do
       subject.register(service_provider_metadata)
       expect(subject.metadata_for(entity_id)).to eql(service_provider_metadata)
     end
   end
 
-  describe "#register_url" do
+  describe '#register_url' do
     let(:url) { FFaker::Internet.http_url }
 
     it 'fetches the SP metadata from a remote url and registers it' do
-      stub_request(:get, url).
-        to_return(status: 200, body: service_provider_metadata.to_xml)
+      stub_request(:get, url)
+        .to_return(status: 200, body: service_provider_metadata.to_xml)
       subject.register_url(url)
 
       result = subject.metadata_for(entity_id)
@@ -33,8 +34,8 @@ RSpec.describe Saml::Kit::DefaultRegistry do
     end
 
     it 'fetches the IDP metadata from a remote url' do
-      stub_request(:get, url).
-        to_return(status: 200, body: identity_provider_metadata.to_xml)
+      stub_request(:get, url)
+        .to_return(status: 200, body: identity_provider_metadata.to_xml)
       subject.register_url(url)
 
       result = subject.metadata_for(entity_id)
@@ -46,15 +47,15 @@ RSpec.describe Saml::Kit::DefaultRegistry do
       xml = <<-XML
 <EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{::Xml::Kit::Id.generate}" entityID="#{entity_id}">
   <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
-    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
+    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
     <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
-    <AssertionConsumerService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}" index="0" isDefault="true"/>
+    <AssertionConsumerService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}" index="0" isDefault="true"/>
   </SPSSODescriptor>
   <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
-    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
+    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
     <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
-    <SingleSignOnService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri("https")}"/>
-    <SingleSignOnService Binding="#{Saml::Kit::Bindings::HTTP_REDIRECT}" Location="#{FFaker::Internet.uri("https")}"/>
+    <SingleSignOnService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
+    <SingleSignOnService Binding="#{Saml::Kit::Bindings::HTTP_REDIRECT}" Location="#{FFaker::Internet.uri('https')}"/>
   </IDPSSODescriptor>
   <Organization>
     <OrganizationName xml:lang="en">Acme, Inc</OrganizationName>
@@ -75,13 +76,13 @@ RSpec.describe Saml::Kit::DefaultRegistry do
     end
   end
 
-  describe "#each" do
+  describe '#each' do
     it 'yields each registered metadata' do
       idp = Saml::Kit::IdentityProviderMetadata.build do |config|
-        config.entity_id = "idp"
+        config.entity_id = 'idp'
       end
       sp = Saml::Kit::ServiceProviderMetadata.build do |config|
-        config.entity_id = "sp"
+        config.entity_id = 'sp'
       end
 
       subject.register(idp)
