@@ -12,7 +12,6 @@ module Saml
       def initialize(node)
         @name = "Signature"
         @node = node
-        @xml_hash = @node ? Hash.from_xml(to_xml)["Signature"] : {}
       end
 
       # Returns the embedded X509 Certificate
@@ -54,7 +53,7 @@ module Saml
 
       # Returns the XML Hash.
       def to_h
-        @xml_hash
+        @xml_hash ||= present? ? Hash.from_xml(to_xml)["Signature"] : {}
       end
 
       def present?
