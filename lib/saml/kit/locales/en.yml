@@ -8,7 +8,7 @@ en:
         must_contain_single_assertion: "must contain single Assertion."
       AuthnRequest:
         invalid: "must contain AuthnRequest."
-        invalid_fingerprint: "does not match."
+        invalid_fingerprint: "is not registered."
         unregistered: "is unregistered."
       IDPSSODescriptor:
         invalid: "must contain IDPSSODescriptor."
@@ -16,7 +16,7 @@ en:
       InvalidDocument:
         invalid: "must contain valid SAMLRequest"
       LogoutRequest:
-        invalid_fingerprint: "does not match."
+        invalid_fingerprint: "is not registered."
         unregistered: "is unregistered."
       LogoutResponse:
         unregistered: "is unregistered."
@@ -24,7 +24,7 @@ en:
         invalid: "is missing."
       Response:
         invalid: "must contain Response."
-        invalid_fingerprint: "does not match."
+        invalid_fingerprint: "is not registered."
         invalid_response_to: "must match request id."
         invalid_version: "must be 2.0."
         unregistered: "must originate from registered identity provider."

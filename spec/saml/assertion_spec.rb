@@ -143,4 +143,39 @@ XML
       expect(assertion.to_xml).to include("Assertion")
     end
   end
+
+  describe "#valid?" do
+    let(:entity_id) { FFaker::Internet.uri("https") }
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: entity_id, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
+    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
+    let(:registry) { double(:registry, metadata_for: idp) }
+    let(:idp) { Saml::Kit::IdentityProviderMetadata.build(configuration: configuration) }
+    let(:configuration) do
+      Saml::Kit::Configuration.new do |x|
+        x.entity_id = entity_id
+        x.generate_key_pair_for(use: :signing)
+      end
+    end
+
+    before :each do
+      allow(configuration.registry).to receive(:metadata_for).with(entity_id).and_return(idp)
+    end
+
+    it 'is invalid when the encrypted signature is invalid' do
+    end
+
+    it 'is invalid when the signature is invalid' do
+      xml = Saml::Kit::Response.build_xml(user, request, configuration: configuration)
+      altered = xml.gsub(entity_id, 'altered')
+      response = Saml::Kit::Response.new(altered, configuration: configuration)
+      expect(response.assertion).to be_invalid
+    end
+
+    it 'is valid' do
+      response = Saml::Kit::Response.build(user, request, configuration: configuration) do |x|
+        x.sign_with(Xml::Kit::KeyPair.generate(use: :signing))
+      end
+      expect(response.assertion).to be_valid
+    end
+  end
 end
