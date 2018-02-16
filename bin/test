@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# script/test: Run test suite for application. Optionally pass in a path to an
+#              individual test file to run a single test.
+
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+[ -z "$DEBUG" ] || set -x
+
+echo "==> Running setup…"
+date "+%H:%M:%S"
+bin/setup
+
+echo "==> Running tests…"
+date "+%H:%M:%S"
+bundle exec rake spec
