@@ -9,9 +9,9 @@ module Saml
 
       attr_reader :name
 
-      def initialize(item)
+      def initialize(node)
         @name = "Signature"
-        @node = item
+        @node = node
         @xml_hash = @node ? Hash.from_xml(to_xml)["Signature"] : {}
       end
 
@@ -46,6 +46,10 @@ module Saml
 
       def canonicalization_method
         at_xpath("./ds:SignedInfo/ds:CanonicalizationMethod/@Algorithm").try(:value)
+      end
+
+      def transforms
+        node.search("./ds:SignedInfo/ds:Reference/ds:Transforms/ds:Transform/@Algorithm", Saml::Kit::Document::NAMESPACES).try(:map, &:value)
       end
 
       # Returns the XML Hash.
