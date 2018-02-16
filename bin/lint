@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+[ -z "$DEBUG" ] || set -x
+
+echo "==> Running setup…"
+date "+%H:%M:%S"
+bin/setup
+
+echo "==> Running linters…"
+date "+%H:%M:%S"
+bundle exec rake rubocop
