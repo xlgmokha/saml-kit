@@ -35,6 +35,12 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
     end
 
+    it 'deserializes the raw query_string to an AuthnRequest' do
+      url, _ = subject.serialize(Saml::Kit::AuthenticationRequest.builder, relay_state: "HELLO")
+      result = subject.deserialize(url)
+      expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
+    end
+
     it 'deserializes the SAMLRequest to an AuthnRequest with symbols for keys' do
       configuration = Saml::Kit::Configuration.new do |config|
         config.entity_id = entity_id

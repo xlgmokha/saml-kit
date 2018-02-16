@@ -12,6 +12,7 @@ require "logger"
 require "net/http"
 require "nokogiri"
 require "securerandom"
+require "uri"
 require "xml/kit"
 
 require "saml/kit/buildable"

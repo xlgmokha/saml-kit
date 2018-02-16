@@ -17,7 +17,7 @@ module Saml
         end
 
         def deserialize(params, configuration: Saml::Kit.configuration)
-          parameters = normalize(params)
+          parameters = normalize(params_to_hash(params))
           document = deserialize_document_from!(parameters, configuration)
           ensure_valid_signature!(parameters, document)
           document
@@ -73,6 +73,11 @@ module Saml
             Signature: params['Signature'] || params[:Signature],
             SigAlg: params['SigAlg'] || params[:SigAlg],
           }
+        end
+
+        def params_to_hash(value)
+          return value unless value.is_a?(String)
+          Hash[URI.parse(value).query.split('&').map { |x| x.split('=', 2) }]
         end
       end
     end
