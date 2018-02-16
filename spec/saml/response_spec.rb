@@ -117,7 +117,7 @@ RSpec.describe Saml::Kit::Response do
       subject = described_class.build(user, request)
       travel_to Saml::Kit.configuration.session_timeout.from_now + 5.seconds
       expect(subject).to_not be_valid
-      expect(subject.errors[:base]).to be_present
+      expect(subject.errors[:assertion]).to match_array(["must not be expired."])
     end
 
     it 'is invalid before the valid session window' do
@@ -127,7 +127,7 @@ RSpec.describe Saml::Kit::Response do
       subject = described_class.build(user, request)
       travel_to (Saml::Kit.configuration.clock_drift + 1.second).before(Time.now)
       expect(subject).to be_invalid
-      expect(subject.errors[:base]).to be_present
+      expect(subject.errors[:assertion]).to match_array(["must not be expired."])
     end
 
     it 'is invalid when the audience does not match the expected issuer' do
@@ -243,6 +243,16 @@ RSpec.describe Saml::Kit::Response do
       subject = described_class.new(altered_xml)
       expect(subject).to_not be_valid
       expect(subject.errors[:digest_value]).to be_present
+    end
+
+    it 'is invalid when we do not have a private key to decrypt the assertion' do
+      xml = described_class.build_xml(user, request) do |x|
+        x.encrypt_with(::Xml::Kit::KeyPair.generate(use: :encryption))
+      end
+
+      subject = described_class.new(xml)
+      expect(subject).to be_invalid
+      expect(subject.errors[:assertion]).to match_array(["cannot be decrypted."])
     end
   end
 

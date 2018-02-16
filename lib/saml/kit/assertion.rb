@@ -8,9 +8,10 @@ module Saml
       include ActiveModel::Validations
       include Translatable
 
-      validate :must_match_issuer
-      validate :must_be_active_session
-      validate :must_have_valid_signature
+      validate :must_be_decryptable
+      validate :must_match_issuer, if: :decryptable?
+      validate :must_be_active_session, if: :decryptable?
+      validate :must_have_valid_signature, if: :decryptable?
       attr_reader :name
       attr_accessor :occurred_at
 
@@ -84,6 +85,11 @@ module Saml
         @xml_hash.fetch('EncryptedAssertion', nil).present?
       end
 
+      def decryptable?
+        return true unless encrypted?
+        !@cannot_decrypt
+      end
+
       def present?
         assertion.present?
       end
@@ -110,6 +116,9 @@ module Saml
 
         encrypted_assertion = @node.at_xpath('./xmlenc:EncryptedData', Saml::Kit::Document::NAMESPACES)
         @node = decryptor.decrypt_node(encrypted_assertion)
+      rescue Xml::Kit::DecryptionError => error
+        @cannot_decrypt = true
+        Saml::Kit.logger.error(error)
       end
 
       def parse_date(value)
@@ -136,6 +145,10 @@ module Saml
             errors.add(attribute, message)
           end
         end
+      end
+
+      def must_be_decryptable
+        errors.add(:base, error_message(:cannot_decrypt)) unless decryptable?
       end
 
       def at_xpath(xpath)

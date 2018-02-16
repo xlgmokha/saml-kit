@@ -32,6 +32,7 @@ module Saml
       def must_be_valid_assertion
         assertion.valid?
         assertion.errors.each do |attribute, error|
+          attribute = :assertion if :base == attribute
           self.errors[attribute] << error
         end
       end
