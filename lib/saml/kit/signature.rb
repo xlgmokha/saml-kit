@@ -12,7 +12,7 @@ module Saml
       def initialize(item)
         @name = "Signature"
         @node = item
-        @xml_hash = @node ? Hash.from_xml(@node.to_s)["Signature"] : {}
+        @xml_hash = @node ? Hash.from_xml(to_xml)["Signature"] : {}
       end
 
       # Returns the embedded X509 Certificate
@@ -28,16 +28,42 @@ module Saml
         metadata.matches?(certificate.fingerprint, use: :signing)
       end
 
+      def digest_value
+        at_xpath("./ds:SignedInfo/ds:Reference/ds:DigestValue").try(:text)
+      end
+
+      def digest_method
+        at_xpath("./ds:SignedInfo/ds:Reference/ds:DigestMethod/@Algorithm").try(:value)
+      end
+
+      def signature_value
+        at_xpath("./ds:SignatureValue").try(:text)
+      end
+
+      def signature_method
+        at_xpath("./ds:SignedInfo/ds:SignatureMethod/@Algorithm").try(:value)
+      end
+
+      def canonicalization_method
+        at_xpath("./ds:SignedInfo/ds:CanonicalizationMethod/@Algorithm").try(:value)
+      end
+
       # Returns the XML Hash.
       def to_h
         @xml_hash
       end
 
       def present?
-        @node
+        node
+      end
+
+      def to_xml
+        node.to_s
       end
 
       private
+
+      attr_reader :node
 
       def validate_signature
         return errors[:base].push(error_message(:empty)) if certificate.nil?
@@ -57,6 +83,10 @@ module Saml
             not_after: certificate.not_after
           ))
         end
+      end
+
+      def at_xpath(xpath)
+        node.at_xpath(xpath, Saml::Kit::Document::NAMESPACES)
       end
     end
   end

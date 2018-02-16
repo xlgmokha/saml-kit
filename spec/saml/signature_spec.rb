@@ -5,7 +5,14 @@ RSpec.describe Saml::Kit::Signature do
       x.sign_with(key_pair)
     end
   end
+  let(:xml_hash) { Hash.from_xml(subject.to_xml) }
   subject { described_class.new(signed_document.at_xpath('//ds:Signature')) }
+
+  specify { expect(subject.digest_value).to eql(xml_hash['Signature']['SignedInfo']['Reference']['DigestValue']) }
+  specify { expect(subject.digest_method).to eql(xml_hash['Signature']['SignedInfo']['Reference']['DigestMethod']['Algorithm']) }
+  specify { expect(subject.signature_value).to eql(xml_hash['Signature']['SignatureValue']) }
+  specify { expect(subject.signature_method).to eql(xml_hash['Signature']['SignedInfo']['SignatureMethod']['Algorithm']) }
+  specify { expect(subject.canonicalization_method).to eql(xml_hash['Signature']['SignedInfo']['CanonicalizationMethod']['Algorithm']) }
 
   describe "#valid?" do
     it 'returns true when the signature is valid' do
