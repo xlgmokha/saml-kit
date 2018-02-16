@@ -17,7 +17,7 @@ module Saml
 
       # Returns the embedded X509 Certificate
       def certificate
-        value = to_h.fetch('KeyInfo', {}).fetch('X509Data', {}).fetch('X509Certificate', nil)
+        value = at_xpath('./ds:KeyInfo/ds:X509Data/ds:X509Certificate').try(:text)
         return if value.nil?
         ::Xml::Kit::Certificate.new(value, use: :signing)
       end
@@ -90,6 +90,7 @@ module Saml
       end
 
       def at_xpath(xpath)
+        return nil unless node
         node.at_xpath(xpath, Saml::Kit::Document::NAMESPACES)
       end
     end

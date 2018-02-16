@@ -14,6 +14,10 @@ RSpec.describe Saml::Kit::Signature do
   specify { expect(subject.signature_method).to eql(xml_hash['Signature']['SignedInfo']['SignatureMethod']['Algorithm']) }
   specify { expect(subject.canonicalization_method).to eql(xml_hash['Signature']['SignedInfo']['CanonicalizationMethod']['Algorithm']) }
   specify { expect(subject.transforms).to eql(xml_hash['Signature']['SignedInfo']['Reference']['Transforms']['Transform'].map { |x| x['Algorithm'] }) }
+  specify do
+    expected = ::Xml::Kit::Certificate.new(xml_hash['Signature']['KeyInfo']['X509Data']['X509Certificate'], use: :signing)
+    expect(subject.certificate).to eql(expected)
+  end
 
   describe "#valid?" do
     it 'returns true when the signature is valid' do
