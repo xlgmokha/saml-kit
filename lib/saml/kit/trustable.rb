@@ -16,10 +16,8 @@ module Saml
 
       # @!visibility private
       def signature
-        xml_hash = to_h.fetch(name, {}).fetch('Signature', nil)
-        xml_hash ? Signature.new(at_xpath('//ds:Signature')) : nil
+        @signature ||= Signature.new(at_xpath("/samlp:#{name}/ds:Signature"))
       end
-
 
       # Returns true when documents is signed and the signing certificate belongs to a known service entity.
       def trusted?
@@ -44,16 +42,10 @@ module Saml
 
       def must_have_valid_signature
         return if to_xml.blank?
+        return unless signature.present?
 
-        xml = ::Xml::Kit::Document.new(to_xml, namespaces: {
-          "NameFormat": Namespaces::ATTR_SPLAT,
-          "ds": ::Xml::Kit::Namespaces::XMLDSIG,
-          "md": Namespaces::METADATA,
-          "saml": Namespaces::ASSERTION,
-          "samlp": Namespaces::PROTOCOL,
-        })
-        xml.valid?
-        xml.errors.each do |attribute, error|
+        signature.valid?
+        signature.errors.each do |attribute, error|
           errors[attribute] << error
         end
       end

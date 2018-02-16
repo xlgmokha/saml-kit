@@ -367,7 +367,7 @@ RSpec.describe Saml::Kit::Response do
 </samlp:Response>
       XML
       subject = described_class.new(xml)
-      expect(subject.signature).to be_nil
+      expect(subject.signature).to_not be_present
       expect(subject.assertion.signature).to be_present
       expect(subject.assertion.signature.certificate.stripped).to eql(certificate.stripped)
     end
@@ -411,7 +411,7 @@ RSpec.describe Saml::Kit::Response do
 </samlp:Response>
       XML
       subject = described_class.new(xml)
-      expect(subject.signature).to be_nil
+      expect(subject.signature).to_not be_present
     end
   end
 
