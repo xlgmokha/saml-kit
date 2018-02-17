@@ -12,6 +12,6 @@ xml.SPSSODescriptor descriptor_options do
     xml.NameIDFormat format
   end
   acs_urls.each_with_index do |item, index|
-    xml.AssertionConsumerService Binding: item[:binding], Location: item[:location], index: index, isDefault: index == 0
+    xml.AssertionConsumerService Binding: item[:binding], Location: item[:location], index: index, isDefault: index.zero?
   end
 end

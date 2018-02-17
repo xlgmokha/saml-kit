@@ -72,19 +72,22 @@ module Saml
         return errors[:base].push(error_message(:empty)) if certificate.nil?
 
         signature = Xmldsig::Signature.new(@node, 'ID=$uri or @Id')
-        unless signature.valid?(certificate.x509)
-          signature.errors.each do |attribute|
-            errors.add(attribute, error_message(attribute))
-          end
+        return if signature.valid?(certificate.x509)
+        signature.errors.each do |attribute|
+          errors.add(attribute, error_message(attribute))
         end
       end
 
       def validate_certificate(now = Time.now.utc)
-        if certificate.present? && !certificate.active?(now)
-          errors.add(:certificate, error_message(:certificate,
-                                                 not_before: certificate.not_before,
-                                                 not_after: certificate.not_after))
-        end
+        return unless certificate.present?
+        return if certificate.active?(now)
+
+        message = error_message(
+          :certificate,
+          not_before: certificate.not_before,
+          not_after: certificate.not_after
+        )
+        errors.add(:certificate, message)
       end
 
       def at_xpath(xpath)

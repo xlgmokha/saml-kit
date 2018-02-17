@@ -30,11 +30,15 @@ module Saml
       end
 
       def method_missing(name, *args)
-        if target = find { |x| x.respond_to?(name) }
+        if (target = find { |x| x.respond_to?(name) })
           target.public_send(name, *args)
         else
           super
         end
+      end
+
+      def respond_to_missing?(method, *)
+        find { |x| x.respond_to?(method) }
       end
     end
   end

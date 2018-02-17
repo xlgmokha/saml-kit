@@ -33,10 +33,9 @@ module Saml
 
       def must_match_request_id
         return if request_id.nil?
+        return if in_response_to == request_id
 
-        if in_response_to != request_id
-          errors[:in_response_to] << error_message(:invalid_response_to)
-        end
+        errors[:in_response_to] << error_message(:invalid_response_to)
       end
     end
   end

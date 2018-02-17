@@ -62,7 +62,7 @@ module Saml
 
       # Yields each registered [Saml::Kit::Metadata] to the block.
       def each
-        @items.each do |_key, value|
+        @items.each_value do |value|
           yield value
         end
       end

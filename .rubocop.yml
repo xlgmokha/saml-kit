@@ -47,8 +47,10 @@ Lint/InterpolationCheck:
 
 Metrics/BlockLength:
   Exclude:
-    - 'Rakefile'
+    - '**/**/*.builder'
     - '**/*.rake'
+    - '*.gemspec'
+    - 'Rakefile'
     - 'spec/**/*.rb'
 
 Metrics/ModuleLength:
@@ -56,8 +58,16 @@ Metrics/ModuleLength:
     - 'spec/**/*.rb'
 
 Metrics/LineLength:
+  Max: 160
   Exclude:
     - 'spec/**/*.rb'
+
+Naming/FileName:
+  Exclude:
+    - 'lib/saml-kit.rb'
+
+Style/Documentation:
+  Enabled: false
 
 Style/StringLiterals:
   EnforcedStyle: 'single_quotes'
@@ -76,3 +86,6 @@ RSpec/NamedSubject:
 
 RSpec/NestedGroups:
   Max: 7
+
+RSpec/SubjectStub:
+  Enabled: false

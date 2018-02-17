@@ -57,7 +57,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       expect(result).to be_trusted
     end
 
-    it 'deserializes the SAMLRequest to an AuthnRequest' do
+    it 'deserializes the SAMLRequest to an AuthnRequest with symbolized keys' do
       url, = subject.serialize(Saml::Kit::AuthenticationRequest.builder)
       result = subject.deserialize(query_params_from(url).symbolize_keys)
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)

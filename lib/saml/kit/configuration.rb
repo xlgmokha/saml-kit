@@ -36,7 +36,7 @@ module Saml
       # The total allowable clock drift for session timeout validation.
       attr_accessor :clock_drift
 
-      def initialize # :yields configuration
+      def initialize
         @clock_drift = 30.seconds
         @digest_method = :SHA256
         @key_pairs = []
@@ -97,10 +97,10 @@ module Saml
       private
 
       def ensure_proper_use!(use)
-        unless USES.include?(use)
-          error_message = 'Use must be either :signing or :encryption'
-          raise ArgumentError, error_message
-        end
+        return if USES.include?(use)
+
+        error_message = 'Use must be either :signing or :encryption'
+        raise ArgumentError, error_message
       end
     end
   end

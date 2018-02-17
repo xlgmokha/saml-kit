@@ -71,7 +71,7 @@ module Saml
       # @param relay_state [Object] The RelayState to include the returned SAML params.
       # @param configuration [Saml::Kit::Configuration] the configuration to use for generating the request.
       # @return [Array] The url and saml params encoded using the rules for the specified binding.
-      def login_request_for(binding:, relay_state: nil, configuration: Saml::Kit.configuration) # :yields builder
+      def login_request_for(binding:, relay_state: nil, configuration: Saml::Kit.configuration)
         builder = Saml::Kit::AuthenticationRequest.builder(configuration: configuration) do |x|
           x.embed_signature = want_authn_requests_signed
           yield x if block_given?

@@ -14,7 +14,7 @@ module Saml
           binding == other
         end
 
-        def serialize(_builder, relay_state: nil)
+        def serialize(*)
           []
         end
 
