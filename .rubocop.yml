@@ -58,7 +58,6 @@ Metrics/ModuleLength:
     - 'spec/**/*.rb'
 
 Metrics/LineLength:
-  Max: 160
   Exclude:
     - 'spec/**/*.rb'
 
