@@ -13,28 +13,28 @@ RSpec.describe Saml::Kit::Metadata do
     end
 
     it 'returns a composite' do
-      xml = <<-XML
-<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{Xml::Kit::Id.generate}" entityID="#{FFaker::Internet.uri('https')}">
-  <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
-    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
-    <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
-    <AssertionConsumerService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}" index="0" isDefault="true"/>
-  </SPSSODescriptor>
-  <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
-    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
-    <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
-    <SingleSignOnService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
-    <SingleSignOnService Binding="#{Saml::Kit::Bindings::HTTP_REDIRECT}" Location="#{FFaker::Internet.uri('https')}"/>
-  </IDPSSODescriptor>
-  <Organization>
-    <OrganizationName xml:lang="en">Acme, Inc</OrganizationName>
-    <OrganizationDisplayName xml:lang="en">Acme, Inc</OrganizationDisplayName>
-    <OrganizationURL xml:lang="en">http://localhost:5000/</OrganizationURL>
-  </Organization>
-  <ContactPerson contactType="technical">
-    <Company>mailto:hi@example.com</Company>
-  </ContactPerson>
-</EntityDescriptor>
+      xml = <<-XML.strip_heredoc
+        <EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{Xml::Kit::Id.generate}" entityID="#{FFaker::Internet.uri('https')}">
+          <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
+            <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
+            <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
+            <AssertionConsumerService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}" index="0" isDefault="true"/>
+          </SPSSODescriptor>
+          <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
+            <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
+            <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
+            <SingleSignOnService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
+            <SingleSignOnService Binding="#{Saml::Kit::Bindings::HTTP_REDIRECT}" Location="#{FFaker::Internet.uri('https')}"/>
+          </IDPSSODescriptor>
+          <Organization>
+            <OrganizationName xml:lang="en">Acme, Inc</OrganizationName>
+            <OrganizationDisplayName xml:lang="en">Acme, Inc</OrganizationDisplayName>
+            <OrganizationURL xml:lang="en">http://localhost:5000/</OrganizationURL>
+          </Organization>
+          <ContactPerson contactType="technical">
+            <Company>mailto:hi@example.com</Company>
+          </ContactPerson>
+        </EntityDescriptor>
       XML
       result = subject.from(xml)
       expect(result).to be_present

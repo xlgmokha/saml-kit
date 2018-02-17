@@ -95,11 +95,11 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
     it 'validates a request without a signature' do
       now = Time.now.utc
-      raw_xml = <<-XML
-<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Xml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
-  <saml:Issuer>#{issuer}</saml:Issuer>
-  <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::EMAIL_ADDRESS}'/>
-</samlp:AuthnRequest>
+      raw_xml = <<-XML.strip_heredoc
+        <samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Xml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
+          <saml:Issuer>#{issuer}</saml:Issuer>
+          <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::EMAIL_ADDRESS}'/>
+        </samlp:AuthnRequest>
       XML
 
       subject = described_class.new(raw_xml, configuration: configuration)
@@ -109,11 +109,11 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
     it 'is valid when there is no signature, and the issuer is registered' do
       now = Time.now.utc
-      raw_xml = <<-XML
-<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Xml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
-  <saml:Issuer>#{issuer}</saml:Issuer>
-  <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::PERSISTENT}'/>
-</samlp:AuthnRequest>
+      raw_xml = <<-XML.strip_heredoc
+        <samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Xml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
+          <saml:Issuer>#{issuer}</saml:Issuer>
+          <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::PERSISTENT}'/>
+        </samlp:AuthnRequest>
       XML
 
       allow(registry).to receive(:metadata_for).with(issuer).and_return(metadata)
@@ -123,11 +123,11 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
     it 'is invalid when there is no signature, and the issuer is not registered' do
       now = Time.now.utc
-      raw_xml = <<-XML
-<samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Xml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
-  <saml:Issuer>#{issuer}</saml:Issuer>
-  <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::PERSISTENT}'/>
-</samlp:AuthnRequest>
+      raw_xml = <<-XML.strip_heredoc
+        <samlp:AuthnRequest AssertionConsumerServiceURL='#{assertion_consumer_service_url}' ID='#{Xml::Kit::Id.generate}' IssueInstant='#{now.iso8601}' Version='2.0' xmlns:saml='#{Saml::Kit::Namespaces::ASSERTION}' xmlns:samlp='#{Saml::Kit::Namespaces::PROTOCOL}'>
+          <saml:Issuer>#{issuer}</saml:Issuer>
+          <samlp:NameIDPolicy AllowCreate='true' Format='#{Saml::Kit::Namespaces::PERSISTENT}'/>
+        </samlp:AuthnRequest>
       XML
 
       allow(registry).to receive(:metadata_for).with(issuer).and_return(nil)

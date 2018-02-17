@@ -102,14 +102,14 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
     end
 
     it 'is invalid when 0 ACS endpoints are specified' do
-      xml = <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{::Xml::Kit::Id.generate}" entityID="#{entity_id}">
-  <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
-    <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
-    <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
-  </SPSSODescriptor>
-</EntityDescriptor>
+      xml = <<-XML.strip_heredoc
+        <?xml version="1.0" encoding="UTF-8"?>
+        <EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{::Xml::Kit::Id.generate}" entityID="#{entity_id}">
+          <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
+            <SingleLogoutService Binding="#{Saml::Kit::Bindings::HTTP_POST}" Location="#{FFaker::Internet.uri('https')}"/>
+            <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
+          </SPSSODescriptor>
+        </EntityDescriptor>
       XML
       expect(described_class.new(xml)).to be_invalid
     end

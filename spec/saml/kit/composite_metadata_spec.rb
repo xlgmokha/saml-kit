@@ -13,57 +13,57 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   let(:idp_signing_certificate) { ::Xml::Kit::KeyPair.generate(use: :signing).certificate }
   let(:idp_encryption_certificate) { ::Xml::Kit::KeyPair.generate(use: :encryption).certificate }
   let(:xml) do
-    <<-XML
-<EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{::Xml::Kit::Id.generate}" entityID="#{entity_id}">
-  <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
-    <KeyDescriptor use="signing">
-      <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
-        <X509Data>
-          <X509Certificate>#{sp_signing_certificate.stripped}</X509Certificate>
-        </X509Data>
-      </KeyInfo>
-    </KeyDescriptor>
-    <KeyDescriptor use="encryption">
-      <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
-        <X509Data>
-          <X509Certificate>#{sp_encryption_certificate.stripped}</X509Certificate>
-        </X509Data>
-      </KeyInfo>
-    </KeyDescriptor>
-    <SingleLogoutService Binding="#{post_binding}" Location="#{sp_logout_service}"/>
-    <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
-    <AssertionConsumerService Binding="#{post_binding}" Location="#{assertion_consumer_service}" index="0" isDefault="true"/>
-  </SPSSODescriptor>
-  <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
-    <KeyDescriptor use="signing">
-      <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
-        <X509Data>
-          <X509Certificate>#{idp_signing_certificate.stripped}</X509Certificate>
-        </X509Data>
-      </KeyInfo>
-    </KeyDescriptor>
-    <KeyDescriptor use="encryption">
-      <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
-        <X509Data>
-          <X509Certificate>#{idp_encryption_certificate.stripped}</X509Certificate>
-        </X509Data>
-      </KeyInfo>
-    </KeyDescriptor>
-    <SingleLogoutService Binding="#{post_binding}" Location="#{idp_logout_service}"/>
-    <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
-    <SingleSignOnService Binding="#{post_binding}" Location="#{sign_on_service}"/>
-    <SingleSignOnService Binding="#{redirect_binding}" Location="#{sign_on_service}"/>
-    <Attribute xmlns="#{Saml::Kit::Namespaces::ASSERTION}" Name="id" ></Attribute>
-  </IDPSSODescriptor>
-  <Organization>
-    <OrganizationName xml:lang="en">Acme, Inc</OrganizationName>
-    <OrganizationDisplayName xml:lang="en">Acme, Inc</OrganizationDisplayName>
-    <OrganizationURL xml:lang="en">http://localhost:5000/</OrganizationURL>
-  </Organization>
-  <ContactPerson contactType="technical">
-    <Company>mailto:hi@example.com</Company>
-  </ContactPerson>
-</EntityDescriptor>
+    <<-XML.strip_heredoc
+      <EntityDescriptor xmlns="#{Saml::Kit::Namespaces::METADATA}" ID="#{::Xml::Kit::Id.generate}" entityID="#{entity_id}">
+        <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
+          <KeyDescriptor use="signing">
+            <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
+              <X509Data>
+                <X509Certificate>#{sp_signing_certificate.stripped}</X509Certificate>
+              </X509Data>
+            </KeyInfo>
+          </KeyDescriptor>
+          <KeyDescriptor use="encryption">
+            <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
+              <X509Data>
+                <X509Certificate>#{sp_encryption_certificate.stripped}</X509Certificate>
+              </X509Data>
+            </KeyInfo>
+          </KeyDescriptor>
+          <SingleLogoutService Binding="#{post_binding}" Location="#{sp_logout_service}"/>
+          <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
+          <AssertionConsumerService Binding="#{post_binding}" Location="#{assertion_consumer_service}" index="0" isDefault="true"/>
+        </SPSSODescriptor>
+        <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="#{Saml::Kit::Namespaces::PROTOCOL}">
+          <KeyDescriptor use="signing">
+            <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
+              <X509Data>
+                <X509Certificate>#{idp_signing_certificate.stripped}</X509Certificate>
+              </X509Data>
+            </KeyInfo>
+          </KeyDescriptor>
+          <KeyDescriptor use="encryption">
+            <KeyInfo xmlns="#{::Xml::Kit::Namespaces::XMLDSIG}">
+              <X509Data>
+                <X509Certificate>#{idp_encryption_certificate.stripped}</X509Certificate>
+              </X509Data>
+            </KeyInfo>
+          </KeyDescriptor>
+          <SingleLogoutService Binding="#{post_binding}" Location="#{idp_logout_service}"/>
+          <NameIDFormat>#{Saml::Kit::Namespaces::PERSISTENT}</NameIDFormat>
+          <SingleSignOnService Binding="#{post_binding}" Location="#{sign_on_service}"/>
+          <SingleSignOnService Binding="#{redirect_binding}" Location="#{sign_on_service}"/>
+          <Attribute xmlns="#{Saml::Kit::Namespaces::ASSERTION}" Name="id" ></Attribute>
+        </IDPSSODescriptor>
+        <Organization>
+          <OrganizationName xml:lang="en">Acme, Inc</OrganizationName>
+          <OrganizationDisplayName xml:lang="en">Acme, Inc</OrganizationDisplayName>
+          <OrganizationURL xml:lang="en">http://localhost:5000/</OrganizationURL>
+        </Organization>
+        <ContactPerson contactType="technical">
+          <Company>mailto:hi@example.com</Company>
+        </ContactPerson>
+      </EntityDescriptor>
     XML
   end
 

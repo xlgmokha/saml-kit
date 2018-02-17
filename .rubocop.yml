@@ -12,9 +12,6 @@ AllCops:
     - 'vendor/**/*'
   TargetRubyVersion: 2.2
 
-Layout/EndOfLine:
-  EnforcedStyle: lf
-
 Layout/ClassStructure:
   Enabled: true
   Categories:
@@ -30,6 +27,12 @@ Layout/ClassStructure:
       - instance_methods
       - protected_methods
       - private_methods
+
+Layout/EndOfLine:
+  EnforcedStyle: lf
+
+Layout/IndentHeredoc:
+  EnforcedStyle: active_support
 
 Lint/AmbiguousBlockAssociation:
   Exclude:
@@ -59,8 +62,14 @@ Style/StringLiterals:
 Style/TrailingCommaInLiteral:
   Enabled: false
 
-RSpec/NestedGroups:
-  Max: 7
+RSpec/ExampleLength:
+  Max: 10
+
+RSpec/MultipleExpectations:
+  Max: 5
 
 RSpec/NamedSubject:
   Enabled: false
+
+RSpec/NestedGroups:
+  Max: 7
