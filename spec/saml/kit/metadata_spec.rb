@@ -3,13 +3,26 @@ RSpec.describe Saml::Kit::Metadata do
     subject { described_class }
 
     it 'returns an identity provider metadata' do
-      xml = Saml::Kit::IdentityProviderMetadata.build.to_xml
+      xml = described_class.build_xml do |x|
+        x.build_identity_provider
+      end
       expect(subject.from(xml)).to be_instance_of(Saml::Kit::IdentityProviderMetadata)
     end
 
     it 'returns a service provider metadata' do
-      xml = Saml::Kit::ServiceProviderMetadata.build.to_xml
+      xml = described_class.build_xml do |x|
+        x.build_service_provider
+      end
       expect(subject.from(xml)).to be_instance_of(Saml::Kit::ServiceProviderMetadata)
+    end
+
+    it 'generates a full metadata in a reasonable amount of time' do
+      expect do
+        described_class.build_xml do |x|
+          x.build_identity_provider
+          x.build_service_provider
+        end
+      end.to perform_under(10).ms
     end
 
     it 'returns a composite' do
