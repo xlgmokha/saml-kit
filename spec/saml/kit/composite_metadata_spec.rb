@@ -70,9 +70,9 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   describe '#single_sign_on_services' do
     it 'returns the single sign on services from the idp' do
       expect(subject.single_sign_on_services).to match_array([
-                                                               Saml::Kit::Bindings::HttpPost.new(location: sign_on_service),
-                                                               Saml::Kit::Bindings::HttpRedirect.new(location: sign_on_service),
-                                                             ])
+        Saml::Kit::Bindings::HttpPost.new(location: sign_on_service),
+        Saml::Kit::Bindings::HttpRedirect.new(location: sign_on_service),
+      ])
     end
   end
 
@@ -89,8 +89,8 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   it { expect(subject.login_request_for(binding: :http_post)).to be_present }
   it do
     expect(subject.assertion_consumer_services).to match_array([
-                                                                 Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service)
-                                                               ])
+      Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service)
+    ])
   end
   it do
     expect(subject.assertion_consumer_service_for(binding: :http_post)).to eql(
@@ -102,30 +102,30 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   it { expect(subject.name_id_formats).to match_array([Saml::Kit::Namespaces::PERSISTENT]) }
   it do
     expect(subject.certificates).to match_array([
-                                                  sp_signing_certificate,
-                                                  sp_encryption_certificate,
-                                                  idp_signing_certificate,
-                                                  idp_encryption_certificate,
-                                                ])
+      sp_signing_certificate,
+      sp_encryption_certificate,
+      idp_signing_certificate,
+      idp_encryption_certificate,
+    ])
   end
 
   it do
     expect(subject.encryption_certificates).to match_array([
-                                                             sp_encryption_certificate,
-                                                             idp_encryption_certificate,
-                                                           ])
+      sp_encryption_certificate,
+      idp_encryption_certificate,
+    ])
   end
   it do
     expect(subject.signing_certificates).to match_array([
-                                                          sp_signing_certificate,
-                                                          idp_signing_certificate,
-                                                        ])
+      sp_signing_certificate,
+      idp_signing_certificate,
+    ])
   end
   it do
     expect(subject.services('SingleLogoutService')).to match_array([
-                                                                     Saml::Kit::Bindings::HttpPost.new(location: sp_logout_service),
-                                                                     Saml::Kit::Bindings::HttpPost.new(location: idp_logout_service),
-                                                                   ])
+      Saml::Kit::Bindings::HttpPost.new(location: sp_logout_service),
+      Saml::Kit::Bindings::HttpPost.new(location: idp_logout_service),
+    ])
   end
   it do
     expect(subject.service_for(type: 'SingleLogoutService', binding: :http_post)).to eql(
@@ -134,8 +134,8 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   end
   it do
     expect(subject.services('AssertionConsumerService')).to match_array([
-                                                                          Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service),
-                                                                        ])
+      Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service),
+    ])
   end
   it do
     expect(subject.service_for(type: 'AssertionConsumerService', binding: :http_post)).to eql(
@@ -144,9 +144,9 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   end
   it do
     expect(subject.services('SingleSignOnService')).to match_array([
-                                                                     Saml::Kit::Bindings::HttpPost.new(location: sign_on_service),
-                                                                     Saml::Kit::Bindings::HttpRedirect.new(location: sign_on_service),
-                                                                   ])
+      Saml::Kit::Bindings::HttpPost.new(location: sign_on_service),
+      Saml::Kit::Bindings::HttpRedirect.new(location: sign_on_service),
+    ])
   end
   it do
     expect(subject.service_for(type: 'SingleSignOnService', binding: :http_post)).to eql(
@@ -156,9 +156,9 @@ RSpec.describe Saml::Kit::CompositeMetadata do
 
   it do
     expect(subject.single_logout_services).to match_array([
-                                                            Saml::Kit::Bindings::HttpPost.new(location: sp_logout_service),
-                                                            Saml::Kit::Bindings::HttpPost.new(location: idp_logout_service),
-                                                          ])
+      Saml::Kit::Bindings::HttpPost.new(location: sp_logout_service),
+      Saml::Kit::Bindings::HttpPost.new(location: idp_logout_service),
+    ])
   end
 
   it do
@@ -167,8 +167,5 @@ RSpec.describe Saml::Kit::CompositeMetadata do
     )
   end
 
-  it do
-    user = double(:user, name_id_for: SecureRandom.uuid)
-    expect(subject.logout_request_for(user)).to be_present
-  end
+  specify { expect(subject.logout_request_for(User.new)).to be_present }
 end

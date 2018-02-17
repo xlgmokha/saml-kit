@@ -200,7 +200,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   end
 
   describe '#response_for' do
-    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: []) }
+    let(:user) { User.new }
     let(:provider) do
       Saml::Kit::ServiceProviderMetadata.build do |x|
         x.add_assertion_consumer_service(FFaker::Internet.uri('https'), binding: :http_post)
@@ -209,7 +209,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
 
     it 'serializes a response' do
       allow(subject).to receive(:provider).and_return(provider)
-      url, saml_params = subject.response_for(user, binding: :http_post, relay_state: FFaker::Movie.title)
+      _url, saml_params = subject.response_for(user, binding: :http_post, relay_state: FFaker::Movie.title)
 
       response = provider.assertion_consumer_service_for(binding: :http_post).deserialize(saml_params)
       expect(response).to be_instance_of(Saml::Kit::Response)
@@ -221,7 +221,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
         config.generate_key_pair_for(use: :signing)
       end
       key_pair = configuration.key_pairs(use: :signing).first
-      url, saml_params = subject.response_for(user, binding: :http_post, configuration: configuration) do |builder|
+      _url, saml_params = subject.response_for(user, binding: :http_post, configuration: configuration) do |builder|
         builder.sign_with(key_pair)
       end
 

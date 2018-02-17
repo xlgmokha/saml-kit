@@ -33,10 +33,10 @@ RSpec.describe Saml::Kit::Builders::IdentityProviderMetadata do
     expect(result['EntityDescriptor']['IDPSSODescriptor']['protocolSupportEnumeration']).to eql(Saml::Kit::Namespaces::PROTOCOL)
     expect(result['EntityDescriptor']['IDPSSODescriptor']['WantAuthnRequestsSigned']).to eql('true')
     expect(result['EntityDescriptor']['IDPSSODescriptor']['NameIDFormat']).to match_array([
-                                                                                            Saml::Kit::Namespaces::PERSISTENT,
-                                                                                            Saml::Kit::Namespaces::TRANSIENT,
-                                                                                            Saml::Kit::Namespaces::EMAIL_ADDRESS,
-                                                                                          ])
+      Saml::Kit::Namespaces::PERSISTENT,
+      Saml::Kit::Namespaces::TRANSIENT,
+      Saml::Kit::Namespaces::EMAIL_ADDRESS,
+    ])
     expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Binding']).to eql(Saml::Kit::Bindings::HTTP_REDIRECT)
     expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleSignOnService']['Location']).to eql('https://www.example.com/login')
     expect(result['EntityDescriptor']['IDPSSODescriptor']['SingleLogoutService']['Binding']).to eql(Saml::Kit::Bindings::HTTP_POST)

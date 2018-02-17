@@ -56,8 +56,8 @@ RSpec.describe Saml::Kit::Signature do
         it 'is invalid' do
           expect(subject).to be_invalid
           expect(subject.errors[:certificate]).to match_array([
-                                                                "Not valid before #{expired_certificate.not_before}. Not valid after #{expired_certificate.not_after}."
-                                                              ])
+            "Not valid before #{expired_certificate.not_before}. Not valid after #{expired_certificate.not_after}."
+          ])
         end
       end
 
@@ -68,8 +68,8 @@ RSpec.describe Saml::Kit::Signature do
         it 'invalid' do
           expect(subject).to be_invalid
           expect(subject.errors[:certificate]).to match_array([
-                                                                "Not valid before #{expired_certificate.not_before}. Not valid after #{expired_certificate.not_after}."
-                                                              ])
+            "Not valid before #{expired_certificate.not_before}. Not valid after #{expired_certificate.not_after}."
+          ])
         end
       end
     end

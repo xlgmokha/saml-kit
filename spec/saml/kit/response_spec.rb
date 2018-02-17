@@ -3,7 +3,7 @@ RSpec.describe Saml::Kit::Response do
     subject { described_class.build(user, request, configuration: configuration) }
 
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
-    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
+    let(:user) { User.new(attributes: { id: SecureRandom.uuid }) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
 
@@ -127,7 +127,7 @@ RSpec.describe Saml::Kit::Response do
       allow(metadata).to receive(:matches?).and_return(true)
 
       subject = described_class.build(user, request)
-      travel_to (Saml::Kit.configuration.clock_drift + 1.second).before(Time.now)
+      travel_to((Saml::Kit.configuration.clock_drift + 1.second).before(Time.now))
       expect(subject).to be_invalid
       expect(subject.errors[:assertion]).to match_array(['must not be expired.'])
     end
@@ -179,7 +179,7 @@ RSpec.describe Saml::Kit::Response do
         Version: '2.0',
         xmlns: Saml::Kit::Namespaces::ASSERTION,
       }
-      xml = ::Xml::Kit::Signatures.sign(key_pair: key_pair) do |xml, signature|
+      raw_xml = ::Xml::Kit::Signatures.sign(key_pair: key_pair) do |xml, signature|
         xml.instruct!
         xml.Response response_options do
           xml.Issuer(issuer, xmlns: Saml::Kit::Namespaces::ASSERTION)
@@ -228,13 +228,13 @@ RSpec.describe Saml::Kit::Response do
           end
         end
       end
-      subject = described_class.new(xml)
+      subject = described_class.new(raw_xml)
       expect(subject).not_to be_valid
       expect(subject.errors.full_messages).to include('must contain a single Assertion.')
     end
 
     it 'is invalid when the assertion has a signature and has been tampered with' do
-      user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { token: SecureRandom.uuid })
+      user = User.new(attributes: { token: SecureRandom.uuid })
       request = Saml::Kit::AuthenticationRequest.build
       document = described_class.build(user, request, configuration: configuration) do |x|
         x.embed_signature = false
@@ -433,7 +433,7 @@ RSpec.describe Saml::Kit::Response do
     let(:assertion_consumer_service_url) { FFaker::Internet.uri('https') }
     let(:password) { FFaker::Movie.title }
     let(:email) { FFaker::Internet.email }
-    let(:created_at) { DateTime.now }
+    let(:created_at) { Time.now }
     let(:assertion) do
       <<-XML.strip_heredoc
         <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{id}" IssueInstant="2017-11-23T04:33:58Z" Version="2.0">
@@ -506,20 +506,20 @@ XML
 
       subject = described_class.new(xml)
       expect(subject.attributes).to match_array([
-                                                  ['created_at', created_at.iso8601],
-                                                  ['email', email]
-                                                ])
+        ['created_at', created_at.iso8601],
+        ['email', email]
+      ])
     end
   end
 
   describe 'parsing' do
-    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: attributes) }
-    let(:request) { double(:request, id: Xml::Kit::Id.generate, signed?: true, trusted?: true, provider: nil, assertion_consumer_service_url: FFaker::Internet.uri('https'), name_id_format: '', issuer: FFaker::Internet.uri('https')) }
+    let(:user) { User.new(attributes: attributes) }
+    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: Xml::Kit::Id.generate, signed?: true, trusted?: true, provider: nil, assertion_consumer_service_url: FFaker::Internet.uri('https'), name_id_format: '', issuer: FFaker::Internet.uri('https')) }
     let(:attributes) { { name: 'mo' } }
 
     it 'returns the name id' do
       subject = described_class.build(user, request)
-      expect(subject.name_id).to eql(user.name_id_for)
+      expect(subject.name_id).to eql(user.name_id)
     end
 
     it 'returns the single attributes' do

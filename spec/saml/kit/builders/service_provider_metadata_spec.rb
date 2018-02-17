@@ -33,10 +33,10 @@ RSpec.describe Saml::Kit::Builders::ServiceProviderMetadata do
     expect(result['EntityDescriptor']['SPSSODescriptor']['WantAssertionsSigned']).to eql('true')
     expect(result['EntityDescriptor']['SPSSODescriptor']['protocolSupportEnumeration']).to eql('urn:oasis:names:tc:SAML:2.0:protocol')
     expect(result['EntityDescriptor']['SPSSODescriptor']['NameIDFormat']).to match_array([
-                                                                                           Saml::Kit::Namespaces::PERSISTENT,
-                                                                                           Saml::Kit::Namespaces::TRANSIENT,
-                                                                                           Saml::Kit::Namespaces::EMAIL_ADDRESS,
-                                                                                         ])
+      Saml::Kit::Namespaces::PERSISTENT,
+      Saml::Kit::Namespaces::TRANSIENT,
+      Saml::Kit::Namespaces::EMAIL_ADDRESS,
+    ])
     expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['Binding']).to eql('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST')
     expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['Location']).to eql(assertion_consumer_service_url)
     expect(result['EntityDescriptor']['SPSSODescriptor']['AssertionConsumerService']['isDefault']).to eql('true')

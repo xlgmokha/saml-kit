@@ -1,7 +1,7 @@
 RSpec.describe Saml::Kit::IdentityProviderMetadata do
   subject { described_class.new(raw_metadata) }
 
-  context 'okta metadata' do
+  describe 'okta metadata' do
     let(:raw_metadata) { IO.read('spec/fixtures/metadata/okta.xml') }
     let(:certificate) do
       Hash.from_xml(raw_metadata)['EntityDescriptor']['IDPSSODescriptor']['KeyDescriptor']['KeyInfo']['X509Data']['X509Certificate']
@@ -12,9 +12,9 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it do
       location = 'https://dev.oktapreview.com/app/example/1/sso/saml'
       expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
-                                                                           { binding: Saml::Kit::Bindings::HTTP_POST, location: location },
-                                                                           { binding: Saml::Kit::Bindings::HTTP_REDIRECT, location: location },
-                                                                         ])
+        { binding: Saml::Kit::Bindings::HTTP_POST, location: location },
+        { binding: Saml::Kit::Bindings::HTTP_REDIRECT, location: location },
+      ])
     end
     it { expect(subject.single_logout_services).to be_empty }
     it do
@@ -25,7 +25,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it { expect(subject.attributes).to be_empty }
   end
 
-  context 'active directory' do
+  describe 'active directory' do
     let(:raw_metadata) { IO.read('spec/fixtures/metadata/ad_2012.xml') }
     let(:xml_hash) { Hash.from_xml(raw_metadata) }
     let(:signing_certificate) do
@@ -38,30 +38,30 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     it { expect(subject.entity_id).to eql('http://www.example.com/adfs/services/trust') }
     it do
       expect(subject.name_id_formats).to match_array([
-                                                       Saml::Kit::Namespaces::EMAIL_ADDRESS,
-                                                       Saml::Kit::Namespaces::PERSISTENT,
-                                                       Saml::Kit::Namespaces::TRANSIENT,
-                                                     ])
+        Saml::Kit::Namespaces::EMAIL_ADDRESS,
+        Saml::Kit::Namespaces::PERSISTENT,
+        Saml::Kit::Namespaces::TRANSIENT,
+      ])
     end
     it do
       location = 'https://www.example.com/adfs/ls/'
       expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
-                                                                           { location: location, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
-                                                                           { location: location, binding: Saml::Kit::Bindings::HTTP_POST },
-                                                                         ])
+        { location: location, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
+        { location: location, binding: Saml::Kit::Bindings::HTTP_POST },
+      ])
     end
     it do
       location = 'https://www.example.com/adfs/ls/'
       expect(subject.single_logout_services.map(&:to_h)).to match_array([
-                                                                          { location: location, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
-                                                                          { location: location, binding: Saml::Kit::Bindings::HTTP_POST },
-                                                                        ])
+        { location: location, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
+        { location: location, binding: Saml::Kit::Bindings::HTTP_POST },
+      ])
     end
     it do
       expect(subject.certificates).to match_array([
-                                                    ::Xml::Kit::Certificate.new(signing_certificate, use: :signing),
-                                                    ::Xml::Kit::Certificate.new(encryption_certificate, use: :encryption),
-                                                  ])
+        ::Xml::Kit::Certificate.new(signing_certificate, use: :signing),
+        ::Xml::Kit::Certificate.new(encryption_certificate, use: :encryption),
+      ])
     end
     it { expect(subject.attributes).to be_present }
   end
@@ -210,7 +210,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
       subject = described_class.build do |x|
         x.add_single_sign_on_service(FFaker::Internet.uri('https'), binding: :http_post)
       end
-      url, saml_params = subject.login_request_for(binding: :http_post, relay_state: FFaker::Movie.title)
+      _url, saml_params = subject.login_request_for(binding: :http_post, relay_state: FFaker::Movie.title)
       result = subject.single_sign_on_service_for(binding: :http_post).deserialize(saml_params)
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
     end

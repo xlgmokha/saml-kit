@@ -1,7 +1,7 @@
 RSpec.describe Saml::Kit::LogoutRequest do
   subject { described_class.build(user, configuration: configuration) }
 
-  let(:user) { double(:user, name_id_for: name_id) }
+  let(:user) { User.new(name_id: name_id) }
   let(:name_id) { SecureRandom.uuid }
   let(:entity_id) { FFaker::Internet.uri('https') }
   let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
@@ -103,8 +103,8 @@ RSpec.describe Saml::Kit::LogoutRequest do
       allow(registry).to receive(:metadata_for).with(issuer).and_return(metadata)
       allow(metadata).to receive(:matches?).and_return(true)
       allow(metadata).to receive(:single_logout_services).and_return([
-                                                                       Saml::Kit::Bindings::HttpPost.new(location: FFaker::Internet.uri('https'))
-                                                                     ])
+        Saml::Kit::Bindings::HttpPost.new(location: FFaker::Internet.uri('https'))
+      ])
 
       subject = described_class.build(user, configuration: configuration) do |builder|
         builder.issuer = issuer

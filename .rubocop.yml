@@ -31,6 +31,9 @@ Layout/ClassStructure:
 Layout/EndOfLine:
   EnforcedStyle: lf
 
+Layout/IndentArray:
+  EnforcedStyle: consistent
+
 Layout/IndentHeredoc:
   EnforcedStyle: active_support
 
@@ -63,10 +66,10 @@ Style/TrailingCommaInLiteral:
   Enabled: false
 
 RSpec/ExampleLength:
-  Max: 10
+  Max: 80
 
 RSpec/MultipleExpectations:
-  Max: 5
+  Enabled: false
 
 RSpec/NamedSubject:
   Enabled: false

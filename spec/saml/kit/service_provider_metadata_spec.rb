@@ -25,22 +25,22 @@ RSpec.describe Saml::Kit::ServiceProviderMetadata do
 
     it 'returns each acs url and binding' do
       expect(subject.assertion_consumer_services.map(&:to_h)).to match_array([
-                                                                               { location: acs_post_url, binding: Saml::Kit::Bindings::HTTP_POST },
-                                                                               { location: acs_redirect_url, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
-                                                                             ])
+        { location: acs_post_url, binding: Saml::Kit::Bindings::HTTP_POST },
+        { location: acs_redirect_url, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
+      ])
     end
 
     it 'returns each logout url and binding' do
       expect(subject.single_logout_services.map(&:to_h)).to match_array([
-                                                                          { location: logout_post_url, binding: Saml::Kit::Bindings::HTTP_POST },
-                                                                          { location: logout_redirect_url, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
-                                                                        ])
+        { location: logout_post_url, binding: Saml::Kit::Bindings::HTTP_POST },
+        { location: logout_redirect_url, binding: Saml::Kit::Bindings::HTTP_REDIRECT },
+      ])
     end
 
     it 'returns each of the nameid formats' do
       expect(subject.name_id_formats).to match_array([
-                                                       Saml::Kit::Namespaces::PERSISTENT
-                                                     ])
+        Saml::Kit::Namespaces::PERSISTENT
+      ])
     end
 
     it 'returns the entity id' do

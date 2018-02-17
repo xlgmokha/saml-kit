@@ -114,7 +114,7 @@ XML
 
   describe '#signed?' do
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
-    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
+    let(:user) { User.new(attributes: { id: SecureRandom.uuid }) }
 
     it 'detects a signature in an encrypted assertion' do
       encryption_key_pair = Xml::Kit::KeyPair.generate(use: :encryption)
@@ -130,7 +130,7 @@ XML
 
   describe '#to_xml' do
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
-    let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { id: SecureRandom.uuid }) }
+    let(:user) { User.new(attributes: { id: SecureRandom.uuid }) }
 
     it 'returns the decrypted xml' do
       encryption_key_pair = Xml::Kit::KeyPair.generate(use: :encryption)
@@ -148,8 +148,8 @@ XML
     let(:entity_id) { FFaker::Internet.uri('https') }
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: entity_id, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:name_id) { SecureRandom.uuid }
-    let(:user) { double(:user, name_id_for: name_id, assertion_attributes_for: { id: SecureRandom.uuid }) }
-    let(:registry) { double(:registry, metadata_for: idp) }
+    let(:user) { User.new(name_id: name_id, attributes: { id: SecureRandom.uuid }) }
+    let(:registry) { instance_double(Saml::Kit::DefaultRegistry, metadata_for: idp) }
     let(:idp) { Saml::Kit::IdentityProviderMetadata.build(configuration: configuration) }
     let(:configuration) do
       Saml::Kit::Configuration.new do |x|
