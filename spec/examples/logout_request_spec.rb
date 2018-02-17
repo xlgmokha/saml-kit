@@ -1,7 +1,7 @@
-require_relative './user'
+require_relative './principal'
 
 RSpec.describe "Logout Request" do
-  let(:user) { User.new(id: SecureRandom.uuid, email: "hello@example.com") }
+  let(:user) { Principal.new(id: SecureRandom.uuid, email: "hello@example.com") }
 
   it 'produces a SAMLRequest' do
     xml = Saml::Kit::Metadata.build_xml do |builder|

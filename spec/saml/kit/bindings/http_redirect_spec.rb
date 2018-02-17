@@ -57,7 +57,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       expect(result).to be_trusted
     end
 
-    it 'deserializes the SAMLRequest to an AuthnRequest with symbols for keys' do
+    it 'deserializes the SAMLRequest to an AuthnRequest' do
       url, = subject.serialize(Saml::Kit::AuthenticationRequest.builder)
       result = subject.deserialize(query_params_from(url).symbolize_keys)
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
@@ -65,12 +65,14 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
     it 'deserializes the SAMLRequest to an AuthnRequest when given a custom params object' do
       class Parameters
+        attr_reader :params
+
         def initialize(params)
           @params = params
         end
 
         def [](key)
-          @params[key]
+          params[key]
         end
       end
       url, = subject.serialize(Saml::Kit::AuthenticationRequest.builder)
@@ -79,7 +81,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'deserializes the SAMLRequest to a LogoutRequest' do
-      user = double(:user, name_id_for: SecureRandom.uuid)
+      user = User.new
       url, = subject.serialize(Saml::Kit::LogoutRequest.builder(user))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::LogoutRequest)
@@ -92,15 +94,15 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'deserializes the SAMLResponse to a Response' do
-      user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
-      request = double(:request, id: SecureRandom.uuid, provider: nil, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: entity_id, signed?: true, trusted?: true)
+      user = User.new
+      request = instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, provider: nil, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: entity_id, signed?: true, trusted?: true)
       url, = subject.serialize(Saml::Kit::Response.builder(user, request))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::Response)
     end
 
     it 'deserializes the SAMLResponse to a LogoutResponse' do
-      request = double(:request, id: SecureRandom.uuid, provider: provider, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url)
+      request = instance_double(Saml::Kit::LogoutRequest, id: SecureRandom.uuid, provider: provider, issuer: FFaker::Internet.http_url)
       url, = subject.serialize(Saml::Kit::LogoutResponse.builder(request))
       result = subject.deserialize(query_params_from(url))
       expect(result).to be_instance_of(Saml::Kit::LogoutResponse)

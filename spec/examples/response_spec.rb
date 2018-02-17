@@ -1,7 +1,7 @@
-require_relative './user'
+require_relative './principal'
 
 RSpec.describe "Response" do
-  let(:user) { User.new(id: SecureRandom.uuid, email: "hello@example.com") }
+  let(:user) { Principal.new(id: SecureRandom.uuid, email: "hello@example.com") }
   let(:request) { Saml::Kit::AuthenticationRequest.build }
 
   it 'consumes a Response' do

@@ -1,7 +1,7 @@
 RSpec.describe Saml::Kit::Builders::LogoutResponse do
   subject { described_class.new(request) }
 
-  let(:user) { double(:user, name_id_for: SecureRandom.uuid) }
+  let(:user) { User.new }
   let(:request) { Saml::Kit::Builders::LogoutRequest.new(user).build }
   let(:issuer) { FFaker::Internet.http_url }
   let(:destination) { FFaker::Internet.http_url }

@@ -1,7 +1,7 @@
 RSpec.describe Saml::Kit::Builders::LogoutRequest do
   subject { described_class.new(user, configuration: configuration) }
 
-  let(:user) { double(:user, name_id_for: name_id) }
+  let(:user) { User.new(name_id: name_id) }
   let(:name_id) { SecureRandom.uuid }
   let(:configuration) do
     Saml::Kit::Configuration.new do |config|

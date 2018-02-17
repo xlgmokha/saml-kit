@@ -42,7 +42,8 @@ require 'saml/kit/invalid_document'
 require 'saml/kit/service_provider_metadata'
 require 'saml/kit/signature'
 
-I18n.load_path += Dir[File.expand_path('kit/locales/*.yml', File.dirname(__FILE__))]
+I18n.load_path +=
+  Dir[File.expand_path('kit/locales/*.yml', File.dirname(__FILE__))]
 
 module Saml
   module Kit

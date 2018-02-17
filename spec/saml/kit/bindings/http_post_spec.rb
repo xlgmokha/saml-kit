@@ -43,7 +43,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
     end
 
     it 'returns a SAMLRequest for a LogoutRequest' do
-      user = double(:user, name_id_for: SecureRandom.uuid)
+      user = User.new
       builder = Saml::Kit::LogoutRequest.builder_class.new(user, configuration: configuration)
       url, saml_params = subject.serialize(builder, relay_state: relay_state)
 
@@ -88,7 +88,7 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
     end
 
     it 'deserializes to a LogoutRequest' do
-      user = double(:user, name_id_for: SecureRandom.uuid)
+      user = User.new
       builder = Saml::Kit::LogoutRequest.builder_class.new(user)
       _, params = subject.serialize(builder)
       result = subject.deserialize(params)
@@ -96,8 +96,8 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
     end
 
     it 'deserializes to a Response' do
-      user = double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: [])
-      request = double(:request, id: SecureRandom.uuid, provider: nil, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url, signed?: true, trusted?: true)
+      user = User.new
+      request = instance_double(Saml::Kit::AuthenticationRequest, id: SecureRandom.uuid, provider: nil, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, issuer: FFaker::Internet.http_url, signed?: true, trusted?: true)
       builder = Saml::Kit::Response.builder_class.new(user, request)
       _, params = subject.serialize(builder)
       result = subject.deserialize(params)

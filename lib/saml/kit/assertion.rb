@@ -129,9 +129,8 @@ module Saml
       end
 
       def must_match_issuer
-        unless audiences.include?(configuration.entity_id)
-          errors[:audience] << error_message(:must_match_issuer)
-        end
+        return if audiences.include?(configuration.entity_id)
+        errors[:audience] << error_message(:must_match_issuer)
       end
 
       def must_be_active_session
@@ -140,10 +139,10 @@ module Saml
       end
 
       def must_have_valid_signature
-        if signed? && signature.invalid?
-          signature.errors.each do |attribute, message|
-            errors.add(attribute, message)
-          end
+        return if !signed? || signature.valid?
+
+        signature.errors.each do |attribute, message|
+          errors.add(attribute, message)
         end
       end
 

@@ -10,9 +10,9 @@ RSpec.describe Saml::Kit::Builders::Response do
   end
   let(:email) { FFaker::Internet.email }
   let(:assertion_consumer_service_url) { FFaker::Internet.uri('https') }
-  let(:user) { double(:user, name_id_for: SecureRandom.uuid, assertion_attributes_for: { email: email, created_at: Time.now.utc.iso8601 }) }
-  let(:request) { double(:request, id: Xml::Kit::Id.generate, assertion_consumer_service_url: assertion_consumer_service_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, trusted?: true, signed?: true) }
-  let(:provider) { double(:provider, want_assertions_signed: false, encryption_certificates: [configuration.certificates(use: :encryption).last]) }
+  let(:user) { User.new(attributes: { email: email, created_at: Time.now.utc.iso8601 }) }
+  let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: Xml::Kit::Id.generate, assertion_consumer_service_url: assertion_consumer_service_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, trusted?: true, signed?: true) }
+  let(:provider) { instance_double(Saml::Kit::ServiceProviderMetadata, want_assertions_signed: false, encryption_certificates: [configuration.certificates(use: :encryption).last]) }
   let(:issuer) { FFaker::Internet.uri('https') }
 
   describe '#build' do
@@ -59,7 +59,7 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(hash['Response']['Assertion']['Version']).to eql('2.0')
       expect(hash['Response']['Assertion']['Issuer']).to eql(issuer)
 
-      expect(hash['Response']['Assertion']['Subject']['NameID']).to eql(user.name_id_for)
+      expect(hash['Response']['Assertion']['Subject']['NameID']).to eql(user.name_id)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['Method']).to eql('urn:oasis:names:tc:SAML:2.0:cm:bearer')
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['NotOnOrAfter']).to eql(3.hours.from_now.utc.iso8601)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['Recipient']).to eql(assertion_consumer_service_url)

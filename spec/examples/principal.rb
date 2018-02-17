@@ -1,4 +1,4 @@
-class User
+class Principal
   attr_reader :id, :email
 
   def initialize(id:, email:)

@@ -35,7 +35,7 @@ RSpec.describe Saml::Kit::Assertion do
         </Response>
 XML
       subject = described_class.new(Nokogiri::XML(xml), configuration: configuration)
-      travel_to (configuration.clock_drift - 1.second).before(now)
+      travel_to((configuration.clock_drift - 1.second).before(now))
       expect(subject).to be_active
       expect(subject).not_to be_expired
     end
