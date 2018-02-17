@@ -9,4 +9,7 @@ before_script:
 rspec:
   script:
     - bin/cibuild
+
+lint:
+  script:
     - bin/lint
