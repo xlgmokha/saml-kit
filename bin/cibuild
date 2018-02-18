@@ -17,7 +17,6 @@ export RUBY_HEAP_FREE_MIN=100000
 export RUBY_HEAP_SLOTS_INCREMENT=400000
 export RUBY_HEAP_SLOTS_GROWTH_FACTOR=1
 
-gem install bundler --no-ri --no-rdoc --conservative
-# run tests
 ruby -v
-bin/test
+gem install bundler --no-ri --no-rdoc --conservative
+time bin/test
