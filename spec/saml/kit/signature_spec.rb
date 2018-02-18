@@ -96,7 +96,7 @@ RSpec.describe Saml::Kit::Signature do
     end
   end
 
-  describe "#expected_digest_value" do
+  describe '#expected_digest_value' do
     it 'returns the expected digest value' do
       expected_digest = subject.digest_value
 

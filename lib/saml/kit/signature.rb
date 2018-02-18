@@ -77,8 +77,8 @@ module Saml
 
       def validate_signature
         return errors[:base].push(error_message(:empty)) if certificate.nil?
-
         return if dsignature.valid?(certificate.x509)
+
         dsignature.errors.each do |attribute|
           errors.add(attribute, error_message(attribute))
         end
