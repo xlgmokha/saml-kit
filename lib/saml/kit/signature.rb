@@ -31,6 +31,13 @@ module Saml
         at_xpath('./ds:SignedInfo/ds:Reference/ds:DigestValue').try(:text)
       end
 
+      def expected_digest_value
+        digests = dsignature.references.map do |x|
+          Base64.encode64(x.calculate_digest_value).chomp
+        end
+        digests.count > 1 ? digests : digests[0]
+      end
+
       def digest_method
         at_xpath('./ds:SignedInfo/ds:Reference/ds:DigestMethod/@Algorithm').try(:value)
       end
@@ -71,9 +78,8 @@ module Saml
       def validate_signature
         return errors[:base].push(error_message(:empty)) if certificate.nil?
 
-        signature = Xmldsig::Signature.new(@node, 'ID=$uri or @Id')
-        return if signature.valid?(certificate.x509)
-        signature.errors.each do |attribute|
+        return if dsignature.valid?(certificate.x509)
+        dsignature.errors.each do |attribute|
           errors.add(attribute, error_message(attribute))
         end
       end
@@ -93,6 +99,10 @@ module Saml
       def at_xpath(xpath)
         return nil unless node
         node.at_xpath(xpath, Saml::Kit::Document::NAMESPACES)
+      end
+
+      def dsignature
+        @dsignature ||= Xmldsig::Signature.new(node, 'ID=$uri or @Id')
       end
     end
   end

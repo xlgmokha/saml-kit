@@ -95,4 +95,15 @@ RSpec.describe Saml::Kit::Signature do
       end
     end
   end
+
+  describe "#expected_digest_value" do
+    it 'returns the expected digest value' do
+      expected_digest = subject.digest_value
+
+      signed_document.at_xpath('//ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestValue').content = 'INVALID'
+      subject = described_class.new(signed_document.at_xpath('//ds:Signature'))
+
+      expect(subject.expected_digest_value).to eql(expected_digest)
+    end
+  end
 end
