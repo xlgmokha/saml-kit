@@ -1,4 +1,15 @@
 RSpec.describe Saml::Kit::Assertion do
+  subject do
+    Saml::Kit::Response.build(user, request) do |x|
+      x.issuer = entity_id
+    end.assertion
+  end
+  let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: entity_id, assertion_consumer_service_url: FFaker::Internet.uri("https"), name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
+  let(:user) { User.new(name_id: SecureRandom.uuid, attributes: { }) }
+  let(:entity_id) { FFaker::Internet.uri("https") }
+
+  specify { expect(subject.issuer).to eql(entity_id) }
+
   describe '#active?' do
     let(:configuration) do
       Saml::Kit::Configuration.new do |config|

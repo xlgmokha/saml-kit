@@ -29,7 +29,7 @@ module Saml
       end
 
       def issuer
-        assertion.fetch('Issuer')
+        at_xpath('./saml:Issuer').try(:text)
       end
 
       def name_id
