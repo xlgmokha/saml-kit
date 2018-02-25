@@ -9,6 +9,7 @@ RSpec.describe Saml::Kit::Assertion do
   let(:entity_id) { FFaker::Internet.uri("https") }
 
   specify { expect(subject.issuer).to eql(entity_id) }
+  specify { expect(subject.name_id).to eql(user.name_id) }
 
   describe '#active?' do
     let(:configuration) do

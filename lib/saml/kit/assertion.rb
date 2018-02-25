@@ -22,9 +22,9 @@ module Saml
         @configuration = configuration
         @occurred_at = Time.current
         decrypt!(::Xml::Kit::Decryption.new(
-                   private_keys: (
-                     configuration.private_keys(use: :encryption) + private_keys
-                   ).uniq
+          private_keys: (
+            configuration.private_keys(use: :encryption) + private_keys
+          ).uniq
         ))
       end
 
@@ -33,7 +33,7 @@ module Saml
       end
 
       def name_id
-        assertion.fetch('Subject', {}).fetch('NameID', nil)
+        at_xpath('./saml:Subject/saml:NameID').try(:text)
       end
 
       def signed?
