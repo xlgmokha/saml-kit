@@ -31,7 +31,7 @@ module Saml
       # Extract the AssertionConsumerServiceURL from the AuthnRequest
       #    <samlp:AuthnRequest AssertionConsumerServiceURL="https://carroll.com/acs"></samlp:AuthnRequest>
       def assertion_consumer_service_url
-        to_h[name]['AssertionConsumerServiceURL']
+        at_xpath('./*/@AssertionConsumerServiceURL').try(:value)
       end
 
       # Extract the NameIDPolicy from the AuthnRequest

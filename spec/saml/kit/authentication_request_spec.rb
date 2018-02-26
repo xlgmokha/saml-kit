@@ -22,11 +22,11 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
   end
 
-  it { expect(subject.issuer).to eql(issuer) }
-  it { expect(subject.id).to eql(id) }
-  it { expect(subject.assertion_consumer_service_url).to eql(assertion_consumer_service_url) }
-  it { expect(subject.name_id_format).to eql(name_id_format) }
-  it { expect(subject.destination).to eql(destination) }
+  specify { expect(subject.issuer).to eql(issuer) }
+  specify { expect(subject.id).to eql(id) }
+  specify { expect(subject.assertion_consumer_service_url).to eql(assertion_consumer_service_url) }
+  specify { expect(subject.name_id_format).to eql(name_id_format) }
+  specify { expect(subject.destination).to eql(destination) }
 
   describe '#valid?' do
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
