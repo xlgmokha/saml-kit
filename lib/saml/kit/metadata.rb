@@ -29,11 +29,11 @@ module Saml
       include Buildable
       METADATA_XSD = File.expand_path('./xsd/saml-schema-metadata-2.0.xsd', File.dirname(__FILE__)).freeze
       NAMESPACES = {
-        "NameFormat": Namespaces::ATTR_SPLAT,
-        "ds": ::Xml::Kit::Namespaces::XMLDSIG,
-        "md": Namespaces::METADATA,
-        "saml": Namespaces::ASSERTION,
-        "samlp": Namespaces::PROTOCOL,
+        NameFormat: Namespaces::ATTR_SPLAT,
+        ds: ::Xml::Kit::Namespaces::XMLDSIG,
+        md: Namespaces::METADATA,
+        saml: Namespaces::ASSERTION,
+        samlp: Namespaces::PROTOCOL,
       }.freeze
 
       validates_presence_of :metadata
