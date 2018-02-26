@@ -4,10 +4,8 @@ set -e
 
 [ -z "$DEBUG" ] || set -x
 
-echo "==> Running setup…"
-date "+%H:%M:%S"
+echo $(date "+%H:%M:%S") "==> Running setup…"
 bin/setup
 
-echo "==> Running linters…"
-date "+%H:%M:%S"
+echo $(date "+%H:%M:%S") "==> Running linters…"
 bundle exec rake rubocop

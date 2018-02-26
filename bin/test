@@ -10,10 +10,8 @@ cd "$(dirname "$0")/.."
 
 [ -z "$DEBUG" ] || set -x
 
-echo "==> Running setup…"
-date "+%H:%M:%S"
+echo $(date "+%H:%M:%S") "==> Running setup…"
 bin/setup
 
-echo "==> Running tests…"
-date "+%H:%M:%S"
+echo $(date "+%H:%M:%S") "==> Running tests…"
 bundle exec rake spec
