@@ -21,7 +21,7 @@ module Saml
 
       # Returns the /InResponseTo attribute.
       def in_response_to
-        to_h.fetch(name, {}).fetch('InResponseTo', nil)
+        at_xpath('./*/@InResponseTo').try(:value)
       end
 
       # Returns true if the Status code is #{Saml::Kit::Namespaces::SUCCESS}

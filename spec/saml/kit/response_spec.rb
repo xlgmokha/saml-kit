@@ -5,6 +5,7 @@ RSpec.describe Saml::Kit::Response do
   let(:user) { User.new(attributes: { id: SecureRandom.uuid }) }
 
   specify { expect(subject.status_code).to eql(Saml::Kit::Namespaces::SUCCESS) }
+  specify { expect(subject.in_response_to).to eql(request.id) }
 
   describe '#valid?' do
     subject { described_class.build(user, request, configuration: configuration) }
