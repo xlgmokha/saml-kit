@@ -54,16 +54,10 @@ module Saml
       end
 
       def attributes
-        @attributes ||=
-          begin
-            attrs = assertion.fetch('AttributeStatement', {}).fetch('Attribute', [])
-            items = if attrs.is_a? Hash
-                      [[attrs['Name'], attrs['AttributeValue']]]
-                    else
-                      attrs.map { |item| [item['Name'], item['AttributeValue']] }
-                    end
-            Hash[items].with_indifferent_access
-          end
+        @attributes ||= @node.search("./saml:AttributeStatement/saml:Attribute", Saml::Kit::Document::NAMESPACES).inject({}) do |memo, item|
+          memo[item.attribute("Name").value] = item.at_xpath('./saml:AttributeValue', Saml::Kit::Document::NAMESPACES).try(:text)
+          memo
+        end.with_indifferent_access
       end
 
       def started_at

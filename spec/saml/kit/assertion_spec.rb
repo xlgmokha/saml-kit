@@ -5,13 +5,14 @@ RSpec.describe Saml::Kit::Assertion do
     end.assertion
   end
   let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: entity_id, assertion_consumer_service_url: FFaker::Internet.uri("https"), name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
-  let(:user) { User.new(name_id: SecureRandom.uuid, attributes: { }) }
+  let(:user) { User.new(name_id: SecureRandom.uuid, attributes: { id: SecureRandom.uuid }) }
   let(:entity_id) { FFaker::Internet.uri("https") }
 
   specify { expect(subject.issuer).to eql(entity_id) }
   specify { expect(subject.name_id).to eql(user.name_id) }
   specify { expect(subject.started_at.to_i).to eql(Time.now.utc.to_i) }
   specify { expect(subject.expired_at.to_i).to eql(Saml::Kit.configuration.session_timeout.since(Time.now).utc.to_i) }
+  specify { expect(subject.attributes).to eql("id" => user.attributes[:id]) }
 
   describe '#active?' do
     let(:configuration) do
