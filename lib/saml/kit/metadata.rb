@@ -132,9 +132,7 @@ module Saml
       # @param relay_state [String] the relay state to have echo'd back.
       # @return [Array] Returns an array with a url and Hash of parameters to send to the other party.
       def logout_request_for(user, binding: :http_post, relay_state: nil)
-        builder = Saml::Kit::LogoutRequest.builder(user) do |x|
-          yield x if block_given?
-        end
+        builder = Saml::Kit::LogoutRequest.builder(user) { |x| yield x if block_given? }
         request_binding = single_logout_service_for(binding: binding)
         request_binding.serialize(builder, relay_state: relay_state)
       end
@@ -145,9 +143,7 @@ module Saml
       # @param use [Symbol] the type of certificates to look at. Can be `:signing` or `:encryption`.
       # @return [Xml::Kit::Certificate] returns the matching `{Xml::Kit::Certificate}`
       def matches?(fingerprint, use: :signing)
-        certificates.find do |certificate|
-          certificate.for?(use) && certificate.fingerprint == fingerprint
-        end
+        certificates.find { |x| x.for?(use) && x.fingerprint == fingerprint }
       end
 
       # Returns the XML document converted to a Hash.
@@ -184,21 +180,14 @@ module Saml
       end
 
       class << self
-        ENTITY_DESCRIPTOR_XPATH = '/md:EntityDescriptor'.freeze
-        SERVICE_PROVIDER_DESCRIPTOR_XPATH = "#{ENTITY_DESCRIPTOR_XPATH}/md:SPSSODescriptor".freeze
-        IDENTITY_PROVIDER_DESCRIPTOR_XPATH = "#{ENTITY_DESCRIPTOR_XPATH}/md:IDPSSODescriptor".freeze
-
         # Creates a `{Saml::Kit::Metadata}` object from a raw XML [String].
         #
         # @param content [String] the raw metadata XML.
         # @return [Saml::Kit::Metadata] the metadata document or subclass.
         def from(content)
-          descriptor = Nokogiri::XML(content).at_xpath(ENTITY_DESCRIPTOR_XPATH, NAMESPACES)
-          return unless descriptor
-
-          sp = descriptor.at_xpath(SERVICE_PROVIDER_DESCRIPTOR_XPATH, NAMESPACES)
-          idp = descriptor.at_xpath(IDENTITY_PROVIDER_DESCRIPTOR_XPATH, NAMESPACES)
-          if sp && idp
+          return unless (descriptor = Nokogiri::XML(content).at_xpath('/md:EntityDescriptor', NAMESPACES))
+          if (sp = descriptor.at_xpath('/md:EntityDescriptor/md:SPSSODescriptor', NAMESPACES)) &&
+             (idp = descriptor.at_xpath('/md:EntityDescriptor/md:IDPSSODescriptor', NAMESPACES))
             Saml::Kit::CompositeMetadata.new(content)
           elsif sp
             Saml::Kit::ServiceProviderMetadata.new(content)
