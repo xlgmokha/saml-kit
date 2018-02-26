@@ -184,18 +184,25 @@ module Saml
       end
 
       class << self
+        ENTITY_DESCRIPTOR_XPATH = '/md:EntityDescriptor'.freeze
+        SERVICE_PROVIDER_DESCRIPTOR_XPATH = "#{ENTITY_DESCRIPTOR_XPATH}/md:SPSSODescriptor".freeze
+        IDENTITY_PROVIDER_DESCRIPTOR_XPATH = "#{ENTITY_DESCRIPTOR_XPATH}/md:IDPSSODescriptor".freeze
+
         # Creates a `{Saml::Kit::Metadata}` object from a raw XML [String].
         #
         # @param content [String] the raw metadata XML.
         # @return [Saml::Kit::Metadata] the metadata document or subclass.
         def from(content)
-          hash = Hash.from_xml(content)
-          entity_descriptor = hash['EntityDescriptor']
-          if entity_descriptor.key?('SPSSODescriptor') && entity_descriptor.key?('IDPSSODescriptor')
+          descriptor = Nokogiri::XML(content).at_xpath(ENTITY_DESCRIPTOR_XPATH, NAMESPACES)
+          return unless descriptor
+
+          sp = descriptor.at_xpath(SERVICE_PROVIDER_DESCRIPTOR_XPATH, NAMESPACES)
+          idp = descriptor.at_xpath(IDENTITY_PROVIDER_DESCRIPTOR_XPATH, NAMESPACES)
+          if sp && idp
             Saml::Kit::CompositeMetadata.new(content)
-          elsif entity_descriptor.keys.include?('SPSSODescriptor')
+          elsif sp
             Saml::Kit::ServiceProviderMetadata.new(content)
-          elsif entity_descriptor.keys.include?('IDPSSODescriptor')
+          elsif idp
             Saml::Kit::IdentityProviderMetadata.new(content)
           end
         end
