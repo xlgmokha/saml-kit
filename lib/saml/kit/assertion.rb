@@ -50,8 +50,8 @@ module Saml
       end
 
       def attributes
-        @attributes ||= search("./saml:AttributeStatement/saml:Attribute").inject({}) do |memo, item|
-          memo[item.attribute("Name").value] = item.at_xpath('./saml:AttributeValue', Saml::Kit::Document::NAMESPACES).try(:text)
+        @attributes ||= search('./saml:AttributeStatement/saml:Attribute').inject({}) do |memo, item|
+          memo[item.attribute('Name').value] = item.at_xpath('./saml:AttributeValue', Saml::Kit::Document::NAMESPACES).try(:text)
           memo
         end.with_indifferent_access
       end
@@ -65,7 +65,7 @@ module Saml
       end
 
       def audiences
-        search("./saml:Conditions/saml:AudienceRestriction/saml:Audience").map(&:text)
+        search('./saml:Conditions/saml:AudienceRestriction/saml:Audience').map(&:text)
       end
 
       def encrypted?
