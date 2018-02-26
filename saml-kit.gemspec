@@ -18,7 +18,11 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.2.0'
 
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
+    (
+      f.match(%r{^(test|spec|features)/}) ||
+      f.match(/^\..*/) ||
+      f.match(%r{^bin/.*})
+    ) && !f.match(%r{^spec/examples.*/})
   end
   spec.metadata['yard.run'] = 'yri'
   spec.bindir        = 'exe'
