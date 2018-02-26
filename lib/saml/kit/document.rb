@@ -135,10 +135,6 @@ module Saml
 
       attr_reader :content, :name, :configuration
 
-      def root
-        to_h.fetch(name, {})
-      end
-
       def must_match_xsd
         matches_xsd?(PROTOCOL_XSD)
       end
