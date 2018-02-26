@@ -11,6 +11,7 @@ RSpec.describe Saml::Kit::Document do
 
   specify { expect(subject.id).to eql(id) }
   specify { expect(subject.issuer).to eql(issuer) }
+  specify { expect(subject.version).to eql("2.0") }
 
   describe '.to_saml_document' do
     subject { described_class }

@@ -39,7 +39,7 @@ module Saml
 
       # Returns the Version of the SAML document.
       def version
-        root.fetch('Version', {})
+        at_xpath('./*/@Version').try(:value)
       end
 
       # Returns the Destination of the SAML document.
