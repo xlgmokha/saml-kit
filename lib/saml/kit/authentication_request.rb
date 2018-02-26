@@ -35,14 +35,14 @@ module Saml
       end
 
       def name_id_format
-        name_id_policy_format
+        name_id_policy
       end
 
       # Extract the NameIDPolicy from the AuthnRequest
       #    <samlp:AuthnRequest>
       #      <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
       #    </samlp:AuthnRequest>
-      def name_id_policy_format
+      def name_id_policy
         at_xpath('./*/samlp:NameIDPolicy/@Format').try(:value)
       end
 
