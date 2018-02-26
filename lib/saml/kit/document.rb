@@ -44,12 +44,12 @@ module Saml
 
       # Returns the Destination of the SAML document.
       def destination
-        root.fetch('Destination', nil)
+        at_xpath('./*/@Destination').try(:value)
       end
 
       # Returns the Destination of the SAML document.
       def issue_instant
-        Time.parse(root['IssueInstant'])
+        Time.parse(at_xpath('./*/@IssueInstant').try(:value))
       end
 
       # Returns the SAML document returned as a Hash.
@@ -102,15 +102,12 @@ module Saml
         # @param xml [String] the raw xml string.
         # @param configuration [Saml::Kit::Configuration] the configuration to use for unpacking the document.
         def to_saml_document(xml, configuration: Saml::Kit.configuration)
-          xml_document = ::Xml::Kit::Document.new(xml, namespaces: {
-                                                    "samlp": ::Saml::Kit::Namespaces::PROTOCOL
-                                                  })
           constructor = {
             'AuthnRequest' => Saml::Kit::AuthenticationRequest,
             'LogoutRequest' => Saml::Kit::LogoutRequest,
             'LogoutResponse' => Saml::Kit::LogoutResponse,
             'Response' => Saml::Kit::Response,
-          }[xml_document.find_by(XPATH).name] || InvalidDocument
+          }[Nokogiri::XML(xml).at_xpath(XPATH, "samlp": ::Saml::Kit::Namespaces::PROTOCOL).name] || InvalidDocument
           constructor.new(xml, configuration: configuration)
         rescue StandardError => error
           Saml::Kit.logger.error(error)

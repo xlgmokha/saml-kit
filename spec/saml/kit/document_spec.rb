@@ -3,15 +3,19 @@ RSpec.describe Saml::Kit::Document do
     Saml::Kit::AuthenticationRequest.build do |x|
       x.id = id
       x.issuer = issuer
+      x.destination = destination
     end
   end
 
   let(:id) { Xml::Kit::Id.generate }
   let(:issuer) { FFaker::Internet.uri('https') }
+  let(:destination) { FFaker::Internet.uri('https') }
 
   specify { expect(subject.id).to eql(id) }
   specify { expect(subject.issuer).to eql(issuer) }
-  specify { expect(subject.version).to eql("2.0") }
+  specify { expect(subject.version).to eql('2.0') }
+  specify { expect(subject.destination).to eql(destination) }
+  specify { expect(subject.issue_instant.to_i).to eql(Time.now.to_i) }
 
   describe '.to_saml_document' do
     subject { described_class }
