@@ -1,13 +1,6 @@
 RSpec::Matchers.define :have_xpath do |xpath|
   match do |actual|
-    namespaces = {
-      "NameFormat": Saml::Kit::Namespaces::ATTR_SPLAT,
-      "ds": ::Xml::Kit::Namespaces::XMLDSIG,
-      "md": Saml::Kit::Namespaces::METADATA,
-      "saml": Saml::Kit::Namespaces::ASSERTION,
-      "samlp": Saml::Kit::Namespaces::PROTOCOL,
-    }
-    xml_document(actual).xpath(xpath, namespaces).any?
+    xml_document(actual).xpath(xpath, Saml::Kit::Document::NAMESPACES).any?
   end
 
   failure_message do |actual|
