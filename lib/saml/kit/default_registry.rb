@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Saml
   module Kit
     # The default metadata registry is used to fetch the metadata associated with an issuer or entity id.

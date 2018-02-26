@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uri'
 
 RSpec::Matchers.define :have_query_param do |key|

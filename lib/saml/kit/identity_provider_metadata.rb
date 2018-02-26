@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Saml
   module Kit
     # This class is used to parse the IDPSSODescriptor from a SAML metadata document.

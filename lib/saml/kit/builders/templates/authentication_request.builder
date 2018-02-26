@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 xml.instruct!
 xml.tag!('samlp:AuthnRequest', request_options) do
   xml.tag!('saml:Issuer', issuer)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Metadata do
   describe '.from' do
     subject { described_class }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 xml.instruct!
 xml.EntityDescriptor entity_descriptor_options do
   signature_for(reference_id: id, xml: xml)

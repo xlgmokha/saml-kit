@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Builders::LogoutRequest do
   subject { described_class.new(user, configuration: configuration) }
 

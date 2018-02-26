@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 xml.instruct!
 xml.Response response_options do
   xml.Issuer(issuer, xmlns: Saml::Kit::Namespaces::ASSERTION)

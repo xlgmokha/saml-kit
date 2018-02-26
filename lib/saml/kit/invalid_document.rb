@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Saml
   module Kit
     # {include:file:spec/saml/invalid_document_spec.rb}

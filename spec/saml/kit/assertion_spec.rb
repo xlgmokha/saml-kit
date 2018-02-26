@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Assertion do
   subject do
     Saml::Kit::Response.build(user, request) do |x|

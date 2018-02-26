@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'saml/kit/bindings/binding'
 require 'saml/kit/bindings/http_post'
 require 'saml/kit/bindings/http_redirect'

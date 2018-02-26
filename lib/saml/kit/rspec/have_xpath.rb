@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec::Matchers.define :have_xpath do |xpath|
   match do |actual|
     xml_document(actual).xpath(xpath, Saml::Kit::Document::NAMESPACES).any?

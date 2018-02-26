@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Bindings::Binding do
   subject { described_class.new(binding: Saml::Kit::Bindings::HTTP_ARTIFACT, location: location) }
 

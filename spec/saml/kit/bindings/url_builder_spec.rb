@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Bindings::UrlBuilder do
   describe '#build' do
     let(:xml) { '<xml></xml>' }

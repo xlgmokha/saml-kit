@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Builders::Metadata do
   describe '.build' do
     subject { Saml::Kit::Metadata }

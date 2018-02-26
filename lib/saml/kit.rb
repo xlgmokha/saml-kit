@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'saml/kit/version'
 
 require 'active_model'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::DefaultRegistry do
   subject { described_class.new }
 

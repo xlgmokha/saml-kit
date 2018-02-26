@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 xml.SPSSODescriptor descriptor_options do
   configuration.certificates(use: :signing).each do |certificate|
     render certificate, xml: xml

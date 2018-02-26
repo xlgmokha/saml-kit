@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::InvalidDocument do
   it 'is invalid' do
     subject = described_class.new('<xml></xml>')

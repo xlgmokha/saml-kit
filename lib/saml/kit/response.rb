@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Saml
   module Kit
     # {include:file:spec/examples/response_spec.rb}

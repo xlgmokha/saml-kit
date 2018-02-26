@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TestHelpers
   def query_params_from(url)
     Hash[query_for(url).split('&').map { |x| x.split('=', 2) }]

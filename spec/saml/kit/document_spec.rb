@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Document do
   subject do
     Saml::Kit::AuthenticationRequest.build do |x|

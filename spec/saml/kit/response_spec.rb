@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Response do
   subject { described_class.build(user, request) }
 

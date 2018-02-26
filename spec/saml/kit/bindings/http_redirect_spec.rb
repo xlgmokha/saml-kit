@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Bindings::HttpRedirect do
   subject { described_class.new(location: location) }
 

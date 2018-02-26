@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Configuration do
   describe '#generate_key_pair_for' do
     subject { described_class.new }

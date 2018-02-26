@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Saml
   module Kit
     # This class represents the main configuration that is use for generating SAML documents.

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 xml.Assertion(assertion_options) do
   xml.Issuer issuer
   signature_for(reference_id: reference_id, xml: xml)

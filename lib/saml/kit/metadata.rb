@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Saml
   module Kit
     # The Metadata object can be used to parse an XML string of metadata.

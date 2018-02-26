@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'saml/kit'
 
 Saml::Kit.deprecate("Use the 'saml-kit-cli' gem instead. saml-kit-decode-http-redirect*")

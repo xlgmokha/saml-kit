@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Bindings do
   describe '.to_symbol' do
     subject { described_class }

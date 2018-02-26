@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Signature do
   subject { described_class.new(signed_document.at_xpath('//ds:Signature')) }
 

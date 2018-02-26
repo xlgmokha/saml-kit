@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rspec-benchmark'
 
 RSpec.configure do |config|

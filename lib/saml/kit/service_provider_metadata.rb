@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Saml
   module Kit
     # {include:file:spec/examples/service_provider_metadata_spec.rb}

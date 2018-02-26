@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::AuthenticationRequest do
   subject { described_class.new(raw_xml, configuration: configuration) }
 

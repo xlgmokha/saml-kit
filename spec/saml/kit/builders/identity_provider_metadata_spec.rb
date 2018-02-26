@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Saml::Kit::Builders::IdentityProviderMetadata do
   subject { described_class.new(configuration: configuration) }
 

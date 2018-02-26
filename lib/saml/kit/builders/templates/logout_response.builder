@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 xml.instruct!
 xml.LogoutResponse logout_response_options do
   xml.Issuer(issuer, xmlns: Saml::Kit::Namespaces::ASSERTION)
