@@ -7,7 +7,7 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-echo [$(date "+%H:%M:%S")] "Started at…"
+echo [$(date "+%H:%M:%S")] "==> Started at…"
 
 # GC customizations
 export RUBY_GC_MALLOC_LIMIT=79000000
