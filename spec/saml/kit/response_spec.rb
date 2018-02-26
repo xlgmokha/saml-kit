@@ -1,9 +1,14 @@
 RSpec.describe Saml::Kit::Response do
+  subject { described_class.build(user, request) }
+
+  let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: FFaker::Internet.uri('https'), assertion_consumer_service_url: FFaker::Internet.uri('https'), name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
+  let(:user) { User.new(attributes: { id: SecureRandom.uuid }) }
+
+  specify { expect(subject.status_code).to eql(Saml::Kit::Namespaces::SUCCESS) }
+
   describe '#valid?' do
     subject { described_class.build(user, request, configuration: configuration) }
 
-    let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
-    let(:user) { User.new(attributes: { id: SecureRandom.uuid }) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
 

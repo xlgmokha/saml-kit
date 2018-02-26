@@ -16,7 +16,7 @@ module Saml
 
       # Returns the /Status/StatusCode@Value
       def status_code
-        to_h.fetch(name, {}).fetch('Status', {}).fetch('StatusCode', {}).fetch('Value', nil)
+        at_xpath('./*/samlp:Status/samlp:StatusCode/@Value').try(:value)
       end
 
       # Returns the /InResponseTo attribute.
