@@ -18,7 +18,6 @@ module Saml
       def initialize(node, configuration: Saml::Kit.configuration, private_keys: [])
         @name = 'Assertion'
         @node = node
-        @xml_hash = hash_from(node)['Response'] || {}
         @configuration = configuration
         @occurred_at = Time.current
         private_keys = (configuration.private_keys(use: :encryption) + private_keys).uniq
@@ -136,11 +135,6 @@ module Saml
 
       def search(xpath)
         @node.search(xpath, Saml::Kit::Document::NAMESPACES)
-      end
-
-      def hash_from(node)
-        return {} if node.nil?
-        Hash.from_xml(node.document.root.to_s) || {}
       end
     end
   end
