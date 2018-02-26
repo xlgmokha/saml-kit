@@ -50,32 +50,32 @@ module Saml
 
       # Returns the /EntityDescriptor/@entityID
       def entity_id
-        document.find_by('/md:EntityDescriptor/@entityID').value
+        at_xpath('/md:EntityDescriptor/@entityID').try(:value)
       end
 
       # Returns the supported NameIDFormats.
       def name_id_formats
-        document.find_all("/md:EntityDescriptor/md:#{name}/md:NameIDFormat").map(&:text)
+        search("/md:EntityDescriptor/md:#{name}/md:NameIDFormat").map(&:text)
       end
 
       # Returns the Organization Name
       def organization_name
-        document.find_by('/md:EntityDescriptor/md:Organization/md:OrganizationName').try(:text)
+        at_xpath('/md:EntityDescriptor/md:Organization/md:OrganizationName').try(:text)
       end
 
       # Returns the Organization URL
       def organization_url
-        document.find_by('/md:EntityDescriptor/md:Organization/md:OrganizationURL').try(:text)
+        at_xpath('/md:EntityDescriptor/md:Organization/md:OrganizationURL').try(:text)
       end
 
       # Returns the Company
       def contact_person_company
-        document.find_by('/md:EntityDescriptor/md:ContactPerson/md:Company').try(:text)
+        at_xpath('/md:EntityDescriptor/md:ContactPerson/md:Company').try(:text)
       end
 
       # Returns each of the X509 certificates.
       def certificates
-        @certificates ||= document.find_all("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
+        @certificates ||= search("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
           cert = item.at_xpath('./ds:KeyInfo/ds:X509Data/ds:X509Certificate', NAMESPACES).text
           attribute = item.attribute('use')
           use = attribute.nil? ? nil : item.attribute('use').value
@@ -97,7 +97,7 @@ module Saml
       #
       # @param type [String] the type of service. .E.g. `AssertionConsumerServiceURL`
       def services(type)
-        document.find_all("/md:EntityDescriptor/md:#{name}/md:#{type}").map do |item|
+        search("/md:EntityDescriptor/md:#{name}/md:#{type}").map do |item|
           binding = item.attribute('Binding').value
           location = item.attribute('Location').value
           Saml::Kit::Bindings.create_for(binding, location)
@@ -221,6 +221,10 @@ module Saml
 
       def at_xpath(xpath)
         document.find_by(xpath)
+      end
+
+      def search(xpath)
+        document.find_all(xpath)
       end
 
       def metadata
