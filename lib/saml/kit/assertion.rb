@@ -21,11 +21,8 @@ module Saml
         @xml_hash = hash_from(node)['Response'] || {}
         @configuration = configuration
         @occurred_at = Time.current
-        decrypt!(::Xml::Kit::Decryption.new(
-          private_keys: (
-            configuration.private_keys(use: :encryption) + private_keys
-          ).uniq
-        ))
+        private_keys = (configuration.private_keys(use: :encryption) + private_keys).uniq
+        decrypt!(::Xml::Kit::Decryption.new(private_keys: private_keys))
       end
 
       def issuer
@@ -82,7 +79,7 @@ module Saml
       end
 
       def present?
-        assertion.present?
+        @node.present?
       end
 
       def to_xml(pretty: false)
@@ -93,19 +90,10 @@ module Saml
 
       attr_reader :configuration
 
-      def assertion
-        @assertion ||=
-          begin
-            result = (hash_from(@node)['Response'] || {})['Assertion']
-            return result if result.is_a?(Hash)
-            {}
-          end
-      end
-
       def decrypt!(decryptor)
         return unless encrypted?
 
-        encrypted_assertion = @node.at_xpath('./xmlenc:EncryptedData', Saml::Kit::Document::NAMESPACES)
+        encrypted_assertion = at_xpath('./xmlenc:EncryptedData')
         @node = decryptor.decrypt_node(encrypted_assertion)
       rescue Xml::Kit::DecryptionError => error
         @cannot_decrypt = true
