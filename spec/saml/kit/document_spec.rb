@@ -16,6 +16,7 @@ RSpec.describe Saml::Kit::Document do
   specify { expect(subject.version).to eql('2.0') }
   specify { expect(subject.destination).to eql(destination) }
   specify { expect(subject.issue_instant.to_i).to eql(Time.now.to_i) }
+  specify { expect(Saml::Kit::AuthenticationRequest.new('blah').id).to be_nil }
 
   describe '.to_saml_document' do
     subject { described_class }

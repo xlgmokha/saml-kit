@@ -144,7 +144,7 @@ module Saml
       end
 
       def expected_type?
-        to_h[name].present?
+        at_xpath("./samlp:#{name}").present?
       end
 
       def must_be_valid_version
