@@ -214,6 +214,11 @@ module Saml
         @document ||= ::Xml::Kit::Document.new(xml, namespaces: NAMESPACES)
       end
 
+      # @!visibility private
+      def to_nokogiri
+        @nokogiri ||= Nokogiri::XML(xml)
+      end
+
       def at_xpath(xpath)
         document.find_by(xpath)
       end

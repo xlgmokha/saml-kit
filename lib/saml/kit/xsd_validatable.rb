@@ -5,8 +5,7 @@ module Saml
       def matches_xsd?(xsd)
         Dir.chdir(File.dirname(xsd)) do
           xsd = Nokogiri::XML::Schema(IO.read(xsd))
-          document = Nokogiri::XML(to_xml)
-          xsd.validate(document).each do |error|
+          xsd.validate(to_nokogiri).each do |error|
             errors[:base] << error.message
           end
         end
