@@ -39,7 +39,7 @@ module Saml
       #      <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
       #    </samlp:AuthnRequest>
       def name_id_format
-        to_h[name]['NameIDPolicy']['Format']
+        at_xpath('./*/samlp:NameIDPolicy/@Format').try(:value)
       end
 
       # Generate a Response for a specific user.
