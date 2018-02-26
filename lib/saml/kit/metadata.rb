@@ -76,10 +76,8 @@ module Saml
       # Returns each of the X509 certificates.
       def certificates
         @certificates ||= search("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
-          cert = item.at_xpath('./ds:KeyInfo/ds:X509Data/ds:X509Certificate', NAMESPACES).text
-          attribute = item.attribute('use')
-          use = attribute.nil? ? nil : item.attribute('use').value
-          ::Xml::Kit::Certificate.new(cert, use: use)
+          cert = item.at_xpath('./ds:KeyInfo/ds:X509Data/ds:X509Certificate', 'ds' => ::Xml::Kit::Namespaces::XMLDSIG).try(:text)
+          ::Xml::Kit::Certificate.new(cert, use: item.attribute('use').try(:value))
         end
       end
 
@@ -185,9 +183,11 @@ module Saml
         # @param content [String] the raw metadata XML.
         # @return [Saml::Kit::Metadata] the metadata document or subclass.
         def from(content)
-          return unless (descriptor = Nokogiri::XML(content).at_xpath('/md:EntityDescriptor', NAMESPACES))
-          if (sp = descriptor.at_xpath('/md:EntityDescriptor/md:SPSSODescriptor', NAMESPACES)) &&
-             (idp = descriptor.at_xpath('/md:EntityDescriptor/md:IDPSSODescriptor', NAMESPACES))
+          document = Nokogiri::XML(content)
+          return unless document.at_xpath('/md:EntityDescriptor', NAMESPACES)
+          sp = document.at_xpath('/md:EntityDescriptor/md:SPSSODescriptor', NAMESPACES)
+          idp = document.at_xpath('/md:EntityDescriptor/md:IDPSSODescriptor', NAMESPACES)
+          if sp && idp
             Saml::Kit::CompositeMetadata.new(content)
           elsif sp
             Saml::Kit::ServiceProviderMetadata.new(content)
