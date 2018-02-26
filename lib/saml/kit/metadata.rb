@@ -159,7 +159,7 @@ module Saml
       #
       # @param pretty [Symbol] true to return a human friendly version of the XML.
       def to_xml(pretty: false)
-        document.to_xml(pretty: pretty)
+        pretty ? to_nokogiri.to_xml(indent: 2) : @xml
       end
 
       # Returns the XML document as a [String].
@@ -210,25 +210,21 @@ module Saml
 
       attr_reader :xml
 
-      def document
-        @document ||= ::Xml::Kit::Document.new(xml, namespaces: NAMESPACES)
-      end
-
       # @!visibility private
       def to_nokogiri
         @nokogiri ||= Nokogiri::XML(xml)
       end
 
       def at_xpath(xpath)
-        document.find_by(xpath)
+        to_nokogiri.at_xpath(xpath, NAMESPACES)
       end
 
       def search(xpath)
-        document.find_all(xpath)
+        to_nokogiri.search(xpath, NAMESPACES)
       end
 
       def metadata
-        document.find_by("/md:EntityDescriptor/md:#{name}").present?
+        at_xpath("/md:EntityDescriptor/md:#{name}").present?
       end
 
       def must_contain_descriptor

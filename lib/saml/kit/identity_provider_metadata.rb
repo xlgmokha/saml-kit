@@ -38,7 +38,7 @@ module Saml
       # Returns the IDPSSODescriptor/@WantAuthnRequestsSigned attribute.
       def want_authn_requests_signed
         xpath = "/md:EntityDescriptor/md:#{name}"
-        attribute = document.find_by(xpath).attribute('WantAuthnRequestsSigned')
+        attribute = at_xpath(xpath).attribute('WantAuthnRequestsSigned')
         return true if attribute.nil?
         attribute.text.casecmp('true').zero?
       end
@@ -57,7 +57,7 @@ module Saml
 
       # Returns each of the Attributes in the metadata.
       def attributes
-        document.find_all("/md:EntityDescriptor/md:#{name}/saml:Attribute").map do |item|
+        search("/md:EntityDescriptor/md:#{name}/saml:Attribute").map do |item|
           {
             format: item.attribute('NameFormat').try(:value),
             name: item.attribute('Name').value,

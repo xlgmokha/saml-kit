@@ -14,7 +14,7 @@ module Saml
 
       def services(type)
         xpath = map { |x| "//md:EntityDescriptor/md:#{x.name}/md:#{type}" }.join('|')
-        document.find_all(xpath).map do |item|
+        search(xpath).map do |item|
           binding = item.attribute('Binding').value
           location = item.attribute('Location').value
           Saml::Kit::Bindings.create_for(binding, location)
