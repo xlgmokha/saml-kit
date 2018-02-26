@@ -67,11 +67,11 @@ module Saml
       end
 
       def started_at
-        parse_date(assertion.fetch('Conditions', {}).fetch('NotBefore', nil))
+        parse_date(at_xpath('./saml:Conditions/@NotBefore').try(:value))
       end
 
       def expired_at
-        parse_date(assertion.fetch('Conditions', {}).fetch('NotOnOrAfter', nil))
+        parse_date(at_xpath('./saml:Conditions/@NotOnOrAfter').try(:value))
       end
 
       def audiences

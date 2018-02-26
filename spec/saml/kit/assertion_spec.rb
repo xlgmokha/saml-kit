@@ -10,6 +10,8 @@ RSpec.describe Saml::Kit::Assertion do
 
   specify { expect(subject.issuer).to eql(entity_id) }
   specify { expect(subject.name_id).to eql(user.name_id) }
+  specify { expect(subject.started_at.to_i).to eql(Time.now.utc.to_i) }
+  specify { expect(subject.expired_at.to_i).to eql(Saml::Kit.configuration.session_timeout.since(Time.now).utc.to_i) }
 
   describe '#active?' do
     let(:configuration) do
@@ -24,7 +26,7 @@ RSpec.describe Saml::Kit::Assertion do
       travel_to now
       not_on_or_after = configuration.session_timeout.since(now).iso8601
       xml = <<-XML.strip_heredoc
-        <Response>
+      <Response xmlns="#{Saml::Kit::Namespaces::PROTOCOL}">
         <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{Xml::Kit::Id.generate}" IssueInstant="#{now.iso8601}" Version="2.0">
          <Issuer>#{FFaker::Internet.uri('https')}</Issuer>
          <Subject>
@@ -44,9 +46,11 @@ RSpec.describe Saml::Kit::Assertion do
            </AuthnContext>
          </AuthnStatement>
         </Assertion>
-        </Response>
+      </Response>
 XML
-      subject = described_class.new(Nokogiri::XML(xml), configuration: configuration)
+      document = Nokogiri::XML(xml)
+      node = document.at_xpath('//saml:Assertion', 'saml' => Saml::Kit::Namespaces::ASSERTION)
+      subject = described_class.new(node, configuration: configuration)
       travel_to((configuration.clock_drift - 1.second).before(now))
       expect(subject).to be_active
       expect(subject).not_to be_expired
@@ -59,7 +63,7 @@ XML
       not_before = now.utc.iso8601
       not_after = configuration.session_timeout.since(now).iso8601
       xml = <<-XML.strip_heredoc
-        <Response>
+      <Response xmlns="#{Saml::Kit::Namespaces::PROTOCOL}">
         <Assertion xmlns="#{Saml::Kit::Namespaces::ASSERTION}" ID="#{Xml::Kit::Id.generate}" IssueInstant="#{now.iso8601}" Version="2.0">
          <Issuer>#{FFaker::Internet.uri('https')}</Issuer>
          <Subject>
@@ -79,9 +83,11 @@ XML
            </AuthnContext>
          </AuthnStatement>
         </Assertion>
-        </Response>
+      </Response>
 XML
-      subject = described_class.new(Nokogiri::XML(xml), configuration: configuration)
+      document = Nokogiri::XML(xml)
+      node = document.at_xpath('//saml:Assertion', 'saml' => Saml::Kit::Namespaces::ASSERTION)
+      subject = described_class.new(node, configuration: configuration)
       expect(subject).to be_active
       expect(subject).not_to be_expired
     end
