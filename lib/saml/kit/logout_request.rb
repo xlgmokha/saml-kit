@@ -36,7 +36,11 @@ module Saml
 
       # Returns the NameID value.
       def name_id
-        to_h[name]['NameID']
+        at_xpath('./*/saml:NameID').try(:text)
+      end
+
+      def name_id_format
+        at_xpath('./*/saml:NameID/@Format').try(:value)
       end
 
       # Generates a Serialized LogoutResponse using the encoding rules for the specified binding.

@@ -25,9 +25,7 @@ RSpec.describe Saml::Kit::LogoutRequest do
     expect(subject.issue_instant).to eql(Time.now.utc)
   end
 
-  it 'parses the version' do
-    expect(subject.version).to eql('2.0')
-  end
+  specify { expect(subject.version).to eql('2.0') }
 
   it 'parses the destination' do
     destination = FFaker::Internet.uri('https')
@@ -37,9 +35,8 @@ RSpec.describe Saml::Kit::LogoutRequest do
     expect(subject.destination).to eql(destination)
   end
 
-  it 'parses the name_id' do
-    expect(subject.name_id).to eql(name_id)
-  end
+  specify { expect(subject.name_id).to eql(name_id) }
+  specify { expect(subject.name_id_format).to eql(Saml::Kit::Namespaces::PERSISTENT) }
 
   describe '#valid?' do
     let(:metadata) do
