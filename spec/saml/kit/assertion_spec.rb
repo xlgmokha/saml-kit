@@ -148,6 +148,21 @@ XML
     end
   end
 
+  describe "#encrypted?" do
+    it 'returns true when encrypted' do
+      key_pair = Xml::Kit::KeyPair.generate(use: :encryption)
+      response = Saml::Kit::Response.build(user, request) do |x|
+        x.encrypt_with(key_pair)
+      end
+      subject = response.assertion([key_pair.private_key])
+      expect(subject).to be_encrypted
+    end
+
+    it 'returns false when not encrypted' do
+      expect(subject).not_to be_encrypted
+    end
+  end
+
   describe '#to_xml' do
     let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: ::Xml::Kit::Id.generate, issuer: FFaker::Internet.http_url, assertion_consumer_service_url: FFaker::Internet.http_url, name_id_format: Saml::Kit::Namespaces::PERSISTENT, provider: nil, signed?: true, trusted?: true) }
     let(:user) { User.new(attributes: { id: SecureRandom.uuid }) }

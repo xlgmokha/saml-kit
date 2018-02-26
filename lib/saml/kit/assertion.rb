@@ -70,7 +70,7 @@ module Saml
       end
 
       def encrypted?
-        @xml_hash.fetch('EncryptedAssertion', nil).present?
+        @encrypted
       end
 
       def decryptable?
@@ -91,9 +91,9 @@ module Saml
       attr_reader :configuration
 
       def decrypt!(decryptor)
-        return unless encrypted?
-
         encrypted_assertion = at_xpath('./xmlenc:EncryptedData')
+        @encrypted = encrypted_assertion.present?
+        return unless @encrypted
         @node = decryptor.decrypt_node(encrypted_assertion)
       rescue Xml::Kit::DecryptionError => error
         @cannot_decrypt = true
@@ -130,6 +130,7 @@ module Saml
       end
 
       def at_xpath(xpath)
+        return unless @node
         @node.at_xpath(xpath, Saml::Kit::Document::NAMESPACES)
       end
 
