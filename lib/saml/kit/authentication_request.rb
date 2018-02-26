@@ -34,9 +34,7 @@ module Saml
         at_xpath('./*/@AssertionConsumerServiceURL').try(:value)
       end
 
-      # @deprecated
       def name_id_format
-        Saml::Kit.deprecate("Use the method 'name_id_policy_format' instead. 'name_id_format'")
         name_id_policy_format
       end
 
