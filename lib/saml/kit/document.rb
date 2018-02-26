@@ -34,7 +34,7 @@ module Saml
 
       # Returns the Issuer for the SAML document.
       def issuer
-        root.fetch('Issuer', nil)
+        at_xpath('/*/saml:Issuer').try(:text)
       end
 
       # Returns the Version of the SAML document.
