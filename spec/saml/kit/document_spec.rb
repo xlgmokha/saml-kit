@@ -1,4 +1,16 @@
 RSpec.describe Saml::Kit::Document do
+  subject do
+    Saml::Kit::AuthenticationRequest.build do |x|
+      x.id = id
+      x.issuer = issuer
+    end
+  end
+  let(:id) { Xml::Kit::Id.generate }
+  let(:issuer) { FFaker::Internet.uri("https") }
+
+  specify { expect(subject.id).to eql(id) }
+  specify { expect(subject.issuer).to eql(issuer) }
+
   describe '.to_saml_document' do
     subject { described_class }
 

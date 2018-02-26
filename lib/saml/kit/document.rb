@@ -29,7 +29,7 @@ module Saml
 
       # Returns the ID for the SAML document.
       def id
-        root.fetch('ID', nil)
+        at_xpath('./*/@ID').try(:value)
       end
 
       # Returns the Issuer for the SAML document.
