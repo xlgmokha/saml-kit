@@ -34,11 +34,17 @@ module Saml
         at_xpath('./*/@AssertionConsumerServiceURL').try(:value)
       end
 
+      # @deprecated
+      def name_id_format
+        Saml::Kit.deprecate("Use the method 'name_id_policy_format' instead. 'name_id_format'")
+        name_id_policy_format
+      end
+
       # Extract the NameIDPolicy from the AuthnRequest
       #    <samlp:AuthnRequest>
       #      <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
       #    </samlp:AuthnRequest>
-      def name_id_format
+      def name_id_policy_format
         at_xpath('./*/samlp:NameIDPolicy/@Format').try(:value)
       end
 
