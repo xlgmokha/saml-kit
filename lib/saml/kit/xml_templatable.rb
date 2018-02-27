@@ -3,15 +3,15 @@
 module Saml
   module Kit
     module XmlTemplatable
+      TEMPLATES_DIR=Pathname.new(File.join(__dir__, 'builders/templates/'))
       include ::Xml::Kit::Templatable
 
       def template_path
-        @template_path ||=
-          begin
-            root_path = __dir__
-            template_name = "#{self.class.name.split('::').last.underscore}.builder"
-            File.join(root_path, 'builders/templates/', template_name)
-          end
+        @template_path ||= TEMPLATES_DIR.join(template_name)
+      end
+
+      def template_name
+        "#{self.class.name.split('::').last.underscore}.builder"
       end
 
       # Returns true if an embedded signature is requested and at least one signing certificate is available via the configuration.
