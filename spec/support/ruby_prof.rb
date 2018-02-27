@@ -8,7 +8,7 @@ module RubyProfiler
       yield
     end
     printer = RubyProf::CallTreePrinter.new(result)
-    printer.print(path: "tmp/profile/", profile: Time.now.utc.iso8601)
+    printer.print(path: 'tmp/', profile: Time.now.utc.iso8601)
   end
 end
 
