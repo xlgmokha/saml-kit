@@ -530,6 +530,13 @@ XML
       expect(subject.name_id).to eql(user.name_id)
     end
 
+    it 'excludes comments from the name id' do
+      user.name_id = "shiro@voltron.com<!-- CVE-2017-11428 -->.evil.com"
+      subject = described_class.build(user, request)
+      expect(subject.name_id).to eql("shiro@voltron.com<!-- CVE-2017-11428 -->.evil.com")
+      expect(subject.name_id).not_to eql("shiro@voltron.com")
+    end
+
     it 'returns the single attributes' do
       subject = described_class.build(user, request)
       expect(subject.attributes).to eql('name' => 'mo')

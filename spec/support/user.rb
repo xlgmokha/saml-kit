@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class User
-  attr_reader :name_id, :attributes
+  attr_accessor :name_id, :attributes
 
   def initialize(name_id: SecureRandom.uuid, attributes: {})
     @name_id = name_id
