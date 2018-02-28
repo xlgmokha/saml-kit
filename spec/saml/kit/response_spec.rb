@@ -537,6 +537,13 @@ XML
       expect(subject.name_id).not_to eql("shiro@voltron.com")
     end
 
+    it 'parses the name id safely (CVE-2017-11428)' do
+      raw = IO.read("spec/fixtures/response_node_text_attack.xml.base64")
+      subject = Saml::Kit::Bindings::HttpPost.new(location: '').deserialize('SAMLResponse' => raw)
+      expect(subject.name_id).to eql("support@onelogin.com")
+      expect(subject.attributes[:surname]).to eql("smith")
+    end
+
     it 'returns the single attributes' do
       subject = described_class.build(user, request)
       expect(subject.attributes).to eql('name' => 'mo')
