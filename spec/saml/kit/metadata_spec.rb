@@ -84,4 +84,20 @@ RSpec.describe Saml::Kit::Metadata do
       expect(subject.signature).to be_present
     end
   end
+
+  describe "validations" do
+    it 'is invalid, when the signature is invalid' do
+      xml = described_class.build_xml do |x|
+        x.entity_id = "original"
+        x.sign_with(::Xml::Kit::KeyPair.generate(use: :signing))
+        x.build_identity_provider do |y|
+          y.add_single_sign_on_service(FFaker::Internet.uri("https"), binding: :http_post)
+        end
+      end
+
+      subject = described_class.from(xml.gsub("original", "altered"))
+      expect(subject).not_to be_valid
+      expect(subject.errors[:digest_value]).to include("is invalid.")
+    end
+  end
 end
