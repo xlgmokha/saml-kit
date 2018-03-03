@@ -567,5 +567,19 @@ XML
       expect(result).to be_instance_of(described_class)
       expect(result).to be_valid
     end
+
+    it 'can build a response without the need for the user to provide attributes' do
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.entity_id = FFaker::Internet.uri('https')
+      end
+      sp = Saml::Kit::Metadata.build(&:build_service_provider)
+      allow(configuration.registry).to receive(:metadata_for).with(configuration.entity_id).and_return(sp)
+      user = UserWithoutAttributes.new
+
+      result = described_class.build(user, configuration: configuration)
+      expect(result).to be_instance_of(described_class)
+      expect(result).to be_valid
+      expect(result.attributes).to be_empty
+    end
   end
 end
