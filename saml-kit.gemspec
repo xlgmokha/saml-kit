@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activemodel', '>= 4.2.0'
-  spec.add_dependency 'xml-kit', '>= 0.1.10', '<= 1.0.0'
+  spec.add_dependency 'xml-kit', '>= 0.1.12', '<= 1.0.0'
   spec.add_development_dependency 'bundler', '~> 1.15'
   spec.add_development_dependency 'bundler-audit', '~> 0.6'
   spec.add_development_dependency 'ffaker', '~> 2.7'

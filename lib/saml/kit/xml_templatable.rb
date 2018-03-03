@@ -21,11 +21,6 @@ module Saml
           (embed_signature && signing_key_pair.present?)
       end
 
-      def encrypt_with(key_pair)
-        self.encrypt = true
-        self.encryption_certificate = key_pair.certificate
-      end
-
       def digest_method
         configuration.digest_method
       end
