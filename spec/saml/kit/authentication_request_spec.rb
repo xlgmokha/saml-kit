@@ -189,7 +189,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     let(:url) { FFaker::Internet.uri('https') }
     let(:entity_id) { FFaker::Internet.uri('https') }
 
-    it 'provides a nice API for building metadata' do
+    it 'provides a nice API for building a request' do
       result = described_class.build do |builder|
         builder.issuer = entity_id
         builder.assertion_consumer_service_url = url
@@ -198,6 +198,16 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       expect(result).to be_instance_of(described_class)
       expect(result.issuer).to eql(entity_id)
       expect(result.assertion_consumer_service_url).to eql(url)
+    end
+
+    it 'can build a authnrequest without a nameid policy' do
+      result = described_class.build do |x|
+        x.issuer = entity_id
+        x.assertion_consumer_service_url = url
+        x.name_id_format = nil
+      end
+      expect(result).to be_instance_of(described_class)
+      expect(result).to be_valid
     end
   end
 
