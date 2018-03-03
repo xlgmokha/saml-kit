@@ -555,4 +555,22 @@ XML
       expect(subject.attributes).to eql('name' => 'mo', 'age' => '33')
     end
   end
+
+  describe "#build" do
+    it 'can build a response without a request' do
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.entity_id = FFaker::Internet.uri("https")
+      end
+      sp = Saml::Kit::Metadata.build do |x|
+        x.build_service_provider
+      end
+      allow(configuration.registry).to receive(:metadata_for).with(configuration.entity_id).and_return(sp)
+      result = described_class.build(user, configuration: configuration)
+      expect(result).to be_instance_of(described_class)
+      puts result.valid?
+      puts result.errors.full_messages.inspect
+      puts result.to_xml(pretty: true)
+      expect(result).to be_valid
+    end
+  end
 end

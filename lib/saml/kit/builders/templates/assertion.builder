@@ -9,9 +9,11 @@ xml.Assertion(assertion_options) do
       xml.SubjectConfirmationData '', subject_confirmation_data_options
     end
   end
-  xml.Conditions conditions_options do
-    xml.AudienceRestriction do
-      xml.Audience request.issuer
+  if request.present?
+    xml.Conditions conditions_options do
+      xml.AudienceRestriction do
+        xml.Audience request.issuer
+      end
     end
   end
   xml.AuthnStatement authn_statement_options do

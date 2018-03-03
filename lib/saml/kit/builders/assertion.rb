@@ -16,7 +16,7 @@ module Saml
         end
 
         def name_id_format
-          request.name_id_format
+          request.try(:name_id_format) || Saml::Kit::Namespaces::PERSISTENT
         end
 
         def name_id
@@ -43,11 +43,12 @@ module Saml
         end
 
         def subject_confirmation_data_options
-          {
-            InResponseTo: request.id,
+          options = {
             NotOnOrAfter: 3.hours.since(now).utc.iso8601,
             Recipient: destination,
           }
+          options[:InResponseTo] = request.id if request.present?
+          options
         end
 
         def conditions_options

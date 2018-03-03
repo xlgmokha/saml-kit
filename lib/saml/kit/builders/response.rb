@@ -13,7 +13,7 @@ module Saml
         attr_accessor :issuer, :destination
         attr_reader :configuration
 
-        def initialize(user, request, configuration: Saml::Kit.configuration)
+        def initialize(user, request = nil, configuration: Saml::Kit.configuration)
           @user = user
           @request = request
           @id = ::Xml::Kit::Id.generate
@@ -28,7 +28,7 @@ module Saml
         end
 
         def build
-          Saml::Kit::Response.new(to_xml, request_id: request.id, configuration: configuration)
+          Saml::Kit::Response.new(to_xml, request_id: request.try(:id), configuration: configuration)
         end
 
         def assertion
@@ -46,15 +46,16 @@ module Saml
         private
 
         def response_options
-          {
+          options = {
             ID: id,
             Version: version,
             IssueInstant: now.iso8601,
             Destination: destination,
             Consent: Namespaces::UNSPECIFIED,
-            InResponseTo: request.id,
             xmlns: Namespaces::PROTOCOL,
           }
+          options[:InResponseTo] = request.id if request.present?
+          options
         end
       end
     end
