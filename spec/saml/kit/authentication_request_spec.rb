@@ -207,7 +207,9 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
         x.name_id_format = nil
       end
       expect(result).to be_instance_of(described_class)
+      result.registry = instance_double(Saml::Kit::DefaultRegistry, metadata_for: Saml::Kit::ServiceProviderMetadata.build)
       expect(result).to be_valid
+      expect(result.to_xml).not_to include("NameIDPolicy")
     end
   end
 

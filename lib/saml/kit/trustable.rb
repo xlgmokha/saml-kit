@@ -30,7 +30,7 @@ module Saml
 
       # @!visibility private
       def provider
-        configuration.registry.metadata_for(issuer)
+        registry.metadata_for(issuer)
       end
 
       # @!visibility private

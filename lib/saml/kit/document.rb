@@ -17,6 +17,7 @@ module Saml
         "samlp": ::Saml::Kit::Namespaces::PROTOCOL,
         'xmlenc' => ::Xml::Kit::Namespaces::XMLENC,
       }.freeze
+      attr_accessor :registry
       validates_presence_of :content
       validates_presence_of :id
       validate :must_match_xsd
@@ -25,6 +26,7 @@ module Saml
 
       def initialize(xml, name:, configuration: Saml::Kit.configuration)
         @configuration = configuration
+        @registry = configuration.registry
         @content = xml
         @name = name
       end
