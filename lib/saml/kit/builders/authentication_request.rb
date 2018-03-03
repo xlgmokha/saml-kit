@@ -4,7 +4,7 @@ module Saml
   module Kit
     module Builders
       # {include:file:lib/saml/kit/builders/templates/authentication_request.builder}
-      # {include:file:spec/saml/builders/authentication_request_spec.rb}
+      # {include:file:spec/saml/kit/builders/authentication_request_spec.rb}
       class AuthenticationRequest
         include XmlTemplatable
         attr_accessor :id, :now, :issuer, :assertion_consumer_service_url, :name_id_format, :destination

@@ -4,7 +4,7 @@ module Saml
   module Kit
     module Builders
       # {include:file:lib/saml/kit/builders/templates/logout_response.builder}
-      # {include:file:spec/saml/builders/logout_response_spec.rb}
+      # {include:file:spec/saml/kit/builders/logout_response_spec.rb}
       class LogoutResponse
         include XmlTemplatable
         attr_accessor :id, :issuer, :version, :status_code, :now, :destination

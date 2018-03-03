@@ -29,7 +29,7 @@ module Saml
     #     configuration.logger = Rails.logger
     #   end
     #
-    # {include:file:spec/saml/default_registry_spec.rb}
+    # {include:file:spec/saml/kit/default_registry_spec.rb}
     class DefaultRegistry
       include Enumerable
 

@@ -4,7 +4,7 @@ module Saml
   module Kit
     module Builders
       # {include:file:lib/saml/kit/builders/templates/identity_provider_metadata.builder}
-      # {include:file:spec/saml/builders/identity_provider_metadata_spec.rb}
+      # {include:file:spec/saml/kit/builders/identity_provider_metadata_spec.rb}
       class IdentityProviderMetadata
         include XmlTemplatable
         extend Forwardable
