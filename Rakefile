@@ -8,3 +8,8 @@ task default: :spec
 
 require 'rubocop/rake_task'
 RuboCop::RakeTask.new(:rubocop)
+
+require 'bundler/audit/task'
+Bundler::Audit::Task.new
+
+task lint: [:rubocop, 'bundle:audit']

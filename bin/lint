@@ -8,4 +8,4 @@ echo [$(date "+%H:%M:%S")] "==> Running setup…"
 bin/setup
 
 echo [$(date "+%H:%M:%S")] "==> Running linters…"
-bundle exec rake rubocop
+bundle exec rake lint
