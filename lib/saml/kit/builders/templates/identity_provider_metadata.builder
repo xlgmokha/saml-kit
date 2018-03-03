@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 xml.IDPSSODescriptor descriptor_options do
-  configuration.certificates(use: :signing).each do |certificate|
-    render certificate, xml: xml
-  end
-  configuration.certificates(use: :encryption).each do |certificate|
+  configuration.certificates.each do |certificate|
     render certificate, xml: xml
   end
   logout_urls.each do |item|
