@@ -69,8 +69,8 @@ module Saml
         node
       end
 
-      def to_xml
-        node.to_s
+      def to_xml(pretty: false)
+        pretty ? node.to_xml(indent: 2) : node.to_s
       end
 
       private
@@ -84,6 +84,8 @@ module Saml
         dsignature.errors.each do |attribute|
           errors.add(attribute, error_message(attribute))
         end
+      rescue Xmldsig::SchemaError => error
+        errors.add(:base, error.message)
       end
 
       def validate_certificate(now = Time.now.utc)
