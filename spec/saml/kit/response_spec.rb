@@ -567,9 +567,6 @@ XML
       allow(configuration.registry).to receive(:metadata_for).with(configuration.entity_id).and_return(sp)
       result = described_class.build(user, configuration: configuration)
       expect(result).to be_instance_of(described_class)
-      puts result.valid?
-      puts result.errors.full_messages.inspect
-      puts result.to_xml(pretty: true)
       expect(result).to be_valid
     end
   end

@@ -9,8 +9,8 @@ xml.Assertion(assertion_options) do
       xml.SubjectConfirmationData '', subject_confirmation_data_options
     end
   end
-  if request.present?
-    xml.Conditions conditions_options do
+  xml.Conditions conditions_options do
+    if request.present?
       xml.AudienceRestriction do
         xml.Audience request.issuer
       end

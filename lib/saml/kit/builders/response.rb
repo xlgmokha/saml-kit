@@ -50,10 +50,10 @@ module Saml
             ID: id,
             Version: version,
             IssueInstant: now.iso8601,
-            Destination: destination,
             Consent: Namespaces::UNSPECIFIED,
             xmlns: Namespaces::PROTOCOL,
           }
+          options[:Destination] = destination if destination.present?
           options[:InResponseTo] = request.id if request.present?
           options
         end
