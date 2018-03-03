@@ -42,7 +42,7 @@ RSpec.describe Saml::Kit::Signature do
     it 'is invalid when the schema of the signature is invalid' do
       signature_element = signed_document.at_xpath('//ds:Signature')
       element = signature_element.at_xpath('./ds:SignedInfo', ds: Xml::Kit::Namespaces::XMLDSIG)
-      element.name = "BLAH"
+      element.name = 'BLAH'
       subject = described_class.new(signature_element)
       expect(subject).not_to be_valid
       expect(subject.errors[:base]).to include("1:0: ERROR: Element '{http://www.w3.org/2000/09/xmldsig#}BLAH': This element is not expected. Expected is ( {http://www.w3.org/2000/09/xmldsig#}SignedInfo ).")

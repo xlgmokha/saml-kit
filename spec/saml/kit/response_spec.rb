@@ -531,17 +531,17 @@ XML
     end
 
     it 'excludes comments from the name id' do
-      user.name_id = "shiro@voltron.com<!-- CVE-2017-11428 -->.evil.com"
+      user.name_id = 'shiro@voltron.com<!-- CVE-2017-11428 -->.evil.com'
       subject = described_class.build(user, request)
-      expect(subject.name_id).to eql("shiro@voltron.com<!-- CVE-2017-11428 -->.evil.com")
-      expect(subject.name_id).not_to eql("shiro@voltron.com")
+      expect(subject.name_id).to eql('shiro@voltron.com<!-- CVE-2017-11428 -->.evil.com')
+      expect(subject.name_id).not_to eql('shiro@voltron.com')
     end
 
     it 'parses the name id safely (CVE-2017-11428)' do
-      raw = IO.read("spec/fixtures/response_node_text_attack.xml.base64")
+      raw = IO.read('spec/fixtures/response_node_text_attack.xml.base64')
       subject = Saml::Kit::Bindings::HttpPost.new(location: '').deserialize('SAMLResponse' => raw)
-      expect(subject.name_id).to eql("support@onelogin.com")
-      expect(subject.attributes[:surname]).to eql("smith")
+      expect(subject.name_id).to eql('support@onelogin.com')
+      expect(subject.attributes[:surname]).to eql('smith')
     end
 
     it 'returns the single attributes' do
@@ -556,14 +556,12 @@ XML
     end
   end
 
-  describe "#build" do
+  describe '#build' do
     it 'can build a response without a request' do
       configuration = Saml::Kit::Configuration.new do |config|
-        config.entity_id = FFaker::Internet.uri("https")
+        config.entity_id = FFaker::Internet.uri('https')
       end
-      sp = Saml::Kit::Metadata.build do |x|
-        x.build_service_provider
-      end
+      sp = Saml::Kit::Metadata.build(&:build_service_provider)
       allow(configuration.registry).to receive(:metadata_for).with(configuration.entity_id).and_return(sp)
       result = described_class.build(user, configuration: configuration)
       expect(result).to be_instance_of(described_class)
