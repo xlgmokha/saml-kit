@@ -24,6 +24,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
   end
 
+  specify { expect(subject.name).to eql('AuthnRequest') }
   specify { expect(subject.issuer).to eql(issuer) }
   specify { expect(subject.id).to eql(id) }
   specify { expect(subject.assertion_consumer_service_url).to eql(assertion_consumer_service_url) }

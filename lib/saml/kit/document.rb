@@ -18,6 +18,7 @@ module Saml
         'xmlenc' => ::Xml::Kit::Namespaces::XMLENC,
       }.freeze
       attr_accessor :registry
+      attr_reader :name
       validates_presence_of :content
       validates_presence_of :id
       validate :must_match_xsd
@@ -137,7 +138,7 @@ module Saml
 
       private
 
-      attr_reader :content, :name, :configuration
+      attr_reader :content, :configuration
 
       def must_match_xsd
         matches_xsd?(PROTOCOL_XSD)
