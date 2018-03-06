@@ -26,7 +26,7 @@ module Saml
       # Returns true when the fingerprint of the certificate matches one of the certificates registered in the metadata.
       def trusted?(metadata)
         return false if metadata.nil?
-        metadata.matches?(certificate.fingerprint, use: :signing)
+        metadata.matches?(certificate.fingerprint, use: :signing).present?
       end
 
       def digest_value
