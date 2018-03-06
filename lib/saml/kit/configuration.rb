@@ -55,7 +55,7 @@ module Saml
       # @param private_key [String] the plain text private key.
       # @param passphrase [String] the password to decrypt the private key.
       # @param use [Symbol] the type of key pair, `:signing` or `:encryption`
-      def add_key_pair(certificate, private_key, passphrase: '', use: :signing)
+      def add_key_pair(certificate, private_key, passphrase: nil, use: :signing)
         ensure_proper_use!(use)
         @key_pairs.push(::Xml::Kit::KeyPair.new(certificate, private_key, passphrase, use.to_sym))
       end
