@@ -102,7 +102,7 @@ RSpec.describe Saml::Kit::Signature do
 
     context 'when a signature is present' do
       it 'returns true' do
-        expect(subject).to be_present
+        expect(subject.present?).to be(true)
       end
     end
   end

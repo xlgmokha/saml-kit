@@ -66,7 +66,7 @@ module Saml
       end
 
       def present?
-        node
+        node.present?
       end
 
       def to_xml(pretty: false)
