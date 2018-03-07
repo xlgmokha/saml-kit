@@ -118,14 +118,14 @@ RSpec.describe Saml::Kit::Signature do
     end
   end
 
-  describe "#trusted?" do
-    context "when trusted" do
+  describe '#trusted?' do
+    context 'when trusted' do
       let(:metadata) { instance_double(Saml::Kit::Metadata, matches?: Object.new) }
 
       specify { expect(subject.trusted?(metadata)).to be(true) }
     end
 
-    context "when untrusted" do
+    context 'when untrusted' do
       let(:metadata) { instance_double(Saml::Kit::Metadata, matches?: nil) }
 
       specify { expect(subject.trusted?(metadata)).to be(false) }
