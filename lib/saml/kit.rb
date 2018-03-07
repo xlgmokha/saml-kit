@@ -51,7 +51,7 @@ module Saml
   module Kit
     class << self
       def configuration
-        @config ||= Saml::Kit::Configuration.new
+        @configuration ||= Saml::Kit::Configuration.new
       end
 
       def configure

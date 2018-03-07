@@ -59,7 +59,7 @@ module Saml
 
       # Returns the SAML document returned as a Hash.
       def to_h
-        @xml_hash ||= Hash.from_xml(content) || {}
+        @to_h ||= Hash.from_xml(content) || {}
       end
 
       # Returns the SAML document as an XML string.
@@ -77,7 +77,7 @@ module Saml
 
       # @!visibility private
       def to_nokogiri
-        @nokogiri ||= Nokogiri::XML(content)
+        @to_nokogiri ||= Nokogiri::XML(content)
       end
 
       # @!visibility private

@@ -148,7 +148,7 @@ module Saml
 
       # Returns the XML document converted to a Hash.
       def to_h
-        @xml_hash ||= Hash.from_xml(to_xml)
+        @to_h ||= Hash.from_xml(to_xml)
       end
 
       # Returns the XML document as a String.
@@ -210,7 +210,7 @@ module Saml
 
       # @!visibility private
       def to_nokogiri
-        @nokogiri ||= Nokogiri::XML(xml)
+        @to_nokogiri ||= Nokogiri::XML(xml)
       end
 
       def at_xpath(xpath)
