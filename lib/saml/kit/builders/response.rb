@@ -54,7 +54,7 @@ module Saml
             xmlns: Namespaces::PROTOCOL,
           }
           options[:Destination] = destination if destination.present?
-          options[:InResponseTo] = request.id if request.present?
+          options[:InResponseTo] = request.try(:id) if request.present?
           options
         end
       end
