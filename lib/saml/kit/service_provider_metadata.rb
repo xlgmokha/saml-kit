@@ -2,6 +2,9 @@
 
 module Saml
   module Kit
+    # This class represents a
+    # SPSSODescriptor element in a
+    # SAML metadata document.
     # {include:file:spec/examples/service_provider_metadata_spec.rb}
     class ServiceProviderMetadata < Metadata
       def initialize(xml)

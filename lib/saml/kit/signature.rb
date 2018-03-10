@@ -2,6 +2,9 @@
 
 module Saml
   module Kit
+    # This class is responsible for
+    # validating an xml digital signature
+    # in an xml document.
     class Signature
       include ActiveModel::Validations
       include Translatable

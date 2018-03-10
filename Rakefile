@@ -9,7 +9,9 @@ require 'rubocop/rake_task'
 RSpec::Core::RakeTask.new(:spec)
 RuboCop::RakeTask.new(:rubocop)
 Bundler::Audit::Task.new
-Reek::Rake::Task.new(:reek)
+Reek::Rake::Task.new(:reek) do |task|
+  task.config_file = '.reek'
+end
 
 task lint: [:rubocop, :reek, 'bundle:audit']
 task default: :spec

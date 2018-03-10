@@ -93,7 +93,7 @@ module Saml
 
       # Returns true if there is at least one signing certificate registered.
       def sign?
-        certificates(use: :signing).any?
+        @sign ||= certificates(use: :signing).any?
       end
 
       private

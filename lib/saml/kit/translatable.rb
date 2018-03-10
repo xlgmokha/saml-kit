@@ -2,6 +2,9 @@
 
 module Saml
   module Kit
+    # This module is responsible
+    # for translating error messages
+    # to the current locale.
     module Translatable
       # @!visibility private
       def error_message(attribute, options = {})

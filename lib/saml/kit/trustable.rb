@@ -2,6 +2,9 @@
 
 module Saml
   module Kit
+    # This module is responsible for
+    # validating the trustworthiness
+    # of a saml document.
     module Trustable
       extend ActiveSupport::Concern
 
