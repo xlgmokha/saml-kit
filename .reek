@@ -61,9 +61,6 @@ ControlParameter:
   - Saml::Kit::Document#to_xml
   - Saml::Kit::Metadata#to_xml
   - Saml::Kit::Signature#to_xml
-InstanceVariableAssumption:
-  exclude:
-  - Saml::Kit::Assertion
 IrresponsibleModule:
   exclude:
   - Saml::Kit::Assertion

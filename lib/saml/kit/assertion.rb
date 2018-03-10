@@ -22,6 +22,8 @@ module Saml
         @node = node
         @configuration = configuration
         @occurred_at = Time.current
+        @cannot_decrypt = false
+        @encrypted = false
         private_keys = (configuration.private_keys(use: :encryption) + private_keys).uniq
         decrypt!(::Xml::Kit::Decryption.new(private_keys: private_keys))
       end
