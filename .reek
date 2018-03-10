@@ -62,16 +62,7 @@ ControlParameter:
   - Saml::Kit::Metadata#to_xml
   - Saml::Kit::Signature#to_xml
 TooManyInstanceVariables:
-  exclude:
-  - Saml::Kit::Assertion
-  - Saml::Kit::Builders::AuthenticationRequest
-  - Saml::Kit::Builders::IdentityProviderMetadata
-  - Saml::Kit::Builders::LogoutRequest
-  - Saml::Kit::Builders::LogoutResponse
-  - Saml::Kit::Builders::Metadata
-  - Saml::Kit::Builders::Response
-  - Saml::Kit::Builders::ServiceProviderMetadata
-  - Saml::Kit::Configuration
+  max_instance_variables: 11
 TooManyMethods:
   exclude:
   - Saml::Kit::Assertion
