@@ -64,11 +64,7 @@ ControlParameter:
 TooManyInstanceVariables:
   max_instance_variables: 11
 TooManyMethods:
-  exclude:
-  - Saml::Kit::Assertion
-  - Saml::Kit::Document
-  - Saml::Kit::Metadata
-  - Saml::Kit::Signature
+  max_methods: 30
 TooManyStatements:
   exclude:
   - initialize
