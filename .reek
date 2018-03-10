@@ -61,9 +61,6 @@ ControlParameter:
   - Saml::Kit::Document#to_xml
   - Saml::Kit::Metadata#to_xml
   - Saml::Kit::Signature#to_xml
-PrimaDonnaMethod:
-  exclude:
-  - Saml::Kit::Configuration
 TooManyInstanceVariables:
   exclude:
   - Saml::Kit::Assertion

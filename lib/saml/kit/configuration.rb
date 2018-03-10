@@ -56,7 +56,7 @@ module Saml
       # @param passphrase [String] the password to decrypt the private key.
       # @param use [Symbol] the type of key pair, `:signing` or `:encryption`
       def add_key_pair(certificate, private_key, passphrase: nil, use: :signing)
-        ensure_proper_use!(use)
+        ensure_proper_use(use)
         @key_pairs.push(::Xml::Kit::KeyPair.new(certificate, private_key, passphrase, use.to_sym))
       end
 
@@ -65,7 +65,7 @@ module Saml
       # @param use [Symbol] the type of key pair, `:signing` or `:encryption`
       # @param passphrase [String] the private key passphrase to use.
       def generate_key_pair_for(use:, passphrase: SecureRandom.uuid)
-        ensure_proper_use!(use)
+        ensure_proper_use(use)
         certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: passphrase)
         add_key_pair(certificate, private_key, passphrase: passphrase, use: use)
       end
@@ -98,7 +98,7 @@ module Saml
 
       private
 
-      def ensure_proper_use!(use)
+      def ensure_proper_use(use)
         return if USES.include?(use)
 
         error_message = 'Use must be either :signing or :encryption'
