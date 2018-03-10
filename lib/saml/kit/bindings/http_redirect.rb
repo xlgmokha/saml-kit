@@ -3,6 +3,11 @@
 module Saml
   module Kit
     module Bindings
+      # This class is responsible for
+      # serializing/deserializing SAML
+      # documents using the HTTP Redirect
+      # binding specification.
+      # https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf
       # {include:file:spec/saml/kit/bindings/http_redirect_spec.rb}
       class HttpRedirect < Binding
         include Serializable

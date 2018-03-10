@@ -61,28 +61,6 @@ ControlParameter:
   - Saml::Kit::Document#to_xml
   - Saml::Kit::Metadata#to_xml
   - Saml::Kit::Signature#to_xml
-IrresponsibleModule:
-  exclude:
-  - Saml::Kit::Assertion
-  - Saml::Kit::Bindings::Binding
-  - Saml::Kit::Bindings::HttpPost
-  - Saml::Kit::Bindings::HttpRedirect
-  - Saml::Kit::Bindings::UrlBuilder
-  - Saml::Kit::Bindings
-  - Saml::Kit::Buildable
-  - Saml::Kit::Builders::Assertion
-  - Saml::Kit::Builders::EncryptedAssertion
-  - Saml::Kit::Builders
-  - Saml::Kit::CompositeMetadata
-  - Saml::Kit::DefaultRegistry::HttpApi
-  - Saml::Kit::Document
-  - Saml::Kit::InvalidDocument
-  - Saml::Kit::NullAssertion
-  - Saml::Kit::Requestable
-  - Saml::Kit::Respondable
-  - Saml::Kit::Response
-  - Saml::Kit::Serializable
-  - Saml::Kit
 PrimaDonnaMethod:
   exclude:
   - Saml::Kit::Assertion

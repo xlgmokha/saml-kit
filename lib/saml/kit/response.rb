@@ -2,6 +2,8 @@
 
 module Saml
   module Kit
+    # This class is responsible for validating and
+    # parsing a SAML Response document.
     # {include:file:spec/examples/response_spec.rb}
     class Response < Document
       include Respondable

@@ -48,7 +48,11 @@ I18n.load_path +=
   Dir[File.expand_path('kit/locales/*.yml', File.dirname(__FILE__))]
 
 module Saml
+  # This module is the container for all classes/modules in this gem.
   module Kit
+    # This class provides a global access to the
+    # default SAML configuration. This is useful
+    # for long running processes.
     class << self
       def configuration
         @configuration ||= Saml::Kit::Configuration.new

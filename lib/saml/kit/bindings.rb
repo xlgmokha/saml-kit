@@ -7,6 +7,9 @@ require 'saml/kit/bindings/url_builder'
 
 module Saml
   module Kit
+    # This module is responsible for exposing
+    # the different SAML bindings that are
+    # supported by this gem.
     module Bindings
       HTTP_ARTIFACT = 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact'.freeze
       HTTP_POST = 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'.freeze

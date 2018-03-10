@@ -69,6 +69,9 @@ module Saml
         end
       end
 
+      # This class is responsible for
+      # making HTTP requests to fetch metadata
+      # from remote locations.
       class HttpApi # :nodoc:
         def initialize(url, verify_ssl: true)
           @uri = URI.parse(url)

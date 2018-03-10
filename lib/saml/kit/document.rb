@@ -2,6 +2,7 @@
 
 module Saml
   module Kit
+    # This class is a base class for SAML documents.
     class Document
       include ActiveModel::Validations
       include XsdValidatable

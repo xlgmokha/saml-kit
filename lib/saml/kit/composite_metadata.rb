@@ -2,6 +2,11 @@
 
 module Saml
   module Kit
+    # This class implements the Composite
+    # design pattern to allow client
+    # component to work with a metadata
+    # that provides an IDPSSODescriptor
+    # and SPSSODescriptor element.
     class CompositeMetadata < Metadata # :nodoc:
       include Enumerable
       attr_reader :service_provider, :identity_provider

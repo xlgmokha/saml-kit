@@ -2,6 +2,9 @@
 
 module Saml
   module Kit
+    # This module is responsible for
+    # providing an API to build a
+    # document object, xml, or builder class.
     module Buildable
       extend ActiveSupport::Concern
 

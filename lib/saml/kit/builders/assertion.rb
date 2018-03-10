@@ -3,6 +3,7 @@
 module Saml
   module Kit
     module Builders
+      # This class is responsible for building a SAML Assertion
       # {include:file:lib/saml/kit/builders/templates/assertion.builder}
       class Assertion
         include XmlTemplatable

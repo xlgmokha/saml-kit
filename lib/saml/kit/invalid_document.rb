@@ -2,6 +2,8 @@
 
 module Saml
   module Kit
+    # This class represents an invalid SAML
+    # document that could not be parsed.
     # {include:file:spec/saml/kit/invalid_document_spec.rb}
     class InvalidDocument < Document
       validate do |model|

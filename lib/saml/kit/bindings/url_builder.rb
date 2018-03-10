@@ -3,6 +3,11 @@
 module Saml
   module Kit
     module Bindings
+      # This class is responsible for
+      # generating a url as per the
+      # rules for the HTTP redirect binding
+      # specification.
+      # https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf
       # {include:file:spec/saml/kit/bindings/url_builder_spec.rb}
       class UrlBuilder
         include Serializable

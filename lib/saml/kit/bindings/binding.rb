@@ -3,6 +3,7 @@
 module Saml
   module Kit
     module Bindings
+      # This class is a base class for SAML bindings.
       # {include:file:spec/saml/kit/bindings/binding_spec.rb}
       class Binding
         attr_reader :binding, :location

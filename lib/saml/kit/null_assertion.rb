@@ -2,6 +2,9 @@
 
 module Saml
   module Kit
+    # This class is an implementation of the
+    # Null Object pattern for when a Response
+    # is missing an Assertion.
     class NullAssertion
       include ActiveModel::Validations
       include Translatable

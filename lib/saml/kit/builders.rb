@@ -13,6 +13,8 @@ require 'saml/kit/builders/service_provider_metadata'
 
 module Saml
   module Kit
+    # This module contains all the builders classes
+    # that are used to create SAML documents.
     module Builders
     end
   end

@@ -3,6 +3,7 @@
 module Saml
   module Kit
     module Builders
+      # This class is responsible for encrypting an Assertion.
       # {include:file:lib/saml/kit/builders/templates/encrypted_assertion.builder}
       class EncryptedAssertion
         include XmlTemplatable

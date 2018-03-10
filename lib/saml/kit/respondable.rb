@@ -2,6 +2,9 @@
 
 module Saml
   module Kit
+    # This module provides the behaviours
+    # associated with SAML Response documents.
+    # .e.g. Response, LogoutResponse
     module Respondable
       extend ActiveSupport::Concern
       attr_reader :request_id

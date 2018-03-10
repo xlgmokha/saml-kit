@@ -2,6 +2,9 @@
 
 module Saml
   module Kit
+    # This class validates the Assertion
+    # element nested in a Response element
+    # of a SAML document.
     class Assertion
       include ActiveModel::Validations
       include Translatable

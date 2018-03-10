@@ -2,6 +2,7 @@
 
 module Saml
   module Kit
+    # This module is responsible for serializing/deserialing values.
     module Serializable
       # Base 64 decodes the value.
       #
