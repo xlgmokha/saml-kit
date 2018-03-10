@@ -52,12 +52,8 @@ Attribute:
   - Saml::Kit::Document#registry
 BooleanParameter:
   exclude:
-  - Saml::Kit::Assertion#to_xml
   - Saml::Kit::DefaultRegistry#register_url
   - Saml::Kit::DefaultRegistry::HttpApi#initialize
-  - Saml::Kit::Document#to_xml
-  - Saml::Kit::Metadata#to_xml
-  - Saml::Kit::Signature#to_xml
 ControlParameter:
   exclude:
   - Saml::Kit::Assertion#to_xml

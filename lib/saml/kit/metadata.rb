@@ -153,14 +153,14 @@ module Saml
 
       # Returns the XML document as a String.
       #
-      # @param pretty [Symbol] true to return a human friendly version of the XML.
-      def to_xml(pretty: false)
-        pretty ? to_nokogiri.to_xml(indent: 2) : @xml
+      # @param pretty [Boolean] true to return a human friendly version of the XML.
+      def to_xml(pretty: nil)
+        pretty ? to_nokogiri.to_xml(indent: 2) : to_s
       end
 
       # Returns the XML document as a [String].
       def to_s
-        to_xml
+        @xml
       end
 
       # Verifies the signature and data using the signing certificates.

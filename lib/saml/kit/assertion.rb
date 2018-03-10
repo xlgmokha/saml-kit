@@ -83,8 +83,12 @@ module Saml
         @node.present?
       end
 
-      def to_xml(pretty: false)
-        pretty ? @node.to_xml(indent: 2) : @node.to_s
+      def to_xml(pretty: nil)
+        pretty ? @node.to_xml(indent: 2) : to_s
+      end
+
+      def to_s
+        @node.to_s
       end
 
       private
