@@ -66,13 +66,7 @@ TooManyInstanceVariables:
 TooManyMethods:
   max_methods: 30
 TooManyStatements:
-  exclude:
-  - initialize
-  - Saml::Kit::Assertion#decrypt
-  - Saml::Kit::CompositeMetadata#services
-  - Saml::Kit::DefaultRegistry::HttpApi#http
-  - Saml::Kit::Metadata#from
-  - Saml::Kit::Signature#validate_signature
+  max_statements: 10
 UtilityFunction:
   exclude:
   - Saml::Kit::Assertion#parse_date
