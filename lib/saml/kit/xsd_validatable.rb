@@ -2,6 +2,8 @@
 
 module Saml
   module Kit
+    # This module is responsible for validating
+    # xml documents against the SAML XSD's
     module XsdValidatable
       # @!visibility private
       def matches_xsd?(xsd)
