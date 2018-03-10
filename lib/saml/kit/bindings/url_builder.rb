@@ -18,15 +18,16 @@ module Saml
         end
 
         def build(saml_document, relay_state: nil)
+          destination = saml_document.destination
           if configuration.sign?
             payload = canonicalize(saml_document, relay_state)
-            "#{saml_document.destination}?#{payload}&Signature=#{signature_for(payload)}"
+            "#{destination}?#{payload}&Signature=#{signature_for(payload)}"
           else
             payload = to_query_string(
               saml_document.query_string_parameter => serialize(saml_document.to_xml),
               'RelayState' => relay_state
             )
-            "#{saml_document.destination}?#{payload}"
+            "#{destination}?#{payload}"
           end
         end
 
