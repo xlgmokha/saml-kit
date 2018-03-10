@@ -28,7 +28,7 @@ module Saml
         @cannot_decrypt = false
         @encrypted = false
         private_keys = (configuration.private_keys(use: :encryption) + private_keys).uniq
-        decrypt!(::Xml::Kit::Decryption.new(private_keys: private_keys))
+        decrypt(::Xml::Kit::Decryption.new(private_keys: private_keys))
       end
 
       def issuer
@@ -100,7 +100,7 @@ module Saml
 
       attr_reader :configuration
 
-      def decrypt!(decryptor)
+      def decrypt(decryptor)
         encrypted_assertion = at_xpath('./xmlenc:EncryptedData')
         @encrypted = encrypted_assertion.present?
         return unless @encrypted

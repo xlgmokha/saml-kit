@@ -63,7 +63,6 @@ ControlParameter:
   - Saml::Kit::Signature#to_xml
 PrimaDonnaMethod:
   exclude:
-  - Saml::Kit::Assertion
   - Saml::Kit::Bindings::HttpRedirect
   - Saml::Kit::Configuration
 TooManyInstanceVariables:
@@ -86,7 +85,7 @@ TooManyMethods:
 TooManyStatements:
   exclude:
   - initialize
-  - Saml::Kit::Assertion#decrypt!
+  - Saml::Kit::Assertion#decrypt
   - Saml::Kit::CompositeMetadata#services
   - Saml::Kit::DefaultRegistry::HttpApi#http
   - Saml::Kit::Metadata#from
