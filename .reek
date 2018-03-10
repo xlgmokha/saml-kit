@@ -63,7 +63,6 @@ ControlParameter:
   - Saml::Kit::Signature#to_xml
 PrimaDonnaMethod:
   exclude:
-  - Saml::Kit::Bindings::HttpRedirect
   - Saml::Kit::Configuration
 TooManyInstanceVariables:
   exclude:
@@ -131,7 +130,7 @@ UncommunicativeVariableName:
 DuplicateMethodCall:
   exclude:
   - Saml::Kit::Bindings::Binding#saml_param_from
-  - Saml::Kit::Bindings::HttpRedirect#ensure_valid_signature!
+  - Saml::Kit::Bindings::HttpRedirect#ensure_valid_signature
   - Saml::Kit::Bindings::UrlBuilder#build
   - Saml::Kit::Builders::Response#initialize
   - Saml::Kit::XmlTemplatable#sign?
@@ -145,7 +144,7 @@ FeatureEnvy:
   - Saml::Kit::Signature#trusted?
 NilCheck:
   exclude:
-  - Saml::Kit::Bindings::HttpRedirect#ensure_valid_signature!
+  - Saml::Kit::Bindings::HttpRedirect#ensure_valid_signature
   - Saml::Kit::IdentityProviderMetadata#want_authn_requests_signed
   - Saml::Kit::LogoutRequest#single_logout_service
   - Saml::Kit::Respondable#must_match_request_id

@@ -25,19 +25,19 @@ module Saml
 
         def deserialize(params, configuration: Saml::Kit.configuration)
           parameters = normalize(params_to_hash(params))
-          document = deserialize_document_from!(parameters, configuration)
-          ensure_valid_signature!(parameters, document)
+          document = deserialize_document_from(parameters, configuration)
+          ensure_valid_signature(parameters, document)
           document
         end
 
         private
 
-        def deserialize_document_from!(params, configuration)
+        def deserialize_document_from(params, configuration)
           xml = inflate(decode(unescape(saml_param_from(params))))
           Saml::Kit::Document.to_saml_document(xml, configuration: configuration)
         end
 
-        def ensure_valid_signature!(params, document)
+        def ensure_valid_signature(params, document)
           return if params[:Signature].blank? || params[:SigAlg].blank?
           return if document.provider.nil?
 
