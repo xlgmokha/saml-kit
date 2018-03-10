@@ -74,7 +74,7 @@ module Saml
       #
       # @param use [Symbol] the type of key pair to return `nil`, `:signing` or `:encryption`
       def key_pairs(use: nil)
-        use.present? ? @key_pairs.find_all { |x| x.for?(use) } : @key_pairs
+        use.present? ? @key_pairs.find_all { |xxx| xxx.for?(use) } : @key_pairs
       end
 
       # Return each certificate for a specific use.

@@ -110,7 +110,7 @@ module Saml
       # @param type [Symbol] can be on the service element like `AssertionConsumerServiceURL`, `SingleSignOnService` or `SingleLogoutService`.
       def service_for(binding:, type:)
         binding = Saml::Kit::Bindings.binding_for(binding)
-        services(type).find { |x| x.binding?(binding) }
+        services(type).find { |xxx| xxx.binding?(binding) }
       end
 
       # Returns each of the SingleLogoutService bindings
@@ -132,7 +132,7 @@ module Saml
       # @param relay_state [String] the relay state to have echo'd back.
       # @return [Array] Returns an array with a url and Hash of parameters to send to the other party.
       def logout_request_for(user, binding: :http_post, relay_state: nil)
-        builder = Saml::Kit::LogoutRequest.builder(user) { |x| yield x if block_given? }
+        builder = Saml::Kit::LogoutRequest.builder(user) { |xxx| yield xxx if block_given? }
         request_binding = single_logout_service_for(binding: binding)
         request_binding.serialize(builder, relay_state: relay_state)
       end
@@ -143,7 +143,7 @@ module Saml
       # @param use [Symbol] the type of certificates to look at. Can be `:signing` or `:encryption`.
       # @return [Xml::Kit::Certificate] returns the matching `{Xml::Kit::Certificate}`
       def matches?(fingerprint, use: :signing)
-        certificates.find { |x| x.for?(use) && x.fingerprint == fingerprint }
+        certificates.find { |xxx| xxx.for?(use) && xxx.fingerprint == fingerprint }
       end
 
       # Returns the XML document converted to a Hash.

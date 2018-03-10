@@ -74,9 +74,9 @@ module Saml
       # @param configuration [Saml::Kit::Configuration] the configuration to use for generating the request.
       # @return [Array] The url and saml params encoded using the rules for the specified binding.
       def login_request_for(binding:, relay_state: nil, configuration: Saml::Kit.configuration)
-        builder = Saml::Kit::AuthenticationRequest.builder(configuration: configuration) do |x|
-          x.embed_signature = want_authn_requests_signed
-          yield x if block_given?
+        builder = Saml::Kit::AuthenticationRequest.builder(configuration: configuration) do |xxx|
+          xxx.embed_signature = want_authn_requests_signed
+          yield xxx if block_given?
         end
         request_binding = single_sign_on_service_for(binding: binding)
         request_binding.serialize(builder, relay_state: relay_state)

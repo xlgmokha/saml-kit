@@ -20,7 +20,7 @@ module Saml
       end
 
       def services(type)
-        xpath = map { |x| "//md:EntityDescriptor/md:#{x.name}/md:#{type}" }.join('|')
+        xpath = map { |xxx| "//md:EntityDescriptor/md:#{xxx.name}/md:#{type}" }.join('|')
         search(xpath).map do |item|
           binding = item.attribute('Binding').value
           location = item.attribute('Location').value
@@ -37,7 +37,7 @@ module Saml
       end
 
       def method_missing(name, *args)
-        if (target = find { |x| x.respond_to?(name) })
+        if (target = find { |xxx| xxx.respond_to?(name) })
           target.public_send(name, *args)
         else
           super
@@ -45,7 +45,7 @@ module Saml
       end
 
       def respond_to_missing?(method, *)
-        find { |x| x.respond_to?(method) }
+        find { |xxx| xxx.respond_to?(method) }
       end
     end
   end

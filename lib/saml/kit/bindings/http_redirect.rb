@@ -84,7 +84,7 @@ module Saml
 
         def params_to_hash(value)
           return value unless value.is_a?(String)
-          Hash[URI.parse(value).query.split('&').map { |x| x.split('=', 2) }]
+          Hash[URI.parse(value).query.split('&').map { |xx| xx.split('=', 2) }]
         end
       end
     end

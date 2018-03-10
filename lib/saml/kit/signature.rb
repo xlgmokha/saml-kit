@@ -37,8 +37,8 @@ module Saml
       end
 
       def expected_digest_value
-        digests = dsignature.references.map do |x|
-          Base64.encode64(x.calculate_digest_value).chomp
+        digests = dsignature.references.map do |xxx|
+          Base64.encode64(xxx.calculate_digest_value).chomp
         end
         digests.count > 1 ? digests : digests[0]
       end

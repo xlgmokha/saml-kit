@@ -85,26 +85,7 @@ UtilityFunction:
   - Saml::Kit::Serializable#inflate
   - Saml::Kit::Serializable#unescape
 LongParameterList:
-  exclude:
-  - Saml::Kit::AuthenticationRequest#response_for
-  - Saml::Kit::Configuration#add_key_pair
-UncommunicativeVariableName:
-  exclude:
-  - Saml::Kit::AuthenticationRequest#response_for
-  - Saml::Kit::Bindings::HttpRedirect#params_to_hash
-  - Saml::Kit::Builders::Metadata#build_identity_provider
-  - Saml::Kit::Builders::Metadata#build_service_provider
-  - Saml::Kit::CompositeMetadata#method_missing
-  - Saml::Kit::CompositeMetadata#respond_to_missing?
-  - Saml::Kit::CompositeMetadata#services
-  - Saml::Kit::Configuration#key_pairs
-  - Saml::Kit::IdentityProviderMetadata#login_request_for
-  - Saml::Kit::LogoutRequest#response_for
-  - Saml::Kit::Metadata#logout_request_for
-  - Saml::Kit::Metadata#matches?
-  - Saml::Kit::Metadata#service_for
-  - query_params_from
-  - Saml::Kit::Signature#expected_digest_value
+  max_params: 4
 DuplicateMethodCall:
   exclude:
   - Saml::Kit::Bindings::Binding#saml_param_from

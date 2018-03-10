@@ -8,7 +8,7 @@ RSpec::Matchers.define :have_query_param do |key|
   end
 
   def query_params_from(url)
-    Hash[query_for(url).split('&').map { |x| x.split('=', 2) }]
+    Hash[query_for(url).split('&').map { |xxx| xxx.split('=', 2) }]
   end
 
   def uri_for(url)

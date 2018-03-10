@@ -51,8 +51,8 @@ module Saml
       # @param relay_state [Object] The RelayState to include in the RelayState param.
       # @return [Array] Returns an array with a url and Hash of parameters to return to the requestor.
       def response_for(binding:, relay_state: nil)
-        builder = Saml::Kit::LogoutResponse.builder(self) do |x|
-          yield x if block_given?
+        builder = Saml::Kit::LogoutResponse.builder(self) do |xxx|
+          yield xxx if block_given?
         end
         response_binding = provider.single_logout_service_for(binding: binding)
         response_binding.serialize(builder, relay_state: relay_state)

@@ -54,11 +54,11 @@ module Saml
       # @param configuration [Saml::Kit::Configuration] the configuration to use to build the response.
       def response_for(user, binding:, relay_state: nil, configuration: Saml::Kit.configuration)
         response_binding = provider.assertion_consumer_service_for(binding: binding)
-        builder = Saml::Kit::Response.builder(user, self, configuration: configuration) do |x|
-          x.embed_signature = provider.want_assertions_signed
-          yield x if block_given?
+        response = Saml::Kit::Response.builder(user, self, configuration: configuration) do |builder|
+          builder.embed_signature = provider.want_assertions_signed
+          yield builder if block_given?
         end
-        response_binding.serialize(builder, relay_state: relay_state)
+        response_binding.serialize(response, relay_state: relay_state)
       end
     end
   end
