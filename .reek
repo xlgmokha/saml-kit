@@ -89,7 +89,6 @@ LongParameterList:
 DuplicateMethodCall:
   exclude:
   - Saml::Kit::Bindings::Binding#saml_param_from
-  - Saml::Kit::Bindings::HttpRedirect#ensure_valid_signature
   - Saml::Kit::Bindings::UrlBuilder#build
   - Saml::Kit::Builders::Response#initialize
   - Saml::Kit::XmlTemplatable#sign?

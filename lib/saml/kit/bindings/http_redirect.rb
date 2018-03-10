@@ -38,18 +38,18 @@ module Saml
         end
 
         def ensure_valid_signature(params, document)
-          return if params[:Signature].blank? || params[:SigAlg].blank?
-          return if document.provider.nil?
+          signature = params[:Signature]
+          algorithm = params[:SigAlg]
+          provider = document.provider
+          return if signature.blank? || algorithm.blank?
+          return if provider.nil?
 
-          if document.provider.verify(
-            algorithm_for(params[:SigAlg]),
-            decode(params[:Signature]),
+          return document.signature_verified! if provider.verify(
+            algorithm_for(algorithm),
+            decode(signature),
             canonicalize(params)
           )
-            document.signature_verified!
-          else
-            raise ArgumentError, 'Invalid Signature'
-          end
+          raise ArgumentError, 'Invalid Signature'
         end
 
         def canonicalize(params)
