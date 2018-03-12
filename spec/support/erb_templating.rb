@@ -15,8 +15,8 @@ module ErbTemplating
       @erb.result(binding)
     end
 
-    def method_missing(name, *args)
-      @data[name]
+    def method_missing(method, *)
+      @data[method] || super
     end
 
     def respond_to_missing?(method, *)

@@ -9,7 +9,7 @@ module Saml
         include XmlTemplatable
         attr_reader :user, :request
         attr_accessor :id, :reference_id, :now
-        attr_accessor :version, :status_code
+        attr_accessor :version, :status_code, :status_message
         attr_accessor :issuer, :destination
         attr_reader :configuration
 
@@ -21,6 +21,7 @@ module Saml
           @now = Time.now.utc
           @version = '2.0'
           @status_code = Namespaces::SUCCESS
+          @status_message = nil
           @issuer = configuration.entity_id
           @encryption_certificate = request.try(:provider).try(:encryption_certificates).try(:last)
           @encrypt = encryption_certificate.present?

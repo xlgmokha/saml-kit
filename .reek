@@ -37,6 +37,7 @@ Attribute:
   - Saml::Kit::Builders::Response#now
   - Saml::Kit::Builders::Response#reference_id
   - Saml::Kit::Builders::Response#status_code
+  - Saml::Kit::Builders::Response#status_message
   - Saml::Kit::Builders::Response#version
   - Saml::Kit::Builders::ServiceProviderMetadata#acs_urls
   - Saml::Kit::Builders::ServiceProviderMetadata#logout_urls
@@ -62,7 +63,7 @@ ControlParameter:
   - Saml::Kit::Metadata#to_xml
   - Saml::Kit::Signature#to_xml
 TooManyInstanceVariables:
-  max_instance_variables: 11
+  max_instance_variables: 12
 TooManyMethods:
   max_methods: 30
 TooManyStatements:

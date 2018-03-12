@@ -38,6 +38,13 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(result.issuer).to eql(issuer)
       expect(result.assertion.issuer).to eql(issuer)
     end
+
+    it 'builds a response with a status code' do
+      subject.status_code = Saml::Kit::Namespaces::REQUESTER_ERROR
+      subject.status_message = 'Invalid message signature'
+      result = subject.build
+      expect(result.status_message).to eql('Invalid message signature')
+    end
   end
 
   describe '#to_xml' do
