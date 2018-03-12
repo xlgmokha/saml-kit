@@ -8,7 +8,7 @@ module ErbTemplating
     end
 
     def fetch(key, default)
-      @data.fetch(key, default)
+      @data.fetch(key) { default }
     end
 
     def __expand
