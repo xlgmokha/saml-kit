@@ -1,4 +1,4 @@
-<saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Destination="<%= fetch(:destination, 'https://www.example.com/acs') %>" ID="_d2b481a92e895f1436189403b7d5ccd1" InResponseTo="<%= fetch(:in_response_to, "_4db60150-227a-439b-a686-e7c57a9b5f9a") %>" IssueInstant="<%= issue_instant.iso8601 %>" Version="2.0">
+<saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Destination="<%= fetch(:destination, 'https://www.example.com') %>" ID="_d2b481a92e895f1436189403b7d5ccd1" InResponseTo="<%= fetch(:in_response_to, "_4db60150-227a-439b-a686-e7c57a9b5f9a") %>" IssueInstant="<%= issue_instant.iso8601 %>" Version="2.0">
   <saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"><%= fetch(:issuer, 'https://www.example.com') %></saml2:Issuer>
   <saml2p:Status>
     <saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"></saml2p:StatusCode>

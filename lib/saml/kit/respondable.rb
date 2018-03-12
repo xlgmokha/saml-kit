@@ -24,6 +24,11 @@ module Saml
         at_xpath('./*/samlp:Status/samlp:StatusCode/@Value').try(:value)
       end
 
+      # Returns the /Status/StatusMessage
+      def status_message
+        at_xpath('./*/samlp:Status/samlp:StatusMessage').try(:text)
+      end
+
       # Returns the /InResponseTo attribute.
       def in_response_to
         at_xpath('./*/@InResponseTo').try(:value)

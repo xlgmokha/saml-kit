@@ -560,6 +560,13 @@ XML
       subject = described_class.new(xml)
       expect(subject.name_id).to be_nil
     end
+
+    it 'parses a response with a status code of Requester' do
+      message = FFaker::Lorem.sentence
+      subject = described_class.new(expand_template('requester_error.saml_response', status_message: message))
+      expect(subject.status_code).to eql(Saml::Kit::Namespaces::REQUESTER_ERROR)
+      expect(subject.status_message).to eql(message)
+    end
   end
 
   describe '#build' do
