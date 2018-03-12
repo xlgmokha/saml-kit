@@ -45,6 +45,12 @@ RSpec.describe Saml::Kit::Builders::Response do
       result = subject.build
       expect(result.status_message).to eql('Invalid message signature')
     end
+
+    it 'builds a response without an assertion' do
+      subject.assertion = nil
+      result = subject.build
+      expect(result.assertion).not_to be_present
+    end
   end
 
   describe '#to_xml' do

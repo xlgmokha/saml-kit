@@ -63,7 +63,7 @@ ControlParameter:
   - Saml::Kit::Metadata#to_xml
   - Saml::Kit::Signature#to_xml
 TooManyInstanceVariables:
-  max_instance_variables: 12
+  max_instance_variables: 15
 TooManyMethods:
   max_methods: 30
 TooManyStatements:

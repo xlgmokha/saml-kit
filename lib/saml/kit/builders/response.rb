@@ -32,6 +32,10 @@ module Saml
           Saml::Kit::Response.new(to_xml, request_id: request.try(:id), configuration: configuration)
         end
 
+        def assertion=(value)
+          @assertion = value ? value : Null.new
+        end
+
         def assertion
           @assertion ||=
             begin
