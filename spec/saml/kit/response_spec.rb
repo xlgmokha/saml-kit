@@ -554,6 +554,12 @@ XML
       subject = described_class.build(user, request)
       expect(subject.attributes).to eql('name' => 'mo', 'age' => '33')
     end
+
+    it 'can parse an assertion without a name id' do
+      xml = expand_template('no_nameid.saml_response', issue_instant: Time.now)
+      subject = described_class.new(xml)
+      expect(subject.name_id).to be_nil
+    end
   end
 
   describe '#build' do

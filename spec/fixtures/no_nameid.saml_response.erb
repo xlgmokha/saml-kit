@@ -1,0 +1,25 @@
+<saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Destination="<%= fetch(:destination, 'https://www.example.com/acs') %>" ID="_d2b481a92e895f1436189403b7d5ccd1" InResponseTo="<%= fetch(:in_response_to, "_4db60150-227a-439b-a686-e7c57a9b5f9a") %>" IssueInstant="<%= issue_instant.iso8601 %>" Version="2.0">
+  <saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"><%= fetch(:issuer, 'https://www.example.com') %></saml2:Issuer>
+  <saml2p:Status>
+    <saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"></saml2p:StatusCode>
+  </saml2p:Status>
+  <saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="_637d9c5c732418d7cef10586f21c21b0" IssueInstant="<%= issue_instant.iso8601 %>" Version="2.0">
+    <saml2:Issuer><%= fetch(:issuer, 'https://www.example.com') %></saml2:Issuer>
+    <saml2:Subject>
+      <saml2:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <saml2:SubjectConfirmationData Address="10.38.131.134" InResponseTo="<%= fetch(:in_response_to, "_4db60150-227a-439b-a686-e7c57a9b5f9a") %>" NotOnOrAfter="<%= fetch(:not_on_or_after, Time.now).iso8601 %>" Recipient="<%= fetch(:recipient, 'https://www.example.com/') %>"></saml2:SubjectConfirmationData>
+      </saml2:SubjectConfirmation>
+    </saml2:Subject>
+    <saml2:Conditions NotBefore="<%= fetch(:not_before, Time.now).iso8601 %>" NotOnOrAfter="<%= fetch(:not_on_or_after, Time.now).iso8601 %>">
+      <saml2:AudienceRestriction>
+        <saml2:Audience><%= fetch(:audience, 'https://www.example.com') %></saml2:Audience>
+      </saml2:AudienceRestriction>
+    </saml2:Conditions>
+    <saml2:AuthnStatement AuthnInstant="<%= issue_instant.iso8601 %>" SessionIndex="_99d6ac14d6ad70a23c89f82ba75c4ae0">
+      <saml2:SubjectLocality Address="10.38.131.134"></saml2:SubjectLocality>
+      <saml2:AuthnContext>
+        <saml2:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</saml2:AuthnContextClassRef>
+      </saml2:AuthnContext>
+    </saml2:AuthnStatement>
+  </saml2:Assertion>
+</saml2p:Response>
