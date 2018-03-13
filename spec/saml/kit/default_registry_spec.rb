@@ -7,11 +7,13 @@ RSpec.describe Saml::Kit::DefaultRegistry do
   let(:service_provider_metadata) do
     Saml::Kit::ServiceProviderMetadata.build do |builder|
       builder.entity_id = entity_id
+      builder.add_assertion_consumer_service(FFaker::Internet.uri('https'), binding: :http_post)
     end
   end
   let(:identity_provider_metadata) do
     Saml::Kit::IdentityProviderMetadata.build do |builder|
       builder.entity_id = entity_id
+      builder.add_single_sign_on_service(FFaker::Internet.uri('https'), binding: :http_post)
     end
   end
 
@@ -78,13 +80,41 @@ RSpec.describe Saml::Kit::DefaultRegistry do
     end
   end
 
+  describe '#register' do
+    it 'registers the metadata' do
+      metadata = Saml::Kit::IdentityProviderMetadata.build do |xxx|
+        xxx.entity_id = FFaker::Internet.uri('https')
+        xxx.add_single_sign_on_service(FFaker::Internet.uri('https'), binding: :http_post)
+      end
+      subject.register(metadata)
+      expect(subject.metadata_for(metadata.entity_id)).to eql(metadata)
+    end
+
+    it 'raises an error when the metadata is invalid' do
+      expect do
+        subject.register(Saml::Kit::IdentityProviderMetadata.build)
+      end.to raise_error(/Cannot register invalid metadata/)
+    end
+
+    it 'raises an error when the document is not a metadata' do
+      authn_request = Saml::Kit::AuthenticationRequest.build
+      allow(authn_request).to receive(:valid?).and_return(true)
+
+      expect do
+        subject.register(authn_request)
+      end.to raise_error(/Cannot register invalid metadata/)
+    end
+  end
+
   describe '#each' do
     it 'yields each registered metadata' do
-      idp = Saml::Kit::IdentityProviderMetadata.build do |config|
-        config.entity_id = 'idp'
+      idp = Saml::Kit::IdentityProviderMetadata.build do |xxx|
+        xxx.entity_id = 'idp'
+        xxx.add_single_sign_on_service(FFaker::Internet.uri('https'), binding: :http_post)
       end
-      sp = Saml::Kit::ServiceProviderMetadata.build do |config|
-        config.entity_id = 'sp'
+      sp = Saml::Kit::ServiceProviderMetadata.build do |xxx|
+        xxx.entity_id = 'sp'
+        xxx.add_assertion_consumer_service(FFaker::Internet.uri('https'), binding: :http_post)
       end
 
       subject.register(idp)

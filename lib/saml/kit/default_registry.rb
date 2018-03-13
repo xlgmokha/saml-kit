@@ -41,6 +41,7 @@ module Saml
       #
       # @param metadata [Saml::Kit::Metadata] the metadata to register.
       def register(metadata)
+        ensure_valid_metadata(metadata)
         Saml::Kit.logger.debug(metadata.to_xml(pretty: true))
         @items[metadata.entity_id] = metadata
       end
@@ -67,6 +68,13 @@ module Saml
         @items.each_value do |value|
           yield value
         end
+      end
+
+      private
+
+      def ensure_valid_metadata(metadata)
+        error = ArgumentError.new('Cannot register invalid metadata')
+        raise error if metadata.invalid? || !metadata.respond_to?(:entity_id)
       end
 
       # This class is responsible for
