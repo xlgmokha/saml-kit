@@ -9,7 +9,9 @@ module Saml
         include XmlTemplatable
         extend Forwardable
 
-        def_delegators :@response_builder, :request, :issuer, :reference_id, :now, :configuration, :user, :version, :destination
+        def_delegators :@response_builder,
+          :request, :issuer, :reference_id, :now, :configuration, :user,
+          :version, :destination
 
         def initialize(response_builder, embed_signature)
           @response_builder = response_builder
@@ -62,7 +64,8 @@ module Saml
           {
             AuthnInstant: now.iso8601,
             SessionIndex: reference_id,
-            SessionNotOnOrAfter: configuration.session_timeout.since(now).utc.iso8601,
+            SessionNotOnOrAfter:
+            configuration.session_timeout.since(now).utc.iso8601,
           }
         end
       end

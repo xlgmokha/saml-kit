@@ -18,7 +18,8 @@ module Saml
       INVALID_NAME_ID_POLICY = "#{STATUS}:InvalidNameIDPolicy".freeze
       METADATA = "#{SAML_2_0}:metadata".freeze
       PASSWORD = "#{SAML_2_0}:ac:classes:Password".freeze
-      PASSWORD_PROTECTED = "#{SAML_2_0}:ac:classes:PasswordProtectedTransport".freeze
+      PASSWORD_PROTECTED =
+        "#{SAML_2_0}:ac:classes:PasswordProtectedTransport".freeze
       PERSISTENT = "#{NAME_ID_FORMAT_2_0}:persistent".freeze
       PROTOCOL = "#{SAML_2_0}:protocol".freeze
       REQUESTER_ERROR = "#{STATUS}:Requester".freeze

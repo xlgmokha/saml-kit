@@ -14,7 +14,11 @@ module Saml
       validate :must_be_valid_assertion
       validate :must_contain_single_assertion
 
-      def initialize(xml, request_id: nil, configuration: Saml::Kit.configuration)
+      def initialize(
+        xml,
+        request_id: nil,
+        configuration: Saml::Kit.configuration
+      )
         @request_id = request_id
         super(xml, name: 'Response', configuration: configuration)
       end
@@ -26,7 +30,11 @@ module Saml
             if node.nil?
               Saml::Kit::NullAssertion.new
             else
-              Saml::Kit::Assertion.new(node, configuration: @configuration, private_keys: private_keys)
+              Saml::Kit::Assertion.new(
+                node,
+                configuration: @configuration,
+                private_keys: private_keys
+              )
             end
           end
       end

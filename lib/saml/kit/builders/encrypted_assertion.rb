@@ -10,7 +10,9 @@ module Saml
         extend Forwardable
 
         attr_reader :assertion
-        def_delegators :@response_builder, :configuration, :encryption_certificate
+        def_delegators :@response_builder,
+          :configuration,
+          :encryption_certificate
 
         def initialize(response_builder, assertion)
           @response_builder = response_builder

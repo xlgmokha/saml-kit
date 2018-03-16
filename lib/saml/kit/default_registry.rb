@@ -2,8 +2,10 @@
 
 module Saml
   module Kit
-    # The default metadata registry is used to fetch the metadata associated with an issuer or entity id.
-    # The metadata associated with an issuer is used to verify trust for any SAML documents that are received.
+    # The default metadata registry is used to fetch the metadata associated
+    # with an issuer or entity id.
+    # The metadata associated with an issuer is used to verify trust for any
+    # SAML documents that are received.
     #
     # You can replace the default registry with your own at startup.
     #
@@ -47,7 +49,8 @@ module Saml
       end
 
       # Register metadata via a remote URL.
-      # This will attempt to connect to the remove URL to download the metadata and register it in the registry.
+      # This will attempt to connect to the remove URL to download the
+      # metadata and register it in the registry.
       #
       # @param url [String] the url to download the metadata from.
       # @param verify_ssl [Boolean] enable/disable SSL peer verification.
@@ -58,7 +61,8 @@ module Saml
 
       # Returns the metadata document associated with an issuer or entityID.
       #
-      # @param entity_id [String] the unique entityID/Issuer associated with metadata.
+      # @param entity_id [String] unique entityID/Issuer associated with
+      # metadata.
       def metadata_for(entity_id)
         @items[entity_id]
       end
@@ -74,7 +78,10 @@ module Saml
 
       def ensure_valid_metadata(metadata)
         error = ArgumentError.new('Cannot register invalid metadata')
-        raise error if metadata.nil? || !metadata.respond_to?(:entity_id) || metadata.invalid?
+        raise error if
+          metadata.nil? ||
+          !metadata.respond_to?(:entity_id) ||
+          metadata.invalid?
       end
 
       # This class is responsible for

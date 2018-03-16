@@ -9,14 +9,15 @@ module Saml
       extend ActiveSupport::Concern
 
       included do
-        validate :must_have_valid_signature, unless: :signature_manually_verified
+        validate :must_have_valid_signature, unless: :signature_verified
         validate :must_be_registered
         validate :must_be_trusted
       end
 
-      # Returns true when the document has an embedded XML Signature or has been verified externally.
+      # Returns true when the document has an embedded XML Signature or has
+      # been verified externally.
       def signed?
-        signature_manually_verified || signature.present?
+        signature_verified || signature.present?
       end
 
       # @!visibility private
@@ -24,9 +25,10 @@ module Saml
         @signature ||= Signature.new(at_xpath("/samlp:#{name}/ds:Signature"))
       end
 
-      # Returns true when documents is signed and the signing certificate belongs to a known service entity.
+      # Returns true when documents is signed and the signing certificate
+      # belongs to a known service entity.
       def trusted?
-        return true if signature_manually_verified
+        return true if signature_verified
         return false unless signed?
         signature.trusted?(provider)
       end
@@ -38,12 +40,12 @@ module Saml
 
       # @!visibility private
       def signature_verified!
-        @signature_manually_verified = true
+        @signature_verified = true
       end
 
       private
 
-      attr_reader :signature_manually_verified
+      attr_reader :signature_verified
 
       def must_have_valid_signature
         return if to_xml.blank?

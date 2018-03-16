@@ -25,7 +25,8 @@ module Saml
 
       # Returns true when the metadata demands that Assertions must be signed.
       def want_assertions_signed
-        attribute = at_xpath("/md:EntityDescriptor/md:#{name}").attribute('WantAssertionsSigned')
+        element = at_xpath("/md:EntityDescriptor/md:#{name}")
+        attribute = element.attribute('WantAssertionsSigned')
         return true if attribute.nil?
         attribute.text.casecmp('true').zero?
       end

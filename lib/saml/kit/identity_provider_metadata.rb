@@ -2,16 +2,31 @@
 
 module Saml
   module Kit
-    # This class is used to parse the IDPSSODescriptor from a SAML metadata document.
+    # This class parses the IDPSSODescriptor from a SAML metadata document.
     #
     #  raw_xml = <<-XML
     #  <?xml version="1.0" encoding="UTF-8"?>
-    #  <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_cfa24e2f-0ec0-4ee3-abb8-b2fcfe394c1c" entityID="">
-    #    <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-    #      <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://www.example.com/logout"/>
-    #      <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
-    #      <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://www.example.com/login"/>
-    #      <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://www.example.com/login"/>
+    #  <EntityDescriptor
+    #    xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+    #    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    #    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+    #    ID="_cfa24e2f-0ec0-4ee3-abb8-b2fcfe394c1c"
+    #    entityID="my-entity-id">
+    #    <IDPSSODescriptor
+    #      WantAuthnRequestsSigned="true"
+    #      protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    #      <SingleLogoutService
+    #        Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+    #        Location="https://www.example.com/logout" />
+    #      <NameIDFormat>
+    #        urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+    #      </NameIDFormat>
+    #      <SingleSignOnService
+    #        Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+    #        Location="https://www.example.com/login" />
+    #      <SingleSignOnService
+    #        Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+    #        Location="https://www.example.com/login" />
     #      <saml:Attribute Name="id"/>
     #    </IDPSSODescriptor>
     #  </EntityDescriptor>
@@ -70,14 +85,18 @@ module Saml
       # Creates a AuthnRequest document for the specified binding.
       #
       # @param binding [Symbol] `:http_post` or `:http_redirect`.
-      # @param relay_state [Object] The RelayState to include the returned SAML params.
-      # @param configuration [Saml::Kit::Configuration] the configuration to use for generating the request.
-      # @return [Array] The url and saml params encoded using the rules for the specified binding.
-      def login_request_for(binding:, relay_state: nil, configuration: Saml::Kit.configuration)
-        builder = Saml::Kit::AuthenticationRequest.builder(configuration: configuration) do |xxx|
-          xxx.embed_signature = want_authn_requests_signed
-          yield xxx if block_given?
-        end
+      # @param relay_state [Object] RelayState to include the returned params.
+      # @param configuration [Saml::Kit::Configuration] the configuration to
+      # use for generating the request.
+      # @return [Array] Url and params encoded using rules for binding.
+      def login_request_for(
+        binding:, relay_state: nil, configuration: Saml::Kit.configuration
+      )
+        builder =
+          AuthenticationRequest.builder(configuration: configuration) do |x|
+            x.embed_signature = want_authn_requests_signed
+            yield x if block_given?
+          end
         request_binding = single_sign_on_service_for(binding: binding)
         request_binding.serialize(builder, relay_state: relay_state)
       end

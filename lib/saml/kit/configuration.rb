@@ -2,7 +2,8 @@
 
 module Saml
   module Kit
-    # This class represents the main configuration that is use for generating SAML documents.
+    # This class represents the main configuration that is use for generating
+    # SAML documents.
     #
     #   Saml::Kit::Configuration.new do |config|
     #     config.entity_id = "com:saml:kit"
@@ -19,17 +20,25 @@ module Saml
     #   Saml::Kit.configure do |configuration|
     #     configuration.entity_id = "https://www.example.com/saml/metadata"
     #     configuration.generate_key_pair_for(use: :signing)
-    #     configuration.add_key_pair(ENV["X509_CERTIFICATE"], ENV["PRIVATE_KEY"], passphrase: ENV['PRIVATE_KEY_PASSPHRASE'], use: :encryption)
+    #     configuration.add_key_pair(
+    #       ENV["X509_CERTIFICATE"],
+    #         ENV["PRIVATE_KEY"],
+    #         passphrase: ENV['PRIVATE_KEY_PASSPHRASE'],
+    #         use: :encryption
+    #     )
     #   end
     class Configuration
       USES = %i[signing encryption].freeze
       # The issuer to use in requests or responses from this entity to use.
       attr_accessor :entity_id
-      # The signature method to use when generating signatures (See {Saml::Kit::Builders::XmlSignature::SIGNATURE_METHODS})
+      # The signature method to use when generating signatures
+      # (See {Saml::Kit::Builders::XmlSignature::SIGNATURE_METHODS})
       attr_accessor :signature_method
-      # The digest method to use when generating signatures (See {Saml::Kit::Builders::XmlSignature::DIGEST_METHODS})
+      # The digest method to use when generating signatures
+      # (See {Saml::Kit::Builders::XmlSignature::DIGEST_METHODS})
       attr_accessor :digest_method
-      # The metadata registry to use for searching for metadata associated with an issuer.
+      # The metadata registry to use for searching for metadata associated
+      # with an issuer.
       attr_accessor :registry
       # The session timeout to use when generating an Assertion.
       attr_accessor :session_timeout
@@ -57,7 +66,11 @@ module Saml
       # @param use [Symbol] the type of key pair, `:signing` or `:encryption`
       def add_key_pair(certificate, private_key, passphrase: nil, use: :signing)
         ensure_proper_use(use)
-        @key_pairs.push(::Xml::Kit::KeyPair.new(certificate, private_key, passphrase, use.to_sym))
+        @key_pairs.push(
+          ::Xml::Kit::KeyPair.new(
+            certificate, private_key, passphrase, use.to_sym
+          )
+        )
       end
 
       # Generates a unique key pair that can be used for signing or encryption.
@@ -66,27 +79,32 @@ module Saml
       # @param passphrase [String] the private key passphrase to use.
       def generate_key_pair_for(use:, passphrase: SecureRandom.uuid)
         ensure_proper_use(use)
-        certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: passphrase)
+        certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new.create(
+          passphrase: passphrase
+        )
         add_key_pair(certificate, private_key, passphrase: passphrase, use: use)
       end
 
       # Return each key pair for a specific use.
       #
-      # @param use [Symbol] the type of key pair to return `nil`, `:signing` or `:encryption`
+      # @param use [Symbol] the type of key pair to return
+      # `nil`, `:signing` or `:encryption`
       def key_pairs(use: nil)
         use.present? ? @key_pairs.find_all { |xxx| xxx.for?(use) } : @key_pairs
       end
 
       # Return each certificate for a specific use.
       #
-      # @param use [Symbol] the type of key pair to return `nil`, `:signing` or `:encryption`
+      # @param use [Symbol] the type of key pair to return
+      # `nil`, `:signing` or `:encryption`
       def certificates(use: nil)
         key_pairs(use: use).flat_map(&:certificate)
       end
 
       # Return each private for a specific use.
       #
-      # @param use [Symbol] the type of key pair to return `nil`, `:signing` or `:encryption`
+      # @param use [Symbol] the type of key pair to return
+      # `nil`, `:signing` or `:encryption`
       def private_keys(use: nil)
         key_pairs(use: use).flat_map(&:private_key)
       end

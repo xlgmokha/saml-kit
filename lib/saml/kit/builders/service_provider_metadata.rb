@@ -12,7 +12,9 @@ module Saml
         attr_accessor :want_assertions_signed
         attr_reader :configuration
         attr_reader :metadata
-        def_delegators :metadata, :id, :id=, :entity_id, :entity_id=, :organization_name, :organization_name=, :organization_url, :organization_url=, :contact_email, :contact_email=, :to_xml
+        def_delegators :metadata, :id, :id=, :entity_id, :entity_id=,
+          :organization_name, :organization_name=, :organization_url,
+          :organization_url=, :contact_email, :contact_email=, :to_xml
 
         def initialize(configuration: Saml::Kit.configuration)
           @acs_urls = []
@@ -20,7 +22,9 @@ module Saml
           @logout_urls = []
           @name_id_formats = [Namespaces::PERSISTENT]
           @want_assertions_signed = true
-          @metadata = Saml::Kit::Builders::Metadata.new(configuration: configuration)
+          @metadata = Saml::Kit::Builders::Metadata.new(
+            configuration: configuration
+          )
           @metadata.service_provider = self
         end
 
@@ -29,7 +33,10 @@ module Saml
         end
 
         def add_single_logout_service(url, binding: :http_post)
-          @logout_urls.push(location: url, binding: Bindings.binding_for(binding))
+          @logout_urls.push(
+            location: url,
+            binding: Bindings.binding_for(binding)
+          )
         end
 
         def build

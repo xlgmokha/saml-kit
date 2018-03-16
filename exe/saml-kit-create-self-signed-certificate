@@ -3,11 +3,15 @@
 
 require 'saml/kit'
 
-Saml::Kit.deprecate("Use the 'saml-kit-cli' gem instead. saml-kit-create-self-signed-certificate")
+message = "Use the 'saml-kit-cli' gem instead."\
+  ' saml-kit-create-self-signed-certificate'
+Saml::Kit.deprecate(message)
 
 puts 'Enter Passphrase:'
 passphrase = STDIN.read.strip
-certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new.create(passphrase: passphrase)
+certificate, private_key = ::Xml::Kit::SelfSignedCertificate.new.create(
+  passphrase: passphrase
+)
 
 puts '** BEGIN File Format **'
 print certificate

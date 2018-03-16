@@ -9,7 +9,9 @@ module Saml
       include Translatable
       include Trustable
       include Buildable
-      PROTOCOL_XSD = File.expand_path('./xsd/saml-schema-protocol-2.0.xsd', File.dirname(__FILE__)).freeze
+      PROTOCOL_XSD = File.expand_path(
+        './xsd/saml-schema-protocol-2.0.xsd', File.dirname(__FILE__)
+      ).freeze
       NAMESPACES = {
         "NameFormat": ::Saml::Kit::Namespaces::ATTR_SPLAT,
         "ds": ::Xml::Kit::Namespaces::XMLDSIG,
@@ -106,14 +108,18 @@ module Saml
         # Returns the raw xml as a Saml::Kit SAML document.
         #
         # @param xml [String] the raw xml string.
-        # @param configuration [Saml::Kit::Configuration] the configuration to use for unpacking the document.
+        # @param configuration [Saml::Kit::Configuration] configuration to use
+        # for unpacking the document.
         def to_saml_document(xml, configuration: Saml::Kit.configuration)
+          namespaces = { "samlp": ::Saml::Kit::Namespaces::PROTOCOL }
+          document = Nokogiri::XML(xml)
+          element = document.at_xpath(XPATH, namespaces)
           constructor = {
             'AuthnRequest' => Saml::Kit::AuthenticationRequest,
             'LogoutRequest' => Saml::Kit::LogoutRequest,
             'LogoutResponse' => Saml::Kit::LogoutResponse,
             'Response' => Saml::Kit::Response,
-          }[Nokogiri::XML(xml).at_xpath(XPATH, "samlp": ::Saml::Kit::Namespaces::PROTOCOL).name] || InvalidDocument
+          }[element.name] || InvalidDocument
           constructor.new(xml, configuration: configuration)
         rescue StandardError => error
           Saml::Kit.logger.error(error)

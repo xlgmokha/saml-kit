@@ -20,7 +20,8 @@ module Saml
           builder.embed_signature = false
           builder.destination = location
           document = builder.build
-          [UrlBuilder.new(configuration: builder.configuration).build(document, relay_state: relay_state), {}]
+          url_builder = UrlBuilder.new(configuration: builder.configuration)
+          [url_builder.build(document, relay_state: relay_state), {}]
         end
 
         def deserialize(params, configuration: Saml::Kit.configuration)
@@ -34,7 +35,10 @@ module Saml
 
         def deserialize_document_from(params, configuration)
           xml = inflate(decode(unescape(saml_param_from(params))))
-          Saml::Kit::Document.to_saml_document(xml, configuration: configuration)
+          Saml::Kit::Document.to_saml_document(
+            xml,
+            configuration: configuration
+          )
         end
 
         def ensure_valid_signature(params, document)

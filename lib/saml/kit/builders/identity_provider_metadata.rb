@@ -13,7 +13,9 @@ module Saml
         attr_reader :logout_urls, :single_sign_on_urls
         attr_reader :configuration
         attr_reader :metadata
-        def_delegators :metadata, :id, :id=, :entity_id, :entity_id=, :organization_name, :organization_name=, :organization_url, :organization_url=, :contact_email, :contact_email=, :to_xml
+        def_delegators :metadata, :id, :id=, :entity_id, :entity_id=,
+          :organization_name, :organization_name=, :organization_url,
+          :organization_url=, :contact_email, :contact_email=, :to_xml
 
         def initialize(configuration: Saml::Kit.configuration)
           @attributes = []
@@ -24,16 +26,24 @@ module Saml
           @name_id_formats = [Namespaces::PERSISTENT]
           @single_sign_on_urls = []
           @want_authn_requests_signed = true
-          @metadata = Saml::Kit::Builders::Metadata.new(configuration: configuration)
+          @metadata = Saml::Kit::Builders::Metadata.new(
+            configuration: configuration
+          )
           @metadata.identity_provider = self
         end
 
         def add_single_sign_on_service(url, binding: :http_post)
-          @single_sign_on_urls.push(location: url, binding: Bindings.binding_for(binding))
+          @single_sign_on_urls.push(
+            location: url,
+            binding: Bindings.binding_for(binding)
+          )
         end
 
         def add_single_logout_service(url, binding: :http_post)
-          @logout_urls.push(location: url, binding: Bindings.binding_for(binding))
+          @logout_urls.push(
+            location: url,
+            binding: Bindings.binding_for(binding)
+          )
         end
 
         def build

@@ -16,7 +16,8 @@ module Saml
     #
     # See {Saml::Kit::Builders::LogoutRequest} for a list of available settings.
     #
-    # This class can also be used to generate the correspondong LogoutResponse for a LogoutRequest.
+    # This class can also be used to generate the correspondong LogoutResponse
+    # for a LogoutRequest.
     #
     #   document = Saml::Kit::LogoutRequest.new(raw_xml)
     #   url, saml_params = document.response_for(binding: :http_post)
@@ -31,7 +32,7 @@ module Saml
       # A new instance of LogoutRequest
       #
       # @param xml [String] The raw xml string.
-      # @param configuration [Saml::Kit::Configuration] the configuration to use.
+      # @param configuration [Saml::Kit::Configuration] configuration to use.
       def initialize(xml, configuration: Saml::Kit.configuration)
         super(xml, name: 'LogoutRequest', configuration: configuration)
       end
@@ -45,11 +46,15 @@ module Saml
         at_xpath('./*/saml:NameID/@Format').try(:value)
       end
 
-      # Generates a Serialized LogoutResponse using the encoding rules for the specified binding.
+      # Generates a Serialized LogoutResponse using the encoding rules for
+      # the specified binding.
       #
-      # @param binding [Symbol] The binding to use `:http_redirect` or `:http_post`.
-      # @param relay_state [Object] The RelayState to include in the RelayState param.
-      # @return [Array] Returns an array with a url and Hash of parameters to return to the requestor.
+      # @param binding [Symbol] The binding to use `:http_redirect` or
+      # `:http_post`.
+      # @param relay_state [Object] The RelayState to include in the
+      # RelayState param.
+      # @return [Array] Returns an array with a url and Hash of parameters to
+      # return to the requestor.
       def response_for(binding:, relay_state: nil)
         builder = Saml::Kit::LogoutResponse.builder(self) do |xxx|
           yield xxx if block_given?

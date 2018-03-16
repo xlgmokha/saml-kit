@@ -13,7 +13,7 @@ Metrics/AbcSize:
 # Offense count: 3
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
-  Max: 136
+  Max: 150
 
 # Offense count: 6
 # Configuration parameters: CountComments.
@@ -24,15 +24,3 @@ Metrics/MethodLength:
 Style/DateTime:
   Exclude:
     - 'lib/saml/kit/assertion.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/IfUnlessModifier:
-  Exclude:
-    - 'lib/saml/kit/builders/authentication_request.rb'
-
-# Offense count: 128
-# Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
-# URISchemes: http, https
-Metrics/LineLength:
-  Max: 313

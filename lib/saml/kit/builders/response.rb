@@ -13,7 +13,9 @@ module Saml
         attr_accessor :issuer, :destination
         attr_reader :configuration
 
-        def initialize(user, request = nil, configuration: Saml::Kit.configuration)
+        def initialize(
+          user, request = nil, configuration: Saml::Kit.configuration
+        )
           @user = user
           @request = request
           @id = ::Xml::Kit::Id.generate
@@ -23,13 +25,18 @@ module Saml
           @status_code = Namespaces::SUCCESS
           @status_message = nil
           @issuer = configuration.entity_id
-          @encryption_certificate = request.try(:provider).try(:encryption_certificates).try(:last)
+          @encryption_certificate = request.try(:provider)
+            .try(:encryption_certificates).try(:last)
           @encrypt = encryption_certificate.present?
           @configuration = configuration
         end
 
         def build
-          Saml::Kit::Response.new(to_xml, request_id: request.try(:id), configuration: configuration)
+          Saml::Kit::Response.new(
+            to_xml,
+            request_id: request.try(:id),
+            configuration: configuration
+          )
         end
 
         def assertion=(value)
@@ -39,7 +46,9 @@ module Saml
         def assertion
           @assertion ||=
             begin
-              assertion = Saml::Kit::Builders::Assertion.new(self, embed_signature)
+              assertion = Saml::Kit::Builders::Assertion.new(
+                self, embed_signature
+              )
               if encrypt
                 Saml::Kit::Builders::EncryptedAssertion.new(self, assertion)
               else

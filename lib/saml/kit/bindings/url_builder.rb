@@ -23,8 +23,9 @@ module Saml
             payload = canonicalize(saml_document, relay_state)
             "#{destination}?#{payload}&Signature=#{signature_for(payload)}"
           else
+            xml = saml_document.to_xml
             payload = to_query_string(
-              saml_document.query_string_parameter => serialize(saml_document.to_xml),
+              saml_document.query_string_parameter => serialize(xml),
               'RelayState' => relay_state
             )
             "#{destination}?#{payload}"
@@ -39,8 +40,9 @@ module Saml
         end
 
         def canonicalize(saml_document, relay_state)
+          xml = saml_document.to_xml
           to_query_string(
-            saml_document.query_string_parameter => serialize(saml_document.to_xml),
+            saml_document.query_string_parameter => serialize(xml),
             'RelayState' => relay_state,
             'SigAlg' => ::Xml::Kit::Namespaces::SHA256
           )

@@ -20,14 +20,18 @@ module Saml
       attr_reader :name
       attr_accessor :occurred_at
 
-      def initialize(node, configuration: Saml::Kit.configuration, private_keys: [])
+      def initialize(
+        node, configuration: Saml::Kit.configuration, private_keys: []
+      )
         @name = 'Assertion'
         @node = node
         @configuration = configuration
         @occurred_at = Time.current
         @cannot_decrypt = false
         @encrypted = false
-        private_keys = (configuration.private_keys(use: :encryption) + private_keys).uniq
+        private_keys = (
+          configuration.private_keys(use: :encryption) + private_keys
+        ).uniq
         decrypt(::Xml::Kit::Decryption.new(private_keys: private_keys))
       end
 
@@ -57,8 +61,11 @@ module Saml
       end
 
       def attributes
-        @attributes ||= search('./saml:AttributeStatement/saml:Attribute').inject({}) do |memo, item|
-          memo[item.attribute('Name').value] = item.at_xpath('./saml:AttributeValue', Saml::Kit::Document::NAMESPACES).try(:text)
+        xpath = './saml:AttributeStatement/saml:Attribute'
+        @attributes ||= search(xpath).inject({}) do |memo, item|
+          namespaces = Saml::Kit::Document::NAMESPACES
+          attribute = item.at_xpath('./saml:AttributeValue', namespaces)
+          memo[item.attribute('Name').value] = attribute.try(:text)
           memo
         end.with_indifferent_access
       end
@@ -72,7 +79,8 @@ module Saml
       end
 
       def audiences
-        search('./saml:Conditions/saml:AudienceRestriction/saml:Audience').map(&:text)
+        xpath = './saml:Conditions/saml:AudienceRestriction/saml:Audience'
+        search(xpath).map(&:text)
       end
 
       def encrypted?

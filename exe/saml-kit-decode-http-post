@@ -3,7 +3,8 @@
 
 require 'saml/kit'
 
-Saml::Kit.deprecate("Use the 'saml-kit-cli' gem instead. saml-kit-decode-http-post")
+message = "Use the 'saml-kit-cli' gem instead. saml-kit-decode-http-post"
+Saml::Kit.deprecate(message)
 
 saml = STDIN.read
 binding = Saml::Kit::Bindings::HttpPost.new(location: '')

@@ -22,14 +22,18 @@ module Saml
         end
 
         def build_service_provider
-          @service_provider = Saml::Kit::ServiceProviderMetadata.builder(configuration: configuration) do |xx|
-            yield xx if block_given?
+          @service_provider = Saml::Kit::ServiceProviderMetadata.builder(
+            configuration: configuration
+          ) do |x|
+            yield x if block_given?
           end
         end
 
         def build_identity_provider
-          @identity_provider = Saml::Kit::IdentityProviderMetadata.builder(configuration: configuration) do |xx|
-            yield xx if block_given?
+          @identity_provider = Saml::Kit::IdentityProviderMetadata.builder(
+            configuration: configuration
+          ) do |x|
+            yield x if block_given?
           end
         end
 

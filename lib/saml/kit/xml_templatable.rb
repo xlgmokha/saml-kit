@@ -16,7 +16,8 @@ module Saml
         "#{self.class.name.split('::').last.underscore}.builder"
       end
 
-      # Returns true if an embedded signature is requested and at least one signing certificate is available via the configuration.
+      # Returns true if an embedded signature is requested and at least one
+      # signing certificate is available via the configuration.
       def sign?
         return configuration.sign? if embed_signature.nil?
         (embed_signature && configuration.sign?) ||

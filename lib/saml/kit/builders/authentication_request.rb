@@ -7,7 +7,8 @@ module Saml
       # {include:file:spec/saml/kit/builders/authentication_request_spec.rb}
       class AuthenticationRequest
         include XmlTemplatable
-        attr_accessor :id, :now, :issuer, :assertion_consumer_service_url, :name_id_format, :destination
+        attr_accessor :id, :now, :issuer, :assertion_consumer_service_url
+        attr_accessor :name_id_format, :destination
         attr_accessor :version
         attr_reader :configuration
 
@@ -36,7 +37,8 @@ module Saml
             Destination: destination,
           }
           if assertion_consumer_service_url.present?
-            options[:AssertionConsumerServiceURL] = assertion_consumer_service_url
+            options[:AssertionConsumerServiceURL] =
+              assertion_consumer_service_url
           end
           options
         end

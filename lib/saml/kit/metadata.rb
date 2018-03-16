@@ -8,20 +8,21 @@ module Saml
     #
     # It can also be used to generate a new metadata string.
     #
-    #   metadata = Saml::Kit::Metadata.build do |builder|
-    #     builder.entity_id = "my-issuer"
-    #     builder.build_service_provider do |x|
-    #       x.add_assertion_consumer_service(assertions_url, binding: :http_post)
-    #       x.add_single_logout_service(logout_url, binding: :http_post)
-    #     end
-    #     builder.build_identity_provider do |x|
-    #       x.add_single_sign_on_service(login_url, binding: :http_redirect)
-    #       x.add_single_logout_service(logout_url, binding: :http_post)
-    #     end
-    #   end
-    #   puts metadata.to_xml(pretty: true)
+    #  metadata = Saml::Kit::Metadata.build do |builder|
+    #    builder.entity_id = "my-issuer"
+    #    builder.build_service_provider do |x|
+    #      x.add_assertion_consumer_service(assertions_url, binding: :http_post)
+    #      x.add_single_logout_service(logout_url, binding: :http_post)
+    #    end
+    #    builder.build_identity_provider do |x|
+    #      x.add_single_sign_on_service(login_url, binding: :http_redirect)
+    #      x.add_single_logout_service(logout_url, binding: :http_post)
+    #    end
+    #  end
+    #  puts metadata.to_xml(pretty: true)
     #
-    # See {Saml::Kit::Builders::ServiceProviderMetadata} and {Saml::Kit::Builders::IdentityProviderMetadata}
+    # See {Saml::Kit::Builders::ServiceProviderMetadata} and
+    # {Saml::Kit::Builders::IdentityProviderMetadata}
     # for a list of options that can be specified.
     # {include:file:spec/examples/metadata_spec.rb}
     class Metadata
@@ -29,7 +30,9 @@ module Saml
       include XsdValidatable
       include Translatable
       include Buildable
-      METADATA_XSD = File.expand_path('./xsd/saml-schema-metadata-2.0.xsd', File.dirname(__FILE__)).freeze
+      METADATA_XSD = File.expand_path(
+        './xsd/saml-schema-metadata-2.0.xsd', File.dirname(__FILE__)
+      ).freeze
       NAMESPACES = {
         NameFormat: Namespaces::ATTR_SPLAT,
         ds: ::Xml::Kit::Namespaces::XMLDSIG,
@@ -62,12 +65,14 @@ module Saml
 
       # Returns the Organization Name
       def organization_name
-        at_xpath('/md:EntityDescriptor/md:Organization/md:OrganizationName').try(:text)
+        xpath = '/md:EntityDescriptor/md:Organization/md:OrganizationName'
+        at_xpath(xpath).try(:text)
       end
 
       # Returns the Organization URL
       def organization_url
-        at_xpath('/md:EntityDescriptor/md:Organization/md:OrganizationURL').try(:text)
+        xpath = '/md:EntityDescriptor/md:Organization/md:OrganizationURL'
+        at_xpath(xpath).try(:text)
       end
 
       # Returns the Company
@@ -76,10 +81,15 @@ module Saml
       end
 
       # Returns each of the X509 certificates.
-      def certificates
-        @certificates ||= search("/md:EntityDescriptor/md:#{name}/md:KeyDescriptor").map do |item|
-          cert = item.at_xpath('./ds:KeyInfo/ds:X509Data/ds:X509Certificate', 'ds' => ::Xml::Kit::Namespaces::XMLDSIG).try(:text)
-          ::Xml::Kit::Certificate.new(cert, use: item.attribute('use').try(:value))
+      def certificates(
+        xpath = "/md:EntityDescriptor/md:#{name}/md:KeyDescriptor"
+      )
+        @certificates ||= search(xpath).map do |item|
+          xpath = './ds:KeyInfo/ds:X509Data/ds:X509Certificate'
+          namespaces = { 'ds' => ::Xml::Kit::Namespaces::XMLDSIG }
+          cert = item.at_xpath(xpath, namespaces).try(:text)
+          use_attribute = item.attribute('use')
+          ::Xml::Kit::Certificate.new(cert, use: use_attribute.try(:value))
         end
       end
 
@@ -95,7 +105,8 @@ module Saml
 
       # Returns each of the service endpoints supported by this metadata.
       #
-      # @param type [String] the type of service. .E.g. `AssertionConsumerServiceURL`
+      # @param type [String] the type of service.
+      # .E.g. `AssertionConsumerServiceURL`
       def services(type)
         search("/md:EntityDescriptor/md:#{name}/md:#{type}").map do |item|
           binding = item.attribute('Binding').value
@@ -107,7 +118,9 @@ module Saml
       # Returns a specifing service binding.
       #
       # @param binding [Symbol] can be `:http_post` or `:http_redirect`.
-      # @param type [Symbol] can be on the service element like `AssertionConsumerServiceURL`, `SingleSignOnService` or `SingleLogoutService`.
+      # @param type [Symbol] can be on the service element like
+      # `AssertionConsumerServiceURL`, `SingleSignOnService` or
+      # `SingleLogoutService`.
       def service_for(binding:, type:)
         binding = Saml::Kit::Bindings.binding_for(binding)
         services(type).find { |xxx| xxx.binding?(binding) }
@@ -127,23 +140,31 @@ module Saml
 
       # Creates a serialized LogoutRequest.
       #
-      # @param user [Object] a user object that responds to `name_id_for` and `assertion_attributes_for`.
+      # @param user [Object] a user object that responds to `name_id_for` and
+      # `assertion_attributes_for`.
       # @param binding [Symbol] can be `:http_post` or `:http_redirect`.
       # @param relay_state [String] the relay state to have echo'd back.
-      # @return [Array] Returns an array with a url and Hash of parameters to send to the other party.
+      # @return [Array] Returns an array with a url and Hash of parameters to
+      # send to the other party.
       def logout_request_for(user, binding: :http_post, relay_state: nil)
-        builder = Saml::Kit::LogoutRequest.builder(user) { |xxx| yield xxx if block_given? }
+        builder = Saml::Kit::LogoutRequest.builder(user) do |xxx|
+          yield xxx if block_given?
+        end
         request_binding = single_logout_service_for(binding: binding)
         request_binding.serialize(builder, relay_state: relay_state)
       end
 
       # Returns the certificate that matches the fingerprint
       #
-      # @param fingerprint [Saml::Kit::Fingerprint] the fingerprint to search for.
-      # @param use [Symbol] the type of certificates to look at. Can be `:signing` or `:encryption`.
-      # @return [Xml::Kit::Certificate] returns the matching `{Xml::Kit::Certificate}`
+      # @param fingerprint [Saml::Kit::Fingerprint] the fingerprint to search.
+      # @param use [Symbol] the type of certificates to look at.
+      # Can be `:signing` or `:encryption`.
+      # @return [Xml::Kit::Certificate] returns the matching
+      # `{Xml::Kit::Certificate}`
       def matches?(fingerprint, use: :signing)
-        certificates.find { |xxx| xxx.for?(use) && xxx.fingerprint == fingerprint }
+        certificates.find do |xxx|
+          xxx.for?(use) && xxx.fingerprint == fingerprint
+        end
       end
 
       # Returns the XML document converted to a Hash.
@@ -153,7 +174,8 @@ module Saml
 
       # Returns the XML document as a String.
       #
-      # @param pretty [Boolean] true to return a human friendly version of the XML.
+      # @param pretty [Boolean] true to return a human friendly version
+      # of the XML.
       def to_xml(pretty: nil)
         pretty ? to_nokogiri.to_xml(indent: 2) : to_s
       end
@@ -165,18 +187,20 @@ module Saml
 
       # Verifies the signature and data using the signing certificates.
       #
-      # @param algorithm [OpenSSL::Digest] the digest algorithm to use. E.g. `OpenSSL::Digest::SHA256`
+      # @param algorithm [OpenSSL::Digest] the digest algorithm to use.
+      # E.g. `OpenSSL::Digest::SHA256`
       # @param signature [String] the signature to verify
       # @param data [String] the data that is used to produce the signature.
-      # @return [Xml::Kit::Certificate] the certificate that was used to produce the signature.
+      # @return [Xml::Kit::Certificate] the certificate that was used to
+      # produce the signature.
       def verify(algorithm, signature, data)
         signing_certificates.find do |certificate|
           certificate.public_key.verify(algorithm, signature, data)
         end
       end
 
-      def signature
-        @signature ||= Signature.new(at_xpath('/md:EntityDescriptor/ds:Signature'))
+      def signature(xpath = '/md:EntityDescriptor/ds:Signature')
+        @signature ||= Signature.new(at_xpath(xpath))
       end
 
       class << self
@@ -187,8 +211,10 @@ module Saml
         def from(content)
           document = Nokogiri::XML(content)
           return unless document.at_xpath('/md:EntityDescriptor', NAMESPACES)
-          sp = document.at_xpath('/md:EntityDescriptor/md:SPSSODescriptor', NAMESPACES)
-          idp = document.at_xpath('/md:EntityDescriptor/md:IDPSSODescriptor', NAMESPACES)
+          xpath = '/md:EntityDescriptor/md:SPSSODescriptor'
+          sp = document.at_xpath(xpath, NAMESPACES)
+          xpath = '/md:EntityDescriptor/md:IDPSSODescriptor'
+          idp = document.at_xpath(xpath, NAMESPACES)
           if sp && idp
             Saml::Kit::CompositeMetadata.new(content)
           elsif sp

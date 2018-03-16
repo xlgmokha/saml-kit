@@ -6,11 +6,13 @@ RSpec::Matchers.define :have_xpath do |xpath|
   end
 
   failure_message do |actual|
-    "Expected xpath: #{xpath.inspect} to match in:\n #{xml_pretty_print(actual)}"
+    xml = xml_pretty_print(actual)
+    "Expected xpath: #{xpath.inspect} to match in:\n #{xml}"
   end
 
   failure_message_when_negated do |actual|
-    "Expected xpath: #{xpath.inspect} not to match in:\n #{xml_pretty_print(actual)}"
+    xml = xml_pretty_print(actual)
+    "Expected xpath: #{xpath.inspect} not to match in:\n #{xml}"
   end
 
   def xml_pretty_print(raw_xml)

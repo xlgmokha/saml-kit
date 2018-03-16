@@ -21,12 +21,14 @@ module Saml
 
       # Returns the embedded X509 Certificate
       def certificate
-        value = at_xpath('./ds:KeyInfo/ds:X509Data/ds:X509Certificate').try(:text)
+        xpath = './ds:KeyInfo/ds:X509Data/ds:X509Certificate'
+        value = at_xpath(xpath).try(:text)
         return if value.nil?
         ::Xml::Kit::Certificate.new(value, use: :signing)
       end
 
-      # Returns true when the fingerprint of the certificate matches one of the certificates registered in the metadata.
+      # Returns true when the fingerprint of the certificate matches one of
+      # the certificates registered in the metadata.
       def trusted?(metadata)
         return false if metadata.nil?
         metadata.matches?(certificate.fingerprint, use: :signing).present?
@@ -44,7 +46,8 @@ module Saml
       end
 
       def digest_method
-        at_xpath('./ds:SignedInfo/ds:Reference/ds:DigestMethod/@Algorithm').try(:value)
+        xpath = './ds:SignedInfo/ds:Reference/ds:DigestMethod/@Algorithm'
+        at_xpath(xpath).try(:value)
       end
 
       def signature_value
@@ -56,11 +59,20 @@ module Saml
       end
 
       def canonicalization_method
-        at_xpath('./ds:SignedInfo/ds:CanonicalizationMethod/@Algorithm').try(:value)
+        xpath = './ds:SignedInfo/ds:CanonicalizationMethod/@Algorithm'
+        at_xpath(xpath).try(:value)
       end
 
       def transforms
-        node.search('./ds:SignedInfo/ds:Reference/ds:Transforms/ds:Transform/@Algorithm', Saml::Kit::Document::NAMESPACES).try(:map, &:value)
+        xpath = xpath_for([
+          '.',
+          'ds:SignedInfo',
+          'ds:Reference',
+          'ds:Transforms',
+          'ds:Transform',
+          '@Algorithm',
+        ])
+        node.search(xpath, Saml::Kit::Document::NAMESPACES).try(:map, &:value)
       end
 
       # Returns the XML Hash.
@@ -114,6 +126,10 @@ module Saml
 
       def dsignature
         @dsignature ||= Xmldsig::Signature.new(node, 'ID=$uri or @Id')
+      end
+
+      def xpath_for(segments)
+        segments.join('/')
       end
     end
   end

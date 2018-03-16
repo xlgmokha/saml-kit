@@ -10,7 +10,9 @@ module Saml
     class LogoutResponse < Document
       include Respondable
 
-      def initialize(xml, request_id: nil, configuration: Saml::Kit.configuration)
+      def initialize(
+        xml, request_id: nil, configuration: Saml::Kit.configuration
+      )
         @request_id = request_id
         super(xml, name: 'LogoutResponse', configuration: configuration)
       end

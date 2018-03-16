@@ -61,7 +61,8 @@ module Saml
           elsif parameters[:SAMLResponse].present?
             parameters[:SAMLResponse]
           else
-            raise ArgumentError, 'SAMLRequest or SAMLResponse parameter is required.'
+            message = 'SAMLRequest or SAMLResponse parameter is required.'
+            raise ArgumentError, message
           end
         end
       end

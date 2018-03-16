@@ -14,6 +14,11 @@ AllCops:
     - 'vendor/**/*'
   TargetRubyVersion: 2.2
 
+Layout/AlignParameters:
+  Enabled: true
+  EnforcedStyle: with_fixed_indentation
+  IndentationWidth: 2
+
 Layout/ClassStructure:
   Enabled: true
   Categories:
@@ -39,6 +44,10 @@ Layout/IndentArray:
 Layout/IndentHeredoc:
   EnforcedStyle: active_support
 
+Layout/MultilineMethodCallIndentation:
+  Enabled: true
+  EnforcedStyle: indented
+
 Lint/AmbiguousBlockAssociation:
   Exclude:
     - 'spec/**/*.rb'
@@ -61,6 +70,7 @@ Metrics/ModuleLength:
 
 Metrics/LineLength:
   Exclude:
+    - 'lib/saml/kit/builders/templates/*.builder'
     - 'spec/**/*.rb'
 
 Naming/FileName:
