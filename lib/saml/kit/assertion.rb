@@ -8,6 +8,7 @@ module Saml
     class Assertion
       include ActiveModel::Validations
       include Translatable
+      include XmlParseable
       XPATH = [
         '/samlp:Response/saml:Assertion',
         '/samlp:Response/saml:EncryptedAssertion'
@@ -96,10 +97,6 @@ module Saml
         @node.present?
       end
 
-      def to_xml(pretty: nil)
-        pretty ? @node.to_xml(indent: 2) : to_s
-      end
-
       def to_s
         @node.to_s
       end
@@ -148,13 +145,8 @@ module Saml
         errors.add(:base, error_message(:cannot_decrypt)) unless decryptable?
       end
 
-      def at_xpath(xpath)
-        return unless @node
-        @node.at_xpath(xpath, Saml::Kit::Document::NAMESPACES)
-      end
-
-      def search(xpath)
-        @node.search(xpath, Saml::Kit::Document::NAMESPACES)
+      def to_nokogiri
+        @node
       end
     end
   end
