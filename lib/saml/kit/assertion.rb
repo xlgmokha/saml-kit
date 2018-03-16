@@ -64,8 +64,8 @@ module Saml
       def attributes
         xpath = './saml:AttributeStatement/saml:Attribute'
         @attributes ||= search(xpath).inject({}) do |memo, item|
-          namespaces = Saml::Kit::Document::NAMESPACES
-          attribute = item.at_xpath('./saml:AttributeValue', namespaces)
+          namespace = Saml::Kit::Document::NAMESPACES
+          attribute = item.at_xpath('./saml:AttributeValue', namespace)
           memo[item.attribute('Name').value] = attribute.try(:text)
           memo
         end.with_indifferent_access

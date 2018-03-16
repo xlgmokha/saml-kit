@@ -16,12 +16,13 @@ module Saml
 
       # Returns the SAML document returned as a Hash.
       def to_h
-        @to_h ||= Hash.from_xml(content) || {}
+        @to_h ||= Hash.from_xml(to_s) || {}
       end
 
-      # Returns the SAML document as an XML string.
+      # Returns the XML document as a String.
       #
-      # @param pretty [Boolean] formats the xml or returns the raw xml.
+      # @param pretty [Boolean] true to return a human friendly version
+      # of the XML.
       def to_xml(pretty: nil)
         pretty ? to_nokogiri.to_xml(indent: 2) : to_s
       end
@@ -52,6 +53,7 @@ module Saml
         to_nokogiri.search(xpath, NAMESPACES)
       end
 
+      # Returns the XML document as a [String].
       def to_s
         content
       end

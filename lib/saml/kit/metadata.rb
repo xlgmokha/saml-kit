@@ -27,16 +27,10 @@ module Saml
     # {include:file:spec/examples/metadata_spec.rb}
     class Metadata
       include ActiveModel::Validations
-      include XsdValidatable
-      include Translatable
       include Buildable
-      NAMESPACES = {
-        NameFormat: Namespaces::ATTR_SPLAT,
-        ds: ::Xml::Kit::Namespaces::XMLDSIG,
-        md: Namespaces::METADATA,
-        saml: Namespaces::ASSERTION,
-        samlp: Namespaces::PROTOCOL,
-      }.freeze
+      include Translatable
+      include XmlParseable
+      include XsdValidatable
 
       validates_presence_of :metadata
       validate :must_contain_descriptor
@@ -45,9 +39,9 @@ module Saml
 
       attr_reader :name
 
-      def initialize(name, xml)
+      def initialize(name, content)
         @name = name
-        @xml = xml
+        @content = content
       end
 
       # Returns the /EntityDescriptor/@entityID
@@ -164,24 +158,6 @@ module Saml
         end
       end
 
-      # Returns the XML document converted to a Hash.
-      def to_h
-        @to_h ||= Hash.from_xml(to_xml)
-      end
-
-      # Returns the XML document as a String.
-      #
-      # @param pretty [Boolean] true to return a human friendly version
-      # of the XML.
-      def to_xml(pretty: nil)
-        pretty ? to_nokogiri.to_xml(indent: 2) : to_s
-      end
-
-      # Returns the XML document as a [String].
-      def to_s
-        @xml
-      end
-
       # Verifies the signature and data using the signing certificates.
       #
       # @param algorithm [OpenSSL::Digest] the digest algorithm to use.
@@ -207,11 +183,12 @@ module Saml
         # @return [Saml::Kit::Metadata] the metadata document or subclass.
         def from(content)
           document = Nokogiri::XML(content)
-          return unless document.at_xpath('/md:EntityDescriptor', NAMESPACES)
+          return unless document.at_xpath('/md:EntityDescriptor', XmlParseable::NAMESPACES)
+
           xpath = '/md:EntityDescriptor/md:SPSSODescriptor'
-          sp = document.at_xpath(xpath, NAMESPACES)
+          sp = document.at_xpath(xpath, XmlParseable::NAMESPACES)
           xpath = '/md:EntityDescriptor/md:IDPSSODescriptor'
-          idp = document.at_xpath(xpath, NAMESPACES)
+          idp = document.at_xpath(xpath, XmlParseable::NAMESPACES)
           if sp && idp
             Saml::Kit::CompositeMetadata.new(content)
           elsif sp
@@ -229,20 +206,7 @@ module Saml
 
       private
 
-      attr_reader :xml
-
-      # @!visibility private
-      def to_nokogiri
-        @to_nokogiri ||= Nokogiri::XML(xml)
-      end
-
-      def at_xpath(xpath)
-        to_nokogiri.at_xpath(xpath, NAMESPACES)
-      end
-
-      def search(xpath)
-        to_nokogiri.search(xpath, NAMESPACES)
-      end
+      attr_reader :content
 
       def metadata
         at_xpath("/md:EntityDescriptor/md:#{name}").present?

@@ -49,10 +49,9 @@ RSpec.describe Saml::Kit::Metadata do
       XML
       result = subject.from(xml)
       expect(result).to be_present
-
-      expect(result.single_sign_on_services.count).to be(2)
-      expect(result.assertion_consumer_services.count).to be(1)
-      expect(result.single_logout_services.count).to be(2)
+      expect(result.single_sign_on_services.count).to eq(2)
+      expect(result.assertion_consumer_services.count).to eq(1)
+      expect(result.single_logout_services.count).to eq(2)
       expect(result.organization_name).to eql('Acme, Inc')
       expect(result.organization_url).to eql('http://localhost:5000/')
       expect(result.contact_person_company).to eql('mailto:hi@example.com')
