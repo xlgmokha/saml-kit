@@ -104,6 +104,12 @@ RSpec.describe Saml::Kit::DefaultRegistry do
         subject.register(authn_request)
       end.to raise_error(/Cannot register invalid metadata/)
     end
+
+    it 'raises an error when the document is nil' do
+      expect do
+        subject.register(nil)
+      end.to raise_error(/Cannot register invalid metadata/)
+    end
   end
 
   describe '#each' do

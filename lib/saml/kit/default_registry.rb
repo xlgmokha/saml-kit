@@ -74,7 +74,7 @@ module Saml
 
       def ensure_valid_metadata(metadata)
         error = ArgumentError.new('Cannot register invalid metadata')
-        raise error if metadata.invalid? || !metadata.respond_to?(:entity_id)
+        raise error if metadata.nil? || !metadata.respond_to?(:entity_id) || metadata.invalid?
       end
 
       # This class is responsible for
