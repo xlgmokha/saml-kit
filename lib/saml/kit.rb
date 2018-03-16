@@ -23,6 +23,7 @@ require 'saml/kit/concerns/respondable'
 require 'saml/kit/concerns/serializable'
 require 'saml/kit/concerns/translatable'
 require 'saml/kit/concerns/trustable'
+require 'saml/kit/concerns/xml_parseable'
 require 'saml/kit/concerns/xml_templatable'
 require 'saml/kit/concerns/xsd_validatable'
 
