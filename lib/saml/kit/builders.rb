@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'saml/kit/xml_templatable'
 require 'saml/kit/builders/assertion'
 require 'saml/kit/builders/authentication_request'
 require 'saml/kit/builders/encrypted_assertion'

@@ -5,7 +5,7 @@ module Saml
     # This module is responsible for
     # generating converting templates to xml.
     module XmlTemplatable
-      TEMPLATES_DIR = Pathname.new(File.join(__dir__, 'builders/templates/'))
+      TEMPLATES_DIR = Pathname.new(File.join(__dir__, '../builders/templates/'))
       include ::Xml::Kit::Templatable
 
       def template_path
