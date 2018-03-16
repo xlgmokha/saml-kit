@@ -9,9 +9,6 @@ module Saml
       include Translatable
       include Trustable
       include Buildable
-      PROTOCOL_XSD = File.expand_path(
-        './xsd/saml-schema-protocol-2.0.xsd', File.dirname(__FILE__)
-      ).freeze
       NAMESPACES = {
         "NameFormat": ::Saml::Kit::Namespaces::ATTR_SPLAT,
         "ds": ::Xml::Kit::Namespaces::XMLDSIG,

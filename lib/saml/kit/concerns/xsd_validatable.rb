@@ -5,6 +5,14 @@ module Saml
     # This module is responsible for validating
     # xml documents against the SAML XSD's
     module XsdValidatable
+      PROTOCOL_XSD = File.expand_path(
+        '../xsd/saml-schema-protocol-2.0.xsd', File.dirname(__FILE__)
+      ).freeze
+
+      METADATA_XSD = File.expand_path(
+        '../xsd/saml-schema-metadata-2.0.xsd', File.dirname(__FILE__)
+      ).freeze
+
       # @!visibility private
       def matches_xsd?(xsd)
         Dir.chdir(File.dirname(xsd)) do
