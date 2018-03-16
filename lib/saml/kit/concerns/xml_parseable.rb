@@ -32,6 +32,10 @@ module Saml
         Nokogiri::XML(to_xml, &:noblanks).to_xhtml
       end
 
+      def present?
+        to_nokogiri.present?
+      end
+
       # @!visibility private
       def to_nokogiri
         @to_nokogiri ||= Nokogiri::XML(to_s)
@@ -39,7 +43,7 @@ module Saml
 
       # @!visibility private
       def at_xpath(xpath)
-        return unless to_nokogiri
+        return unless present?
         to_nokogiri.at_xpath(xpath, NAMESPACES)
       end
 

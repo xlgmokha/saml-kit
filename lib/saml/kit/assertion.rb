@@ -72,11 +72,11 @@ module Saml
       end
 
       def started_at
-        parse_date(at_xpath('./saml:Conditions/@NotBefore').try(:value))
+        parse_iso8601(at_xpath('./saml:Conditions/@NotBefore').try(:value))
       end
 
       def expired_at
-        parse_date(at_xpath('./saml:Conditions/@NotOnOrAfter').try(:value))
+        parse_iso8601(at_xpath('./saml:Conditions/@NotOnOrAfter').try(:value))
       end
 
       def audiences
@@ -91,10 +91,6 @@ module Saml
       def decryptable?
         return true unless encrypted?
         !@cannot_decrypt
-      end
-
-      def present?
-        @node.present?
       end
 
       def to_s
@@ -115,7 +111,7 @@ module Saml
         Saml::Kit.logger.error(error)
       end
 
-      def parse_date(value)
+      def parse_iso8601(value)
         DateTime.parse(value)
       rescue StandardError => error
         Saml::Kit.logger.error(error)
