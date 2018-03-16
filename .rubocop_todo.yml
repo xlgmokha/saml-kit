@@ -24,9 +24,3 @@ Metrics/MethodLength:
 Style/DateTime:
   Exclude:
     - 'lib/saml/kit/assertion.rb'
-
-# Offense count: 4
-# Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
-# URISchemes: http, https
-Metrics/LineLength:
-  Max: 89

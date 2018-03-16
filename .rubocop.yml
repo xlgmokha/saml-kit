@@ -72,6 +72,8 @@ Metrics/LineLength:
   Exclude:
     - 'lib/saml/kit/builders/templates/*.builder'
     - 'spec/**/*.rb'
+  IgnoredPatterns:
+    - '^#*'
 
 Naming/FileName:
   Exclude:
