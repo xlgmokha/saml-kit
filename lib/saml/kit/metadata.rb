@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'saml/kit/organization'
-
 module Saml
   module Kit
     # The Metadata object can be used to parse an XML string of metadata.
@@ -42,7 +40,7 @@ module Saml
       validate :must_match_xsd
       validate :must_have_valid_signature
 
-      attr_reader :name
+      attr_reader :name, :content
 
       def initialize(name, content)
         @name = name
@@ -59,9 +57,8 @@ module Saml
         search("/md:EntityDescriptor/md:#{name}/md:NameIDFormat").map(&:text)
       end
 
-      def organization
-        @organization ||=
-          Organization.new(at_xpath('/md:EntityDescriptor/md:Organization'))
+      def organization(xpath = '/md:EntityDescriptor/md:Organization')
+        @organization ||= Organization.new(at_xpath(xpath))
       end
 
       # Returns the Company
@@ -175,25 +172,8 @@ module Saml
       end
 
       class << self
-        # Creates a `{Saml::Kit::Metadata}` object from a raw XML [String].
-        #
-        # @param content [String] the raw metadata XML.
-        # @return [Saml::Kit::Metadata] the metadata document or subclass.
         def from(content)
-          document = Nokogiri::XML(content)
-          return unless document.at_xpath('/md:EntityDescriptor', XmlParseable::NAMESPACES)
-
-          xpath = '/md:EntityDescriptor/md:SPSSODescriptor'
-          sp = document.at_xpath(xpath, XmlParseable::NAMESPACES)
-          xpath = '/md:EntityDescriptor/md:IDPSSODescriptor'
-          idp = document.at_xpath(xpath, XmlParseable::NAMESPACES)
-          if sp && idp
-            Saml::Kit::CompositeMetadata.new(content)
-          elsif sp
-            Saml::Kit::ServiceProviderMetadata.new(content)
-          elsif idp
-            Saml::Kit::IdentityProviderMetadata.new(content)
-          end
+          Saml::Kit::Parser.new.map_from(content)
         end
 
         # @!visibility private
@@ -203,8 +183,6 @@ module Saml
       end
 
       private
-
-      attr_reader :content
 
       def metadata
         at_xpath("/md:EntityDescriptor/md:#{name}").present?
