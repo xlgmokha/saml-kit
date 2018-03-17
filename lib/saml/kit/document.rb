@@ -52,6 +52,12 @@ module Saml
       end
 
       class << self
+        CONSTRUCTORS = {
+          'AuthnRequest' => -> { Saml::Kit::AuthenticationRequest },
+          'LogoutRequest' => -> { Saml::Kit::LogoutRequest },
+          'LogoutResponse' => -> { Saml::Kit::LogoutResponse },
+          'Response' => -> { Saml::Kit::Response },
+        }.freeze
         XPATH = [
           '/samlp:AuthnRequest',
           '/samlp:LogoutRequest',
@@ -65,15 +71,9 @@ module Saml
         # @param configuration [Saml::Kit::Configuration] configuration to use
         # for unpacking the document.
         def to_saml_document(xml, configuration: Saml::Kit.configuration)
-          namespaces = { "samlp": ::Saml::Kit::Namespaces::PROTOCOL }
-          document = Nokogiri::XML(xml)
-          element = document.at_xpath(XPATH, namespaces)
-          constructor = {
-            'AuthnRequest' => Saml::Kit::AuthenticationRequest,
-            'LogoutRequest' => Saml::Kit::LogoutRequest,
-            'LogoutResponse' => Saml::Kit::LogoutResponse,
-            'Response' => Saml::Kit::Response,
-          }[element.name] || InvalidDocument
+          namespaces = { samlp: Namespaces::PROTOCOL }
+          element = Nokogiri::XML(xml).at_xpath(XPATH, namespaces)
+          constructor = CONSTRUCTORS[element.name].try(:call) || InvalidDocument
           constructor.new(xml, configuration: configuration)
         rescue StandardError => error
           Saml::Kit.logger.error(error)
@@ -82,18 +82,12 @@ module Saml
 
         # @!visibility private
         def builder_class # :nodoc:
-          case name
-          when Saml::Kit::Response.to_s
-            Saml::Kit::Builders::Response
-          when Saml::Kit::LogoutResponse.to_s
-            Saml::Kit::Builders::LogoutResponse
-          when Saml::Kit::AuthenticationRequest.to_s
-            Saml::Kit::Builders::AuthenticationRequest
-          when Saml::Kit::LogoutRequest.to_s
-            Saml::Kit::Builders::LogoutRequest
-          else
-            raise ArgumentError, "Unknown SAML Document #{name}"
-          end
+          {
+            Response.to_s => Saml::Kit::Builders::Response,
+            LogoutResponse.to_s => Saml::Kit::Builders::LogoutResponse,
+            AuthenticationRequest.to_s => Saml::Kit::Builders::AuthenticationRequest,
+            LogoutRequest.to_s => Saml::Kit::Builders::LogoutRequest,
+          }[name] || (raise ArgumentError, "Unknown SAML Document #{name}")
         end
       end
 
