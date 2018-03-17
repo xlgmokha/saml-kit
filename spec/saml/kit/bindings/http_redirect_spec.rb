@@ -5,6 +5,8 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
   let(:location) { FFaker::Internet.http_url }
 
+  specify { expect(subject.binding).to eql(Saml::Kit::Bindings::HTTP_REDIRECT) }
+
   describe '#serialize' do
     let(:relay_state) { 'ECHO' }
     let(:configuration) do

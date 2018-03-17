@@ -5,6 +5,8 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
 
   let(:location) { FFaker::Internet.uri('https') }
 
+  specify { expect(subject.binding).to eql(Saml::Kit::Bindings::HTTP_POST) }
+
   describe 'equality' do
     it 'is referentially equal' do
       expect(subject).to eql(subject)
