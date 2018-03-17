@@ -109,7 +109,7 @@ module Saml
       # `SingleLogoutService`.
       def service_for(binding:, type:)
         binding = Saml::Kit::Bindings.binding_for(binding)
-        services(type).find { |xxx| xxx.binding?(binding) }
+        services(type).find { |x| x.binding?(binding) }
       end
 
       # Returns each of the SingleLogoutService bindings
@@ -133,9 +133,8 @@ module Saml
       # @return [Array] Returns an array with a url and Hash of parameters to
       # send to the other party.
       def logout_request_for(user, binding: :http_post, relay_state: nil)
-        builder = Saml::Kit::LogoutRequest.builder(user) do |xxx|
-          yield xxx if block_given?
-        end
+        builder =
+          Saml::Kit::LogoutRequest.builder(user) { |x| yield x if block_given? }
         request_binding = single_logout_service_for(binding: binding)
         request_binding.serialize(builder, relay_state: relay_state)
       end
@@ -148,9 +147,7 @@ module Saml
       # @return [Xml::Kit::Certificate] returns the matching
       # `{Xml::Kit::Certificate}`
       def matches?(fingerprint, use: :signing)
-        certificates.find do |xxx|
-          xxx.for?(use) && xxx.fingerprint == fingerprint
-        end
+        certificates.find { |x| x.for?(use) && x.fingerprint == fingerprint }
       end
 
       # Verifies the signature and data using the signing certificates.
