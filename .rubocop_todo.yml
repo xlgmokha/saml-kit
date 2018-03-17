@@ -10,11 +10,6 @@
 Metrics/AbcSize:
   Max: 19
 
-# Offense count: 3
-# Configuration parameters: CountComments.
-Metrics/ClassLength:
-  Max: 150
-
 # Offense count: 11
 # Configuration parameters: CountComments.
 Metrics/MethodLength:
@@ -23,4 +18,4 @@ Metrics/MethodLength:
 # Offense count: 1
 Style/DateTime:
   Exclude:
-    - 'lib/saml/kit/assertion.rb'
+    - 'lib/saml/kit/conditions.rb'
