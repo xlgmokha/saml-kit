@@ -133,8 +133,7 @@ module Saml
       # @return [Array] Returns an array with a url and Hash of parameters to
       # send to the other party.
       def logout_request_for(user, binding: :http_post, relay_state: nil)
-        builder =
-          Saml::Kit::LogoutRequest.builder(user) { |x| yield x if block_given? }
+        builder = LogoutRequest.builder(user) { |x| yield x if block_given? }
         request_binding = single_logout_service_for(binding: binding)
         request_binding.serialize(builder, relay_state: relay_state)
       end
