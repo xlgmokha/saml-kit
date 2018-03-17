@@ -34,7 +34,7 @@ module Saml
       end
 
       def present?
-        to_nokogiri.present?
+        to_s.present?
       end
 
       # @!visibility private

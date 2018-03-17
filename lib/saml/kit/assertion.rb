@@ -25,15 +25,13 @@ module Saml
         node, configuration: Saml::Kit.configuration, private_keys: []
       )
         @name = 'Assertion'
-        @node = node
+        @to_nokogiri = node
         @configuration = configuration
         @occurred_at = Time.current
         @cannot_decrypt = false
         @encrypted = false
-        private_keys = (
-          configuration.private_keys(use: :encryption) + private_keys
-        ).uniq
-        decrypt(::Xml::Kit::Decryption.new(private_keys: private_keys))
+        keys = configuration.private_keys(use: :encryption) + private_keys
+        decrypt(::Xml::Kit::Decryption.new(private_keys: keys.uniq))
       end
 
       def issuer
@@ -94,7 +92,7 @@ module Saml
       end
 
       def to_s
-        @node.to_s
+        @to_nokogiri.to_s
       end
 
       private
@@ -105,7 +103,7 @@ module Saml
         encrypted_assertion = at_xpath('./xmlenc:EncryptedData')
         @encrypted = encrypted_assertion.present?
         return unless @encrypted
-        @node = decryptor.decrypt_node(encrypted_assertion)
+        @to_nokogiri = decryptor.decrypt_node(encrypted_assertion)
       rescue Xml::Kit::DecryptionError => error
         @cannot_decrypt = true
         Saml::Kit.logger.error(error)
@@ -119,8 +117,7 @@ module Saml
       end
 
       def must_match_issuer
-        return if audiences.empty?
-        return if audiences.include?(configuration.entity_id)
+        return if audiences.empty? || audiences.include?(configuration.entity_id)
         errors[:audience] << error_message(:must_match_issuer)
       end
 
@@ -131,7 +128,6 @@ module Saml
 
       def must_have_valid_signature
         return if !signed? || signature.valid?
-
         signature.errors.each do |attribute, message|
           errors.add(attribute, message)
         end
@@ -139,10 +135,6 @@ module Saml
 
       def must_be_decryptable
         errors.add(:base, error_message(:cannot_decrypt)) unless decryptable?
-      end
-
-      def to_nokogiri
-        @node
       end
     end
   end

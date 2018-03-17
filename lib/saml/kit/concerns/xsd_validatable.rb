@@ -15,6 +15,8 @@ module Saml
 
       # @!visibility private
       def matches_xsd?(xsd)
+        return unless to_nokogiri.present?
+
         Dir.chdir(File.dirname(xsd)) do
           xsd = Nokogiri::XML::Schema(IO.read(xsd))
           xsd.validate(to_nokogiri).each do |error|
