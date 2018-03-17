@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'saml/kit/organization'
+
 module Saml
   module Kit
     # The Metadata object can be used to parse an XML string of metadata.
@@ -31,6 +33,9 @@ module Saml
       include Translatable
       include XmlParseable
       include XsdValidatable
+      extend Forwardable
+
+      def_delegator :organization, :organization_name, :organization_url
 
       validates_presence_of :metadata
       validate :must_contain_descriptor
@@ -54,16 +59,9 @@ module Saml
         search("/md:EntityDescriptor/md:#{name}/md:NameIDFormat").map(&:text)
       end
 
-      # Returns the Organization Name
-      def organization_name
-        xpath = '/md:EntityDescriptor/md:Organization/md:OrganizationName'
-        at_xpath(xpath).try(:text)
-      end
-
-      # Returns the Organization URL
-      def organization_url
-        xpath = '/md:EntityDescriptor/md:Organization/md:OrganizationURL'
-        at_xpath(xpath).try(:text)
+      def organization
+        @organization ||=
+          Organization.new(at_xpath('/md:EntityDescriptor/md:Organization'))
       end
 
       # Returns the Company

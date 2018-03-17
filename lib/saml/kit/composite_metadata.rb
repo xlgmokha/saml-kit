@@ -9,6 +9,7 @@ module Saml
     # and SPSSODescriptor element.
     class CompositeMetadata < Metadata # :nodoc:
       include Enumerable
+
       attr_reader :service_provider, :identity_provider
 
       def initialize(xml)
@@ -17,6 +18,18 @@ module Saml
           Saml::Kit::ServiceProviderMetadata.new(xml),
           Saml::Kit::IdentityProviderMetadata.new(xml),
         ]
+      end
+
+      def organization
+        find { |x| x.organization.present? }.try(:organization)
+      end
+
+      def organization_name
+        organization.name
+      end
+
+      def organization_url
+        organization.url
       end
 
       def services(type)
