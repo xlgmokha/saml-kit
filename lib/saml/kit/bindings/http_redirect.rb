@@ -43,13 +43,12 @@ module Saml
 
         def ensure_valid_signature(params, document)
           signature = params[:Signature]
-          algorithm = params[:SigAlg]
           provider = document.provider
-          return if signature.blank? || algorithm.blank?
+          return if signature.blank? || params[:SigAlg].blank?
           return if provider.nil?
 
           return document.signature_verified! if provider.verify(
-            algorithm_for(algorithm),
+            algorithm_for(params[:SigAlg]),
             decode(signature),
             canonicalize(params)
           )

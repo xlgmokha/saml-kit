@@ -56,14 +56,10 @@ module Saml
             SAMLRequest: params[:SAMLRequest] || params['SAMLRequest'],
             SAMLResponse: params[:SAMLResponse] || params['SAMLResponse'],
           }
-          if parameters[:SAMLRequest].present?
-            parameters[:SAMLRequest]
-          elsif parameters[:SAMLResponse].present?
-            parameters[:SAMLResponse]
-          else
-            message = 'SAMLRequest or SAMLResponse parameter is required.'
-            raise ArgumentError, message
-          end
+          return parameters[:SAMLRequest] if parameters[:SAMLRequest].present?
+          return parameters[:SAMLResponse] if parameters[:SAMLResponse].present?
+          message = 'SAMLRequest or SAMLResponse parameter is required.'
+          raise ArgumentError, message
         end
       end
     end
