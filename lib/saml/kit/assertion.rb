@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'saml/kit/attribute_statement'
-
 module Saml
   module Kit
     # This class validates the Assertion
@@ -11,10 +9,13 @@ module Saml
       include ActiveModel::Validations
       include Translatable
       include XmlParseable
+      extend Forwardable
       XPATH = [
         '/samlp:Response/saml:Assertion',
         '/samlp:Response/saml:EncryptedAssertion'
       ].join('|')
+      def_delegators :conditions, :started_at, :expired_at, :audiences
+      def_delegators :attribute_statement, :attributes
 
       validate :must_be_decryptable
       validate :must_match_issuer, if: :decryptable?
@@ -61,22 +62,13 @@ module Saml
         now > drifted_started_at && !expired?(now)
       end
 
-      def attributes
-        xpath = './saml:AttributeStatement'
-        AttributeStatement.new(search(xpath)).attributes
+      def attribute_statement
+        @attribute_statement ||=
+          AttributeStatement.new(search('./saml:AttributeStatement'))
       end
 
-      def started_at
-        parse_iso8601(at_xpath('./saml:Conditions/@NotBefore').try(:value))
-      end
-
-      def expired_at
-        parse_iso8601(at_xpath('./saml:Conditions/@NotOnOrAfter').try(:value))
-      end
-
-      def audiences
-        xpath = './saml:Conditions/saml:AudienceRestriction/saml:Audience'
-        search(xpath).map(&:text)
+      def conditions
+        @conditions ||= Conditions.new(search('./saml:Conditions'))
       end
 
       def encrypted?
@@ -104,13 +96,6 @@ module Saml
       rescue Xml::Kit::DecryptionError => error
         @cannot_decrypt = true
         Saml::Kit.logger.error(error)
-      end
-
-      def parse_iso8601(value)
-        DateTime.parse(value)
-      rescue StandardError => error
-        Saml::Kit.logger.error(error)
-        Time.at(0).to_datetime
       end
 
       def must_match_issuer
