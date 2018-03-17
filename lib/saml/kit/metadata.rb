@@ -171,15 +171,12 @@ module Saml
         @signature ||= Signature.new(at_xpath(xpath))
       end
 
-      class << self
-        def from(content)
-          Saml::Kit::Parser.new.map_from(content)
-        end
+      def self.from(content)
+        Saml::Kit::Parser.new.metadata_from(content)
+      end
 
-        # @!visibility private
-        def builder_class
-          Saml::Kit::Builders::Metadata
-        end
+      def self.builder_class
+        Saml::Kit::Builders::Metadata
       end
 
       private

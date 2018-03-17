@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-#
+
 module Saml
   module Kit
     class Parser
@@ -7,7 +7,7 @@ module Saml
       #
       # @param content [String] the raw metadata XML.
       # @return [Saml::Kit::Metadata] the metadata document or subclass.
-      def map_from(content)
+      def metadata_from(content)
         document = Nokogiri::XML(content)
         return unless document.at_xpath('/md:EntityDescriptor', XmlParseable::NAMESPACES)
 
