@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'saml/kit/attribute_statement'
+
 module Saml
   module Kit
     # This class validates the Assertion
@@ -60,13 +62,8 @@ module Saml
       end
 
       def attributes
-        xpath = './saml:AttributeStatement/saml:Attribute'
-        @attributes ||= search(xpath).inject({}) do |memo, item|
-          namespace = Saml::Kit::Document::NAMESPACES
-          attribute = item.at_xpath('./saml:AttributeValue', namespace)
-          memo[item.attribute('Name').value] = attribute.try(:text)
-          memo
-        end.with_indifferent_access
+        xpath = './saml:AttributeStatement'
+        AttributeStatement.new(search(xpath)).attributes
       end
 
       def started_at
