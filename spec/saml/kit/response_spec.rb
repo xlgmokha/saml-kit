@@ -471,7 +471,7 @@ RSpec.describe Saml::Kit::Response do
            </Attribute>
          </AttributeStatement>
         </Assertion>
-XML
+      XML
     end
 
     it 'parses the encrypted assertion' do
@@ -510,7 +510,7 @@ XML
             </xenc:EncryptedData>
           </saml:EncryptedAssertion>
         </samlp:Response>
-XML
+      XML
 
       subject = described_class.new(xml)
       expect(subject.attributes).to match_array([

@@ -1,4 +1,3 @@
-
 module Saml
   module Kit
     class Organization

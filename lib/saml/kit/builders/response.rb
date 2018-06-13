@@ -40,7 +40,7 @@ module Saml
         end
 
         def assertion=(value)
-          @assertion = value ? value : Null.new
+          @assertion = value || Null.new
         end
 
         def assertion

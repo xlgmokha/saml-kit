@@ -52,7 +52,7 @@ RSpec.describe Saml::Kit::Assertion do
          </AuthnStatement>
         </Assertion>
       </Response>
-XML
+      XML
       document = Nokogiri::XML(xml)
       node = document.at_xpath('//saml:Assertion', 'saml' => Saml::Kit::Namespaces::ASSERTION)
       subject = described_class.new(node, configuration: configuration)
@@ -89,7 +89,7 @@ XML
          </AuthnStatement>
         </Assertion>
       </Response>
-XML
+      XML
       document = Nokogiri::XML(xml)
       node = document.at_xpath('//saml:Assertion', 'saml' => Saml::Kit::Namespaces::ASSERTION)
       subject = described_class.new(node, configuration: configuration)
@@ -129,7 +129,7 @@ XML
          </AuthnStatement>
         </Assertion>
         </Response>
-XML
+      XML
       subject = described_class.new(Nokogiri::XML(xml))
       expect(subject).to be_present
     end
