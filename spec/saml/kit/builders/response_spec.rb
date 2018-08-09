@@ -179,7 +179,7 @@ RSpec.describe Saml::Kit::Builders::Response do
       authnrequest = Saml::Kit::AuthenticationRequest.new(xml)
       user = User.new(name_id: FFaker::Internet.email)
       result = Saml::Kit::Response.build(user, authnrequest)
-      expect(result.assertion.name_id_format).to be_nil
+      expect(result.assertion.name_id_format).to eql(Saml::Kit::Namespaces::UNSPECIFIED_NAMEID)
     end
   end
 

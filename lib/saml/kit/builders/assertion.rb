@@ -69,7 +69,7 @@ module Saml
         end
 
         def name_id_options
-          name_id_format.blank? ? {} : { Format: name_id_format }
+          { Format: name_id_format || Saml::Kit::Namespaces::UNSPECIFIED_NAMEID }
         end
       end
     end
