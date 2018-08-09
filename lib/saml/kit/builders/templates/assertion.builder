@@ -24,7 +24,7 @@ xml.Assertion(assertion_options) do
   if assertion_attributes.any?
     xml.AttributeStatement do
       assertion_attributes.each do |key, value|
-        xml.Attribute Name: key, NameFormat: Saml::Kit::Namespaces::URI, FriendlyName: key do
+        xml.Attribute Name: key do
           xml.AttributeValue value.to_s
         end
       end
