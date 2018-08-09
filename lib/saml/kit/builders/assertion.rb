@@ -64,9 +64,12 @@ module Saml
           {
             AuthnInstant: now.iso8601,
             SessionIndex: reference_id,
-            SessionNotOnOrAfter:
-            configuration.session_timeout.since(now).utc.iso8601,
+            SessionNotOnOrAfter: configuration.session_timeout.since(now).utc.iso8601,
           }
+        end
+
+        def name_id_options
+          name_id_format.blank? ? {} : { Format: name_id_format }
         end
       end
     end

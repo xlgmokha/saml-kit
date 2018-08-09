@@ -4,7 +4,7 @@ xml.Assertion(assertion_options) do
   xml.Issuer issuer
   signature_for(reference_id: reference_id, xml: xml)
   xml.Subject do
-    xml.NameID name_id, Format: name_id_format
+    xml.NameID name_id, name_id_options
     xml.SubjectConfirmation Method: Saml::Kit::Namespaces::BEARER do
       xml.SubjectConfirmationData '', subject_confirmation_data_options
     end

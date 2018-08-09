@@ -165,6 +165,22 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(result.assertion).not_to be_signed
       expect(result.assertion).to be_encrypted
     end
+
+    it 'excludes the nameid format when the request does not specify a nameid format in the nameid policy' do
+      xml = <<-XML.strip_heredoc
+        <samlp:AuthnRequest Version="2.0" ID="I_RzVGR.ktLi_wpo3IbsgwVJ2r8" IssueInstant="#{Time.now.iso8601}" Destination="#{FFaker::Internet.uri('https')}" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+          <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">#{FFaker::Name.first_name}</saml:Issuer>
+          <samlp:NameIDPolicy AllowCreate="true" />
+          <samlp:RequestedAuthnContext Comparison="exact">
+            <saml:AuthnContextClassRef xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+          </samlp:RequestedAuthnContext>
+        </samlp:AuthnRequest>
+      XML
+      authnrequest = Saml::Kit::AuthenticationRequest.new(xml)
+      user = User.new(name_id: FFaker::Internet.email)
+      result = Saml::Kit::Response.build(user, authnrequest)
+      expect(result.assertion.name_id_format).to be_nil
+    end
   end
 
   describe '.build' do
