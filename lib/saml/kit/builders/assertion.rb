@@ -19,7 +19,7 @@ module Saml
         end
 
         def name_id_format
-          request.try(:name_id_format) || Saml::Kit::Namespaces::PERSISTENT
+          request.try(:name_id_format)
         end
 
         def name_id
