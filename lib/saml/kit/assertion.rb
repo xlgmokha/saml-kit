@@ -46,7 +46,7 @@ module Saml
       end
 
       def name_id_format
-        at_xpath('./saml:Subject/saml:NameID').attribute("Format").try(:value)
+        at_xpath('./saml:Subject/saml:NameID').attribute('Format').try(:value)
       end
 
       def signed?
