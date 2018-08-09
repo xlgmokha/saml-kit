@@ -13,6 +13,7 @@ RSpec.describe Saml::Kit::Assertion do
 
   specify { expect(subject.issuer).to eql(entity_id) }
   specify { expect(subject.name_id).to eql(user.name_id) }
+  specify { expect(subject.name_id_format).to eql(Saml::Kit::Namespaces::PERSISTENT) }
   specify { expect(subject.started_at.to_i).to eql(Time.now.utc.to_i) }
   specify { expect(subject.expired_at.to_i).to eql(Saml::Kit.configuration.session_timeout.since(Time.now).utc.to_i) }
   specify { expect(subject.attributes).to eql('id' => user.attributes[:id]) }
