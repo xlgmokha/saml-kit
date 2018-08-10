@@ -13,9 +13,12 @@ module Saml
           :request, :issuer, :reference_id, :now, :configuration, :user,
           :version, :destination
 
+        attr_accessor :default_name_id_format
+
         def initialize(response_builder, embed_signature)
           @response_builder = response_builder
           self.embed_signature = embed_signature
+          self.default_name_id_format = Saml::Kit::Namespaces::UNSPECIFIED_NAMEID
         end
 
         def name_id_format
@@ -69,7 +72,7 @@ module Saml
         end
 
         def name_id_options
-          { Format: name_id_format || Saml::Kit::Namespaces::UNSPECIFIED_NAMEID }
+          { Format: name_id_format || default_name_id_format }
         end
       end
     end
