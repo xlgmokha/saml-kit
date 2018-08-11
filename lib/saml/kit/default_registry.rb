@@ -76,7 +76,7 @@ module Saml
         end
       end
 
-      private
+      protected
 
       def ensure_valid_metadata(metadata)
         error = ArgumentError.new('Cannot register invalid metadata')
