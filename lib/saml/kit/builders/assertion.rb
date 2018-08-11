@@ -50,7 +50,7 @@ module Saml
         end
 
         def subject_confirmation_data_options
-          options = { NotOnOrAfter: configuration.session_timeout.since(now).utc.iso8601 }
+          options = { NotOnOrAfter: not_on_or_after }
           options[:Recipient] = destination if destination.present?
           options[:InResponseTo] = request.id if request.present?
           options
@@ -59,7 +59,7 @@ module Saml
         def conditions_options
           {
             NotBefore: now.utc.iso8601,
-            NotOnOrAfter: configuration.session_timeout.since(now).utc.iso8601,
+            NotOnOrAfter: not_on_or_after,
           }
         end
 
@@ -67,12 +67,16 @@ module Saml
           {
             AuthnInstant: now.iso8601,
             SessionIndex: reference_id,
-            SessionNotOnOrAfter: configuration.session_timeout.since(now).utc.iso8601,
+            SessionNotOnOrAfter: not_on_or_after,
           }
         end
 
         def name_id_options
           { Format: name_id_format || default_name_id_format }
+        end
+
+        def not_on_or_after
+          configuration.session_timeout.since(now).utc.iso8601
         end
       end
     end
