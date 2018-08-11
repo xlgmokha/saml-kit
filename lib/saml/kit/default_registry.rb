@@ -55,8 +55,8 @@ module Saml
       # @param url [String] the url to download the metadata from.
       # @param verify_ssl [Boolean] enable/disable SSL peer verification.
       def register_url(url, verify_ssl: true)
-        content = HttpApi.new(url, verify_ssl: verify_ssl).get
-        register(Saml::Kit::Metadata.from(content))
+        client = Net::Hippie::Client.new(verify_mode: verify_ssl ? nil : OpenSSL::SSL::VERIFY_NONE)
+        register(Saml::Kit::Metadata.from(client.get(url).body))
       end
 
       # Returns the metadata document associated with an issuer or entityID.
@@ -82,37 +82,6 @@ module Saml
           metadata.nil? ||
           !metadata.respond_to?(:entity_id) ||
           metadata.invalid?
-      end
-
-      # This class is responsible for
-      # making HTTP requests to fetch metadata
-      # from remote locations.
-      class HttpApi # :nodoc:
-        def initialize(url, verify_ssl: true)
-          @uri = URI.parse(url)
-          @verify_ssl = verify_ssl
-        end
-
-        def get
-          execute(Net::HTTP::Get.new(uri.request_uri)).body
-        end
-
-        def execute(request)
-          http.request(request)
-        end
-
-        private
-
-        attr_reader :uri, :verify_ssl
-
-        def http
-          http = Net::HTTP.new(uri.host, uri.port)
-          http.read_timeout = 30
-          http.use_ssl = uri.is_a?(URI::HTTPS)
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE unless verify_ssl
-          http.set_debug_output(Saml::Kit.logger)
-          http
-        end
       end
     end
   end
