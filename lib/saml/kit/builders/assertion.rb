@@ -50,7 +50,7 @@ module Saml
         end
 
         def subject_confirmation_data_options
-          options = { NotOnOrAfter: 3.hours.since(now).utc.iso8601 }
+          options = { NotOnOrAfter: configuration.session_timeout.since(now).utc.iso8601 }
           options[:Recipient] = destination if destination.present?
           options[:InResponseTo] = request.id if request.present?
           options
