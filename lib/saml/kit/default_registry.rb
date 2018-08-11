@@ -55,7 +55,9 @@ module Saml
       # @param url [String] the url to download the metadata from.
       # @param verify_ssl [Boolean] enable/disable SSL peer verification.
       def register_url(url, verify_ssl: true)
-        client = Net::Hippie::Client.new(verify_mode: verify_ssl ? nil : OpenSSL::SSL::VERIFY_NONE)
+        headers = { 'User-Agent' => "saml/kit #{Saml::Kit::VERSION}" }
+        verify_mode = verify_ssl ? nil : OpenSSL::SSL::VERIFY_NONE
+        client = Net::Hippie::Client.new(headers: headers, verify_mode: verify_mode)
         register(Saml::Kit::Metadata.from(client.get(url).body))
       end
 
