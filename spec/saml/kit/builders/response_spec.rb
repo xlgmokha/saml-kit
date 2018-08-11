@@ -76,7 +76,7 @@ RSpec.describe Saml::Kit::Builders::Response do
 
       expect(hash['Response']['Assertion']['Subject']['NameID']).to eql(user.name_id)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['Method']).to eql('urn:oasis:names:tc:SAML:2.0:cm:bearer')
-      expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['NotOnOrAfter']).to eql((3.hours.from_now.utc - 1.second).iso8601)
+      expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['NotOnOrAfter']).to be_nil
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['Recipient']).to eql(assertion_consumer_service_url)
       expect(hash['Response']['Assertion']['Subject']['SubjectConfirmation']['SubjectConfirmationData']['InResponseTo']).to eql(request.id)
 
