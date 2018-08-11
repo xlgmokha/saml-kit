@@ -50,7 +50,7 @@ module Saml
         end
 
         def subject_confirmation_data_options
-          options = { }
+          options = {}
           options[:InResponseTo] = request.id if request.present?
           options[:NotOnOrAfter] = (not_on_or_after - 1.second).iso8601
           options[:Recipient] = destination if destination.present?
