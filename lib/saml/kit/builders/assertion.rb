@@ -53,6 +53,7 @@ module Saml
           options = {}
           options[:InResponseTo] = request.id if request.present?
           options[:Recipient] = destination if destination.present?
+          options[:NotOnOrAfter] = (now + 5.minutes).utc.iso8601
           options
         end
 
