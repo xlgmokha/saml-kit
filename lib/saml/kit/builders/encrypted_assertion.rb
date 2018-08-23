@@ -14,6 +14,10 @@ module Saml
           :configuration,
           :encryption_certificate
 
+        def_delegators :@assertion,
+          :default_name_id_format,
+          :default_name_id_format=
+
         def initialize(response_builder, assertion)
           @response_builder = response_builder
           @assertion = assertion

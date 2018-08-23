@@ -32,6 +32,23 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(result).to be_valid
     end
 
+    it 'builds an encrypted assertion with a custom default nameid format' do
+      allow(configuration.registry).to receive(:metadata_for).with(issuer).and_return(provider)
+      allow(provider).to receive(:matches?).and_return(true)
+      allow(request).to receive(:name_id_format).and_return(nil)
+
+      subject.assertion.default_name_id_format = Saml::Kit::Namespaces::TRANSIENT
+      subject.embed_signature = true
+      subject.encrypt = true
+
+      result = Hash.from_xml(subject.to_xml)
+      expect(result['Response']['EncryptedAssertion']).to be_present
+      encrypted_assertion = result['Response']['EncryptedAssertion']
+      decrypted_assertion = Xml::Kit::Decryption.new(private_keys: configuration.private_keys(use: :encryption)).decrypt_hash(encrypted_assertion)
+      document = Saml::Kit::Document.new(decrypted_assertion, name: 'Assertion')
+      expect(document.at_xpath('//saml:NameID/@Format').value).to eql(Saml::Kit::Namespaces::TRANSIENT)
+    end
+
     it 'includes the issuer' do
       subject.encrypt = false
       result = subject.build
