@@ -73,7 +73,7 @@ module Saml
       end
 
       def expected_type?
-        at_xpath("//saml:Assertion|//saml:EncryptedAssertion").present?
+        at_xpath("../saml:Assertion|../saml:EncryptedAssertion").present?
       end
 
       def attribute_statement
