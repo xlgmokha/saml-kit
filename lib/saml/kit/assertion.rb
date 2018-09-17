@@ -5,11 +5,7 @@ module Saml
     # This class validates the Assertion
     # element nested in a Response element
     # of a SAML document.
-    class Assertion
-      include ActiveModel::Validations
-      include Buildable
-      include Translatable
-      include XmlParseable
+    class Assertion < Document
       extend Forwardable
       XPATH = [
         '/samlp:Response/saml:Assertion',
@@ -36,10 +32,19 @@ module Saml
         @encrypted = false
         keys = configuration.private_keys(use: :encryption) + private_keys
         decrypt(::Xml::Kit::Decryption.new(private_keys: keys.uniq))
+        super(to_s, name: 'Assertion', configuration: configuration)
+      end
+
+      def id
+        at_xpath('./@ID').try(:value)
       end
 
       def issuer
         at_xpath('./saml:Issuer').try(:text)
+      end
+
+      def version
+        at_xpath('./@Version').try(:value)
       end
 
       def name_id
@@ -67,6 +72,10 @@ module Saml
         now > drifted_started_at && !expired?(now)
       end
 
+      def expected_type?
+        at_xpath("//saml:Assertion|//saml:EncryptedAssertion").present?
+      end
+
       def attribute_statement
         @attribute_statement ||=
           AttributeStatement.new(search('./saml:AttributeStatement'))
@@ -87,12 +96,6 @@ module Saml
 
       def to_s
         @to_nokogiri.to_s
-      end
-
-      class << self
-        def builder_class
-          Saml::Kit::Builders::Assertion
-        end
       end
 
       private

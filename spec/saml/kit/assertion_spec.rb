@@ -243,12 +243,21 @@ RSpec.describe Saml::Kit::Assertion do
 
   describe '.new' do
     let(:user) { instance_double(User, name_id_for: SecureRandom.uuid, assertion_attributes_for: {}) }
-    let(:saml_request) { double(id: SecureRandom.uuid, issuer: configuration.entity_id) }
+    let(:saml_request) { double(id: Xml::Kit::Id.generate, issuer: configuration.entity_id) }
+    let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:configuration) do
       Saml::Kit::Configuration.new do |x|
         x.entity_id = FFaker::Internet.uri('https')
+        x.registry = registry
       end
     end
+    let(:metadata) do
+      Saml::Kit::Metadata.build(configuration: configuration) do |x|
+        x.build_identity_provider
+      end
+    end
+
+    before { allow(registry).to receive(:metadata_for).with(configuration.entity_id).and_return(metadata) }
 
     it 'parses a raw xml assertion' do
       saml = Saml::Kit::Response.build(user, saml_request, configuration: configuration)

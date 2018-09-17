@@ -83,10 +83,11 @@ module Saml
         # @!visibility private
         def builder_class # :nodoc:
           {
-            Response.to_s => Saml::Kit::Builders::Response,
-            LogoutResponse.to_s => Saml::Kit::Builders::LogoutResponse,
+            Assertion.to_s => Saml::Kit::Builders::Assertion,
             AuthenticationRequest.to_s => Saml::Kit::Builders::AuthenticationRequest,
             LogoutRequest.to_s => Saml::Kit::Builders::LogoutRequest,
+            LogoutResponse.to_s => Saml::Kit::Builders::LogoutResponse,
+            Response.to_s => Saml::Kit::Builders::Response,
           }[name] || (raise ArgumentError, "Unknown SAML Document #{name}")
         end
       end
