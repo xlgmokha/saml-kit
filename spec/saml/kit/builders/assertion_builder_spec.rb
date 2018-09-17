@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe Saml::Kit::Builders::Assertion do
-  describe "#build" do
+  describe '#build' do
+    subject { described_class.new(user, request, configuration: configuration) }
+
     let(:email) { FFaker::Internet.email }
     let(:assertion_consumer_service_url) { FFaker::Internet.uri('https') }
     let(:user) { User.new(attributes: { email: email, created_at: Time.now.utc.iso8601 }) }
@@ -15,8 +17,6 @@ RSpec.describe Saml::Kit::Builders::Assertion do
         config.generate_key_pair_for(use: :encryption)
       end
     end
-
-    subject { described_class.new(user, request, configuration: configuration) }
 
     specify { expect(subject.build).to be_valid }
   end

@@ -241,7 +241,7 @@ RSpec.describe Saml::Kit::Assertion do
     end
   end
 
-  describe ".new" do
+  describe '.new' do
     let(:user) { instance_double(User, name_id_for: SecureRandom.uuid, assertion_attributes_for: {}) }
     let(:saml_request) { double(id: SecureRandom.uuid, issuer: configuration.entity_id) }
     let(:configuration) do
