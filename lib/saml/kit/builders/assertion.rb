@@ -7,16 +7,23 @@ module Saml
       # {include:file:lib/saml/kit/builders/templates/assertion.builder}
       class Assertion
         include XmlTemplatable
-        extend Forwardable
 
-        def_delegators :@response_builder,
-          :request, :issuer, :reference_id, :now, :configuration, :user,
-          :version, :destination
-
+        attr_reader :user, :request, :configuration
+        attr_accessor :reference_id
+        attr_accessor :now, :destination
+        attr_accessor :issuer, :version
         attr_accessor :default_name_id_format
 
-        def initialize(response_builder, embed_signature)
-          @response_builder = response_builder
+        def initialize(user, request = nil, embed_signature, configuration: Saml::Kit.configuration, now: Time.now.utc, destination: nil, signing_key_pair: nil, issuer: nil)
+          @user = user
+          @request = request
+          @destination = destination
+          @configuration = configuration
+          @issuer = issuer || configuration.entity_id
+          @reference_id = ::Xml::Kit::Id.generate
+          @version = '2.0'
+          @now = now
+          @signing_key_pair = signing_key_pair
           self.embed_signature = embed_signature
           self.default_name_id_format = Saml::Kit::Namespaces::UNSPECIFIED_NAMEID
         end
@@ -34,8 +41,8 @@ module Saml
           user.assertion_attributes_for(request)
         end
 
-        def signing_key_pair
-          super || @response_builder.signing_key_pair
+        def build
+          Saml::Kit::Assertion.new(to_xml, configuration: configuration)
         end
 
         private

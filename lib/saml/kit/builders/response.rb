@@ -8,7 +8,7 @@ module Saml
       class Response
         include XmlTemplatable
         attr_reader :user, :request
-        attr_accessor :id, :reference_id, :now
+        attr_accessor :id, :now
         attr_accessor :version, :status_code, :status_message
         attr_accessor :issuer, :destination
         attr_reader :configuration
@@ -19,7 +19,6 @@ module Saml
           @user = user
           @request = request
           @id = ::Xml::Kit::Id.generate
-          @reference_id = ::Xml::Kit::Id.generate
           @now = Time.now.utc
           @version = '2.0'
           @status_code = Namespaces::SUCCESS
@@ -47,7 +46,14 @@ module Saml
           @assertion ||=
             begin
               assertion = Saml::Kit::Builders::Assertion.new(
-                self, embed_signature
+                user,
+                request,
+                embed_signature,
+                configuration: configuration,
+                now: now,
+                destination: destination,
+                signing_key_pair: signing_key_pair,
+                issuer: issuer
               )
               if encrypt
                 Saml::Kit::Builders::EncryptedAssertion.new(self, assertion)
