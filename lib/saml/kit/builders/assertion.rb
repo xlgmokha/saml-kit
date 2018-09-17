@@ -14,7 +14,7 @@ module Saml
         attr_accessor :issuer, :version
         attr_accessor :default_name_id_format
 
-        def initialize(user, request = nil, embed_signature, configuration: Saml::Kit.configuration, now: Time.now.utc, destination: nil, signing_key_pair: nil, issuer: nil)
+        def initialize(user, request, embed_signature, configuration: Saml::Kit.configuration, now: Time.now.utc, destination: nil, signing_key_pair: nil, issuer: nil)
           @user = user
           @request = request
           @destination = destination
