@@ -7,6 +7,7 @@ module Saml
     # of a SAML document.
     class Assertion
       include ActiveModel::Validations
+      include Buildable
       include Translatable
       include XmlParseable
       extend Forwardable
@@ -86,6 +87,12 @@ module Saml
 
       def to_s
         @to_nokogiri.to_s
+      end
+
+      class << self
+        def builder_class
+          Saml::Kit::Builders::Assertion
+        end
       end
 
       private
