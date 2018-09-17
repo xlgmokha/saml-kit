@@ -240,4 +240,20 @@ RSpec.describe Saml::Kit::Assertion do
       expect(response.assertion).to be_valid
     end
   end
+
+  describe ".new" do
+    let(:user) { instance_double(User, name_id_for: SecureRandom.uuid, assertion_attributes_for: {}) }
+    let(:saml_request) { double(id: SecureRandom.uuid, issuer: configuration.entity_id) }
+    let(:configuration) do
+      Saml::Kit::Configuration.new do |x|
+        x.entity_id = FFaker::Internet.uri('https')
+      end
+    end
+
+    it 'parses a raw xml assertion' do
+      saml = Saml::Kit::Response.build(user, saml_request, configuration: configuration)
+      subject = described_class.new(saml.assertion.to_xml, configuration: configuration)
+      expect(subject).to be_valid
+    end
+  end
 end
