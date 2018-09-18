@@ -595,4 +595,24 @@ RSpec.describe Saml::Kit::Response do
       expect(result.attributes).to be_empty
     end
   end
+
+  describe ".new" do
+    let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
+    let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
+    let(:configuration) do
+      Saml::Kit::Configuration.new do |config|
+        config.entity_id = request.issuer
+        config.registry = registry
+        config.generate_key_pair_for(use: :signing)
+      end
+    end
+
+    it 'parses a raw response' do
+      allow(registry).to receive(:metadata_for).and_return(metadata)
+      allow(metadata).to receive(:matches?).and_return(true)
+
+      saml = described_class.build(user, request, configuration: configuration)
+      expect(described_class.new(saml.to_xml, configuration: configuration)).to be_valid
+    end
+  end
 end

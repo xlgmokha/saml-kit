@@ -243,7 +243,7 @@ RSpec.describe Saml::Kit::Assertion do
 
   describe '.new' do
     let(:user) { instance_double(User, name_id_for: SecureRandom.uuid, assertion_attributes_for: {}) }
-    let(:saml_request) { double(id: Xml::Kit::Id.generate, issuer: configuration.entity_id) }
+    let(:saml_request) { instance_double(Saml::Kit::AuthenticationRequest, id: Xml::Kit::Id.generate, issuer: configuration.entity_id) }
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:configuration) do
       Saml::Kit::Configuration.new do |x|
@@ -260,8 +260,7 @@ RSpec.describe Saml::Kit::Assertion do
 
     it 'parses a raw xml assertion' do
       saml = described_class.build(user, saml_request, true, configuration: configuration)
-      subject = described_class.new(saml.to_xml, configuration: configuration)
-      expect(subject).to be_valid
+      expect(described_class.new(saml.to_xml, configuration: configuration)).to be_valid
     end
   end
 end
