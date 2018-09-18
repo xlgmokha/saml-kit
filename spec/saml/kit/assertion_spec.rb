@@ -249,19 +249,18 @@ RSpec.describe Saml::Kit::Assertion do
       Saml::Kit::Configuration.new do |x|
         x.entity_id = FFaker::Internet.uri('https')
         x.registry = registry
+        x.generate_key_pair_for(use: :signing)
       end
     end
     let(:metadata) do
-      Saml::Kit::Metadata.build(configuration: configuration) do |x|
-        x.build_identity_provider
-      end
+      Saml::Kit::Metadata.build(configuration: configuration, &:build_identity_provider)
     end
 
     before { allow(registry).to receive(:metadata_for).with(configuration.entity_id).and_return(metadata) }
 
     it 'parses a raw xml assertion' do
-      saml = Saml::Kit::Response.build(user, saml_request, configuration: configuration)
-      subject = described_class.new(saml.assertion.to_xml, configuration: configuration)
+      saml = described_class.build(user, saml_request, true, configuration: configuration)
+      subject = described_class.new(saml.to_xml, configuration: configuration)
       expect(subject).to be_valid
     end
   end

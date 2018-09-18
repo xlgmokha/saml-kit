@@ -20,10 +20,9 @@ RSpec.describe Saml::Kit::Builders::Assertion do
       end
     end
     let(:metadata) do
-      Saml::Kit::Metadata.build(configuration: configuration) do |x|
-        x.build_identity_provider
-      end
+      Saml::Kit::Metadata.build(configuration: configuration, &:build_identity_provider)
     end
+
     before { allow(registry).to receive(:metadata_for).and_return(metadata) }
 
     specify { expect(subject.build).to be_valid }
