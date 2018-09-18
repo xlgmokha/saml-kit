@@ -596,7 +596,7 @@ RSpec.describe Saml::Kit::Response do
     end
   end
 
-  describe ".new" do
+  describe '.new' do
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
     let(:metadata) { instance_double(Saml::Kit::IdentityProviderMetadata) }
     let(:configuration) do

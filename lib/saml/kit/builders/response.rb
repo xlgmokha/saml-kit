@@ -45,21 +45,13 @@ module Saml
         def assertion
           @assertion ||=
             begin
-              assertion = Saml::Kit::Builders::Assertion.new(
-                user,
-                request,
-                embed_signature,
+              assertion = Assertion.new(user, request, embed_signature,
                 configuration: configuration,
                 now: now,
                 destination: destination,
                 signing_key_pair: signing_key_pair,
-                issuer: issuer
-              )
-              if encrypt
-                Saml::Kit::Builders::EncryptedAssertion.new(self, assertion)
-              else
-                assertion
-              end
+                issuer: issuer)
+              encrypt ? EncryptedAssertion.new(self, assertion) : assertion
             end
         end
 

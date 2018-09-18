@@ -18,7 +18,7 @@ module Saml
       validate :must_match_issuer, if: :decryptable?
       validate :must_be_active_session, if: :decryptable?
       validate :must_have_valid_signature, if: :decryptable?
-      attr_reader :name
+      attr_reader :name, :configuration
       attr_accessor :occurred_at
 
       def initialize(
@@ -76,9 +76,8 @@ module Saml
         at_xpath('../saml:Assertion|../saml:EncryptedAssertion').present?
       end
 
-      def attribute_statement
-        @attribute_statement ||=
-          AttributeStatement.new(search('./saml:AttributeStatement'))
+      def attribute_statement(xpath = './saml:AttributeStatement')
+        @attribute_statement ||= AttributeStatement.new(search(xpath))
       end
 
       def conditions
@@ -99,8 +98,6 @@ module Saml
       end
 
       private
-
-      attr_reader :configuration
 
       def decrypt(decryptor)
         encrypted_assertion = at_xpath('./xmlenc:EncryptedData')
