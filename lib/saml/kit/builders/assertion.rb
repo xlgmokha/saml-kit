@@ -14,17 +14,14 @@ module Saml
         attr_accessor :issuer, :version
         attr_accessor :default_name_id_format
 
-        def initialize(user, request, embed_signature, configuration: Saml::Kit.configuration, now: Time.now.utc, destination: nil, signing_key_pair: nil, issuer: nil)
+        def initialize(user, request, configuration: Saml::Kit.configuration)
           @user = user
           @request = request
-          @destination = destination
           @configuration = configuration
-          @issuer = issuer || configuration.entity_id
+          @issuer = configuration.entity_id
           @reference_id = ::Xml::Kit::Id.generate
           @version = '2.0'
-          @now = now
-          @signing_key_pair = signing_key_pair
-          self.embed_signature = embed_signature
+          @now = Time.now.utc
           self.default_name_id_format = Saml::Kit::Namespaces::UNSPECIFIED_NAMEID
         end
 

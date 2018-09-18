@@ -2,7 +2,7 @@
 
 RSpec.describe Saml::Kit::Assertion do
   subject do
-    described_class.build(user, request, true) do |x|
+    described_class.build(user, request) do |x|
       x.issuer = entity_id
     end
   end
@@ -259,7 +259,7 @@ RSpec.describe Saml::Kit::Assertion do
     before { allow(registry).to receive(:metadata_for).with(configuration.entity_id).and_return(metadata) }
 
     it 'parses a raw xml assertion' do
-      saml = described_class.build_xml(user, saml_request, true, configuration: configuration)
+      saml = described_class.build_xml(user, saml_request, configuration: configuration)
       expect(described_class.new(saml, configuration: configuration)).to be_valid
     end
   end

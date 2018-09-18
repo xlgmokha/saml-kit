@@ -45,12 +45,12 @@ module Saml
         def assertion
           @assertion ||=
             begin
-              assertion = Assertion.new(user, request, embed_signature,
-                configuration: configuration,
-                now: now,
-                destination: destination,
-                signing_key_pair: signing_key_pair,
-                issuer: issuer)
+              assertion = Assertion.new(user, request, configuration: configuration)
+              assertion.sign_with(@signing_key_pair) if @signing_key_pair
+              assertion.embed_signature = embed_signature unless embed_signature.nil?
+              assertion.now = now
+              assertion.destination = destination
+              assertion.issuer = issuer
               encrypt ? EncryptedAssertion.new(self, assertion) : assertion
             end
         end

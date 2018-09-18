@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Saml::Kit::Builders::Assertion do
   describe '#build' do
-    subject { described_class.new(user, authn_request, true, configuration: configuration) }
+    subject { described_class.new(user, authn_request, configuration: configuration) }
 
     let(:email) { FFaker::Internet.email }
     let(:assertion_consumer_service_url) { FFaker::Internet.uri('https') }
