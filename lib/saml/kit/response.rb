@@ -51,6 +51,7 @@ module Saml
 
       def must_contain_single_assertion
         return if assertion_nodes.count <= 1
+
         errors[:base] << error_message(:must_contain_single_assertion)
       end
 

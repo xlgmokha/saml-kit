@@ -45,6 +45,7 @@ module Saml
       # @!visibility private
       def at_xpath(xpath)
         return unless present?
+
         to_nokogiri.at_xpath(xpath, NAMESPACES)
       end
 

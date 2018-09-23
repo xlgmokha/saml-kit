@@ -30,6 +30,7 @@ module Saml
       def trusted?
         return true if signature_verified
         return false unless signed?
+
         signature.trusted?(provider)
       end
 
@@ -60,12 +61,14 @@ module Saml
       def must_be_registered
         return unless expected_type?
         return if provider.present?
+
         errors[:provider] << error_message(:unregistered)
       end
 
       def must_be_trusted
         return if trusted?
         return if provider.present? && !signed?
+
         errors[:fingerprint] << error_message(:invalid_fingerprint)
       end
     end

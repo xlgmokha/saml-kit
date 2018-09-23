@@ -52,6 +52,7 @@ module Saml
             decode(signature),
             canonicalize(params)
           )
+
           raise ArgumentError, 'Invalid Signature'
         end
 
@@ -87,6 +88,7 @@ module Saml
 
         def params_to_hash(value)
           return value unless value.is_a?(String)
+
           Hash[URI.parse(value).query.split('&').map { |xx| xx.split('=', 2) }]
         end
       end

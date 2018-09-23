@@ -111,6 +111,7 @@ module Saml
       def must_be_valid_version
         return unless expected_type?
         return if version == '2.0'
+
         errors[:version] << error_message(:invalid_version)
       end
     end

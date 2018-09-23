@@ -20,6 +20,7 @@ module Saml
       # signing certificate is available via the configuration.
       def sign?
         return configuration.sign? if embed_signature.nil?
+
         (embed_signature && configuration.sign?) ||
           (embed_signature && signing_key_pair.present?)
       end

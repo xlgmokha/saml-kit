@@ -67,6 +67,7 @@ module Saml
 
       def single_logout_service
         return if provider.nil?
+
         urls = provider.single_logout_services
         urls.first
       end

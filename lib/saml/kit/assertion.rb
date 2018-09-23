@@ -90,6 +90,7 @@ module Saml
 
       def decryptable?
         return true unless encrypted?
+
         !@cannot_decrypt
       end
 
@@ -103,6 +104,7 @@ module Saml
         encrypted_assertion = at_xpath('./xmlenc:EncryptedData')
         @encrypted = encrypted_assertion.present?
         return unless @encrypted
+
         @to_nokogiri = decryptor.decrypt_node(encrypted_assertion)
       rescue Xml::Kit::DecryptionError => error
         @cannot_decrypt = true
@@ -111,16 +113,19 @@ module Saml
 
       def must_match_issuer
         return if audiences.empty? || audiences.include?(configuration.entity_id)
+
         errors[:audience] << error_message(:must_match_issuer)
       end
 
       def must_be_active_session
         return if active?
+
         errors[:base] << error_message(:expired)
       end
 
       def must_have_valid_signature
         return if !signed? || signature.valid?
+
         signature.errors.each do |attribute, message|
           errors.add(attribute, message)
         end

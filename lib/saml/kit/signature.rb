@@ -24,6 +24,7 @@ module Saml
         xpath = './ds:KeyInfo/ds:X509Data/ds:X509Certificate'
         value = at_xpath(xpath).try(:text)
         return if value.nil?
+
         ::Xml::Kit::Certificate.new(value, use: :signing)
       end
 
@@ -31,6 +32,7 @@ module Saml
       # the certificates registered in the metadata.
       def trusted?(metadata)
         return false if metadata.nil?
+
         metadata.matches?(certificate.fingerprint, use: :signing).present?
       end
 
@@ -121,6 +123,7 @@ module Saml
 
       def at_xpath(xpath)
         return nil unless node
+
         node.at_xpath(xpath, Saml::Kit::Document::NAMESPACES)
       end
 

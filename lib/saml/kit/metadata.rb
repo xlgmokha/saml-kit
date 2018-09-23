@@ -191,6 +191,7 @@ module Saml
 
       def must_have_valid_signature
         return if !signature.present? || signature.valid?
+
         signature.errors.each do |attribute, error|
           errors[attribute] << error
         end

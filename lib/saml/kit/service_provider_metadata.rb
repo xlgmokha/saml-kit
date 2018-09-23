@@ -28,6 +28,7 @@ module Saml
         element = at_xpath("/md:EntityDescriptor/md:#{name}")
         attribute = element.attribute('WantAssertionsSigned')
         return true if attribute.nil?
+
         attribute.text.casecmp('true').zero?
       end
 

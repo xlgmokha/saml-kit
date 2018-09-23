@@ -35,6 +35,7 @@ module Saml
 
         def assertion_attributes
           return {} unless user.respond_to?(:assertion_attributes_for)
+
           user.assertion_attributes_for(request)
         end
 
