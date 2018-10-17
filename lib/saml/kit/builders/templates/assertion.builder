@@ -25,7 +25,13 @@ xml.Assertion(assertion_options) do
     xml.AttributeStatement do
       assertion_attributes.each do |key, value|
         xml.Attribute Name: key do
-          xml.AttributeValue value.to_s
+          if value.respond_to?(:each)
+            value.each do |x|
+              xml.AttributeValue x.to_s
+            end
+          else
+            xml.AttributeValue value.to_s
+          end
         end
       end
     end

@@ -12,7 +12,7 @@ RSpec.describe Saml::Kit::Builders::Response do
   end
   let(:email) { FFaker::Internet.email }
   let(:assertion_consumer_service_url) { FFaker::Internet.uri('https') }
-  let(:user) { User.new(attributes: { email: email, created_at: Time.now.utc.iso8601 }) }
+  let(:user) { User.new(attributes: { email: email, created_at: Time.now.utc.iso8601, roles: ['husband', 'father', 'programmer'] }) }
   let(:request) { instance_double(Saml::Kit::AuthenticationRequest, id: Xml::Kit::Id.generate, assertion_consumer_service_url: assertion_consumer_service_url, issuer: issuer, name_id_format: Saml::Kit::Namespaces::EMAIL_ADDRESS, provider: provider, trusted?: true, signed?: true) }
   let(:provider) { instance_double(Saml::Kit::ServiceProviderMetadata, want_assertions_signed: false, encryption_certificates: [configuration.certificates(use: :encryption).last]) }
   let(:issuer) { FFaker::Internet.uri('https') }
@@ -110,6 +110,9 @@ RSpec.describe Saml::Kit::Builders::Response do
 
       expect(hash['Response']['Assertion']['AttributeStatement']['Attribute'][1]['Name']).to eql('created_at')
       expect(hash['Response']['Assertion']['AttributeStatement']['Attribute'][1]['AttributeValue']).to be_present
+
+      expect(hash['Response']['Assertion']['AttributeStatement']['Attribute'][2]['Name']).to eql('roles')
+      expect(hash['Response']['Assertion']['AttributeStatement']['Attribute'][2]['AttributeValue']).to match_array(['husband', 'father', 'programmer'])
     end
 
     it 'does not add a signature when the SP does not want assertions signed' do
