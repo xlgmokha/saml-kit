@@ -20,7 +20,7 @@ RSpec.describe Saml::Kit::Metadata do
           x.build_identity_provider
           x.build_service_provider
         end
-      end.to perform_under(10).ms
+      end.to perform_under(30).ms
     end
 
     it 'returns a composite' do
