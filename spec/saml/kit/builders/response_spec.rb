@@ -76,6 +76,8 @@ RSpec.describe Saml::Kit::Builders::Response do
       allow(Saml::Kit.configuration).to receive(:entity_id).and_return(issuer)
       subject.destination = assertion_consumer_service_url
       subject.encrypt = false
+      subject.encrypt = true
+      subject.encrypt = false
       hash = Hash.from_xml(subject.to_xml)
 
       expect(hash['Response']['ID']).to be_present

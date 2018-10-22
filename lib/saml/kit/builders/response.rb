@@ -52,6 +52,17 @@ module Saml
             end
         end
 
+        def encrypt=(value)
+          super(value)
+          return if @assertion.nil?
+
+          if value
+            @assertion = EncryptedAssertion.new(self, assertion) if assertion.is_a?(Assertion)
+          elsif assertion.is_a?(EncryptedAssertion)
+            @assertion = assertion.assertion if assertion.is_a?(EncryptedAssertion)
+          end
+        end
+
         def destination=(value)
           @destination = value
           assertion.destination = value
