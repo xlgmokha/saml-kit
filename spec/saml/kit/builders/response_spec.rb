@@ -218,5 +218,13 @@ RSpec.describe Saml::Kit::Builders::Response do
       expect(result).to be_signed
       expect(result.signature.certificate).to eql(key_pair.certificate)
     end
+
+    it 'specifies the recipient on the subject confirmation data' do
+      acs_url = FFaker::Internet.uri('https')
+      subject.assertion # force memoization the assertion
+      subject.destination = acs_url
+      result = subject.build
+      expect(result.assertion.at_xpath('/samlp:Response/saml:Assertion/saml:Subject/saml:SubjectConfirmation/saml:SubjectConfirmationData').attribute('Recipient').value).to eql(acs_url)
+    end
   end
 end

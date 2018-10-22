@@ -55,6 +55,11 @@ module Saml
             end
         end
 
+        def destination=(value)
+          @destination = value
+          assertion.destination = value
+        end
+
         private
 
         def response_options
