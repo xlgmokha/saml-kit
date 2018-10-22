@@ -226,5 +226,28 @@ RSpec.describe Saml::Kit::Builders::Response do
       result = subject.build
       expect(result.assertion.at_xpath('/samlp:Response/saml:Assertion/saml:Subject/saml:SubjectConfirmation/saml:SubjectConfirmationData').attribute('Recipient').value).to eql(acs_url)
     end
+
+    it 'uses the updated issuer on the assertion' do
+      issuer = FFaker::Internet.uri('https')
+      subject.assertion # force memoization the assertion
+      subject.issuer = issuer
+      result = subject.build
+      expect(result.assertion.issuer).to eql(issuer)
+    end
+
+    it 'uses the `now` on the assertion' do
+      now = 5.minutes.from_now
+      subject.assertion # force memoization the assertion
+      subject.now = now
+      result = subject.build
+      expect(result.assertion.started_at.to_i).to eql(now.to_i)
+    end
+
+    it 'does not embed the signature' do
+      subject.assertion # force memoization the assertion
+      subject.embed_signature = false
+      result = subject.build
+      expect(result.assertion).not_to be_signed
+    end
   end
 end

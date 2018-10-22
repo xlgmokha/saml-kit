@@ -2,6 +2,6 @@
 
 module Saml
   module Kit
-    VERSION = '1.0.25'.freeze
+    VERSION = '1.0.26'.freeze
   end
 end

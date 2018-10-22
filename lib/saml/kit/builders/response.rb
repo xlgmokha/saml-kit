@@ -7,11 +7,8 @@ module Saml
       # {include:file:spec/saml/kit/builders/response_spec.rb}
       class Response
         include XmlTemplatable
-        attr_reader :user, :request
-        attr_accessor :id, :now
-        attr_accessor :version, :status_code, :status_message
-        attr_accessor :issuer, :destination
-        attr_reader :configuration
+        attr_reader :user, :request, :issuer, :destination, :now, :configuration
+        attr_accessor :id, :version, :status_code, :status_message
 
         def initialize(
           user, request = nil, configuration: Saml::Kit.configuration
@@ -58,6 +55,21 @@ module Saml
         def destination=(value)
           @destination = value
           assertion.destination = value
+        end
+
+        def issuer=(value)
+          @issuer = value
+          assertion.issuer = value
+        end
+
+        def now=(value)
+          @now = value
+          assertion.now = value
+        end
+
+        def embed_signature=(value)
+          @embed_signature = value
+          assertion.embed_signature = value
         end
 
         private
