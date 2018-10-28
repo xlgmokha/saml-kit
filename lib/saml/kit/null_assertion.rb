@@ -25,11 +25,11 @@ module Saml
       end
 
       def started_at
-        Time.at(0).to_datetime
+        Time.at(0)
       end
 
       def expired_at
-        Time.at(0).to_datetime
+        Time.at(0)
       end
 
       def audiences
