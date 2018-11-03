@@ -53,17 +53,17 @@ RSpec.describe Saml::Kit::Configuration do
       specify { expect { subject.add_key_pair(active_certificate, private_key.export, use: :blah) }.to raise_error(/:signing or :encryption/) }
     end
 
-    context "when adding a signing key pair" do
+    context 'when adding a signing key pair' do
       before do
         subject.add_key_pair(active_certificate.to_pem, private_key.export, use: :signing)
         subject.add_key_pair(expired_certificate.to_pem, private_key.export, use: :signing)
         subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :signing)
       end
 
-      specify { expect(subject.key_pairs(use: :signing).count).to eql(1) }
+      specify { expect(subject.key_pairs(use: :signing).count).to be(1) }
     end
 
-    context "when adding an encryption key pair" do
+    context 'when adding an encryption key pair' do
       before do
         subject.add_key_pair(active_certificate.to_pem, private_key.export, use: :encryption)
         subject.add_key_pair(expired_certificate.to_pem, private_key.export, use: :encryption)
@@ -74,8 +74,8 @@ RSpec.describe Saml::Kit::Configuration do
     end
   end
 
-  describe "#key_pairs" do
-    context "when a certificate expires" do
+  describe '#key_pairs' do
+    context 'when a certificate expires' do
       let(:active_certificate) do
         certificate = OpenSSL::X509::Certificate.new
         certificate.not_before = 1.minute.ago
@@ -107,11 +107,11 @@ RSpec.describe Saml::Kit::Configuration do
         subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :signing)
       end
 
-      specify { expect(subject.key_pairs.count).to eql(1) }
+      specify { expect(subject.key_pairs.count).to be(1) }
       specify { expect(subject.key_pairs.map(&:certificate).map(&:fingerprint)).to match_array([Xml::Kit::Fingerprint.new(active_certificate)]) }
     end
 
-    context "when there is more than one key pair" do
+    context 'when there is more than one key pair' do
       let(:oldest_certificate) do
         certificate = OpenSSL::X509::Certificate.new
         certificate.not_before = 45.minutes.ago
@@ -137,7 +137,7 @@ RSpec.describe Saml::Kit::Configuration do
       end
 
       specify { expect(fingerprints[0]).to eql(Xml::Kit::Fingerprint.new(newest_certificate)) }
-      specify { expect(fingerprints[1]).to eql( Xml::Kit::Fingerprint.new(oldest_certificate)) }
+      specify { expect(fingerprints[1]).to eql(Xml::Kit::Fingerprint.new(oldest_certificate)) }
     end
   end
 end
