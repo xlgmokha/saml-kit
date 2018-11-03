@@ -90,7 +90,7 @@ module Saml
       # @param use [Symbol] the type of key pair to return
       # `nil`, `:signing` or `:encryption`
       def key_pairs(use: nil)
-        use.present? ? @key_pairs.find_all { |xxx| xxx.for?(use) } : @key_pairs
+        use.present? ? active_key_pairs.find_all { |xxx| xxx.for?(use) } : active_key_pairs
       end
 
       # Return each certificate for a specific use.
@@ -121,6 +121,15 @@ module Saml
 
         error_message = 'Use must be either :signing or :encryption'
         raise ArgumentError, error_message
+      end
+
+      def active_key_pairs
+        @key_pairs.find_all do |x|
+          x.certificate.active?
+        rescue OpenSSL::X509::CertificateError => error
+          Saml::Kit.logger.error(error)
+          false
+        end
       end
     end
   end
