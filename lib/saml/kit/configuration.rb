@@ -124,12 +124,14 @@ module Saml
       end
 
       def active_key_pairs
-        @key_pairs.find_all do |x|
-          x.certificate.active?
-        rescue OpenSSL::X509::CertificateError => error
-          Saml::Kit.logger.error(error)
-          false
-        end
+        @key_pairs.find_all { |x| active?(x) }.sort_by { |x| x.certificate.not_after }.reverse
+      end
+
+      def active?(key_pair)
+        key_pair.certificate.active?
+      rescue OpenSSL::X509::CertificateError => error
+        Saml::Kit.logger.error(error)
+        false
       end
     end
   end

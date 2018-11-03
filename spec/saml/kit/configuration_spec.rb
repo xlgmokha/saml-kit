@@ -112,8 +112,32 @@ RSpec.describe Saml::Kit::Configuration do
     end
 
     context "when there is more than one key pair" do
-      it 'returns them sorted from newest to oldest' do
+      let(:oldest_certificate) do
+        certificate = OpenSSL::X509::Certificate.new
+        certificate.not_before = 45.minutes.ago
+        certificate.not_after = 15.minutes.from_now
+        certificate.public_key = private_key.public_key
+        certificate.sign(private_key, OpenSSL::Digest::SHA256.new)
+        certificate
       end
+      let(:newest_certificate) do
+        certificate = OpenSSL::X509::Certificate.new
+        certificate.not_before = 30.minutes.ago
+        certificate.not_after = 30.minutes.from_now
+        certificate.public_key = private_key.public_key
+        certificate.sign(private_key, OpenSSL::Digest::SHA256.new)
+        certificate
+      end
+      let(:private_key) { OpenSSL::PKey::RSA.new(2048) }
+      let(:fingerprints) { subject.key_pairs.map(&:certificate).map(&:fingerprint) }
+
+      before do
+        subject.add_key_pair(oldest_certificate.to_pem, private_key.export, use: :signing)
+        subject.add_key_pair(newest_certificate.to_pem, private_key.export, use: :signing)
+      end
+
+      specify { expect(fingerprints[0]).to eql(Xml::Kit::Fingerprint.new(newest_certificate)) }
+      specify { expect(fingerprints[1]).to eql( Xml::Kit::Fingerprint.new(oldest_certificate)) }
     end
   end
 end
