@@ -60,7 +60,11 @@ RSpec.describe Saml::Kit::Configuration do
         subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :signing)
       end
 
-      specify { expect(subject.key_pairs(use: :signing).count).to be(1) }
+      specify do
+        expect(subject.key_pairs(use: :signing).map(&:certificate).map(&:fingerprint)).to match_array([
+          Xml::Kit::Fingerprint.new(active_certificate.to_pem)
+        ])
+      end
     end
 
     context 'when adding an encryption key pair' do
@@ -70,7 +74,11 @@ RSpec.describe Saml::Kit::Configuration do
         subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :encryption)
       end
 
-      specify { expect(subject.key_pairs(use: :encryption).count).to be(1) }
+      specify do
+        expect(subject.key_pairs(use: :encryption).map(&:certificate).map(&:fingerprint)).to match_array([
+          Xml::Kit::Fingerprint.new(active_certificate.to_pem)
+        ])
+      end
     end
   end
 
