@@ -60,7 +60,7 @@ RSpec.describe Saml::Kit::Configuration do
         subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :signing)
       end
 
-      specify do
+      fspecify do
         expect(subject.key_pairs(use: :signing).map(&:certificate).map(&:fingerprint).map(&:to_s)).to match_array([
           Xml::Kit::Fingerprint.new(active_certificate.to_pem).to_s
         ])
