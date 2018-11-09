@@ -128,8 +128,11 @@ module Saml
       end
 
       def active?(key_pair)
-        key_pair.certificate.active?
+        x = key_pair.certificate.active?
+        puts [key_pair.certificate.fingerprint.to_s, x].inspect
+        x
       rescue OpenSSL::X509::CertificateError => error
+        puts error.inspect
         Saml::Kit.logger.error(error)
         false
       end
