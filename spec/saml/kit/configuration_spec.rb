@@ -94,8 +94,8 @@ RSpec.describe Saml::Kit::Configuration do
       end
       let(:expired_certificate) do
         certificate = OpenSSL::X509::Certificate.new
-        certificate.not_before = 2.minutes.ago
-        certificate.not_after = 1.minute.ago
+        certificate.not_before = 2.hours.ago
+        certificate.not_after = 1.hour.ago
         certificate.public_key = private_key.public_key
         certificate.sign(private_key, OpenSSL::Digest::SHA256.new)
         certificate
