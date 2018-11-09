@@ -60,7 +60,7 @@ RSpec.describe Saml::Kit::Configuration do
         subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :signing)
       end
 
-      fspecify do
+      specify do
         expect(subject.key_pairs(use: :signing).map(&:certificate).map(&:fingerprint).map(&:to_s)).to match_array([
           Xml::Kit::Fingerprint.new(active_certificate.to_pem).to_s
         ])
@@ -102,8 +102,8 @@ RSpec.describe Saml::Kit::Configuration do
       end
       let(:unsigned_certificate) do
         certificate = OpenSSL::X509::Certificate.new
-        certificate.not_before = 1.minute.ago
-        certificate.not_after = 1.minute.from_now
+        certificate.not_before = 2.hours.ago
+        certificate.not_after = 1.hour.ago
         certificate.public_key = private_key.public_key
         certificate
       end
