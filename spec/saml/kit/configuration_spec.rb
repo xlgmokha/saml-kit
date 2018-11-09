@@ -61,8 +61,8 @@ RSpec.describe Saml::Kit::Configuration do
       end
 
       specify do
-        expect(subject.key_pairs(use: :signing).map(&:certificate).map(&:fingerprint)).to match_array([
-          Xml::Kit::Fingerprint.new(active_certificate.to_pem)
+        expect(subject.key_pairs(use: :signing).map(&:certificate).map(&:fingerprint).map(&:to_s)).to match_array([
+          Xml::Kit::Fingerprint.new(active_certificate.to_pem).to_s
         ])
       end
     end
@@ -75,8 +75,8 @@ RSpec.describe Saml::Kit::Configuration do
       end
 
       specify do
-        expect(subject.key_pairs(use: :encryption).map(&:certificate).map(&:fingerprint)).to match_array([
-          Xml::Kit::Fingerprint.new(active_certificate.to_pem)
+        expect(subject.key_pairs(use: :encryption).map(&:certificate).map(&:fingerprint).map(&:to_s)).to match_array([
+          Xml::Kit::Fingerprint.new(active_certificate.to_pem).to_s
         ])
       end
     end
@@ -116,7 +116,7 @@ RSpec.describe Saml::Kit::Configuration do
       end
 
       specify { expect(subject.key_pairs.count).to be(1) }
-      specify { expect(subject.key_pairs.map(&:certificate).map(&:fingerprint)).to match_array([Xml::Kit::Fingerprint.new(active_certificate)]) }
+      specify { expect(subject.key_pairs.map(&:certificate).map(&:fingerprint).map(&:to_s)).to match_array([Xml::Kit::Fingerprint.new(active_certificate).to_s]) }
     end
 
     context 'when there is more than one key pair' do
@@ -137,15 +137,15 @@ RSpec.describe Saml::Kit::Configuration do
         certificate
       end
       let(:private_key) { OpenSSL::PKey::RSA.new(2048) }
-      let(:fingerprints) { subject.key_pairs.map(&:certificate).map(&:fingerprint) }
+      let(:fingerprints) { subject.key_pairs.map(&:certificate).map(&:fingerprint).map(&:to_s) }
 
       before do
         subject.add_key_pair(oldest_certificate.to_pem, private_key.export, use: :signing)
         subject.add_key_pair(newest_certificate.to_pem, private_key.export, use: :signing)
       end
 
-      specify { expect(fingerprints[0]).to eql(Xml::Kit::Fingerprint.new(newest_certificate)) }
-      specify { expect(fingerprints[1]).to eql(Xml::Kit::Fingerprint.new(oldest_certificate)) }
+      specify { expect(fingerprints[0]).to eql(Xml::Kit::Fingerprint.new(newest_certificate).to_s) }
+      specify { expect(fingerprints[1]).to eql(Xml::Kit::Fingerprint.new(oldest_certificate).to_s) }
     end
   end
 end
