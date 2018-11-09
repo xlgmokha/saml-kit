@@ -42,8 +42,8 @@ RSpec.describe Saml::Kit::Configuration do
     end
     let(:unsigned_certificate) do
       certificate = OpenSSL::X509::Certificate.new
-      certificate.not_before = 1.minute.ago
-      certificate.not_after = 1.minute.from_now
+      certificate.not_before = 2.minutes.ago
+      certificate.not_after = 1.minute.ago
       certificate.public_key = private_key.public_key
       certificate
     end
@@ -102,8 +102,8 @@ RSpec.describe Saml::Kit::Configuration do
       end
       let(:unsigned_certificate) do
         certificate = OpenSSL::X509::Certificate.new
-        certificate.not_before = 1.minute.ago
-        certificate.not_after = 1.minute.from_now
+        certificate.not_before = 2.minutes.ago
+        certificate.not_after = 1.minute.ago
         certificate.public_key = private_key.public_key
         certificate
       end
