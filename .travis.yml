@@ -1,7 +1,6 @@
 sudo: false
 env:
-  global:
-    - CC_TEST_REPORTER=256cf27053220ac6b8962d6aef566e28753bc58633348ffef9274d3e1a48b31c
+  - CC_TEST_REPORTER=256cf27053220ac6b8962d6aef566e28753bc58633348ffef9274d3e1a48b31c
 language: ruby
 rvm:
   - 2.2.10
@@ -16,4 +15,4 @@ script:
   - bin/cibuild
   - bin/lint
 after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  - ./cc-test-reporter after-build -t simplecov --exit-code $TRAVIS_TEST_RESULT
