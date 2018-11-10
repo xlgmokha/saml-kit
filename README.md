@@ -2,10 +2,11 @@
 
 *Logo courtesy of [@speasley](https://github.com/speasley)*
 
-[![Gem Version](https://badge.fury.io/rb/saml-kit.svg)](https://rubygems.org/gems/saml-kit)
-[![Code Climate](https://codeclimate.com/github/saml-kit/saml-kit.svg)](https://codeclimate.com/github/saml-kit/saml-kit)
 [![Build Status](https://travis-ci.org/saml-kit/saml-kit.svg?branch=master)](https://travis-ci.org/saml-kit/saml-kit)
+[![Code Climate](https://codeclimate.com/github/saml-kit/saml-kit.svg)](https://codeclimate.com/github/saml-kit/saml-kit)
+[![Gem Version](https://badge.fury.io/rb/saml-kit.svg)](https://rubygems.org/gems/saml-kit)
 [![Security](https://hakiri.io/github/saml-kit/saml-kit/master.svg)](https://hakiri.io/github/saml-kit/saml-kit/master)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/32583dc119cf05ff4080/test_coverage)](https://codeclimate.com/github/saml-kit/saml-kit/test_coverage)
 
 Saml::Kit is a library with the purpose of creating and consuming SAML
 documents. It supports the HTTP Post and HTTP Redirect bindings. It can
