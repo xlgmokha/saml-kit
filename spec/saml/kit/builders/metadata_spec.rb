@@ -74,4 +74,21 @@ RSpec.describe Saml::Kit::Builders::Metadata do
       expect(metadata).to be_valid
     end
   end
+
+  specify do
+    configuration = Saml::Kit::Configuration.new do |config|
+      config.entity_id = "https://www.example.org/metadata"
+      config.generate_key_pair_for(use: :signing)
+      config.generate_key_pair_for(use: :encryption)
+    end
+    metadata = Saml::Kit::Metadata.build(configuration: configuration) do |x|
+      x.organization_name = "Acme"
+      x.contact_email = "acme@example.org"
+      x.organization_url = "https://www.example.org"
+      x.build_service_provider do |_|
+        _.add_assertion_consumer_service('https://www.example.org/assertions', binding: :http_post)
+      end
+    end
+    puts metadata.to_xml(pretty: true)
+  end
 end

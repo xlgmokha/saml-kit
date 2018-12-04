@@ -567,6 +567,12 @@ RSpec.describe Saml::Kit::Response do
       expect(subject.status_code).to eql(Saml::Kit::Namespaces::REQUESTER_ERROR)
       expect(subject.status_message).to eql(message)
     end
+
+    it 'parses an array of attributes' do
+      attributes[:roles] = [:admin, :user]
+      subject = described_class.build(user, request)
+      expect(subject.attributes[:roles]).to match_array(['admin', 'user'])
+    end
   end
 
   describe '#build' do
