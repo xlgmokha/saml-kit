@@ -89,6 +89,6 @@ RSpec.describe Saml::Kit::Builders::Metadata do
         xxx.add_assertion_consumer_service('https://www.example.org/assertions', binding: :http_post)
       end
     end
-    puts metadata.to_xml(pretty: true)
+    expect(metadata.to_xml(pretty: true)).to be_present
   end
 end
