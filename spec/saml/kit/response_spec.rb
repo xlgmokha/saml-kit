@@ -569,9 +569,9 @@ RSpec.describe Saml::Kit::Response do
     end
 
     it 'parses an array of attributes' do
-      attributes[:roles] = [:admin, :user]
+      attributes[:roles] = %i[admin user]
       subject = described_class.build(user, request)
-      expect(subject.attributes[:roles]).to match_array(['admin', 'user'])
+      expect(subject.attributes[:roles]).to match_array(%w[admin user])
     end
   end
 

@@ -16,11 +16,7 @@ module Saml
         @attributes ||= search('./saml:Attribute').inject({}) do |memo, item|
           namespace = Saml::Kit::Document::NAMESPACES
           values = item.search('./saml:AttributeValue', namespace)
-          if values.length == 1
-            memo[item.attribute('Name').value] = values[0].try(:text)
-          else
-            memo[item.attribute('Name').value] = values.map { |x| x.try(:text) }
-          end
+          memo[item.attribute('Name').value] = values.length == 1 ? values[0].try(:text) : values.map { |x| x.try(:text) }
           memo
         end.with_indifferent_access
       end
