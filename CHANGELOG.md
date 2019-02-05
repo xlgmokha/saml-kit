@@ -1,4 +1,4 @@
-Version 0.2.16
+Version 1.0.29
 # Changelog
 All notable changes to this project will be documented in this file.
 
@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
-- nil
+- change xml-kit dependency to minimum 0.3.0
+- use `encrypt_data_for` instead of `encryption_for`.
 
 ## [1.0.29] - 2018-12-04
 ### Changed
