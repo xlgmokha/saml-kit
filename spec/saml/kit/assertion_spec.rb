@@ -207,7 +207,7 @@ RSpec.describe Saml::Kit::Assertion do
       document = Nokogiri::XML(altered)
       assertion = document.at_xpath('/samlp:Response/saml:Assertion', Saml::Kit::Document::NAMESPACES)
       key_pair = Xml::Kit::KeyPair.generate(use: :encryption)
-      encrypted = Xml::Kit::Encryption.new(assertion.to_xml, key_pair.public_key).to_xml
+      encrypted = Xml::Kit::EncryptedData.new(assertion.to_xml, asymmetric_cipher: Xml::Kit::Crypto::RsaCipher.new('', key_pair.private_key)).to_xml
       response = Saml::Kit::Response.new(encrypted, configuration: configuration)
       expect(response.assertion([key_pair.private_key])).to be_invalid
     end
