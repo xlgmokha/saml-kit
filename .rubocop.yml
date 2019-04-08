@@ -79,6 +79,9 @@ Naming/FileName:
   Exclude:
     - 'lib/saml-kit.rb'
 
+Naming/RescuedExceptionsVariableName:
+  PreferredName: error
+
 Style/Documentation:
   Enabled: false
 
