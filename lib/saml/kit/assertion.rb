@@ -106,7 +106,7 @@ module Saml
         return unless @encrypted
 
         @to_nokogiri = decryptor.decrypt_node(encrypted_assertion)
-      rescue Xml::Kit::DecryptionError => error
+      rescue StandardError => error
         @cannot_decrypt = true
         Saml::Kit.logger.error(error)
       end

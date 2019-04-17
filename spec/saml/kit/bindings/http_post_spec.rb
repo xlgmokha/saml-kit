@@ -113,5 +113,13 @@ RSpec.describe Saml::Kit::Bindings::HttpPost do
         subject.deserialize({})
       end.to raise_error(/SAMLRequest or SAMLResponse parameter is required/)
     end
+
+    it 'can deserialize a request encrypted with unknown keys' do
+      saml_params = { 'SAMLResponse' => IO.read("spec/fixtures/1555534792.3954718-9d1c5e47e1b1abc70e9774d3.saml_response") }
+      result = subject.deserialize(saml_params)
+      expect(result).to be_present
+      expect(result.assertion).to be_present
+      expect(result.assertion).not_to be_decryptable
+    end
   end
 end
