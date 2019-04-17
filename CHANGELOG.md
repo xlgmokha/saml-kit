@@ -1,4 +1,4 @@
-Version 1.0.30
+Version 1.0.31
 # Changelog
 All notable changes to this project will be documented in this file.
 
@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - nil
+
+## [1.0.31] - 2019-04-17
+### Changed
+- Rescue from all decryption errors
 
 ## [1.0.30] - 2019-04-07
 ### Changed
@@ -65,7 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed optional SessionNotOnOrAfter attribute from AuthnStatement.
 
-[Unreleased]: https://github.com/saml-kit/saml-kit/compare/v1.0.30...HEAD
+[Unreleased]: https://github.com/saml-kit/saml-kit/compare/v1.0.31...HEAD
+[1.0.31]: https://github.com/saml-kit/saml-kit/compare/v1.0.30...v1.0.31
 [1.0.30]: https://github.com/saml-kit/saml-kit/compare/v1.0.29...v1.0.30
 [1.0.29]: https://github.com/saml-kit/saml-kit/compare/v1.0.28...v1.0.29
 [1.0.28]: https://github.com/saml-kit/saml-kit/compare/v1.0.27...v1.0.28
