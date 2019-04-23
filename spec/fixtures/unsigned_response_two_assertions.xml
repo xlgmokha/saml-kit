@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" Destination="https://portal.dev/sessions/acs" ID="_f6a486e0-29e2-0135-23c6-20999b09e5e7" InResponseTo="_0890e87d-1b33-4d0d-8875-776b50bf3359" IssueInstant="2017-06-02T17:00:54Z" Version="2.0">
+  <Issuer xmlns="urn:oasis:names:tc:SAML:2.0:assertion">https://portal/sessions/metadata</Issuer>
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </samlp:Status>
+  <Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="_03c49290-29e5-0135-23c7-20999b09e5e7" IssueInstant="2017-06-02T17:15:35Z" Version="2.0">
+    <Issuer>http://auth.dev/auth/metadata</Issuer>
+    <Subject>
+      <NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">mokha@cisco.com</NameID>
+      <SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <SubjectConfirmationData InResponseTo="_e2d943d8-8c0f-4de6-b58a-0ded2d016b85" NotOnOrAfter="2017-06-02T17:18:35Z" Recipient="https://portal.dev/sessions/acs"/>
+      </SubjectConfirmation>
+    </Subject>
+    <Conditions NotBefore="2017-06-02T17:15:30Z" NotOnOrAfter="2017-06-02T18:15:35Z">
+      <AudienceRestriction>
+        <Audience>https://portal.dev/sessions/metadata</Audience>
+      </AudienceRestriction>
+    </Conditions>
+    <AttributeStatement>
+      <Attribute FriendlyName="user_id" Name="user_id" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue>a44550cf-9839-49fb-a101-10a741afe16b</AttributeValue>
+      </Attribute>
+      <Attribute FriendlyName="success_notice" Name="success_notice" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri"/>
+      <Attribute FriendlyName="business_guid" Name="business_guid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue>4198398a-8cd3-4539-a936-5b34e35513ac</AttributeValue>
+      </Attribute>
+      <Attribute FriendlyName="event_intake_url" Name="event_intake_url" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue/>
+      </Attribute>
+      <Attribute FriendlyName="console_base_url" Name="console_base_url" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue/>
+      </Attribute>
+      <Attribute FriendlyName="auth_token" Name="auth_token" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue>8185b86b3e19fe9782fd69c790b2d185627e9b68bff229fb</AttributeValue>
+      </Attribute>
+      <Attribute FriendlyName="amp_user_role" Name="amp_user_admin" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue>true</AttributeValue>
+      </Attribute>
+      <Attribute FriendlyName="amp_business_name" Name="amp_business_name" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue>Business for mokha@cisco.com</AttributeValue>
+      </Attribute>
+    </AttributeStatement>
+    <AuthnStatement AuthnInstant="2017-06-02T17:15:35Z" SessionIndex="_03c49290-29e5-0135-23c7-20999b09e5e7">
+      <AuthnContext>
+        <AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</AuthnContextClassRef>
+      </AuthnContext>
+    </AuthnStatement>
+  </Assertion>
+  <Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="_03c49290-29e5-0135-23c7-20999b09e5e7" IssueInstant="2017-06-02T17:15:35Z" Version="2.0">
+    <Issuer>http://auth.dev/auth/metadata</Issuer>
+    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+      <ds:SignedInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+        <ds:Reference URI="#_03c49290-29e5-0135-23c7-20999b09e5e7">
+          <ds:Transforms>
+            <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+            <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          </ds:Transforms>
+          <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+          <ds:DigestValue>00HKo34VqiMWtfJC6V2ZECp/gGCyXpmsoAJ7d1ApBlI=</ds:DigestValue>
+        </ds:Reference>
+      </ds:SignedInfo>
+      <ds:SignatureValue>WsM5KurVpKx9ewETIoWM9hrXKbDGybwCA7mgp0v4bUuq4njpGCDVwfLyOvc7zGbeJ2KIZ3IRF5fra3y97xlXXnEbwUth1b43liXi/SvOawkI38AGyu9CVqu2PgX+tt73in81Z1n8w0esZpy1L1mdgZqLLTpgVee+feEO6fd4TfPqy2VdLJJaSWWdIhyIEsK2pN7sO8476KS+PMcazhy15lGXR8/NEtzSC39t7NpfYg4CHHOypOHLnkiuY3sOC9Y3DLK/vUG/yx/43BCMDksW4mPNXFMQEoRb3+Hc0yEN5liz73oZa02wSwUYioj2FTCU2Ll003pgY/+E0kIV5hIzpg==</ds:SignatureValue>
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+          <ds:X509Certificate>MIID2zCCAsOgAwIBAgIJANEwdtPv2CcfMA0GCSqGSIb3DQEBCwUAMIGDMQswCQYDVQQGEwJDQTEQMA4GA1UECAwHQWxiZXJ0YTEQMA4GA1UEBwwHQ2FsZ2FyeTEOMAwGA1UECgwFQ2lzY28xDDAKBgNVBAsMA0FNUDESMBAGA1UEAwwJY2lzY28uY29tMR4wHAYJKoZIhvcNAQkBFg9wamlzbEBjaXNjby5jb20wHhcNMTYwMjIzMTgyMDEzWhcNMjYwMjIyMTgyMDEzWjCBgzELMAkGA1UEBhMCQ0ExEDAOBgNVBAgMB0FsYmVydGExEDAOBgNVBAcMB0NhbGdhcnkxDjAMBgNVBAoMBUNpc2NvMQwwCgYDVQQLDANBTVAxEjAQBgNVBAMMCWNpc2NvLmNvbTEeMBwGCSqGSIb3DQEJARYPcGppc2xAY2lzY28uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApY6BaL1HZn3OQM0zPV+5+KkpJc90fUKGI0mf4WmbPB3NPF1qKhoFVS9cZclyL4y6vRhL88lZBp87xkz3M1pz14HLTdls4NsOGzw1xKMizFzP/sEBmn5gL2fWHkkb5mFtrWa1PqEM5cTWPYvej/5fKM4qdQtW3kZFuMghacCV9Y9xGObkucZMRov1Yy8Hea3vEH/SQ5a/7NJNFiHzCQ2109OCkxpTV0njcYeIBQxUFkR2UKWID1wbiEqvjAurtA8siq/CPpwMjkAGiqiaRMDroHCRpyc3ZIDiew49es3txwqJrZJPgiXy7HdIdCAaigFsWAvi6YdVEEyNExeb3giObwIDAQABo1AwTjAdBgNVHQ4EFgQUbpy9sDuGyct0uIu3OYkyI7GVd4EwHwYDVR0jBBgwFoAUbpy9sDuGyct0uIu3OYkyI7GVd4EwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAXTUOqaz1a7McsgiU6u09iQ4HUZKk5WgsoIjkMJY/jE1I8GsOlhly1tHgPmOVHe/0QxZg+YB4MV/d83708NpBiK+qGzE9mjCC457tcfzd762VcpexmLo5SR+JWOBFXSFgddrEhBy8eWXk075vdQt/fmB8S4MwWSiICcwY4rTddwy4LBQ4yqsLh7u7y1XptZG20jd1VIBsFP1kcrxlPTDxhulHJkgADWf+N/nyhUOTSOmFlaXK7LJFJDjqL4uslP85iPnEzjCRrNRCrI6eQleTrrTdev1u32RMj5nyrcp1h9G3Jt5/gyJChM7Bar3bwJMZpv7cmdGmYa3Lsx6mRgO6Gg==</ds:X509Certificate>
+        </ds:X509Data>
+      </KeyInfo>
+    </ds:Signature>
+    <Subject>
+      <NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">mokha@cisco.com</NameID>
+      <SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <SubjectConfirmationData InResponseTo="_e2d943d8-8c0f-4de6-b58a-0ded2d016b85" NotOnOrAfter="2017-06-02T17:18:35Z" Recipient="https://portal.dev/sessions/acs"/>
+      </SubjectConfirmation>
+    </Subject>
+    <Conditions NotBefore="2017-06-02T17:15:30Z" NotOnOrAfter="2017-06-02T18:15:35Z">
+      <AudienceRestriction>
+        <Audience>https://portal.dev/sessions/metadata</Audience>
+      </AudienceRestriction>
+    </Conditions>
+    <AttributeStatement>
+      <Attribute FriendlyName="user_id" Name="user_id" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue>a44550cf-9839-49fb-a101-10a741afe16b</AttributeValue>
+      </Attribute>
+      <Attribute FriendlyName="success_notice" Name="success_notice" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri"/>
+      <Attribute FriendlyName="business_guid" Name="business_guid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue>4198398a-8cd3-4539-a936-5b34e35513ac</AttributeValue>
+      </Attribute>
+      <Attribute FriendlyName="event_intake_url" Name="event_intake_url" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue/>
+      </Attribute>
+      <Attribute FriendlyName="console_base_url" Name="console_base_url" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue/>
+      </Attribute>
+      <Attribute FriendlyName="auth_token" Name="auth_token" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue>8185b86b3e19fe9782fd69c790b2d185627e9b68bff229fb</AttributeValue>
+      </Attribute>
+      <Attribute FriendlyName="amp_user_role" Name="amp_user_admin" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue>true</AttributeValue>
+      </Attribute>
+      <Attribute FriendlyName="amp_business_name" Name="amp_business_name" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <AttributeValue>Business for mokha@cisco.com</AttributeValue>
+      </Attribute>
+    </AttributeStatement>
+    <AuthnStatement AuthnInstant="2017-06-02T17:15:35Z" SessionIndex="_03c49290-29e5-0135-23c7-20999b09e5e7">
+      <AuthnContext>
+        <AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</AuthnContextClassRef>
+      </AuthnContext>
+    </AuthnStatement>
+  </Assertion>
+</samlp:Response>

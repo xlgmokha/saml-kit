@@ -107,6 +107,8 @@ module Saml
         end
       rescue Xmldsig::SchemaError => error
         errors.add(:base, error.message)
+      rescue StandardError => error
+        errors.add(:base, :invalid)
       end
 
       def validate_certificate(now = Time.now.utc)

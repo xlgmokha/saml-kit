@@ -241,6 +241,13 @@ RSpec.describe Saml::Kit::Response do
       expect(subject.errors.full_messages).to include('must contain a single Assertion.')
     end
 
+    it 'is invalid if there are two assertions (one signed and the other unsigned)' do
+      raw_xml = IO.read("spec/fixtures/unsigned_response_two_assertions.xml")
+      subject = described_class.new(raw_xml)
+      expect(subject).not_to be_valid
+      expect(subject.errors.full_messages).to include('must contain a single Assertion.')
+    end
+
     it 'is invalid when the assertion has a signature and has been tampered with' do
       user = User.new(attributes: { token: SecureRandom.uuid })
       request = Saml::Kit::AuthenticationRequest.build
