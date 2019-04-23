@@ -105,10 +105,8 @@ module Saml
         dsignature.errors.each do |attribute|
           errors.add(attribute, error_message(attribute))
         end
-      rescue Xmldsig::SchemaError => error
+      rescue StandardError => error
         errors.add(:base, error.message)
-      rescue StandardError
-        errors.add(:base, :invalid)
       end
 
       def validate_certificate(now = Time.now.utc)
