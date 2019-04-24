@@ -11,10 +11,10 @@ module Saml
     # the different SAML bindings that are
     # supported by this gem.
     module Bindings
-      BINDINGS_2_0 = 'urn:oasis:names:tc:SAML:2.0:bindings'.freeze
-      HTTP_ARTIFACT = "#{BINDINGS_2_0}:HTTP-Artifact".freeze
-      HTTP_POST = "#{BINDINGS_2_0}:HTTP-POST".freeze
-      HTTP_REDIRECT = "#{BINDINGS_2_0}:HTTP-Redirect".freeze
+      BINDINGS_2_0 = 'urn:oasis:names:tc:SAML:2.0:bindings'
+      HTTP_ARTIFACT = "#{BINDINGS_2_0}:HTTP-Artifact"
+      HTTP_POST = "#{BINDINGS_2_0}:HTTP-POST"
+      HTTP_REDIRECT = "#{BINDINGS_2_0}:HTTP-Redirect"
       ALL = {
         http_post: HTTP_POST,
         http_redirect: HTTP_REDIRECT,

@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Rescue from invalid signature validation
+- Change minimum ruby version to 2.4
+- Change minimum bundler to 2.0
 
 ## [1.0.31] - 2019-04-17
 ### Changed

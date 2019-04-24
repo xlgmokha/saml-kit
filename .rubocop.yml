@@ -12,7 +12,7 @@ AllCops:
     - 'spec/examples/**/*'
     - 'tmp/**/*'
     - 'vendor/**/*'
-  TargetRubyVersion: 2.2
+  TargetRubyVersion: 2.4
 
 Layout/AlignParameters:
   Enabled: true
