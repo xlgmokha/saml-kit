@@ -187,20 +187,20 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
     end
   end
 
-  describe "#force_authn" do
-    context "when set to true" do
+  describe '#force_authn' do
+    context 'when set to true' do
       subject { described_class.build { |x| x.force_authn = true } }
 
       specify { expect(subject.force_authn).to be(true) }
     end
 
-    context "when set to false" do
+    context 'when set to false' do
       subject { described_class.build { |x| x.force_authn = false } }
 
       specify { expect(subject.force_authn).to be(false) }
     end
 
-    context "when not specified" do
+    context 'when not specified' do
       subject { described_class.build { |x| x.force_authn = nil } }
 
       specify { expect(subject.force_authn).to be(false) }

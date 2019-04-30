@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    saml-kit (1.0.31)
+    saml-kit (1.1.0)
       activemodel (>= 4.2.0)
       net-hippie (~> 0.1)
       xml-kit (>= 0.3.0, < 1.0.0)
