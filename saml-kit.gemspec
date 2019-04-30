@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'A simple toolkit for working with SAML.'
   spec.homepage      = 'https://github.com/saml-kit/saml-kit'
   spec.license       = 'MIT'
-  spec.required_ruby_version = '>= 2.4.0'
+  spec.required_ruby_version = '~> 2.4'
 
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
     (

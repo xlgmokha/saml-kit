@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add support for ForceAuthn attribute on AuthnRequest
 
+### Removed
+- Drop support for ruby 2.2
+- Drop support for ruby 2.3
+
 ### Changed
 - Rescue from invalid signature validation
 - Change minimum ruby version to 2.4
