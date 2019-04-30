@@ -10,6 +10,7 @@ module Saml
         attr_accessor :id, :now, :issuer, :assertion_consumer_service_url
         attr_accessor :name_id_format, :destination
         attr_accessor :version
+        attr_accessor :force_authn
         attr_reader :configuration
 
         def initialize(configuration: Saml::Kit.configuration)
@@ -36,6 +37,7 @@ module Saml
             IssueInstant: now.utc.iso8601,
             Destination: destination,
           }
+          options[:ForceAuthn] = force_authn if !force_authn.nil?
           if assertion_consumer_service_url.present?
             options[:AssertionConsumerServiceURL] =
               assertion_consumer_service_url
