@@ -26,7 +26,7 @@ RSpec.describe Saml::Kit::Builders::AuthenticationRequest do
       expect(result['AuthnRequest']['NameIDPolicy']['Format']).to eql(Saml::Kit::Namespaces::PERSISTENT)
     end
 
-    context "when force authn is enabled" do
+    context 'when force authn is enabled' do
       before { subject.force_authn = true }
 
       let(:result) { Hash.from_xml(subject.to_xml) }

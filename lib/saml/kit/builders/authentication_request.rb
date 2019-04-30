@@ -37,11 +37,8 @@ module Saml
             IssueInstant: now.utc.iso8601,
             Destination: destination,
           }
-          options[:ForceAuthn] = force_authn if !force_authn.nil?
-          if assertion_consumer_service_url.present?
-            options[:AssertionConsumerServiceURL] =
-              assertion_consumer_service_url
-          end
+          options[:ForceAuthn] = force_authn unless force_authn.nil?
+          options[:AssertionConsumerServiceURL] = assertion_consumer_service_url if assertion_consumer_service_url.present?
           options
         end
       end
