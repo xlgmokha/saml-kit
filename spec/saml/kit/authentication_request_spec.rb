@@ -30,6 +30,7 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
   specify { expect(subject.assertion_consumer_service_url).to eql(assertion_consumer_service_url) }
   specify { expect(subject.name_id_format).to eql(name_id_format) }
   specify { expect(subject.destination).to eql(destination) }
+  specify { expect(subject.force_authn).to be(false) }
 
   describe '#valid?' do
     let(:registry) { instance_double(Saml::Kit::DefaultRegistry) }
@@ -183,6 +184,26 @@ RSpec.describe Saml::Kit::AuthenticationRequest do
       end
 
       expect(subject.assertion_consumer_service_url).to be_nil
+    end
+  end
+
+  describe "#force_authn" do
+    context "when set to true" do
+      subject { described_class.build { |x| x.force_authn = true } }
+
+      specify { expect(subject.force_authn).to be(true) }
+    end
+
+    context "when set to false" do
+      subject { described_class.build { |x| x.force_authn = false } }
+
+      specify { expect(subject.force_authn).to be(false) }
+    end
+
+    context "when not specified" do
+      subject { described_class.build { |x| x.force_authn = nil } }
+
+      specify { expect(subject.force_authn).to be(false) }
     end
   end
 

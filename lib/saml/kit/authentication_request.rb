@@ -47,6 +47,11 @@ module Saml
         at_xpath('./*/@AssertionConsumerServiceURL').try(:value)
       end
 
+      # Returns the ForceAuthn attribute as a boolean.
+      def force_authn
+        at_xpath('./*/@ForceAuthn').try(:value) == 'true'
+      end
+
       def name_id_format
         name_id_policy
       end
