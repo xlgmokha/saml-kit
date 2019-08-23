@@ -14,6 +14,9 @@ AllCops:
     - 'vendor/**/*'
   TargetRubyVersion: 2.4
 
+Layout/AlignArguments:
+  EnforcedStyle: with_fixed_indentation
+
 Layout/AlignParameters:
   Enabled: true
   EnforcedStyle: with_fixed_indentation
@@ -38,7 +41,7 @@ Layout/ClassStructure:
 Layout/EndOfLine:
   EnforcedStyle: lf
 
-Layout/IndentArray:
+Layout/IndentFirstArrayElement:
   EnforcedStyle: consistent
 
 Layout/IndentHeredoc:
