@@ -7,6 +7,7 @@ end
 require 'bundler/setup'
 require 'saml/kit'
 require 'saml/kit/rspec'
+require 'active_support/core_ext/string/strip'
 require 'active_support/testing/time_helpers'
 require 'ffaker'
 require 'webmock/rspec'
