@@ -29,5 +29,4 @@ package:
   artifacts:
     paths:
       - pkg/
-    when:
-      - always
+    when: always
