@@ -9,6 +9,7 @@ before_script:
   - echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
   - locale-gen
   - export LC_ALL=en_US.UTF-8
+  - gem install bundler:'~> 2.0' --no-document
 
 rspec:
   stage: test
