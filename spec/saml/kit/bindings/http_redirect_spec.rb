@@ -68,7 +68,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
     end
 
     it 'deserializes the SAMLRequest to an AuthnRequest when given a custom params object' do
-      class Parameters
+      params = Class.new do
         attr_reader :params
 
         def initialize(params)
@@ -79,8 +79,9 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
           params[key]
         end
       end
+
       url, = subject.serialize(Saml::Kit::AuthenticationRequest.builder)
-      result = subject.deserialize(Parameters.new(query_params_from(url)))
+      result = subject.deserialize(params.new(query_params_from(url)))
       expect(result).to be_instance_of(Saml::Kit::AuthenticationRequest)
     end
 
