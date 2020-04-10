@@ -36,7 +36,7 @@ GEM
     i18n (1.6.0)
       concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.3)
-    json (2.2.0)
+    json (2.3.0)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
     net-hippie (0.2.6)
@@ -120,4 +120,4 @@ DEPENDENCIES
   webmock (~> 3.1)
 
 BUNDLED WITH
-   2.0.2
+   2.1.4
