@@ -39,7 +39,7 @@ GEM
     json (2.3.0)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
-    net-hippie (0.2.6)
+    net-hippie (0.3.2)
     nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
     parallel (1.17.0)
