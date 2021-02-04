@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    saml-kit (1.1.0)
+    saml-kit (1.2.0)
       activemodel (~> 5.1)
       net-hippie (~> 0.1)
       xml-kit (~> 0.4)
@@ -35,11 +35,9 @@ GEM
     hashdiff (1.0.1)
     i18n (1.8.8)
       concurrent-ruby (~> 1.0)
-    mini_portile2 (2.5.0)
     minitest (5.14.3)
     net-hippie (0.3.2)
-    nokogiri (1.11.1)
-      mini_portile2 (~> 2.5.0)
+    nokogiri (1.11.1-x86_64-linux)
       racc (~> 1.4)
     parallel (1.20.1)
     parser (3.0.0.0)
