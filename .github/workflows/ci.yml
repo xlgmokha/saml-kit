@@ -33,7 +33,6 @@ jobs:
         run: sh bin/style
   audit:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - name: Set up Ruby
@@ -42,4 +41,5 @@ jobs:
           ruby-version: '2.7'
           bundler-cache: true
       - name: Running audit…
+        continue-on-error: true
         run: sh bin/audit
