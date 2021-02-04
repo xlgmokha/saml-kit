@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'A simple toolkit for working with SAML.'
   spec.description   = 'A simple toolkit for working with SAML.'
-  spec.homepage      = 'https://github.com/saml-kit/saml-kit'
+  spec.homepage      = 'https://github.com/xlgmokha/saml-kit'
   spec.license       = 'MIT'
   spec.required_ruby_version = '~> 2.4'
 
