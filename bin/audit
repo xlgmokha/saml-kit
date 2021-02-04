@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+[ -z "$DEBUG" ] || set -x
+
+echo [$(date "+%H:%M:%S")] "==> Running audit…"
+bundle exec rake bundle:audit

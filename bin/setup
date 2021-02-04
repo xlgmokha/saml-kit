@@ -1,6 +1,8 @@
-#!/usr/bin/env bash
-set -euo pipefail
-IFS=$'\n\t'
-set -vx
+#!/bin/sh
 
-bundle check || bundle install --jobs "$(sysctl -n hw.ncpu || nproc)"
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+ruby -v
+bundle check || bundle install

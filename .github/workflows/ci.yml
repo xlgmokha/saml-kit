@@ -18,9 +18,9 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
-      - name: Run tests
+      - name: Running tests…
         run: sh bin/test
-  lint:
+  style:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,5 +29,5 @@ jobs:
         with:
           ruby-version: '2.7'
           bundler-cache: true
-      - name: Run linters
-        run: sh bin/lint
+      - name: Running style checks…
+        run: sh bin/style
