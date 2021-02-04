@@ -54,7 +54,7 @@ module Saml
 
         signature.valid?
         signature.errors.each do |attribute, error|
-          errors[attribute] << error
+          errors.add(attribute, error)
         end
       end
 
@@ -62,14 +62,14 @@ module Saml
         return unless expected_type?
         return if provider.present?
 
-        errors[:provider] << error_message(:unregistered)
+        errors.add(:provider, error_message(:unregistered))
       end
 
       def must_be_trusted
         return if trusted?
         return if provider.present? && !signed?
 
-        errors[:fingerprint] << error_message(:invalid_fingerprint)
+        errors.add(:fingerprint, error_message(:invalid_fingerprint))
       end
     end
   end

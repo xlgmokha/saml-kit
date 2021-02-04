@@ -11,6 +11,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
 
     it { expect(subject.entity_id).to eql('http://www.okta.com/1') }
     it { expect(subject.name_id_formats).to match_array([Saml::Kit::Namespaces::EMAIL_ADDRESS, Saml::Kit::Namespaces::UNSPECIFIED_NAMEID]) }
+
     it do
       location = 'https://dev.oktapreview.com/app/example/1/sso/saml'
       expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
@@ -18,12 +19,15 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
         { binding: Saml::Kit::Bindings::HTTP_REDIRECT, location: location },
       ])
     end
+
     it { expect(subject.single_logout_services).to be_empty }
+
     it do
       fingerprint = '9F:74:13:3B:BC:5A:7B:8B:2D:4F:8B:EF:1E:88:EB:D1:AE:BC:19:BF:CA:19:C6:2F:0F:4B:31:1D:68:98:B0:1B'
       expect(subject.certificates).to match_array([::Xml::Kit::Certificate.new(certificate, use: :signing)])
       expect(subject.certificates.first.fingerprint.to_s).to eql(fingerprint)
     end
+
     it { expect(subject.attributes).to be_empty }
   end
 
@@ -38,6 +42,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
     end
 
     it { expect(subject.entity_id).to eql('http://www.example.com/adfs/services/trust') }
+
     it do
       expect(subject.name_id_formats).to match_array([
         Saml::Kit::Namespaces::EMAIL_ADDRESS,
@@ -45,6 +50,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
         Saml::Kit::Namespaces::TRANSIENT,
       ])
     end
+
     it do
       location = 'https://www.example.com/adfs/ls/'
       expect(subject.single_sign_on_services.map(&:to_h)).to match_array([
@@ -52,6 +58,7 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
         { location: location, binding: Saml::Kit::Bindings::HTTP_POST },
       ])
     end
+
     it do
       location = 'https://www.example.com/adfs/ls/'
       expect(subject.single_logout_services.map(&:to_h)).to match_array([
@@ -59,12 +66,14 @@ RSpec.describe Saml::Kit::IdentityProviderMetadata do
         { location: location, binding: Saml::Kit::Bindings::HTTP_POST },
       ])
     end
+
     it do
       expect(subject.certificates).to match_array([
         ::Xml::Kit::Certificate.new(signing_certificate, use: :signing),
         ::Xml::Kit::Certificate.new(encryption_certificate, use: :encryption),
       ])
     end
+
     it { expect(subject.attributes).to be_present }
   end
 

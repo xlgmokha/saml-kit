@@ -53,7 +53,7 @@ module Saml
       end
 
       def invalid
-        errors[:assertion].push(error_message(:invalid))
+        errors.add(:assertion, error_message(:invalid))
       end
 
       def name

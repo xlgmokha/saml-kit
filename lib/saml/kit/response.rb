@@ -45,14 +45,14 @@ module Saml
         assertion.valid?
         assertion.errors.each do |attribute, error|
           attribute = :assertion if attribute == :base
-          errors[attribute] << error
+          errors.add(attribute, error)
         end
       end
 
       def must_contain_single_assertion
         return if assertion_nodes.count <= 1
 
-        errors[:base] << error_message(:must_contain_single_assertion)
+        errors.add(:base, error_message(:must_contain_single_assertion))
       end
 
       def assertion_nodes

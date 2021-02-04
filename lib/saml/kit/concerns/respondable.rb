@@ -45,7 +45,7 @@ module Saml
         return if request_id.nil?
         return if in_response_to == request_id
 
-        errors[:in_response_to] << error_message(:invalid_response_to)
+        errors.add(:in_response_to, error_message(:invalid_response_to))
       end
     end
   end

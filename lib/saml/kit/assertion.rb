@@ -114,13 +114,13 @@ module Saml
       def must_match_issuer
         return if audiences.empty? || audiences.include?(configuration.entity_id)
 
-        errors[:audience] << error_message(:must_match_issuer)
+        errors.add(:audience, error_message(:must_match_issuer))
       end
 
       def must_be_active_session
         return if active?
 
-        errors[:base] << error_message(:expired)
+        errors.add(:base, error_message(:expired))
       end
 
       def must_have_valid_signature
