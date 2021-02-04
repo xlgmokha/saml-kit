@@ -14,7 +14,7 @@ require 'webmock/rspec'
 
 Saml::Kit.configuration.logger.level = Xml::Kit.logger.level = Logger::FATAL
 
-Dir[File.join(Dir.pwd, 'spec/support/**/*.rb')].each { |f| require f }
+Dir[File.join(Dir.pwd, 'spec/support/**/*.rb')].sort.each { |f| require f }
 RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
   # Enable flags like --only-failures and --next-failure

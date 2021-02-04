@@ -12,12 +12,12 @@ AllCops:
     - 'spec/examples/**/*'
     - 'tmp/**/*'
     - 'vendor/**/*'
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 2.5
 
-Layout/AlignArguments:
+Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
 
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   Enabled: true
   EnforcedStyle: with_fixed_indentation
   IndentationWidth: 2
@@ -41,10 +41,10 @@ Layout/ClassStructure:
 Layout/EndOfLine:
   EnforcedStyle: lf
 
-Layout/IndentFirstArrayElement:
+Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
-Layout/IndentHeredoc:
+Layout/HeredocIndentation:
   EnforcedStyle: active_support
 
 Layout/MultilineMethodCallIndentation:
@@ -104,6 +104,9 @@ RSpec/ExampleLength:
   Max: 80
 
 RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
 RSpec/NamedSubject:

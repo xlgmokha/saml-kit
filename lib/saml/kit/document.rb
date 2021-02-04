@@ -101,7 +101,7 @@ module Saml
       end
 
       def must_be_expected_type
-        errors[:base] << error_message(:invalid) unless expected_type?
+        errors.add(:base, error_message(:invalid)) unless expected_type?
       end
 
       def expected_type?
@@ -112,7 +112,7 @@ module Saml
         return unless expected_type?
         return if version == '2.0'
 
-        errors[:version] << error_message(:invalid_version)
+        errors.add(:version, error_message(:invalid_version))
       end
     end
   end

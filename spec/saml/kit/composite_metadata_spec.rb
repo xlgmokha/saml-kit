@@ -89,19 +89,23 @@ RSpec.describe Saml::Kit::CompositeMetadata do
   it { expect(subject.want_authn_requests_signed).to be_truthy }
   it { expect(subject.attributes).to match_array([name: 'id', format: nil]) }
   it { expect(subject.login_request_for(binding: :http_post)).to be_present }
+
   it do
     expect(subject.assertion_consumer_services).to match_array([
       Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service)
     ])
   end
+
   it do
     expect(subject.assertion_consumer_service_for(binding: :http_post)).to eql(
       Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service)
     )
   end
+
   it { expect(subject.want_assertions_signed).to be_truthy }
   it { expect(subject.entity_id).to eql(entity_id) }
   it { expect(subject.name_id_formats).to match_array([Saml::Kit::Namespaces::PERSISTENT]) }
+
   it do
     expect(subject.certificates).to match_array([
       sp_signing_certificate,
@@ -117,39 +121,46 @@ RSpec.describe Saml::Kit::CompositeMetadata do
       idp_encryption_certificate,
     ])
   end
+
   it do
     expect(subject.signing_certificates).to match_array([
       sp_signing_certificate,
       idp_signing_certificate,
     ])
   end
+
   it do
     expect(subject.services('SingleLogoutService')).to match_array([
       Saml::Kit::Bindings::HttpPost.new(location: sp_logout_service),
       Saml::Kit::Bindings::HttpPost.new(location: idp_logout_service),
     ])
   end
+
   it do
     expect(subject.service_for(type: 'SingleLogoutService', binding: :http_post)).to eql(
       Saml::Kit::Bindings::HttpPost.new(location: sp_logout_service)
     )
   end
+
   it do
     expect(subject.services('AssertionConsumerService')).to match_array([
       Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service),
     ])
   end
+
   it do
     expect(subject.service_for(type: 'AssertionConsumerService', binding: :http_post)).to eql(
       Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service)
     )
   end
+
   it do
     expect(subject.services('SingleSignOnService')).to match_array([
       Saml::Kit::Bindings::HttpPost.new(location: sign_on_service),
       Saml::Kit::Bindings::HttpRedirect.new(location: sign_on_service),
     ])
   end
+
   it do
     expect(subject.service_for(type: 'SingleSignOnService', binding: :http_post)).to eql(
       Saml::Kit::Bindings::HttpPost.new(location: sign_on_service)

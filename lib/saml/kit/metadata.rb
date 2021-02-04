@@ -182,7 +182,7 @@ module Saml
       end
 
       def must_contain_descriptor
-        errors[:base] << error_message(:invalid) unless metadata
+        errors.add(:base, error_message(:invalid)) unless metadata
       end
 
       def must_match_xsd
@@ -193,7 +193,7 @@ module Saml
         return if !signature.present? || signature.valid?
 
         signature.errors.each do |attribute, error|
-          errors[attribute] << error
+          errors.add(attribute, error)
         end
       end
     end

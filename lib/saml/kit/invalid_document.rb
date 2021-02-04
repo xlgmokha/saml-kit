@@ -7,7 +7,7 @@ module Saml
     # {include:file:spec/saml/kit/invalid_document_spec.rb}
     class InvalidDocument < Document
       validate do |model|
-        model.errors[:base] << model.error_message(:invalid)
+        model.errors.add(:base, model.error_message(:invalid))
       end
 
       def initialize(xml, *)
