@@ -31,3 +31,15 @@ jobs:
           bundler-cache: true
       - name: Running style checks…
         run: sh bin/style
+  audit:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+          bundler-cache: true
+      - name: Running audit…
+        run: sh bin/audit
