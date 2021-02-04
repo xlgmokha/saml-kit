@@ -15,7 +15,7 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
       - name: Run tests
-        run: sh bin/cibuild
+        run: sh bin/test
   lint:
     runs-on: ubuntu-latest
     steps:
