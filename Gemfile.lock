@@ -23,9 +23,9 @@ GEM
     benchmark-perf (0.6.0)
     benchmark-trend (0.4.0)
     builder (3.2.4)
-    bundler-audit (0.7.0.1)
+    bundler-audit (0.8.0)
       bundler (>= 1.2.0, < 3)
-      thor (>= 0.18, < 2)
+      thor (~> 1.0)
     concurrent-ruby (1.1.8)
     crack (0.4.5)
       rexml
