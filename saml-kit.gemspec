@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activemodel', '~> 5.1'
-  spec.add_dependency 'net-hippie', '~> 0.1'
+  spec.add_dependency 'net-hippie', '>= 0.1', '< 2.0'
   spec.add_dependency 'xml-kit', '~> 0.4'
   spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'bundler-audit', '~> 0.6'
