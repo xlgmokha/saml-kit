@@ -126,7 +126,7 @@ module Saml
       def must_have_valid_signature
         return if !signed? || signature.valid?
 
-        signature.errors.each do |attribute, message|
+        signature.each_error do |attribute, message|
           errors.add(attribute, message)
         end
       end

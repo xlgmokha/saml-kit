@@ -94,7 +94,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
     it 'returns an invalid request when the SAMLRequest is invalid' do
       expect do
-        subject.deserialize('SAMLRequest' => 'nonsense')
+        subject.deserialize({ 'SAMLRequest' => 'nonsense' })
       end.to raise_error(Zlib::DataError)
     end
 
@@ -115,7 +115,7 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
 
     it 'raises an error when the content is invalid' do
       expect do
-        subject.deserialize('SAMLResponse' => 'nonsense')
+        subject.deserialize({ 'SAMLResponse' => 'nonsense' })
       end.to raise_error(Zlib::DataError)
     end
 

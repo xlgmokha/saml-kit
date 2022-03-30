@@ -51,9 +51,9 @@ module Saml
         @metadatum.each(&block)
       end
 
-      def method_missing(name, *args)
+      def method_missing(name, *args, **kwargs)
         if (target = find { |x| x.respond_to?(name) })
-          target.public_send(name, *args)
+          target.public_send(name, *args, **kwargs)
         else
           super
         end

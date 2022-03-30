@@ -6,7 +6,7 @@ module Saml
     # Null Object pattern for when a Response
     # is missing an Assertion.
     class NullAssertion
-      include ActiveModel::Validations
+      include Validatable
       include Translatable
       validate :invalid
 

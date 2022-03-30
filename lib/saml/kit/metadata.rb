@@ -26,7 +26,7 @@ module Saml
     # for a list of options that can be specified.
     # {include:file:spec/examples/metadata_spec.rb}
     class Metadata
-      include ActiveModel::Validations
+      include Validatable
       include Buildable
       include Translatable
       include XmlParseable
@@ -192,7 +192,7 @@ module Saml
       def must_have_valid_signature
         return if !signature.present? || signature.valid?
 
-        signature.errors.each do |attribute, error|
+        signature.each_error do |attribute, error|
           errors.add(attribute, error)
         end
       end

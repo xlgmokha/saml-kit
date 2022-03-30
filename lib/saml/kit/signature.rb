@@ -6,7 +6,7 @@ module Saml
     # validating an xml digital signature
     # in an xml document.
     class Signature
-      include ActiveModel::Validations
+      include Validatable
       include Translatable
 
       validate :validate_signature

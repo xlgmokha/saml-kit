@@ -9,20 +9,20 @@ module Saml
       extend ActiveSupport::Concern
 
       class_methods do
-        def build(*args)
-          builder(*args) do |builder|
+        def build(*args, **kwargs)
+          builder(*args, **kwargs) do |builder|
             yield builder if block_given?
           end.build
         end
 
-        def build_xml(*args)
-          builder(*args) do |builder|
+        def build_xml(*args, **kwargs)
+          builder(*args, **kwargs) do |builder|
             yield builder if block_given?
           end.to_xml
         end
 
-        def builder(*args)
-          builder_class.new(*args).tap do |builder|
+        def builder(*args, **kwargs)
+          builder_class.new(*args, **kwargs).tap do |builder|
             yield builder if block_given?
           end
         end

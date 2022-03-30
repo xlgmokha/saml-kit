@@ -53,7 +53,7 @@ module Saml
         return unless signature.present?
 
         signature.valid?
-        signature.errors.each do |attribute, error|
+        signature.each_error do |attribute, error|
           errors.add(attribute, error)
         end
       end
