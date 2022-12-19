@@ -82,7 +82,7 @@ GEM
     rubocop-rspec (1.44.1)
       rubocop (~> 0.87)
       rubocop-ast (>= 0.7.1)
-    ruby-prof (1.4.3)
+    ruby-prof (1.4.4)
     ruby-progressbar (1.11.0)
     simplecov (0.21.2)
       docile (~> 1.1)
