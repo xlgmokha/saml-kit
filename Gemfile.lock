@@ -9,9 +9,9 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (7.0.4)
-      activesupport (= 7.0.4)
-    activesupport (7.0.4)
+    activemodel (7.0.4.3)
+      activesupport (= 7.0.4.3)
+    activesupport (7.0.4.3)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -26,7 +26,7 @@ GEM
     bundler-audit (0.9.1)
       bundler (>= 1.2.0, < 3)
       thor (~> 1.0)
-    concurrent-ruby (1.1.10)
+    concurrent-ruby (1.2.2)
     crack (0.4.5)
       rexml
     diff-lcs (1.5.0)
@@ -36,7 +36,7 @@ GEM
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     mini_portile2 (2.8.0)
-    minitest (5.16.3)
+    minitest (5.18.0)
     net-hippie (1.1.1)
     nokogiri (1.13.6)
       mini_portile2 (~> 2.8.0)
@@ -92,7 +92,7 @@ GEM
     simplecov_json_formatter (0.1.2)
     thor (1.2.1)
     tilt (2.0.10)
-    tzinfo (2.0.5)
+    tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (1.7.0)
     webmock (3.18.1)
