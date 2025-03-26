@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add support for converting `Assertion` xml to `Saml::Document`
 
+### Removed
+- Drop support for ruby 2.7
+- Drop support for ruby 3.0
+
 ## [1.3.0] - 2022-03-30
 ### Removed
 

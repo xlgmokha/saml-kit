@@ -1,7 +1,7 @@
 inherit_from: .rubocop_todo.yml
 
-require:
-  - rubocop/cop/internal_affairs
+plugins:
+  - rubocop-internal_affairs
   - rubocop-rspec
 
 AllCops:
@@ -12,7 +12,7 @@ AllCops:
     - 'spec/examples/**/*'
     - 'tmp/**/*'
     - 'vendor/**/*'
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.1
 
 Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
@@ -47,6 +47,13 @@ Layout/FirstArrayElementIndentation:
 Layout/HeredocIndentation:
   EnforcedStyle: active_support
 
+Layout/LineLength:
+  Exclude:
+    - 'lib/saml/kit/builders/templates/*.builder'
+    - 'spec/**/*.rb'
+  IgnoredPatterns:
+    - '^#*'
+
 Layout/MultilineMethodCallIndentation:
   Enabled: true
   EnforcedStyle: indented
@@ -70,13 +77,6 @@ Metrics/BlockLength:
 Metrics/ModuleLength:
   Exclude:
     - 'spec/**/*.rb'
-
-Metrics/LineLength:
-  Exclude:
-    - 'lib/saml/kit/builders/templates/*.builder'
-    - 'spec/**/*.rb'
-  IgnoredPatterns:
-    - '^#*'
 
 Naming/FileName:
   Exclude:
