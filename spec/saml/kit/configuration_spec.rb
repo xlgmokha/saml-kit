@@ -57,7 +57,9 @@ RSpec.describe Saml::Kit::Configuration do
       before do
         subject.add_key_pair(active_certificate.to_pem, private_key.export, use: :signing)
         subject.add_key_pair(expired_certificate.to_pem, private_key.export, use: :signing)
-        subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :signing)
+        if Gem::Version.new('3.1.0') > Gem::Version.new(RUBY_VERSION)
+          subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :signing)
+        end
       end
 
       specify do
@@ -71,7 +73,9 @@ RSpec.describe Saml::Kit::Configuration do
       before do
         subject.add_key_pair(active_certificate.to_pem, private_key.export, use: :encryption)
         subject.add_key_pair(expired_certificate.to_pem, private_key.export, use: :encryption)
-        subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :encryption)
+        if Gem::Version.new('3.1.0') > Gem::Version.new(RUBY_VERSION)
+          subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :encryption)
+        end
       end
 
       specify do
@@ -112,7 +116,9 @@ RSpec.describe Saml::Kit::Configuration do
       before do
         subject.add_key_pair(active_certificate.to_pem, private_key.export, use: :signing)
         subject.add_key_pair(expired_certificate.to_pem, private_key.export, use: :signing)
-        subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :signing)
+        if Gem::Version.new('3.1.0') > Gem::Version.new(RUBY_VERSION)
+          subject.add_key_pair(unsigned_certificate.to_pem, private_key.export, use: :signing)
+        end
       end
 
       specify { expect(subject.key_pairs.count).to be(1) }

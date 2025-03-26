@@ -486,7 +486,9 @@ RSpec.describe Saml::Kit::Response do
       public_key = OpenSSL::X509::Certificate.new(certificate_pem).public_key
       private_key = OpenSSL::PKey::RSA.new(private_key_pem, password)
 
-      allow(Saml::Kit.configuration).to receive(:private_keys).with(use: :encryption).and_return([private_key])
+      allow(Saml::Kit.configuration).to receive(:private_keys)
+        .with(hash_including(use: :encryption))
+        .and_return([private_key])
 
       cipher = OpenSSL::Cipher.new('AES-128-CBC')
       cipher.encrypt
