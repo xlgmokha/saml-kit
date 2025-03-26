@@ -1,9 +1,3 @@
-![SAML-Kit](https://github.com/xlgmokha/saml-kit/raw/main/spec/examples/saml-kit.gif)
-
-*Logo courtesy of [@speasley](https://github.com/speasley)*
-
-[![Gem Version](https://badge.fury.io/rb/saml-kit.svg)](https://rubygems.org/gems/saml-kit)
-
 Saml::Kit is a library with the purpose of creating and consuming SAML
 documents. It supports the HTTP Post and HTTP Redirect bindings. It can
 create Service Provider Metadata, Identity Provider Metadata,
