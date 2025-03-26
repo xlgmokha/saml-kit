@@ -42,6 +42,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler-audit', '~> 0.6'
   spec.add_development_dependency 'erb', '~> 4.0'
   spec.add_development_dependency 'ffaker', '~> 2.7'
+  spec.add_development_dependency 'irb', '~> 1.0'
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'rspec-benchmark', '~> 0.3'
