@@ -50,6 +50,12 @@ RSpec.describe Saml::Kit::Document do
       expect(result).to be_instance_of(Saml::Kit::LogoutRequest)
     end
 
+    it 'returns an Assertion' do
+      xml = Saml::Kit::Response.build(user, request).assertion.to_xml
+      result = subject.to_saml_document(xml)
+      expect(result).to be_instance_of(Saml::Kit::Assertion)
+    end
+
     it 'returns an invalid document' do
       xml = <<-XML
       <html>

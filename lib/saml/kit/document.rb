@@ -53,12 +53,14 @@ module Saml
 
       class << self
         CONSTRUCTORS = {
+          'Assertion' => -> { Saml::Kit::Assertion },
           'AuthnRequest' => -> { Saml::Kit::AuthenticationRequest },
           'LogoutRequest' => -> { Saml::Kit::LogoutRequest },
           'LogoutResponse' => -> { Saml::Kit::LogoutResponse },
           'Response' => -> { Saml::Kit::Response },
         }.freeze
         XPATH = [
+          '/saml:Assertion',
           '/samlp:AuthnRequest',
           '/samlp:LogoutRequest',
           '/samlp:LogoutResponse',
@@ -71,7 +73,10 @@ module Saml
         # @param configuration [Saml::Kit::Configuration] configuration to use
         # for unpacking the document.
         def to_saml_document(xml, configuration: Saml::Kit.configuration)
-          namespaces = { samlp: Namespaces::PROTOCOL }
+          namespaces = {
+            saml: Namespaces::ASSERTION,
+            samlp: Namespaces::PROTOCOL,
+          }
           element = Nokogiri::XML(xml).at_xpath(XPATH, namespaces)
           constructor = CONSTRUCTORS[element.name].try(:call) || InvalidDocument
           constructor.new(xml, configuration: configuration)
