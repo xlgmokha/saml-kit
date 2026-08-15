@@ -21,7 +21,7 @@ module Saml
           destination = document.destination
           if configuration.sign?
             payload = canonicalize(document, relay_state)
-            "#{destination}?#{payload}&Signature=#{signature_for(payload)}"
+            "#{destination}?#{payload}&Signature=#{escape(signature_for(payload))}"
           else
             "#{destination}?" + to_query_string(
               document.query_string_parameter => serialize(document.to_xml),

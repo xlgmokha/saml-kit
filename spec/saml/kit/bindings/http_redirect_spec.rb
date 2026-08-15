@@ -154,6 +154,41 @@ RSpec.describe Saml::Kit::Bindings::HttpRedirect do
       expect(result).to be_valid
     end
 
+    it 'url encodes the signature it generates' do
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.entity_id = entity_id
+        config.generate_key_pair_for(use: :signing)
+      end
+      url, = subject.serialize(
+        Saml::Kit::AuthenticationRequest.builder(configuration: configuration)
+      )
+      signature = query_params_from(url)['Signature']
+
+      expect(signature).not_to match(%r{[+/=]})
+    end
+
+    it 'verifies a signature that arrives url encoded' do
+      configuration = Saml::Kit::Configuration.new do |config|
+        config.entity_id = entity_id
+        config.generate_key_pair_for(use: :signing)
+      end
+      provider = Saml::Kit::IdentityProviderMetadata.build(configuration: configuration)
+      url, = subject.serialize(
+        Saml::Kit::AuthenticationRequest.builder(configuration: configuration)
+      )
+      allow(configuration.registry).to receive(:metadata_for).with(entity_id).and_return(provider)
+
+      # Every other SAML implementation percent encodes each query parameter,
+      # including the signature. Base64 alphabet characters +, / and = all
+      # require escaping, so a conformant peer never sends them raw.
+      query_params = query_params_from(url)
+      query_params['Signature'] = CGI.escape(CGI.unescape(query_params['Signature']))
+
+      result = subject.deserialize(query_params, configuration: configuration)
+      expect(result).to be_signed
+      expect(result).to be_trusted
+    end
+
     it 'returns an unverfied document when the provider is unknown' do
       configuration = Saml::Kit::Configuration.new do |config|
         config.generate_key_pair_for(use: :signing)

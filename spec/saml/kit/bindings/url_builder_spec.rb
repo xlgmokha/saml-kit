@@ -64,7 +64,7 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
                     "&SigAlg=#{query_params['SigAlg']}"
           private_key = configuration.private_keys(use: :signing).last
           expected_signature = Base64.strict_encode64(private_key.sign(OpenSSL::Digest::SHA256.new, payload))
-          expect(query_params['Signature']).to eql(expected_signature)
+          expect(query_params['Signature']).to eql(CGI.escape(expected_signature))
         end
 
         it 'generates the signature correctly when the relay state is absent' do
@@ -76,7 +76,7 @@ RSpec.describe Saml::Kit::Bindings::UrlBuilder do
                     "&SigAlg=#{query_params['SigAlg']}"
           private_key = configuration.private_keys(use: :signing).last
           expected_signature = Base64.strict_encode64(private_key.sign(OpenSSL::Digest::SHA256.new, payload))
-          expect(query_params['Signature']).to eql(expected_signature)
+          expect(query_params['Signature']).to eql(CGI.escape(expected_signature))
         end
       end
     end

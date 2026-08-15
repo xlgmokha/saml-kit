@@ -49,11 +49,22 @@ module Saml
 
           return document.signature_verified! if provider.verify(
             algorithm_for(params[:SigAlg]),
-            decode(signature),
+            decode(signature_from(signature)),
             canonicalize(params)
           )
 
           raise ArgumentError, 'Invalid Signature'
+        end
+
+        # The signature arrives percent encoded from any conformant peer, but
+        # versions of this library before 1.4.1 emitted it raw. A percent sign
+        # is not in the base64 alphabet, so its presence distinguishes the two
+        # without a guess. Unescaping unconditionally would corrupt a raw
+        # signature, because CGI.unescape turns + into a space.
+        #
+        # @param signature [String] the Signature query parameter.
+        def signature_from(signature)
+          signature.include?('%') ? unescape(signature) : signature
         end
 
         def canonicalize(params)
