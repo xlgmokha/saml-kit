@@ -12,7 +12,7 @@ AllCops:
     - 'spec/examples/**/*'
     - 'tmp/**/*'
     - 'vendor/**/*'
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.2
 
 Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
