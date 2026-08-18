@@ -1,4 +1,4 @@
-Version 1.5.0
+Version 1.5.1
 
 # Changelog
 All notable changes to this project will be documented in this file.
@@ -7,6 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.5.1] - 2026-08-18
+### Fixed
+- Compile the SAML XSDs without `Dir.chdir`. Schema compilation ran inside a
+  `Dir.chdir` block, which mutates process global state, so two threads
+  validating a document at the same time could raise `conflicting chdir during
+  another chdir block`. Each schema is now parsed as a document carrying its own
+  path, so its relative imports resolve without changing the working directory.
+- Compile each XSD once instead of on every `valid?` call.
 
 ## [1.5.0] - 2026-08-17
 ### Security
@@ -142,7 +151,8 @@ exploitable or is a side effect of closing one that was.
 ### Removed
 - Removed optional SessionNotOnOrAfter attribute from AuthnStatement.
 
-[Unreleased]: https://github.com/xlgmokha/saml-kit/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/xlgmokha/saml-kit/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/xlgmokha/saml-kit/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/xlgmokha/saml-kit/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/xlgmokha/saml-kit/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/xlgmokha/saml-kit/compare/v1.3.0...v1.4.0
