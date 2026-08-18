@@ -1,4 +1,4 @@
-Version 1.4.1
+Version 1.5.0
 
 # Changelog
 All notable changes to this project will be documented in this file.
@@ -7,6 +7,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.5.0] - 2026-08-17
+### Security
+- Reject a `Response` or `Assertion` that carries no signature. A registered
+  issuer was previously enough to make an unsigned document valid, so anyone
+  who could reach the assertion consumer service could forge an assertion for
+  any user. (GHSA-hx7c-98jm-7r55)
+- Require an xml signature to reference the element it is attached to. A
+  signature was verified without checking which element it covered, so a valid
+  signature could be copied onto a forged element with the element it really
+  covered hidden in `saml:Advice` or `ds:Object`. (GHSA-q726-45rx-qvrw)
+
+### Changed
+This release rejects documents that 1.4.1 accepted. Each case below was
+exploitable or is a side effect of closing one that was.
+
+- An unsigned `Response` or `Assertion` is now invalid, even when its issuer is
+  registered. Set `configuration.signature_required = false` to restore the old
+  behaviour while an identity provider is being fixed; doing so accepts forged
+  assertions. Signing only the `Assertion` is still accepted, as is an unsigned
+  `AuthnRequest`, `LogoutRequest` or `LogoutResponse`.
+- `Response.build` on a `Configuration` with no signing key pair emits an
+  unsigned document, which now fails `valid?`. Call
+  `generate_key_pair_for(use: :signing)` or `add_key_pair`.
+- `Assertion.new` with an unsigned assertion as a `String` is now invalid,
+  because a bare assertion is the whole document and nothing else vouches for
+  it. Passing the same assertion as a node nested in a `Response` is unchanged.
+- A signature whose `ds:Reference` does not resolve to the element it hangs
+  off, or resolves to more than one element, adds an error on `:reference`.
+
+### Added
+- `Saml::Kit::Configuration#signature_required`, defaulting to `true`.
 
 ## [1.4.1] - 2026-08-14
 ### Changed
@@ -110,7 +142,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed optional SessionNotOnOrAfter attribute from AuthnStatement.
 
-[Unreleased]: https://github.com/xlgmokha/saml-kit/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/xlgmokha/saml-kit/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/xlgmokha/saml-kit/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/xlgmokha/saml-kit/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/xlgmokha/saml-kit/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/xlgmokha/saml-kit/compare/v1.2.0...v1.3.0

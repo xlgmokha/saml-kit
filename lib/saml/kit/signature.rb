@@ -11,6 +11,7 @@ module Saml
 
       validate :validate_signature
       validate :validate_certificate
+      validate :validate_reference
 
       attr_reader :name
 
@@ -20,18 +21,24 @@ module Saml
       end
 
       # Returns the embedded X509 Certificate
+      #
+      # Memoized with a `defined?` guard rather than `||=` because a signature
+      # without KeyInfo legitimately has no certificate, and callers depend on
+      # the nil.
       def certificate
-        xpath = './ds:KeyInfo/ds:X509Data/ds:X509Certificate'
-        value = at_xpath(xpath).try(:text)
-        return if value.nil?
+        return @certificate if defined?(@certificate)
 
-        ::Xml::Kit::Certificate.new(value, use: :signing)
+        value = at_xpath('./ds:KeyInfo/ds:X509Data/ds:X509Certificate').try(:text)
+        @certificate =
+          value.nil? ? nil : ::Xml::Kit::Certificate.new(value, use: :signing)
       end
 
       # Returns true when the fingerprint of the certificate matches one of
       # the certificates registered in the metadata.
       def trusted?(metadata)
         return false if metadata.nil?
+        return false if certificate.nil?
+        return false unless reference.bound?
 
         metadata.matches?(certificate.fingerprint, use: :signing).present?
       end
@@ -66,15 +73,9 @@ module Saml
       end
 
       def transforms
-        xpath = xpath_for([
-          '.',
-          'ds:SignedInfo',
-          'ds:Reference',
-          'ds:Transforms',
-          'ds:Transform',
-          '@Algorithm',
-        ])
-        node.search(xpath, Saml::Kit::Document::NAMESPACES).try(:map, &:value)
+        xpath = './ds:SignedInfo/ds:Reference/ds:Transforms/ds:Transform'
+        node.search("#{xpath}/@Algorithm", Saml::Kit::Document::NAMESPACES)
+          .try(:map, &:value)
       end
 
       # Returns the XML Hash.
@@ -109,6 +110,17 @@ module Saml
         errors.add(:base, error.message)
       end
 
+      def validate_reference
+        return unless present?
+        return if reference.bound?
+
+        errors.add(:reference, error_message(:reference))
+      end
+
+      def reference
+        @reference ||= SignatureReference.new(node)
+      end
+
       def validate_certificate(now = Time.now.utc)
         return unless certificate.present?
         return if certificate.active?(now)
@@ -128,11 +140,7 @@ module Saml
       end
 
       def dsignature
-        @dsignature ||= Xmldsig::Signature.new(node, 'ID=$uri or @Id')
-      end
-
-      def xpath_for(segments)
-        segments.join('/')
+        @dsignature ||= Xmldsig::Signature.new(node, SignatureReference::ID_ATTR)
       end
     end
   end

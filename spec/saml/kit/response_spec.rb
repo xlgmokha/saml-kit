@@ -585,26 +585,28 @@ RSpec.describe Saml::Kit::Response do
   end
 
   describe '#build' do
-    it 'can build a response without a request' do
-      configuration = Saml::Kit::Configuration.new do |config|
+    let(:configuration) do
+      Saml::Kit::Configuration.new do |config|
         config.entity_id = FFaker::Internet.uri('https')
+        config.generate_key_pair_for(use: :signing)
       end
-      sp = Saml::Kit::Metadata.build(&:build_service_provider)
+    end
+    let(:sp) do
+      Saml::Kit::Metadata.build(configuration: configuration, &:build_service_provider)
+    end
+
+    before do
       allow(configuration.registry).to receive(:metadata_for).with(configuration.entity_id).and_return(sp)
+    end
+
+    it 'can build a response without a request' do
       result = described_class.build(user, configuration: configuration)
       expect(result).to be_instance_of(described_class)
       expect(result).to be_valid
     end
 
     it 'can build a response without the need for the user to provide attributes' do
-      configuration = Saml::Kit::Configuration.new do |config|
-        config.entity_id = FFaker::Internet.uri('https')
-      end
-      sp = Saml::Kit::Metadata.build(&:build_service_provider)
-      allow(configuration.registry).to receive(:metadata_for).with(configuration.entity_id).and_return(sp)
-      user = UserWithoutAttributes.new
-
-      result = described_class.build(user, configuration: configuration)
+      result = described_class.build(UserWithoutAttributes.new, configuration: configuration)
       expect(result).to be_instance_of(described_class)
       expect(result).to be_valid
       expect(result.attributes).to be_empty

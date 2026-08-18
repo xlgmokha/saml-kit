@@ -46,6 +46,13 @@ module Saml
       attr_accessor :logger
       # The total allowable clock drift for session timeout validation.
       attr_accessor :clock_drift
+      # Whether a document that asserts an identity must carry a signature.
+      #
+      # An unsigned Response or Assertion proves nothing about who issued it,
+      # so this defaults to true and should stay that way. Set it to false only
+      # to keep an identity provider that signs nothing working while it is
+      # being fixed, and understand that doing so accepts forged assertions.
+      attr_accessor :signature_required
 
       def initialize
         @clock_drift = 30.seconds
@@ -55,6 +62,7 @@ module Saml
         @registry = DefaultRegistry.new
         @session_timeout = 3.hours
         @signature_method = :SHA256
+        @signature_required = true
         yield self if block_given?
       end
 

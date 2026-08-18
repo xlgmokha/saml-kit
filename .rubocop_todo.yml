@@ -57,6 +57,11 @@ Lint/DeprecatedOpenSSLConstant:
 Metrics/AbcSize:
   Max: 19
 
+# Offense count: 1
+# Configuration parameters: CountComments, CountAsOne.
+Metrics/ClassLength:
+  Max: 102
+
 # Offense count: 5
 # Configuration parameters: CountComments, CountAsOne, AllowedMethods, AllowedPatterns.
 Metrics/MethodLength:

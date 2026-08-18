@@ -41,10 +41,26 @@ module Saml
 
       private
 
+      def signature_required_by_type?
+        true
+      end
+
+      # `signed?` and `trusted?` deliberately report only this element's own
+      # signature, but signing only the Assertion is a common identity provider
+      # configuration, and that signature covers the identity being asserted.
+      def signature_covers_document?
+        signed? || assertion.signed?
+      end
+
+      def signature_trusted?
+        super || (assertion.signed? && assertion.trusted?)
+      end
+
       def must_be_valid_assertion
         assertion.valid?
         assertion.each_error do |attribute, error|
-          errors.add(attribute == :base ? :assertion : attribute, error)
+          attribute = :assertion if attribute == :base
+          errors.add(attribute, error) unless errors.added?(attribute, error)
         end
       end
 

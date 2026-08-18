@@ -89,9 +89,7 @@ module Saml
       end
 
       def decryptable?
-        return true unless encrypted?
-
-        !@cannot_decrypt
+        !encrypted? || !@cannot_decrypt
       end
 
       def to_s
@@ -99,6 +97,12 @@ module Saml
       end
 
       private
+
+      # A nested Assertion is covered by the enclosing Response's policy; a
+      # bare one is the whole document and has nothing else vouching for it.
+      def signature_required_by_type?
+        to_nokogiri == to_nokogiri.document.root
+      end
 
       def decrypt(decryptor)
         encrypted_assertion = at_xpath('./xmlenc:EncryptedData')
