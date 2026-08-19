@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- `CompositeMetadata#identity_provider` and `#service_provider` returned `nil`.
+  `attr_reader` declared them but `initialize` only assigned `@metadatum`, so
+  both readers had answered `nil` since the class was added in 2017. Because
+  `attr_reader` defines the methods, `respond_to?` answered `true` and
+  `method_missing` never delegated, so a caller got a silent `nil` instead of a
+  `NoMethodError`.
 
 ## [1.5.1] - 2026-08-18
 ### Fixed

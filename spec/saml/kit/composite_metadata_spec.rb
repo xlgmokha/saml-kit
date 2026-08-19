@@ -69,6 +69,33 @@ RSpec.describe Saml::Kit::CompositeMetadata do
     XML
   end
 
+  # Both readers returned nil from the original 2017 commit until 1.6.0.
+  # attr_reader declared them but initialize only assigned @metadatum, and
+  # because attr_reader defines the methods, respond_to? answered true and
+  # method_missing never got a chance to delegate -- so a caller got a silent
+  # nil rather than a NoMethodError.
+  describe '#identity_provider' do
+    it 'returns the IDPSSODescriptor half' do
+      expect(subject.identity_provider).to be_a(Saml::Kit::IdentityProviderMetadata)
+      expect(subject.identity_provider.single_sign_on_service_for(binding: :http_post)).to eql(
+        Saml::Kit::Bindings::HttpPost.new(location: sign_on_service)
+      )
+    end
+  end
+
+  describe '#service_provider' do
+    it 'returns the SPSSODescriptor half' do
+      expect(subject.service_provider).to be_a(Saml::Kit::ServiceProviderMetadata)
+      expect(subject.service_provider.assertion_consumer_service_for(binding: :http_post)).to eql(
+        Saml::Kit::Bindings::HttpPost.new(location: assertion_consumer_service)
+      )
+    end
+  end
+
+  it 'enumerates the same two objects the readers return' do
+    expect(subject.to_a).to eql([subject.service_provider, subject.identity_provider])
+  end
+
   describe '#single_sign_on_services' do
     it 'returns the single sign on services from the idp' do
       expect(subject.single_sign_on_services).to match_array([

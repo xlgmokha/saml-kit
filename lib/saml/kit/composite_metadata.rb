@@ -14,10 +14,9 @@ module Saml
 
       def initialize(xml)
         super('IDPSSODescriptor', xml)
-        @metadatum = [
-          Saml::Kit::ServiceProviderMetadata.new(xml),
-          Saml::Kit::IdentityProviderMetadata.new(xml),
-        ]
+        @service_provider = Saml::Kit::ServiceProviderMetadata.new(xml)
+        @identity_provider = Saml::Kit::IdentityProviderMetadata.new(xml)
+        @metadatum = [@service_provider, @identity_provider]
       end
 
       def organization
