@@ -53,6 +53,29 @@ module Saml
       # to keep an identity provider that signs nothing working while it is
       # being fixed, and understand that doing so accepts forged assertions.
       attr_accessor :signature_required
+      # Whether an Assertion must carry an AudienceRestriction naming this
+      # entity.
+      #
+      # Profiles 4.1.4.2 requires one on any assertion with a bearer subject
+      # confirmation. Without it nothing binds the assertion to this service
+      # provider, so an assertion issued for one service provider is accepted
+      # by every other one trusting the same identity provider.
+      attr_accessor :audience_required
+      # Whether an Assertion must carry a conformant bearer
+      # SubjectConfirmation: a Method of bearer, a NotOnOrAfter that has not
+      # passed, and no NotBefore (Profiles 4.1.4.2 and 4.1.4.3).
+      attr_accessor :subject_confirmation_required
+      # Whether an Assertion must carry an AuthnStatement (Profiles 4.1.4.2).
+      #
+      # An assertion that states no authentication event is not evidence that
+      # anyone authenticated.
+      attr_accessor :authn_statement_required
+      # Whether a LogoutRequest or LogoutResponse must carry a signature.
+      #
+      # Profiles 4.4.3.1 and 4.4.3.4 require one for the POST and Redirect
+      # bindings, the only two this library implements. Without it anyone can
+      # terminate any user's session by naming a registered issuer.
+      attr_accessor :logout_signature_required
 
       def initialize
         @clock_drift = 30.seconds
@@ -63,6 +86,7 @@ module Saml
         @session_timeout = 3.hours
         @signature_method = :SHA256
         @signature_required = true
+        disable_conformance_checks
         yield self if block_given?
       end
 
@@ -123,6 +147,16 @@ module Saml
       end
 
       private
+
+      # Every check added for the Web Browser SSO profile starts switched off,
+      # so 1.6.0 changes no behaviour for anyone. 2.0.0 flips these to true,
+      # and this is the only place that has to change.
+      def disable_conformance_checks
+        @audience_required = false
+        @authn_statement_required = false
+        @logout_signature_required = false
+        @subject_confirmation_required = false
+      end
 
       def ensure_proper_use(use)
         return if USES.include?(use)

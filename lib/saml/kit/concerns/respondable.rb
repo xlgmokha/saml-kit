@@ -7,7 +7,11 @@ module Saml
     # .e.g. Response, LogoutResponse
     module Respondable
       extend ActiveSupport::Concern
-      attr_reader :request_id
+      # The id of the request this message answers.
+      #
+      # Only the application knows which request it stored, so the
+      # InResponseTo check stays inert until this is assigned.
+      attr_accessor :request_id
 
       included do
         validates_inclusion_of :status_code, in: [Namespaces::SUCCESS]

@@ -10,11 +10,7 @@ xml.Assertion(assertion_options) do
     end
   end
   xml.Conditions conditions_options do
-    if request.present?
-      xml.AudienceRestriction do
-        xml.Audience request.issuer
-      end
-    end
+    audience_restriction_for(xml)
   end
   xml.AuthnStatement authn_statement_options do
     xml.AuthnContext do

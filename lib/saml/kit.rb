@@ -17,7 +17,9 @@ require 'securerandom'
 require 'uri'
 require 'xml/kit'
 
+require 'saml/kit/concerns/bearer_confirmable'
 require 'saml/kit/concerns/buildable'
+require 'saml/kit/concerns/conformable'
 require 'saml/kit/concerns/requestable'
 require 'saml/kit/concerns/respondable'
 require 'saml/kit/concerns/serializable'
@@ -53,6 +55,7 @@ require 'saml/kit/identity_provider_metadata'
 require 'saml/kit/invalid_document'
 require 'saml/kit/service_provider_metadata'
 require 'saml/kit/signature'
+require 'saml/kit/subject_confirmation'
 
 I18n.load_path +=
   Dir[File.expand_path('kit/locales/*.yml', File.dirname(__FILE__))]
@@ -80,9 +83,26 @@ module Saml
         configuration.registry
       end
 
+      # The deprecator this gem warns through. Assign its `behavior` to
+      # silence or redirect conformance warnings.
+      def deprecator
+        @deprecator ||= ActiveSupport::Deprecation.new('2.0.0', 'saml-kit')
+      end
+
       def deprecate(message)
-        @deprecation ||= ActiveSupport::Deprecation.new('2.0.0', 'saml-kit')
-        @deprecation.deprecation_warning(message)
+        deprecator.deprecation_warning(message)
+      end
+
+      # Warns about a document that 2.0.0 will reject.
+      #
+      # Uses `warn` rather than `deprecation_warning` because nothing is being
+      # removed from the gem: a document the current defaults accept is going
+      # to stop being accepted.
+      def warn_conformance(message)
+        deprecator.warn(
+          "#{message}. saml-kit 2.0.0 will reject this by default. " \
+          'See the Conformance section of the README.'
+        )
       end
     end
   end

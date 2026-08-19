@@ -23,23 +23,35 @@ module Saml
         super(xml, name: 'Response', configuration: configuration)
       end
 
+      # The assertion consumer service url this response was received at.
+      attr_reader :expected_recipient
+
+      # Assigns the assertion consumer service url this response was received
+      # at, forwarding it to the Assertion, which is what carries the
+      # Recipient the specs ask us to compare against.
+      def expected_recipient=(value)
+        @expected_recipient = value
+        return unless @assertion.is_a?(Saml::Kit::Assertion)
+
+        @assertion.expected_recipient = value
+      end
+
       def assertion(private_keys = configuration.private_keys(use: :encryption))
-        @assertion ||=
-          begin
-            node = assertion_nodes.last
-            if node.nil?
-              Saml::Kit::NullAssertion.new
-            else
-              Saml::Kit::Assertion.new(
-                node,
-                configuration: @configuration,
-                private_keys: private_keys
-              )
-            end
-          end
+        @assertion ||= build_assertion(private_keys)
       end
 
       private
+
+      def build_assertion(private_keys)
+        node = assertion_nodes.last
+        return Saml::Kit::NullAssertion.new if node.nil?
+
+        assertion = Saml::Kit::Assertion.new(
+          node, configuration: @configuration, private_keys: private_keys
+        )
+        assertion.expected_recipient = expected_recipient
+        assertion
+      end
 
       def signature_required_by_type?
         true

@@ -58,6 +58,19 @@ module Saml
       def to_s
         content
       end
+
+      private
+
+      # Parses an xsd:dateTime attribute value.
+      #
+      # A value we cannot parse becomes the epoch rather than nil, so a
+      # malformed timestamp reads as "long past" and fails closed.
+      def parse_iso8601(value)
+        DateTime.parse(value)
+      rescue StandardError => error
+        Saml::Kit.logger.error(error)
+        Time.at(0).to_datetime
+      end
     end
   end
 end

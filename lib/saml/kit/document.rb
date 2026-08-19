@@ -6,6 +6,7 @@ module Saml
     class Document
       include Validatable
       include Buildable
+      include Conformable
       include Translatable
       include Trustable
       include XmlParseable

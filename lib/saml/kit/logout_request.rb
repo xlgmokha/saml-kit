@@ -65,6 +65,15 @@ module Saml
 
       private
 
+      # Profiles 4.4.3.1 requires a LogoutRequest to be signed when it is
+      # delivered by the POST or Redirect binding, which are the only two
+      # bindings this library implements. Opt in until 2.0.0, because
+      # saml-kit has never required it and a peer running saml-kit may
+      # therefore not sign.
+      def signature_required_by_type?
+        configuration.logout_signature_required
+      end
+
       def single_logout_service
         return if provider.nil?
 

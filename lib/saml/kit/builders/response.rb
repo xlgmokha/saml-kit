@@ -68,6 +68,12 @@ module Saml
           assertion.destination = value
         end
 
+        # Assigns the audience the assertion is addressed to. Needed for an
+        # unsolicited response, which has no request to derive it from.
+        def audience=(value)
+          assertion.audience = value
+        end
+
         def issuer=(value)
           @issuer = value
           assertion.issuer = value

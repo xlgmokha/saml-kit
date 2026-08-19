@@ -24,13 +24,13 @@ module Saml
         search('./saml:AudienceRestriction/saml:Audience').map(&:text)
       end
 
-      private
-
-      def parse_iso8601(value)
-        DateTime.parse(value)
-      rescue StandardError => error
-        Saml::Kit.logger.error(error)
-        Time.at(0).to_datetime
+      # Returns true when the assertion is marked for single use.
+      #
+      # Core 2.5.1.5 obliges a relying party that retains assertions to honour
+      # this. Enforcing it needs a cache of processed assertion ids, which is
+      # the integrating application's responsibility, not this library's.
+      def one_time_use?
+        search('./saml:OneTimeUse').any?
       end
     end
   end

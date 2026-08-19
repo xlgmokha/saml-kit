@@ -16,6 +16,15 @@ module Saml
         @request_id = request_id
         super(xml, name: 'LogoutResponse', configuration: configuration)
       end
+
+      private
+
+      # Profiles 4.4.3.4 requires a LogoutResponse to be signed when it is
+      # delivered by the POST or Redirect binding. See LogoutRequest for why
+      # this is opt in until 2.0.0.
+      def signature_required_by_type?
+        configuration.logout_signature_required
+      end
     end
   end
 end

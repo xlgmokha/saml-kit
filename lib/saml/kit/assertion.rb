@@ -7,6 +7,7 @@ module Saml
     # of a SAML document.
     class Assertion < Document
       extend Forwardable
+      include BearerConfirmable
       XPATH = [
         '/samlp:Response/saml:Assertion',
         '/samlp:Response/saml:EncryptedAssertion'
@@ -15,7 +16,6 @@ module Saml
       def_delegators :attribute_statement, :attributes
 
       validate :must_be_decryptable
-      validate :must_match_issuer, if: :decryptable?
       validate :must_be_active_session, if: :decryptable?
       validate :must_have_valid_signature, if: :decryptable?
       attr_reader :name, :configuration
@@ -113,12 +113,6 @@ module Saml
       rescue StandardError => error
         @cannot_decrypt = true
         Saml::Kit.logger.error(error)
-      end
-
-      def must_match_issuer
-        return if audiences.empty? || audiences.include?(configuration.entity_id)
-
-        errors.add(:audience, error_message(:must_match_issuer))
       end
 
       def must_be_active_session

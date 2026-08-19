@@ -13,6 +13,7 @@ module Saml
         attr_accessor :now, :destination
         attr_accessor :issuer, :version
         attr_accessor :default_name_id_format
+        attr_writer :audience
 
         def initialize(user, request, configuration: Saml::Kit.configuration)
           @user = user
@@ -23,6 +24,15 @@ module Saml
           @version = '2.0'
           @now = Time.now.utc
           self.default_name_id_format = Saml::Kit::Namespaces::UNSPECIFIED_NAMEID
+        end
+
+        # The audience this assertion is addressed to.
+        #
+        # Defaults to the requesting service provider, so a solicited
+        # assertion is unchanged. An unsolicited one has no request to derive
+        # it from, so only the caller can supply it.
+        def audience
+          @audience || request.try(:issuer)
         end
 
         def name_id_format
@@ -44,6 +54,25 @@ module Saml
         end
 
         private
+
+        # Profiles 4.1.4.2 requires an AudienceRestriction on every assertion
+        # carrying a bearer subject confirmation, and says so unconditionally
+        # -- it covers the case where the response answers no request.
+        #
+        # An assertion with no audience is accepted by every service provider
+        # trusting the issuer, so emitting one is a defect we warn about now
+        # and refuse in 2.0.0.
+        def audience_restriction_for(xml)
+          return warn_missing_audience if audience.blank?
+
+          xml.AudienceRestriction { xml.Audience audience }
+        end
+
+        def warn_missing_audience
+          Saml::Kit.warn_conformance(
+            'Building an Assertion with no AudienceRestriction'
+          )
+        end
 
         def assertion_options
           {

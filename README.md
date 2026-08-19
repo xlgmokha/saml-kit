@@ -237,6 +237,101 @@ puts [url, saml_params].inspect
 # ["https://www.example.com/logout", {"SAMLResponse"=>"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48TG9nb3V0UmVzcG9uc2UgeG1sbnM9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpwcm90b2NvbCIgSUQ9Il9kZDA2YmY5MC04ODI2LTQ5ZTMtYmYxNS1jYzAxMWJkNzU3NGEiIFZlcnNpb249IjIuMCIgSXNzdWVJbnN0YW50PSIyMDE3LTEyLTE5VDA1OjQyOjQyWiIgRGVzdGluYXRpb249Imh0dHBzOi8vd3d3LmV4YW1wbGUuY29tL2xvZ291dCIgSW5SZXNwb25zZVRvPSJfYmVhZjJiN2ItMDlmNC00ZmFkLWJkYmYtOWQ0ZDc1N2I5ZDU0Ij48SXNzdWVyIHhtbG5zPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIi8+PFN0YXR1cz48U3RhdHVzQ29kZSBWYWx1ZT0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnN0YXR1czpTdWNjZXNzIi8+PC9TdGF0dXM+PC9Mb2dvdXRSZXNwb25zZT4="}]
 ```
 
+## Conformance
+
+This library validates what it can determine from a document and your
+`Configuration`. It is not the service provider, so the checks that need state
+or request context are yours -- see "Your responsibilities" below.
+
+### Profile checks
+
+Four checks from the SAML 2.0 Web Browser SSO profile ship switched off, so
+upgrading to 1.6.0 changes nothing. Each will default to `true` in 2.0.0 and
+each stays available afterwards to turn back off. While a check is off, a
+document that would fail it logs a warning naming 2.0.0, so you can find out
+what your identity providers actually send before the defaults change.
+
+```ruby
+Saml::Kit.configure do |configuration|
+  configuration.audience_required = true
+  configuration.subject_confirmation_required = true
+  configuration.authn_statement_required = true
+  configuration.logout_signature_required = true
+end
+```
+
+| Flag | Requires | Spec |
+| ---- | -------- | ---- |
+| `audience_required` | an `AudienceRestriction` naming your `entity_id` | Profiles 4.1.4.2 |
+| `subject_confirmation_required` | a bearer `SubjectConfirmation` with an unexpired `NotOnOrAfter` and no `NotBefore` | Profiles 4.1.4.2, 4.1.4.3 |
+| `authn_statement_required` | an `AuthnStatement` | Profiles 4.1.4.2 |
+| `logout_signature_required` | a signature on `LogoutRequest` and `LogoutResponse` | Profiles 4.4.3.1, 4.4.3.4 |
+
+`logout_signature_required` composes with `signature_required`, which stays the
+master switch: with signatures off entirely, logout signatures are not forced
+back on.
+
+Without an audience, an assertion issued for one service provider is accepted
+by every other service provider that trusts the same identity provider. That is
+the check to enable first.
+
+### Telling a document what you expect
+
+Three checks compare a document against something only your application knows.
+Each is unset by default and stays inert until you assign it, so none of them
+changes behaviour on upgrade.
+
+```ruby
+response = binding.deserialize(params)
+response.expected_destination = request.url            # Core 3.2.2
+response.expected_recipient = acs_url                  # Profiles 4.1.4.3
+response.request_id = session.delete(:saml_request_id)  # Profiles 4.1.4.3
+raise unless response.valid?
+```
+
+Assign all three. Together with the audience they are what ties an assertion to
+this service provider, this endpoint and this login attempt; leave them unset
+and a signed assertion is a bearer token that works anywhere its issuer is
+trusted. Url comparison ignores only differences that are equivalent by
+definition: the case of the scheme and host, and a default port written out.
+
+### Your responsibilities
+
+- **Single use.** Profiles 4.1.4.5 requires a service provider to reject a
+  replayed assertion by remembering the ids it has processed. That needs
+  storage this library does not have and should not choose for you -- an
+  in-process cache would silently fail across Puma workers or dynos. Use
+  `assertion.id` and the bearer window:
+
+  ```ruby
+  confirmation = response.assertion.bearer_confirmation
+  ttl = confirmation.expired_at.to_time - Time.now.utc
+  raise 'replayed assertion' unless Rails.cache.write(
+    "saml:assertion:#{response.assertion.id}", true, expires_in: ttl, unless_exist: true
+  )
+  ```
+
+  `assertion.conditions.one_time_use?` reports a `OneTimeUse` condition, which
+  Core 2.5.1.5 obliges you to honour if you retain assertions at all.
+- **Transport.** Profiles recommends TLS on the assertion consumer service and
+  single logout endpoints. Nothing here can check that for you.
+- **Reading `AssertionConsumerServiceURL` off an `AuthnRequest`.**
+  `AuthenticationRequest#assertion_consumer_service_url` returns what the
+  request claimed, which is unverified even when the request is signed.
+  Profiles 4.1.4.1 requires an identity provider to confirm the url belongs to
+  the service provider it is answering, or a man in the middle can redirect the
+  assertion. `response_for` already does the right thing by taking the endpoint
+  from registered metadata; if you route responses yourself, resolve the url
+  through `provider.assertion_consumer_service_for(binding:)` instead.
+
+### Silencing the warnings
+
+The warnings use `ActiveSupport::Deprecation`, so the standard hooks apply.
+
+```ruby
+Saml::Kit.deprecator.behavior = :silence if Rails.env.test?
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

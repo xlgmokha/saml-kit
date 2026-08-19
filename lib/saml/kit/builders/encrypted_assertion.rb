@@ -16,6 +16,7 @@ module Saml
           :encryption_certificate
 
         def_delegators :@assertion,
+          :audience=,
           :default_name_id_format,
           :default_name_id_format=,
           :destination=,

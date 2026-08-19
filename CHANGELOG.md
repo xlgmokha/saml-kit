@@ -1,4 +1,4 @@
-Version 1.5.1
+Version 1.6.0
 
 # Changelog
 All notable changes to this project will be documented in this file.
@@ -7,6 +7,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.6.0] - 2026-08-19
+### Added
+- Four `Configuration` flags for SAML 2.0 Web Browser SSO profile conformance.
+  All default to `false`, so this release changes no behaviour. Each will
+  default to `true` in 2.0.0, and each remains available afterwards as a
+  per-check escape hatch.
+  - `audience_required` -- an Assertion must carry an `AudienceRestriction`
+    naming this entity (Profiles 4.1.4.2).
+  - `subject_confirmation_required` -- an Assertion must carry a bearer
+    `SubjectConfirmation` with a `NotOnOrAfter` that has not passed and no
+    `NotBefore` (Profiles 4.1.4.2, 4.1.4.3).
+  - `authn_statement_required` -- an Assertion must carry an `AuthnStatement`
+    (Profiles 4.1.4.2).
+  - `logout_signature_required` -- a `LogoutRequest` or `LogoutResponse` must
+    carry a signature (Profiles 4.4.3.1, 4.4.3.4). Composes with
+    `signature_required`, which remains the master switch.
+- `Saml::Kit::SubjectConfirmation`, plus `Assertion#subject_confirmations` and
+  `Assertion#bearer_confirmation`, exposing the bearer `Recipient`,
+  `NotOnOrAfter` and `InResponseTo`.
+- `Conditions#one_time_use?`. Enforcing single use needs a cache of processed
+  assertion ids, which belongs to the integrating application; this and
+  `Assertion#id` are what it needs to build one.
+- `#expected_destination` on every document, and `#expected_recipient` on
+  `Response` and `Assertion`. Only the application knows the url a message
+  arrived at, so both are unset by default and their checks stay inert until
+  assigned (Core 3.2.2, Bindings 3.4.5.2 and 3.5.5.2, Profiles 4.1.4.3).
+- `Builders::Assertion#audience=` and `Builders::Response#audience=`, so an
+  unsolicited response can name the audience it is addressed to.
+
+### Changed
+- `request_id` is now an `attr_accessor` on `Respondable`. It was read only, so
+  a caller who deserialized a response through a binding had no way to switch
+  the `InResponseTo` check on.
+- Building an Assertion with no audience now warns. Profiles 4.1.4.2 requires
+  an `AudienceRestriction` unconditionally, including on a response that
+  answers no request, and an assertion without one is accepted by every
+  service provider that trusts the issuer. Supply `audience` to fix it; a
+  response built from a request is unchanged and still derives the audience
+  from the requesting service provider.
+
+### Deprecated
+- A document that would fail any of the new checks emits a warning naming
+  2.0.0. Silence it through the standard `ActiveSupport::Deprecation`
+  behaviour hooks, but prefer reading it: it names what a real identity
+  provider is sending that 2.0.0 will reject.
+
 ### Fixed
 - `CompositeMetadata#identity_provider` and `#service_provider` returned `nil`.
   `attr_reader` declared them but `initialize` only assigned `@metadatum`, so
@@ -14,6 +61,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `attr_reader` defines the methods, `respond_to?` answered `true` and
   `method_missing` never delegated, so a caller got a silent `nil` instead of a
   `NoMethodError`.
+- Added missing error translations. `LogoutRequest` and `LogoutResponse` had no
+  `invalid`, `invalid_version` or `unsigned` key and `AuthnRequest` had no
+  `invalid_version`, so those errors rendered as the literal string
+  `Translation missing: ...`.
 
 ## [1.5.1] - 2026-08-18
 ### Fixed
@@ -158,7 +209,8 @@ exploitable or is a side effect of closing one that was.
 ### Removed
 - Removed optional SessionNotOnOrAfter attribute from AuthnStatement.
 
-[Unreleased]: https://github.com/xlgmokha/saml-kit/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/xlgmokha/saml-kit/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/xlgmokha/saml-kit/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/xlgmokha/saml-kit/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/xlgmokha/saml-kit/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/xlgmokha/saml-kit/compare/v1.4.0...v1.4.1
